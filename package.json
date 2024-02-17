@@ -1,0 +1,15 @@
+{
+  "workspaces": [
+    "packages/models"
+  ],
+  "dependencies": {
+    "itu-utils": "^1.8.1",
+    "lerna": "^8.1.2",
+    "ts-actors": "^2.3.2",
+    "tsmonads": "^3.1.0"
+  },
+  "name": "recapp",
+  "devDependencies": {
+    "@featherscloud/pinion": "^0.5.3"
+  }
+}

@@ -8,8 +8,8 @@ export const commentSchema = zod
 		text: zod.string(), // Query test
 		upvoters: zod.set(uidSchema), // Who upvoted the query
 		answered: zod.boolean(), // Was the query marked as answered by the teacher
-		relatedQuestion: uidSchema.optional(), // Optional relation to question if comment was generated from there
+		relatedQuestion: uidSchema, // Optional relation to question if comment was generated from there
 	})
 	.merge(idEntitySchema);
 
-export type StudentQuery = zod.infer<typeof commentSchema>;
+export type Comment = zod.infer<typeof commentSchema>;

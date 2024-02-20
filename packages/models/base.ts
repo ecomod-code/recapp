@@ -1,16 +1,19 @@
+import { Timestamp } from "itu-utils";
 import zod from "zod";
 
-export const timestampSchema = zod.object({
-	value: zod.number().int(),
-	type: zod.enum(["Timestamp"]),
-});
+export const timestampSchema = zod
+	.object({
+		value: zod.number().int(),
+		type: zod.enum(["Timestamp"]),
+	})
+	.transform(value => new Timestamp(value.value));
 
 /** UID type */
-export declare const uidSchema: zod.ZodBranded<zod.ZodString, "Id">;
+export const uidSchema = zod.string().brand("UID");
 export type Id = zod.infer<typeof uidSchema>;
 
 /** Actor or actor system uri */
-export declare const actorUriSchema: zod.ZodBranded<zod.ZodString, "ActorUri">;
+export const actorUriSchema = zod.string().brand("ActorUri");
 export type ActorUri = zod.infer<typeof actorUriSchema>;
 
 export const idEntitySchema = zod.object({

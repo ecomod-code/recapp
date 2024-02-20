@@ -13,7 +13,7 @@ export const choiceElementStatisticsSchema = zod.object({
 	participants: zod.number().int(), // Number of participants who answered the question
 	answers: zod.map(zod.number().int(), zod.number().int()), // Number of answers for each option
 	correct: zod.set(zod.number().int()), // Which answers are correct
-	passed: zod.number().int(), // How many people answered the question corectly
+	passed: zod.number().int(), // How many people answered the question correctly
 });
 
 export type ChoiceElementStatistics = zod.infer<typeof choiceElementStatisticsSchema>;

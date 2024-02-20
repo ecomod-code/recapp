@@ -1,18 +1,7 @@
-import { useContext, useEffect, useState } from "react";
-import { SystemContext } from "./SystemContext";
+import { User } from "@recapp/models";
+import { useStatefulActor } from "./hooks/useStatefulActor";
 
 export const Data: React.FC = () => {
-	const system = useContext(SystemContext);
-	const [state, setState] = useState<any>({});
-	useEffect(() => {
-		system
-			?.ask("actors://recapp-backend/UserStore", {
-				UserStoreMessage: "GetUser",
-				value: "hendrik.belitz",
-			})
-			.then(result => {
-				setState(result);
-			});
-	}, [system]);
+	const [_, state] = useStatefulActor<User>("LocalUser", {} as User);
 	return <div>{JSON.stringify(state)}</div>;
 };

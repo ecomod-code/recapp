@@ -116,7 +116,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					idToken: tokenSet.id_token ?? "",
 					accessToken: tokenSet.access_token ?? "",
 					refreshToken: tokenSet.refresh_token ?? "",
-					userId: decoded.sub as Id,
+					uid: decoded.sub as Id,
 					expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
 					role,
 				})
@@ -163,7 +163,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 			system.send(
 				sessionStore,
 				SessionStoreMessages.StoreSession({
-					userId: sub as Id,
+					uid: sub as Id,
 					idToken: newTokenSet.id_token ?? "",
 					accessToken: newTokenSet.access_token ?? "",
 					refreshToken: newTokenSet.refresh_token ?? "",

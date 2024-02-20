@@ -6,3 +6,4 @@ sandbox.nbb
 .env
 .env.production
 .env.development
+docker/mongo/

@@ -58,8 +58,8 @@ const start = async () => {
 		});
 		const system = await DistributedActorSystem.create({ distributor, systemName, logger });
 		Container.set("actor-system", system);
-		await system.createActor(SessionStore, { name: "SessionStore" });
-		await system.createActor(UserStore, { name: "UserStore" });
+		await system.createActor(SessionStore, { name: "SessionStore", strategy: "Restart" });
+		await system.createActor(UserStore, { name: "UserStore", strategy: "Restart" });
 	} catch (err) {
 		console.error(err);
 		process.exit(1);

@@ -16,10 +16,12 @@ export const createActorUri = (actorName: string): ActorUri => {
 };
 
 export const extractSystemName = (actorName: string): Id => {
-	return (/^actors:\/\/(\w+)\/.*$/.exec(actorName)?.[1] ?? "") as Id;
+	return (/^actors:\/\/(.+)\/.*$/.exec(actorName)?.[1] ?? "") as Id;
 };
 
 export const systemEquals = (actorA: ActorRef, actorB: ActorRef): boolean => {
+	console.log(actorA.name, actorB.name);
+	console.log(extractSystemName(actorA.name), extractSystemName(actorB.name));
 	return extractSystemName(actorA.name) === extractSystemName(actorB.name);
 };
 

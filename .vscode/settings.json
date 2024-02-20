@@ -4,6 +4,7 @@
 		"luxon",
 		"OIDC",
 		"rambda",
-		"recapp"
+		"recapp",
+		"upserted"
 	]
 }

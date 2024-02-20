@@ -1,0 +1,38 @@
+{
+  "name": "@recapp/frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "itu-utils": "^1.8.1",
+    "luxon": "^3.4.4",
+    "mutative": "^1.0.3",
+    "rambda": "^9.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1",
+    "ts-actors": "^3.0.4",
+    "tsmonads": "^3.3.0",
+    "uuid": "^9.0.1",
+    "zustand": "^4.3.8"
+  },
+  "devDependencies": {
+    "@types/uuid": "^9.0.1",
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@typescript-eslint/eslint-plugin": "^5.57.1",
+    "@typescript-eslint/parser": "^5.57.1",
+    "@vitejs/plugin-react-swc": "^3.0.0",
+    "eslint": "^8.38.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.3.4",
+    "typescript": "^5.3.3",
+    "vite": "^4.3.2"
+  }
+}

@@ -1,5 +1,5 @@
 import zod from "zod";
-import { idSchema, uidSchema } from "./base";
+import { idEntitySchema, uidSchema } from "./base";
 
 export const commentSchema = zod
 	.object({
@@ -10,6 +10,6 @@ export const commentSchema = zod
 		answered: zod.boolean(), // Was the query marked as answered by the teacher
 		relatedQuestion: uidSchema.optional(), // Optional relation to question if comment was generated from there
 	})
-	.merge(idSchema);
+	.merge(idEntitySchema);
 
 export type StudentQuery = zod.infer<typeof commentSchema>;

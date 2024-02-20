@@ -1,5 +1,5 @@
 import zod, { ZodBoolean } from "zod";
-import { idSchema, timestampSchema, uidSchema } from "./base";
+import { idEntitySchema, timestampSchema, uidSchema } from "./base";
 import { userParticipationSchema } from "./user";
 import { textElementStatisticsSchema, choiceElementStatisticsSchema, groupStatisticsSchema } from "./statistics";
 
@@ -8,7 +8,7 @@ export const answerSchema = zod
 		text: zod.string(), // Text of answer option
 		correct: zod.boolean(), // Whether this is an correct answer
 	})
-	.merge(idSchema);
+	.merge(idEntitySchema);
 
 export type Answer = zod.infer<typeof answerSchema>;
 
@@ -21,7 +21,7 @@ export const quizElementSchema = zod
 		editMode: zod.boolean(), // Whether the question is currently edited by a teacher or its author
 		statistics: zod.union([textElementStatisticsSchema, choiceElementStatisticsSchema]).optional(), // Last statistics for this question (if any)
 	})
-	.merge(idSchema);
+	.merge(idEntitySchema);
 
 export type QuizElement = zod.infer<typeof quizElementSchema>;
 
@@ -31,7 +31,7 @@ export const elementGroupSchema = zod
 		elements: zod.array(quizElementSchema), // Which elements belong to this group
 		statistics: groupStatisticsSchema.optional(), // Last statistics for this group (if any)
 	})
-	.merge(idSchema);
+	.merge(idEntitySchema);
 
 export type ElementGroup = zod.infer<typeof elementGroupSchema>;
 
@@ -71,7 +71,7 @@ export const quizSchema = zod
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
 	})
-	.merge(idSchema);
+	.merge(idEntitySchema);
 
 export type Quiz = zod.infer<typeof quizSchema>;
 

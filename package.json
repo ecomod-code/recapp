@@ -1,15 +1,26 @@
 {
   "workspaces": [
-    "packages/models"
+    "packages/models",
+    "packages/backend",
+    "packages/frontend"
   ],
   "dependencies": {
+	"@featherscloud/pinion": "^0.5.3",
+    "@manypkg/cli": "^0.21.2",
     "itu-utils": "^1.8.1",
     "lerna": "^8.1.2",
-    "ts-actors": "^2.3.2",
-    "tsmonads": "^3.1.0"
+    "ts-actors": "^3.0.4",
+    "tsmonads": "^3.3.0",
+    "typescript": "^5.3.3",
+    "zod": "^3.22.4"
   },
   "name": "recapp",
-  "devDependencies": {
-    "@featherscloud/pinion": "^0.5.3"
+  "scripts": {
+    "start:docker:dev": "cd docker && docker-compose --env-file ../.env.development up -d",
+    "start:docker:prod": "cd docker && docker-compose --env-file ../.env.production up -d",
+    "stop:docker:dev": "cd docker && docker-compose --env-file ../.env.development down",
+    "stop:docker:prod": "cd docker && docker-compose --env-file ../.env.production down",
+    "bootstrap": "lerna bootstrap",
+    "postinstall": "manypkg check"
   }
 }

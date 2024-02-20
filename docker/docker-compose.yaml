@@ -1,0 +1,14 @@
+# Database for recapp
+version: "3.7"
+
+services:
+    recapp-db:
+        restart: always
+        image: mongo:6
+        ports:
+            - ${MONGODB_PORT}:27017
+        volumes:
+            - ./mongo/data/db:/data/db
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+            MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PW}

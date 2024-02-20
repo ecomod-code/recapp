@@ -1,2 +1,8 @@
 node_modules/
 build/
+architecture/
+process_documentation/
+sandbox.nbb
+.env
+.env.production
+.env.development

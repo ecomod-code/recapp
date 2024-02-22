@@ -7,9 +7,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "extract": "lingui extract",
+    "compile": "lingui compile"
   },
   "dependencies": {
+    "@lingui/cli": "^4.7.1",
+    "@lingui/macro": "^4.7.1",
+    "@lingui/react": "^4.7.1",
+    "@lingui/vite-plugin": "^4.7.1",
     "@recapp/models": "^1.0.0",
     "bootstrap": "^5.3.3",
     "itu-utils": "^1.8.1",

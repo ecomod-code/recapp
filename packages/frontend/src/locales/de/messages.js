@@ -1,0 +1,1 @@
+/*eslint-disable*/module.exports={messages:JSON.parse("{\"dashboard.greet-user\":\"Hallo\",\"login-page.login\":\"Anmelden\"}")};

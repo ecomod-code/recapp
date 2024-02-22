@@ -1,0 +1,1 @@
+/*eslint-disable*/module.exports={messages:JSON.parse("{\"dashboard.greet-user\":\"Hello\",\"login-page.login\":\"Login\",\"login-page.validation-warning.email.not-valid\":\"login-page.validation-warning.email.not-valid\"}")};

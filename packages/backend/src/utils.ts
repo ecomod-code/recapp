@@ -1,12 +1,11 @@
 import "reflect-metadata";
 
-import { ActorUri, Id } from "@recapp/models";
+import { ActorUri, Id, SessionStoreMessages } from "@recapp/models";
 import { join } from "path";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { debug } from "itu-utils";
 import { maybe } from "tsmonads";
 import Container from "typedi";
-import { SessionStoreMessages } from "./actors/SessionStore";
 import jwt from "jsonwebtoken";
 
 export const systemName = "recapp-backend";
@@ -20,8 +19,6 @@ export const extractSystemName = (actorName: string): Id => {
 };
 
 export const systemEquals = (actorA: ActorRef, actorB: ActorRef): boolean => {
-	console.log(actorA.name, actorB.name);
-	console.log(extractSystemName(actorA.name), extractSystemName(actorB.name));
 	return extractSystemName(actorA.name) === extractSystemName(actorB.name);
 };
 

@@ -1,10 +1,9 @@
 import { IncomingMessage } from "http";
 import Container from "typedi";
 import { bearerValid, createActorUri } from "../utils";
-import { SessionStoreMessages } from "../actors/SessionStore";
 import { maybe } from "tsmonads";
 import { ActorSystem } from "ts-actors";
-import { Id } from "@recapp/models";
+import { Id, SessionStoreMessages } from "@recapp/models";
 import { logger } from "../logger";
 import createError from "http-errors";
 

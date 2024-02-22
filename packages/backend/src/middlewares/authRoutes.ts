@@ -5,10 +5,8 @@ import Container from "typedi";
 import koa from "koa";
 import { ActorSystem } from "ts-actors";
 import { createActorUri } from "../utils";
-import { UserStoreMessages } from "../actors/UserStore";
-import { Id, User, UserRole } from "@recapp/models";
+import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
 import { Timestamp, fromTimestamp, hours, minutes, toTimestamp } from "itu-utils";
-import { Session, SessionStoreMessages } from "../actors/SessionStore";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 
@@ -83,44 +81,49 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			let role: UserRole = "STUDENT";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
-			const userExists = await system.ask(userStore, UserStoreMessages.HasUser(uid));
-			if (!userExists) {
-				await system.send(
-					userStore,
-					UserStoreMessages.CreateUser({
-						uid,
-						role: "STUDENT",
-						lastLogin: toTimestamp(),
-						created: toTimestamp(),
-						updated: toTimestamp(),
-						username: decoded.name,
-						active: true,
-						quizUsage: new Map(),
+			try {
+				const sessionStore = createActorUri("SessionStore");
+				system.send(
+					sessionStore,
+					SessionStoreMessages.StoreSession({
+						idToken: tokenSet.id_token ?? "",
+						accessToken: tokenSet.access_token ?? "",
+						refreshToken: tokenSet.refresh_token ?? "",
+						uid: decoded.sub as Id,
+						expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
+						role,
 					})
 				);
-			} else {
-				const user: User = await system.ask(
-					userStore,
-					UserStoreMessages.UpdateUser({
-						uid,
-						lastLogin: toTimestamp(),
-						updated: toTimestamp(),
-					})
-				);
-				role = user.role;
+				const userExists = await system.ask(userStore, UserStoreMessages.HasUser(uid));
+				if (!userExists) {
+					await system.send(
+						userStore,
+						UserStoreMessages.CreateUser({
+							uid,
+							role: "STUDENT",
+							lastLogin: toTimestamp(),
+							created: toTimestamp(),
+							updated: toTimestamp(),
+							username: decoded.name,
+							active: true,
+							quizUsage: new Map(),
+						})
+					);
+				} else {
+					const user: User = await system.ask(
+						userStore,
+						UserStoreMessages.UpdateUser({
+							uid,
+							lastLogin: toTimestamp(),
+							updated: toTimestamp(),
+						})
+					);
+					role = user.role;
+				}
+			} catch (e) {
+				console.error(e);
+				throw e;
 			}
-			const sessionStore = createActorUri("SessionStore");
-			system.send(
-				sessionStore,
-				SessionStoreMessages.StoreSession({
-					idToken: tokenSet.id_token ?? "",
-					accessToken: tokenSet.access_token ?? "",
-					refreshToken: tokenSet.refresh_token ?? "",
-					uid: decoded.sub as Id,
-					expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
-					role,
-				})
-			);
 			ctx.set("Set-Cookie", `bearer=${tokenSet.id_token}; path=/; max-age=${hours(2).valueOf() / 1000}`);
 			ctx.redirect("http://localhost:5173/Dashboard"); // FRONTEND_URI ?? "");
 		},

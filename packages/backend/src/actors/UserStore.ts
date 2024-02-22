@@ -46,7 +46,6 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
-		console.log(from.name, message);
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await UserStoreMessages.match<Promise<ResultType>>(message, {
@@ -61,6 +60,12 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					if (this.state.cache.has(userToStore.uid)) {
 						return new Error(`User id ${user.uid} already exists`);
+					}
+					const db = await this.connector.db();
+					const noOfUsers = await db.collection<User>(this.collectionName).countDocuments();
+					if (noOfUsers === 0) {
+						// The first user will always be an admin
+						userToStore.role = "ADMIN";
 					}
 					this.state = create(this.state, draft => {
 						draft.cache.set(userToStore.uid, userToStore);
@@ -78,14 +83,15 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				UpdateUser: async user => this.updateUser(user, clientUserRole, clientUserId),
 				HasUser: async userId => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole) && userId !== clientUserId) {
-						return new Error(`Operation not allowed`);
+						return new Error(
+							`Operation not allowed for ${clientUserRole} and ${clientUserId} on ${userId}`
+						);
 					}
 					const maybeUser = await this.getEntity(userId);
 					return maybeUser.hasValue;
 				},
 				GetOwnUser: async () => {
 					const maybeUser = await this.getEntity(clientUserId);
-					console.log(clientUserId, maybeUser);
 					return maybeUser.match<User | Error>(
 						identity,
 						() => new Error(`User id ${clientUserId} does not exist`)
@@ -104,10 +110,11 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					const db = await this.connector.db();
 					const users = await db.collection<User>(this.collectionName).find().toArray();
-					return users.map(user => {
+					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
-						return rest;
+						this.send(from, new UserUpdateMessage(rest));
 					});
+					return unit();
 				},
 				GetRole: async userId => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole) && userId !== clientUserId) {

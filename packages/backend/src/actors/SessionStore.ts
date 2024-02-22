@@ -59,7 +59,7 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 			},
 			GetSessionForUserId: async userId => {
 				const session = (await this.getEntity(userId)).flatMap(this.sessionValid);
-				return session.match<Session | Error>(identity, () => new Error("Unknown user id"));
+				return session.match<Session | Error>(identity, () => new Error(`Unknown user id ${userId}`));
 			},
 			GetSessionForClient: async client => {
 				const maybeUserId = maybe(this.state.clientIndex.get(client));
@@ -74,7 +74,7 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 			RemoveSession: async userId => {
 				this.state = await create(this.state, async draft => {
 					const maybeSession = await this.getEntity(userId);
-					maybeSession.map(session => {
+					maybeSession.forEach(session => {
 						if (session.actorSystem) {
 							draft.clientIndex.delete(session.actorSystem);
 						}

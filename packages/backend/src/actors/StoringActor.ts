@@ -38,6 +38,10 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		if (systemEquals(this.actorRef!, from)) {
 			return ["SYSTEM", "SYSTEM" as Id];
 		}
+		if (extractSystemName(this.actorRef!.name) === from.name.replace("actors://", "")) {
+			// It's our actor system that's asking directly
+			return ["SYSTEM", "SYSTEM" as Id];
+		}
 
 		const session: Session = await this.ask(
 			createActorUri("SessionStore"),

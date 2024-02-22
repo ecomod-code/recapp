@@ -1,6 +1,6 @@
 import { ActorRef, ActorSystem } from "ts-actors";
 import { StatefulActor } from "./StatefulActor";
-import { User, UserStoreMessages } from "@recapp/models";
+import { User, UserStoreMessages, UserUpdateMessage } from "@recapp/models";
 
 export class LocalUserActor extends StatefulActor<any, any, { user: User | undefined }> {
 	constructor(name: string, system: ActorSystem) {
@@ -22,11 +22,11 @@ export class LocalUserActor extends StatefulActor<any, any, { user: User | undef
 		});
 	}
 
-	async receive(from: ActorRef, message: any): Promise<any> {
-		console.log(from.name, message);
+	async receive(from: ActorRef, message: UserUpdateMessage): Promise<any> {
+		console.log("MSG", from, message);
 		if (message.type == "UserUpdateMessage") {
 			this.updateState(draft => {
-				draft.user = message.user;
+				draft.user = message.user as User;
 			});
 		}
 		return true;

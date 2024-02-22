@@ -1,37 +1,20 @@
-import { ActorUri, Id, User, UserRole, uidSchema, userSchema } from "@recapp/models";
-import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-utils";
+import {
+	ActorUri,
+	Id,
+	User,
+	UserRole,
+	UserStoreMessage,
+	UserStoreMessages,
+	UserUpdateMessage,
+	uidSchema,
+	userSchema,
+} from "@recapp/models";
+import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { create } from "mutative";
-import { unionize, ofType, UnionOf } from "unionize";
-import { identity } from "rambda";
-import { createActorUri, extractSystemName, systemEquals } from "../utils";
-import { Session, SessionStoreMessages } from "./SessionStore";
-import { CLEANUP_INTERVAL, StoringActor } from "./StoringActor";
-import { DateTime } from "luxon";
-
-export const UserStoreMessages = unionize(
-	{
-		CreateUser: ofType<User>(),
-		UpdateUser: ofType<Partial<User> & { uid: Id }>(),
-		HasUser: ofType<Id>(),
-		GetUsers: {},
-		GetUser: ofType<Id>(),
-		GetOwnUser: {},
-		GetRole: ofType<Id>(),
-		SubscribeToUser: ofType<Id>(),
-		SubscribeToUserCollection: {},
-		UnsubscribeToUser: ofType<Id>(),
-		UnsubscribeToUserCollection: {},
-	},
-	{ tag: "UserStoreMessage", value: "value" }
-);
-
-export class UserUpdateMessage {
-	public readonly type = "UserUpdateMessage" as const;
-	constructor(public readonly user: User) {}
-}
-
-export type UserStoreMessage = UnionOf<typeof UserStoreMessages>;
+import { identity, pick } from "rambda";
+import { SubscribableActor } from "./SubscribableActor";
+import { AccessRole } from "./StoringActor";
 
 type ListedUser = Omit<User, "quizUsage">;
 
@@ -40,18 +23,16 @@ type ResultType = User | ListedUser[] | Error | Unit | UserRole | boolean;
 type State = {
 	cache: Map<Id, User>;
 	subscribers: Map<Id, Set<ActorUri>>;
-	collectionSubscribers: Set<ActorUri>;
+	collectionSubscribers: Map<ActorUri, string[]>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
 };
 
-type AccessRole = UserRole | "SYSTEM";
-
-export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> {
+export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultType> {
 	protected override state: State = {
 		cache: new Map(),
 		subscribers: new Map(),
-		collectionSubscribers: new Set(),
+		collectionSubscribers: new Map(),
 		lastSeen: new Map(),
 		lastTouched: new Map(),
 	};
@@ -60,46 +41,8 @@ export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> 
 		super(name, system, "users");
 	}
 
-	protected override cleanup = () => {
-		const cleanupTimestamp = DateTime.utc().minus(hours(CLEANUP_INTERVAL));
-		// Remove all old subscriptions
-		this.state = create(this.state, draft => {
-			const isOld = (s: ActorUri) => fromTimestamp(draft.lastSeen.get(s) ?? toTimestamp()) < cleanupTimestamp;
-			const removedSubscribers = new Set<ActorUri>();
-			// Remove old collection subscrivers
-			const oldCollectionSubscribers = Array.from(draft.collectionSubscribers).filter(isOld);
-			oldCollectionSubscribers.forEach(ogs => {
-				draft.collectionSubscribers.delete(ogs);
-				removedSubscribers.add(ogs);
-			});
-			// For each individual subscriber
-			for (const entity in draft.subscribers.keys()) {
-				const subscriberSet = draft.subscribers.get(entity as Id)!;
-				const toDelete = Array.from(subscriberSet).filter(isOld);
-				toDelete.forEach(rs => {
-					subscriberSet.delete(rs);
-					removedSubscribers.add(rs);
-				});
-			}
-			// Remove the lastSeen entries of all deleted subscribers
-			removedSubscribers.forEach(rs => draft.lastSeen.delete(rs));
-		});
-	};
-
-	private determineRole = async (from: ActorRef): Promise<[AccessRole, Id]> => {
-		if (systemEquals(this.actorRef!, from)) {
-			return ["SYSTEM", "SYSTEM" as Id];
-		}
-
-		const session: Session = await this.ask(
-			createActorUri("SessionStore"),
-			SessionStoreMessages.GetSessionForClient(extractSystemName(from.name))
-		);
-		return [session.role, session.uid];
-	};
-
 	protected override updateIndices(_draft: State, _user: User): void {
-		// TODO
+		return;
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
@@ -109,7 +52,6 @@ export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> 
 			return await UserStoreMessages.match<Promise<ResultType>>(message, {
 				CreateUser: async user => {
 					const validation = userSchema.safeParse(user);
-					console.warn(validation);
 					if (!validation.success) {
 						return new Error(validation.error.toString());
 					}
@@ -123,10 +65,10 @@ export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> 
 					this.state = create(this.state, draft => {
 						draft.cache.set(userToStore.uid, userToStore);
 					});
-					for (const subscriber in this.state.collectionSubscribers) {
-						this.send(subscriber, new UserUpdateMessage(userToStore));
+					for (const [subscriber, properties] of this.state.collectionSubscribers) {
+						this.send(subscriber, new UserUpdateMessage(pick(properties, userToStore)));
 					}
-					for (const subscriber in this.state.subscribers.get(userToStore.uid) ?? new Set()) {
+					for (const subscriber of this.state.subscribers.get(userToStore.uid) ?? new Set()) {
 						this.send(subscriber, new UserUpdateMessage(userToStore));
 					}
 					return await this.storeEntity(user)
@@ -189,13 +131,13 @@ export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> 
 					});
 					return unit();
 				},
-				SubscribeToUserCollection: async () => {
+				SubscribeToUserCollection: async (requestedProperties: string[]) => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);
 					}
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						draft.collectionSubscribers.add(from.name as ActorUri);
+						draft.collectionSubscribers.set(from.name as ActorUri, requestedProperties);
 					});
 					return unit();
 				},
@@ -258,8 +200,8 @@ export class UserStore extends StoringActor<User, UserStoreMessage, ResultType> 
 		this.state = create(this.state, draft => {
 			newUser = { ...oldUser, ...userToStore } as User;
 			draft.cache.set(userToStore.uid, newUser);
-			for (const subscriber of this.state.collectionSubscribers) {
-				this.send(subscriber, new UserUpdateMessage(newUser));
+			for (const [subscriber, properties] of this.state.collectionSubscribers) {
+				this.send(subscriber, new UserUpdateMessage(pick(properties, newUser)));
 				draft.lastSeen.set(subscriber, toTimestamp());
 			}
 			for (const subscriber of this.state.subscribers.get(userToStore.uid) ?? new Set()) {

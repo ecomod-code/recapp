@@ -1,5 +1,5 @@
-import { Id } from "@recapp/models";
-import { Actor, ActorSystem } from "ts-actors";
+import { Id, Session, SessionStoreMessages, UserRole } from "@recapp/models";
+import { Actor, ActorRef, ActorSystem } from "ts-actors";
 import Container from "typedi";
 import { DbClient } from "../DbClient";
 import { Maybe, maybe } from "tsmonads";
@@ -7,8 +7,11 @@ import { Document } from "mongodb";
 import { Draft, create } from "mutative";
 import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-utils";
 import { DateTime } from "luxon";
+import { systemEquals, createActorUri, extractSystemName } from "../utils";
 
 export const CLEANUP_INTERVAL = 2; // When to cleanup old entries
+
+export type AccessRole = UserRole | "SYSTEM";
 
 export abstract class StoringActor<Entity extends Document & { updated: Timestamp }, Message, Result> extends Actor<
 	Message,
@@ -31,7 +34,19 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		clearInterval(this.checkInterval);
 	}
 
-	protected cleanup = () => {
+	protected determineRole = async (from: ActorRef): Promise<[AccessRole, Id]> => {
+		if (systemEquals(this.actorRef!, from)) {
+			return ["SYSTEM", "SYSTEM" as Id];
+		}
+
+		const session: Session = await this.ask(
+			createActorUri("SessionStore"),
+			SessionStoreMessages.GetSessionForClient(extractSystemName(from.name))
+		);
+		return [session.role, session.uid];
+	};
+
+	protected cleanup() {
 		this.logger.debug(`Running cache and subscription cleanups for ${this.name}`);
 		const cleanupTimestamp = DateTime.utc().minus(hours(CLEANUP_INTERVAL));
 
@@ -45,7 +60,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 				draft.cache.delete(e);
 			});
 		});
-	};
+	}
 
 	protected abstract updateIndices(draft: { cache: Map<Id, Entity> }, entity: Entity): void;
 

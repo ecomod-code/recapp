@@ -2,7 +2,7 @@
   "name": "@recapp/models",
   "version": "1.0.0",
   "description": "Data models for RECAPP",
-  "main": "index.ts",
+  "main": "src/index.ts",
   "scripts": {
 	"build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -1,36 +1,10 @@
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { unionize, ofType, UnionOf } from "unionize";
 import { create } from "mutative";
 import { maybe, nothing } from "tsmonads";
-import { Id, UserRole } from "@recapp/models";
+import { Id, Session, SessionStoreMessage, SessionStoreMessages } from "@recapp/models";
 import { identity } from "rambda";
 import { StoringActor } from "./StoringActor";
-
-export type Session = {
-	idToken: string;
-	accessToken: string;
-	refreshToken: string;
-	uid: Id;
-	expires: Timestamp;
-	actorSystem: string;
-	role: UserRole;
-	created: Timestamp;
-	updated: Timestamp;
-};
-
-export const SessionStoreMessages = unionize(
-	{
-		StoreSession: ofType<Partial<Session> & { uid: Id }>(), // Store the session; also removed older sessions of the user
-		CheckSession: ofType<Id>(), // Checks whether the session of the actor is valid
-		GetSessionForUserId: ofType<Id>(), // Returns the session for the given userId
-		GetSessionForClient: ofType<Id>(), // Returns the session for the given client actor system
-		RemoveSession: ofType<Id>(), // Invalidates the session (e.g. when user has logged out)
-	},
-	{ tag: "SessionStoreMessages", value: "value" }
-);
-
-export type SessionStoreMessage = UnionOf<typeof SessionStoreMessages>;
 
 type SessionStoreResult = Unit | Error | Session | boolean;
 

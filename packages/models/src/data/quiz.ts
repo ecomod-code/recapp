@@ -50,7 +50,7 @@ export const quizSchema = zod
 		state: zod.enum(["EDITING", "ACTIVE", "STARTED", "STOPPED"]), // State machine state
 		uniqueLink: zod.string(), // Unique link for this quiz
 		runOptions: runOptionsSchema.optional(), // If running, the current run options are given here
-		groups: zod.array(elementGroupSchema), // Groupd belonging to this quiz
+		groups: zod.array(elementGroupSchema), // Groups belonging to this quiz
 		studentQuestions: zod.boolean(), // Whether to allow students to create their own quiz elements
 		studentParticipationSettings: zod.record<typeof userParticipationSchema, ZodBoolean>(
 			userParticipationSchema,

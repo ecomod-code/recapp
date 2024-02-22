@@ -82,18 +82,6 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
 			try {
-				const sessionStore = createActorUri("SessionStore");
-				system.send(
-					sessionStore,
-					SessionStoreMessages.StoreSession({
-						idToken: tokenSet.id_token ?? "",
-						accessToken: tokenSet.access_token ?? "",
-						refreshToken: tokenSet.refresh_token ?? "",
-						uid: decoded.sub as Id,
-						expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
-						role,
-					})
-				);
 				const userExists = await system.ask(userStore, UserStoreMessages.HasUser(uid));
 				if (!userExists) {
 					await system.send(
@@ -120,6 +108,18 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					);
 					role = user.role;
 				}
+				const sessionStore = createActorUri("SessionStore");
+				system.send(
+					sessionStore,
+					SessionStoreMessages.StoreSession({
+						idToken: tokenSet.id_token ?? "",
+						accessToken: tokenSet.access_token ?? "",
+						refreshToken: tokenSet.refresh_token ?? "",
+						uid: decoded.sub as Id,
+						expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
+						role,
+					})
+				);
 			} catch (e) {
 				console.error(e);
 				throw e;

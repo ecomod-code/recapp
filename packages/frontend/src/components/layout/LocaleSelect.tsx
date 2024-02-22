@@ -3,6 +3,7 @@ import { DateTime } from "luxon";
 
 import { SupportedLocale, dynamicActivate, locales } from "../../i18n";
 import { useLingui } from "@lingui/react";
+import { Form } from "react-bootstrap";
 
 const STORED_SELECTED_LOCALE_KEY = "USER_LOCALE";
 
@@ -52,9 +53,9 @@ export const LocaleSelect = () => {
 	const flagSrc = locales[activeLocale as SupportedLocale].flag;
 
 	return (
-		<div className="control has-icons-left">
-			<div className="select is-small">
-				<select onChange={onChange} value={activeLocale}>
+		<div style={style}>
+			<div>
+				<Form.Select onChange={onChange} value={activeLocale}>
 					{Object.entries(locales).map(([local, label]) => {
 						return (
 							<option key={local} value={local}>
@@ -62,10 +63,17 @@ export const LocaleSelect = () => {
 							</option>
 						);
 					})}
-				</select>
+				</Form.Select>
 			</div>
-
-			<span className="icon is-small is-left">{flagSrc ? <img src={flagSrc} alt="country flag" /> : null}</span>
+			<div style={{ marginTop: 4, marginLeft: 4 }}>
+				<img src={flagSrc} alt="country flag" />
+			</div>
 		</div>
 	);
+};
+
+const style: React.CSSProperties = {
+	display: "flex",
+	flexDirection: "row",
+	justifyContent: "center",
 };

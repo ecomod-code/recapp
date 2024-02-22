@@ -9,7 +9,7 @@ export class LocalUserActor extends StatefulActor<any, any, { user: User | undef
 	}
 
 	async afterStart(): Promise<void> {
-		const result: User = await this.ask("actors://recapp-backend/UserStore", { UserStoreMessage: "GetOwnUser" });
+		const result: User = await this.ask("actors://recapp-backend/UserStore", UserStoreMessages.GetOwnUser());
 		if (!this.state.user && result) {
 			this.send("actors://recapp-backend/UserStore", UserStoreMessages.SubscribeToUser(result.uid));
 			this.send(

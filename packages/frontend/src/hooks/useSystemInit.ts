@@ -4,11 +4,18 @@ import { WebsocketDistributor } from "ts-actors/lib/src/WebsocketDistributor";
 import { LocalUserActor } from "../actors/LocalUserActor";
 import { Maybe, maybe } from "tsmonads";
 import { v4 } from "uuid";
+import { useNavigate } from "react-router-dom";
+import { UserAdminActor } from "../actors/UserAdminActor";
 
 export const useSystemInit = (): Maybe<ActorSystem> => {
+	const navigate = useNavigate();
+
 	const [system, setSystem] = useState<ActorSystem>();
 
 	useEffect(() => {
+		if (!document.cookie.includes("bearer")) {
+			navigate("/login", { replace: true });
+		}
 		let ignore = false;
 		if (!ignore) {
 			const systemId = v4();
@@ -20,6 +27,7 @@ export const useSystemInit = (): Maybe<ActorSystem> => {
 			DistributedActorSystem.create({ distributor, systemName: systemId }).then(system => {
 				setSystem(system);
 				system.createActor(LocalUserActor, { name: "LocalUser" });
+				system.createActor(UserAdminActor, { name: "UserAdmin" });
 			});
 		}
 		return () => {

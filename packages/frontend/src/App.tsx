@@ -1,5 +1,4 @@
-import "./App.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { Login } from "./Login";
 import { Dashboard } from "./Dashboard";
 import { useEffect } from "react";
@@ -10,6 +9,10 @@ import { i18n } from "@lingui/core";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { minutes } from "itu-utils";
 import Axios from "axios";
+import { Layout } from "./layout/Layout";
+import { useSystemInit } from "./hooks/useSystemInit";
+import { SystemContext } from "./SystemContext";
+import "./App.css";
 
 const updateToken = () => {
 	const mm = () => {
@@ -33,6 +36,17 @@ const updateToken = () => {
 
 setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
 
+const Root = () => {
+	const system = useSystemInit();
+	return (
+		<SystemContext.Provider value={system}>
+			<Layout>
+				<Outlet />
+			</Layout>
+		</SystemContext.Provider>
+	);
+};
+
 const router = createBrowserRouter([
 	{
 		path: "/",
@@ -40,7 +54,14 @@ const router = createBrowserRouter([
 	},
 	{
 		path: "/Dashboard",
-		element: <Dashboard />,
+		element: <Root />,
+		// errorElement: <ErrorPage />,
+		children: [
+			{
+				path: "/Dashboard",
+				element: <Dashboard />,
+			},
+		],
 	},
 ]);
 

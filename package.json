@@ -21,6 +21,8 @@
     "stop:docker:dev": "cd docker && docker-compose --env-file ../.env.development down",
     "stop:docker:prod": "cd docker && docker-compose --env-file ../.env.production down",
     "bootstrap": "lerna bootstrap",
-    "postinstall": "manypkg check"
+    "postinstall": "manypkg check",
+	"dev": "lerna run dev",
+	"build": "lerna run build"
   }
 }

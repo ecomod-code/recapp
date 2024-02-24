@@ -1,5 +1,5 @@
 import { ActorRef, ActorSystem } from "ts-actors";
-import { StatefulActor } from "./StatefulActor";
+import { StatefulActor } from "ts-actors-react";
 import { User, UserStoreMessages, UserUpdateMessage } from "@recapp/models";
 
 export class UserAdminActor extends StatefulActor<any, any, { users: User[] }> {

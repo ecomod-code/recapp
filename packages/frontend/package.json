@@ -17,6 +17,8 @@
     "@lingui/react": "^4.7.1",
     "@lingui/vite-plugin": "^4.7.1",
     "@recapp/models": "^1.0.0",
+    "@stylexjs/babel-plugin": "^0.5.1",
+    "@stylexjs/stylex": "^0.5.1",
     "bootstrap": "^5.3.3",
     "itu-utils": "^1.8.1",
     "luxon": "^3.4.4",
@@ -24,9 +26,11 @@
     "rambda": "^9.1.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
+    "react-bootstrap-icons": "^1.11.3",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.1",
     "ts-actors": "^3.0.4",
+    "ts-actors-react": "^1.0.0",
     "tsmonads": "^3.3.0",
     "unionize": "^3.1.0",
     "uuid": "^9.0.1",
@@ -44,6 +48,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.3.4",
     "typescript": "^5.3.3",
-    "vite": "^4.3.2"
+    "vite": "^4.3.2",
+    "vite-plugin-stylex": "^0.5.1"
   }
 }

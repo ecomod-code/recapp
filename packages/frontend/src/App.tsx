@@ -1,7 +1,7 @@
-import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, Outlet, RouterProvider, useNavigate } from "react-router-dom";
 import { Login } from "./Login";
 import { Dashboard } from "./Dashboard";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { dynamicActivate, defaultLocale } from "./i18n";
 import { getStoredSelectedLocal } from "./components/layout/LocaleSelect";
 import { I18nProvider } from "@lingui/react";
@@ -10,9 +10,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { minutes } from "itu-utils";
 import Axios from "axios";
 import { Layout } from "./layout/Layout";
-import { useSystemInit } from "./hooks/useSystemInit";
-import { SystemContext } from "./SystemContext";
 import "./App.css";
+import { useActorSystem, SystemContext } from "ts-actors-react";
+import { UserAdminActor } from "./actors/UserAdminActor";
+import { LocalUserActor } from "./actors/LocalUserActor";
 
 const updateToken = () => {
 	const mm = () => {
@@ -37,7 +38,23 @@ const updateToken = () => {
 setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
 
 const Root = () => {
-	const system = useSystemInit();
+	const [init, setInit] = useState(false);
+	const system = useActorSystem(`ws://127.0.0.1:3123`, document.cookie.split(";")[0].split("=")[1]);
+	useEffect(() => {
+		if (!init) {
+			system.forEach(async s => {
+				await s.createActor(UserAdminActor, { name: "UserAdmin" });
+				await s.createActor(LocalUserActor, { name: "LocalUser" });
+				setInit(true);
+			});
+		}
+	}, [init, system]);
+	const navigate = useNavigate();
+
+	if (!init) return null;
+	if (!document.cookie.includes("bearer")) {
+		navigate("/login", { replace: true });
+	}
 	return (
 		<SystemContext.Provider value={system}>
 			<Layout>

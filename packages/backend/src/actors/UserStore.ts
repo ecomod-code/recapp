@@ -105,7 +105,6 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					return maybeUser.match<User | Error>(identity, () => new Error(`User id ${userId} does not exist`));
 				},
 				GetUsers: async () => {
-					console.log("GU", clientUserRole);
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);
 					}
@@ -113,7 +112,6 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const users = await db.collection<User>(this.collectionName).find().toArray();
 					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
-						console.log("REST", rest);
 						this.send(from, new UserUpdateMessage(rest));
 					});
 					return unit();

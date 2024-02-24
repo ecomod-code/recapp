@@ -66,7 +66,7 @@ export const LocaleSelect = () => {
 				</Form.Select>
 			</div>
 			<div style={{ marginTop: 4, marginLeft: 4 }}>
-				<img src={flagSrc} alt="country flag" />
+				<img src={flagSrc} height="22" alt="country flag" />
 			</div>
 		</div>
 	);
@@ -75,5 +75,5 @@ export const LocaleSelect = () => {
 const style: React.CSSProperties = {
 	display: "flex",
 	flexDirection: "row",
-	justifyContent: "center",
+	justifyContent: "start",
 };

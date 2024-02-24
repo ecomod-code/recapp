@@ -1,37 +1,57 @@
 import { User } from "@recapp/models";
-import { useStatefulActor } from "./hooks/useStatefulActor";
+import { useStatefulActor } from "ts-actors-react";
 import { i18n } from "@lingui/core";
 import { maybe } from "tsmonads";
-import { Container, Row, Table } from "react-bootstrap";
+import { Badge, Card, Container, Row } from "react-bootstrap";
+import { fromTimestamp } from "itu-utils";
+import { CheckCircleFill, CircleFill } from "react-bootstrap-icons";
+
+const UserCard: React.FC<{ user: User }> = ({ user }) => {
+	return (
+		<Card className="p-0 m-1" style={{ width: "16rem" }}>
+			<Card.Title className="p-1 text-bg-primary" style={{ background: "darkGrey" }}>
+				{user.username}
+			</Card.Title>
+			<Card.Body>
+				<Card.Text className="text-start">
+					<div className="d-flex flex-row align-items-center">
+						<div className="d-flex flex-row align-items-center flex-fill">
+							<div>
+								{user.active ? (
+									<CheckCircleFill color="green" size="1.5rem" style={{ paddingBottom: 4 }} />
+								) : (
+									<CircleFill color="grey" size="1.5rem" style={{ paddingBottom: 4 }} />
+								)}
+							</div>
+							<div>&nbsp;{user.uid}</div>
+						</div>
+						<div>
+							<Badge bg={user.role === "ADMIN" ? "success" : "light"}>Admin</Badge>
+						</div>
+					</div>
+				</Card.Text>
+			</Card.Body>
+			<Card.Footer className="w-100">
+				<div>Letzter Login: {fromTimestamp(user.lastLogin).toLocaleString()}</div>
+			</Card.Footer>
+		</Card>
+	);
+};
 
 export const Data: React.FC = () => {
-	const [localUser] = useStatefulActor<{ user: User }>("LocalUser", "DATA");
-	const [userList] = useStatefulActor<{ users: User[] }>("UserAdmin", "DATA");
-	const users: User[] = userList.map(ul => ul.users).orElse([] as User[]);
+	const [localUser] = useStatefulActor<{ user: User }>("LocalUser");
+	const [userList] = useStatefulActor<{ users: User[] }>("UserAdmin");
+	let users: User[] = userList.map(ul => ul.users).orElse([] as User[]);
+	users = [...users, ...users, ...users, ...users, ...users, ...users];
 	const response = i18n._("dashboard.greet-user") + " " + localUser.flatMap(s => maybe(s.user?.username)).orElse("");
 	return (
 		<Container>
 			<Row>{response}</Row>
-			<Table striped bordered hover>
-				<thead>
-					<tr>
-						<th>Login</th>
-						<th>Name</th>
-						<th>Rolle</th>
-						<th>Aktiv</th>
-					</tr>
-				</thead>
-				<tbody>
-					{users.map((user: User) => (
-						<tr key={user.uid}>
-							<td>{user.uid}</td>
-							<td>{user.username}</td>
-							<td>{user.role}</td>
-							<td>{user.active ? "JA" : "NEIN"}</td>
-						</tr>
-					))}
-				</tbody>
-			</Table>
+			<div className="d-flex flex-wrap">
+				{users.map((user: User) => (
+					<UserCard key={user.uid} user={user} />
+				))}
+			</div>
 		</Container>
 	);
 };

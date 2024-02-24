@@ -14,12 +14,22 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/Data.tsx:7
+#: src/App.tsx:26
+msgid "app.could_not_refresh_token"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:43
+msgid "header.logout"
+msgstr "Logout"
+
+#. js-lingui-explicit-id
+#: src/Data.tsx:11
 msgid "dashboard.greet-user"
 msgstr "Hello"
 
 #. js-lingui-explicit-id
-#: src/Login.tsx:9
+#: src/Login.tsx:10
 msgid "login-page.login"
 msgstr "Login"
 

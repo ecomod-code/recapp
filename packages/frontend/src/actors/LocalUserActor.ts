@@ -1,5 +1,5 @@
 import { ActorRef, ActorSystem } from "ts-actors";
-import { StatefulActor } from "./StatefulActor";
+import { StatefulActor } from "ts-actors-react";
 import { User, UserStoreMessages, UserUpdateMessage } from "@recapp/models";
 
 export class LocalUserActor extends StatefulActor<any, any, { user: User | undefined }> {
@@ -23,7 +23,7 @@ export class LocalUserActor extends StatefulActor<any, any, { user: User | undef
 	}
 
 	async receive(from: ActorRef, message: UserUpdateMessage): Promise<any> {
-		console.log("MSG", from, message);
+		console.log("MSG", from.name, message);
 		if (message.type == "UserUpdateMessage") {
 			this.updateState(draft => {
 				draft.user = message.user as User;

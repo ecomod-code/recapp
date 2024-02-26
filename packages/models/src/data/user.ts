@@ -18,6 +18,7 @@ export const userSchema = zod
 	.object({
 		role: userRoleSchema, // Role of user
 		username: zod.string(), // Username (as provisioned by the ID provider)
+		nickname: zod.string().optional(),
 		lastLogin: timestampSchema, // Date of last login
 		active: zod.boolean(), // Whether the user can login
 		quizUsage: zod.map(uidSchema, quizUsageType), // How the user decided to participate in each individual quiz

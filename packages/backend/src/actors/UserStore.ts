@@ -146,6 +146,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
 						draft.collectionSubscribers.set(from.name as ActorUri, requestedProperties);
 					});
+					console.log("SUBSC", this.state.collectionSubscribers);
 					return unit();
 				},
 				UnsubscribeToUser: async userId => {
@@ -216,6 +217,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				draft.lastSeen.set(subscriber, toTimestamp());
 			}
 		});
+		console.log("Updated user", newUser);
 		return this.storeEntity(newUser)
 			.then(() => newUser)
 			.catch(error => error as Error);

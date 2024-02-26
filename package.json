@@ -5,12 +5,12 @@
     "packages/frontend"
   ],
   "dependencies": {
-	"@featherscloud/pinion": "^0.5.3",
+    "@featherscloud/pinion": "^0.5.3",
     "@manypkg/cli": "^0.21.2",
     "itu-utils": "^1.8.1",
     "lerna": "^8.1.2",
-    "ts-actors": "^3.0.4",
-    "tsmonads": "^3.3.0",
+    "ts-actors": "^3.1.0",
+    "tsmonads": "^3.4.0",
     "typescript": "^5.3.3",
     "zod": "^3.22.4"
   },
@@ -22,7 +22,7 @@
     "stop:docker:prod": "cd docker && docker-compose --env-file ../.env.production down",
     "bootstrap": "lerna bootstrap",
     "postinstall": "manypkg check",
-	"dev": "lerna run dev",
-	"build": "lerna run build"
+    "dev": "lerna run dev",
+    "build": "lerna run build"
   }
 }

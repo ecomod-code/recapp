@@ -6,7 +6,7 @@ export const Login: React.FC = () => {
 	return (
 		<div>
 			<h1>RECAPP</h1>
-			<Button variant="primary" href="http://localhost:3123/auth/login">
+			<Button variant="primary" href={`${import.meta.env.VITE_BACKEND_URI}/auth/login`}>
 				<Trans id="login-page.login" />
 			</Button>
 		</div>

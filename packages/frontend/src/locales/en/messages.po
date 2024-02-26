@@ -14,24 +14,115 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/App.tsx:26
+#: src/components/modals/ChangeNicknameModal.tsx:18
+msgid "user-change-nickname-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/App.tsx:27
 msgid "app.could_not_refresh_token"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:43
-msgid "header.logout"
-msgstr "Logout"
+#: src/components/cards/UserCard.tsx:30
+#: src/components/modals/ChangeRoleModal.tsx:34
+msgid "role-name-admin"
+msgstr ""
 
 #. js-lingui-explicit-id
-#: src/Data.tsx:11
-msgid "dashboard.greet-user"
-msgstr "Hello"
+#: src/components/cards/UserCard.tsx:34
+#: src/components/modals/ChangeRoleModal.tsx:29
+msgid "role-name-teacher"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/UserCard.tsx:38
+#: src/components/modals/ChangeRoleModal.tsx:25
+msgid "role-name-student"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/UserCard.tsx:126
+msgid "user-last-login: {date}"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeActiveModal.tsx:16
+msgid "user-deactivate-user-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeActiveModal.tsx:16
+msgid "user-activate-user-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeActiveModal.tsx:19
+msgid "user-change-active-flag-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeActiveModal.tsx:23
+msgid "yes"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeActiveModal.tsx:26
+msgid "no"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNameModal.tsx:18
+msgid "user-change-username-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNameModal.tsx:25
+#: src/components/modals/ChangeNicknameModal.tsx:29
+msgid "okay"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNameModal.tsx:28
+#: src/components/modals/ChangeNicknameModal.tsx:32
+#: src/components/modals/ChangeRoleModal.tsx:44
+msgid "cancel"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeRoleModal.tsx:20
+msgid "user-set-user-role-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeRoleModal.tsx:41
+msgid "user-set-role"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:82
+msgid "header.logout"
+msgstr "Logout"
 
 #. js-lingui-explicit-id
 #: src/Login.tsx:10
 msgid "login-page.login"
 msgstr "Login"
+
+#. js-lingui-explicit-id
+#: src/UserAdminPanel.tsx:30
+msgid "user-admin-panel-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/UserAdminPanel.tsx:38
+msgid "user-admin-panel-search-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/Data.tsx:11
+#~ msgid "dashboard.greet-user"
+#~ msgstr "Hello"
 
 #. js-lingui-explicit-id
 #: src/Data.tsx:7

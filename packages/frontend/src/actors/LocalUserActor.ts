@@ -12,10 +12,6 @@ export class LocalUserActor extends StatefulActor<any, any, { user: User | undef
 		const result: User = await this.ask("actors://recapp-backend/UserStore", UserStoreMessages.GetOwnUser());
 		if (!this.state.user && result) {
 			this.send("actors://recapp-backend/UserStore", UserStoreMessages.SubscribeToUser(result.uid));
-			this.send(
-				"actors://recapp-backend/UserStore",
-				UserStoreMessages.UpdateUser({ uid: result.uid, username: "Foo3 bar4" })
-			);
 		}
 		this.updateState(draft => {
 			draft.user = result;

@@ -1,10 +1,10 @@
 import React from "react";
-import { Data } from "./Data";
+import { UserAdminPanel } from "./UserAdminPanel";
 
 export const Dashboard: React.FC = () => {
 	return (
 		<React.StrictMode>
-			<Data />
+			<UserAdminPanel />
 		</React.StrictMode>
 	);
 };

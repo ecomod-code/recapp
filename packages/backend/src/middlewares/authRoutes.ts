@@ -142,39 +142,46 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 
 export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 	const maybeIdToken = maybe<string>(ctx.request.headers.cookie)
-		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=(.+);/.exec(cookie)))
+		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=(.+)(;|$)/.exec(cookie)))
 		.flatMap(match => maybe(match[1]));
 
 	await maybeIdToken.match(
 		async idToken => {
-			const { expires_at, sub } = jwt.decode(idToken) as jwt.JwtPayload;
-			if (fromTimestamp(expires_at) > DateTime.utc().plus(minutes(15))) {
-				return; // We do not need to refresh the token yet
+			try {
+				const { exp, sub } = jwt.decode(idToken) as jwt.JwtPayload;
+				if (fromTimestamp(exp! * 1000) > DateTime.utc().plus(minutes(15))) {
+					console.log("Refresh not needed yet");
+					ctx.body = "O.K.";
+					return; // We do not need to refresh the token yet
+				}
+				// Refresh the token
+				const client = await getOidc();
+				const system = Container.get<ActorSystem>("actor-system");
+				const sessionStore = createActorUri("SessionStore");
+				const session: Error | Session = await system.ask(
+					sessionStore,
+					SessionStoreMessages.GetSessionForUserId(sub as Id)
+				);
+				if (session instanceof Error) {
+					throw session;
+				}
+				const newTokenSet = await client.refresh(session.refreshToken);
+				system.send(
+					sessionStore,
+					SessionStoreMessages.StoreSession({
+						uid: sub as Id,
+						idToken: newTokenSet.id_token ?? "",
+						accessToken: newTokenSet.access_token ?? "",
+						refreshToken: newTokenSet.refresh_token ?? "",
+						expires: new Timestamp(newTokenSet.expires_at ?? -1),
+					})
+				);
+				ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; max-age=${hours(2).valueOf() / 1000}`);
+				ctx.body = "O.K.";
+			} catch (e) {
+				console.error(e);
+				throw e;
 			}
-			// Refresh the token
-			const client = Container.get<Client>("OIDC client");
-			const system = Container.get<ActorSystem>("actor-system");
-			const sessionStore = createActorUri("SessionStore");
-			const session: Error | Session = await system.ask(
-				sessionStore,
-				SessionStoreMessages.GetSessionForUserId(sub as Id)
-			);
-			if (session instanceof Error) {
-				throw session;
-			}
-			const newTokenSet = await client.refresh(session.refreshToken);
-			system.send(
-				sessionStore,
-				SessionStoreMessages.StoreSession({
-					uid: sub as Id,
-					idToken: newTokenSet.id_token ?? "",
-					accessToken: newTokenSet.access_token ?? "",
-					refreshToken: newTokenSet.refresh_token ?? "",
-					expires: new Timestamp(newTokenSet.expires_at ?? -1),
-				})
-			);
-			ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; max-age=${hours(2).valueOf() / 1000}`);
-			ctx.send("O.K.");
 		},
 		() => ctx.throw(401, "Invalid token")
 	);

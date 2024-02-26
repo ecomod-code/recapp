@@ -192,6 +192,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 			delete userToStore.active;
 			delete userToStore.archived;
 			delete userToStore.lastLogin;
+			delete userToStore.role;
 		} else if (clientUserRole !== "SYSTEM") {
 			delete userToStore.lastLogin;
 			if (clientUserRole !== "ADMIN") {

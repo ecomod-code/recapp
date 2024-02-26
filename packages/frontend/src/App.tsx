@@ -19,7 +19,7 @@ const updateToken = () => {
 	const mm = () => {
 		const hasToken = document.cookie.includes("bearer");
 		if (hasToken) {
-			Axios.put(import.meta.env.VITE_BACKEND_URI + "/refresh", {})
+			Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
 				.then(() => {
 					setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
 				})
@@ -39,7 +39,10 @@ setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf()
 
 const Root = () => {
 	const [init, setInit] = useState(false);
-	const system = useActorSystem(`ws://127.0.0.1:3123`, document.cookie.split(";")[0].split("=")[1]);
+	const system = useActorSystem(
+		`${import.meta.env.VITE_BACKEND_URI.replace("http", "ws")}`,
+		document.cookie.split(";")[0].split("=")[1]
+	);
 	useEffect(() => {
 		if (!init) {
 			system.forEach(async s => {

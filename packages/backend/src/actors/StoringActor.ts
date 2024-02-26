@@ -27,7 +27,11 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		protected readonly collectionName: string
 	) {
 		super(name, system);
-		this.checkInterval = setInterval(this.cleanup, hours(CLEANUP_INTERVAL).valueOf());
+		this.checkInterval = setInterval(this.cleanup.bind(this), hours(CLEANUP_INTERVAL).valueOf());
+	}
+
+	public override async afterStart(): Promise<void> {
+		this.logger.debug("Storing actor initiallized");
 	}
 
 	public override async beforeShutdown(): Promise<void> {

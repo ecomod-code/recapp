@@ -1,1 +1,1 @@
-export type ActorNames = "LocalUser";
+export type ActorNames = "LocalUser" | "UserAdmin";

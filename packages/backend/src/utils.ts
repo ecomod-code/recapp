@@ -3,7 +3,6 @@ import "reflect-metadata";
 import { ActorUri, Id, SessionStoreMessages } from "@recapp/models";
 import { join } from "path";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { debug } from "itu-utils";
 import { maybe } from "tsmonads";
 import Container from "typedi";
 import jwt from "jsonwebtoken";
@@ -25,7 +24,7 @@ export const systemEquals = (actorA: ActorRef, actorB: ActorRef): boolean => {
 export const bearerValid = async (idTokenString: string): Promise<Id> => {
 	const system = Container.get<ActorSystem>("actor-system");
 	const userId = maybe(jwt.decode(idTokenString.replace("Authorization,", "").trim()) as jwt.JwtPayload)
-		.flatMap(token => maybe(debug(token).sub as Id))
+		.flatMap(token => maybe(token.sub as Id))
 		.orUndefined();
 	if (userId) {
 		await system.ask(createActorUri("SessionStore"), SessionStoreMessages.GetSessionForUserId(userId));

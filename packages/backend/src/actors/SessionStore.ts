@@ -44,6 +44,7 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 					if (session.actorSystem) {
 						draft.clientIndex.set(session.actorSystem, session.uid);
 					}
+					session.updated = toTimestamp();
 					const newSession = { ...currentSession, ...session };
 					draft.cache.set(session.uid, newSession);
 					this.storeEntity(newSession);

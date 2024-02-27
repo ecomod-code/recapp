@@ -17,6 +17,7 @@ import { authLogin, authLogout, authProviderCallback, authRefresh } from "./midd
 import { errorHandler } from "./middlewares/errorHandler";
 import { logger } from "./logger";
 import { authenticationMiddleware } from "./middlewares/authMiddleware";
+import { QuizActor } from "./actors/QuizActor";
 
 const config = {
 	port: parseInt(process.env.SERVER_PORT ?? "3123"),
@@ -60,6 +61,7 @@ const start = async () => {
 		Container.set("actor-system", system);
 		await system.createActor(SessionStore, { name: "SessionStore", strategy: "Restart" });
 		await system.createActor(UserStore, { name: "UserStore", strategy: "Restart" });
+		await system.createActor(QuizActor, { name: "QuizActor", strategy: "Restart" });
 	} catch (err) {
 		console.error(err);
 		process.exit(1);

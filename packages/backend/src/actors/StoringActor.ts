@@ -54,6 +54,10 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		return [session.role, session.uid];
 	};
 
+	protected async afterEntityRemovedFromCache(_uid: Id) {
+		/* Override in child classes if you want to do something after an entity was removed */
+	}
+
 	protected cleanup() {
 		this.logger.debug(`Running cache and subscription cleanups for ${this.name}`);
 		const cleanupTimestamp = DateTime.utc().minus(hours(CLEANUP_INTERVAL));
@@ -66,11 +70,16 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 			entitiesToRemove.forEach(e => {
 				draft.lastTouched.delete(e);
 				draft.cache.delete(e);
+				this.afterEntityRemovedFromCache(e);
 			});
 		});
 	}
 
 	protected abstract updateIndices(draft: { cache: Map<Id, Entity> }, entity: Entity): void;
+
+	protected async afterEntityWasCached(_uid: Id) {
+		/* Override in child classes if you want to do something after an entity was fetched from the db */
+	}
 
 	protected getEntity = async (uid: Id): Promise<Maybe<Entity>> => {
 		const maybeEntity = maybe(this.state.cache.get(uid));
@@ -85,6 +94,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 						this.updateIndices(draft as { cache: Map<Id, Entity> }, e);
 						draft.cache.set(uid, { ...currentEntity, ...e } as Draft<Entity>);
 					});
+					this.afterEntityWasCached(uid);
 					return this.state.cache.get(uid)!;
 				});
 			}

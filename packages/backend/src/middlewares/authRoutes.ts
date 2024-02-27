@@ -82,11 +82,11 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
 			try {
-				const userExists = await system.ask(userStore, UserStoreMessages.HasUser(uid));
+				const userExists = await system.ask(userStore, UserStoreMessages.Has(uid));
 				if (!userExists) {
 					await system.send(
 						userStore,
-						UserStoreMessages.CreateUser({
+						UserStoreMessages.Create({
 							uid,
 							role: "STUDENT",
 							lastLogin: toTimestamp(),
@@ -98,7 +98,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 						})
 					);
 				} else {
-					const u: User = await system.ask(userStore, UserStoreMessages.GetUser(uid));
+					const u: User = await system.ask(userStore, UserStoreMessages.Get(uid));
 					if (!u.active) {
 						ctx.status = 401;
 						ctx.redirect("http://localhost:5173/?error=userdeactivated"); // TODO: FRONTEND_URI ?? "");
@@ -106,7 +106,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					}
 					const user: User = await system.ask(
 						userStore,
-						UserStoreMessages.UpdateUser({
+						UserStoreMessages.Update({
 							uid,
 							lastLogin: toTimestamp(),
 							updated: toTimestamp(),

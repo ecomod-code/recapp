@@ -66,10 +66,11 @@ export const quizSchema = zod
 		), // Which participation options are allowed after activating/running this quiz (overrides the settings above)
 		allowedQuestionTypes: zod.record<typeof elementTypesSchema, ZodBoolean>(elementTypesSchema, zod.boolean()), // Which quiz elements are allowed after activating this quiz (overrides the settings above)
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
-		shared: zod.boolean(), // Whether the quiz was shared with other teachers
 		activeComments: zod.boolean(), // Are student queries allowed after the quiz has been started
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
+		teachers: zod.set(uidSchema),
+		students: zod.set(uidSchema),
 	})
 	.merge(idEntitySchema);
 

@@ -49,7 +49,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await UserStoreMessages.match<Promise<ResultType>>(message, {
-				CreateUser: async user => {
+				Create: async user => {
 					const validation = userSchema.safeParse(user);
 					if (!validation.success) {
 						return new Error(validation.error.toString());
@@ -71,7 +71,10 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						draft.cache.set(userToStore.uid, userToStore);
 					});
 					for (const [subscriber, properties] of this.state.collectionSubscribers) {
-						this.send(subscriber, new UserUpdateMessage(pick(properties, userToStore)));
+						this.send(
+							subscriber,
+							new UserUpdateMessage(properties.length > 0 ? pick(properties, userToStore) : userToStore)
+						);
 					}
 					for (const subscriber of this.state.subscribers.get(userToStore.uid) ?? new Set()) {
 						this.send(subscriber, new UserUpdateMessage(userToStore));
@@ -80,8 +83,8 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						.then(() => unit())
 						.catch(error => error as Error);
 				},
-				UpdateUser: async user => this.updateUser(user, clientUserRole, clientUserId),
-				HasUser: async userId => {
+				Update: async user => this.updateUser(user, clientUserRole, clientUserId),
+				Has: async userId => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole) && userId !== clientUserId) {
 						return new Error(
 							`Operation not allowed for ${clientUserRole} and ${clientUserId} on ${userId}`
@@ -90,21 +93,21 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const maybeUser = await this.getEntity(userId);
 					return maybeUser.hasValue;
 				},
-				GetOwnUser: async () => {
+				GetOwn: async () => {
 					const maybeUser = await this.getEntity(clientUserId);
 					return maybeUser.match<User | Error>(
 						identity,
 						() => new Error(`User id ${clientUserId} does not exist`)
 					);
 				},
-				GetUser: async userId => {
+				Get: async userId => {
 					if (!["ADMIN", "SYSTEM", "TEACHER"].includes(clientUserRole) && userId !== clientUserId) {
 						return new Error(`Operation not allowed`);
 					}
 					const maybeUser = await this.getEntity(userId);
 					return maybeUser.match<User | Error>(identity, () => new Error(`User id ${userId} does not exist`));
 				},
-				GetUsers: async () => {
+				GetAll: async () => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);
 					}
@@ -126,7 +129,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						() => new Error(`User id ${userId} does not exist`)
 					);
 				},
-				SubscribeToUser: async userId => {
+				SubscribeTo: async userId => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole) && userId !== clientUserId) {
 						return new Error(`Operation not allowed`);
 					}
@@ -138,7 +141,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					});
 					return unit();
 				},
-				SubscribeToUserCollection: async (requestedProperties: string[]) => {
+				SubscribeToCollection: async (requestedProperties: string[]) => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);
 					}
@@ -146,10 +149,9 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
 						draft.collectionSubscribers.set(from.name as ActorUri, requestedProperties);
 					});
-					console.log("SUBSC", this.state.collectionSubscribers);
 					return unit();
 				},
-				UnsubscribeToUser: async userId => {
+				UnsubscribeFrom: async userId => {
 					this.state = create(this.state, draft => {
 						const subscribers = draft.subscribers.get(userId) ?? new Set();
 						subscribers.delete(from.name as ActorUri);
@@ -157,7 +159,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					});
 					return unit();
 				},
-				UnsubscribeToUserCollection: async () => {
+				UnsubscribeFromCollection: async () => {
 					this.state = create(this.state, draft => {
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
@@ -208,9 +210,13 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 		let newUser!: User;
 		this.state = create(this.state, draft => {
 			newUser = { ...oldUser, ...userToStore } as User;
+			newUser.updated = toTimestamp();
 			draft.cache.set(userToStore.uid, newUser);
 			for (const [subscriber, properties] of this.state.collectionSubscribers) {
-				this.send(subscriber, new UserUpdateMessage(pick(properties, newUser)));
+				this.send(
+					subscriber,
+					new UserUpdateMessage(properties.length > 0 ? pick(properties, newUser) : newUser)
+				);
 				draft.lastSeen.set(subscriber, toTimestamp());
 			}
 			for (const subscriber of this.state.subscribers.get(userToStore.uid) ?? new Set()) {

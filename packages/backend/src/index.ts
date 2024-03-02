@@ -61,7 +61,8 @@ const start = async () => {
 		Container.set("actor-system", system);
 		await system.createActor(SessionStore, { name: "SessionStore", strategy: "Restart" });
 		await system.createActor(UserStore, { name: "UserStore", strategy: "Restart" });
-		await system.createActor(QuizActor, { name: "QuizActor", strategy: "Restart" });
+		const qa = await system.createActor(QuizActor, { name: "QuizActor", strategy: "Restart" });
+		console.error(qa.name);
 	} catch (err) {
 		console.error(err);
 		process.exit(1);

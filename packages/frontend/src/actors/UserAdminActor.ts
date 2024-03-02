@@ -9,18 +9,11 @@ export class UserAdminActor extends StatefulActor<any, any, { users: User[] }> {
 	}
 
 	async afterStart(): Promise<void> {
-		const result: User = await this.ask("actors://recapp-backend/UserStore", UserStoreMessages.GetUsers());
+		const result: User = await this.ask("actors://recapp-backend/UserStore", UserStoreMessages.GetAll());
 		if (this.state.users.length === 0 && result) {
 			this.send(
 				"actors://recapp-backend/UserStore",
-				UserStoreMessages.SubscribeToUserCollection([
-					"uid",
-					"username",
-					"role",
-					"active",
-					"lastlogin",
-					"nickname",
-				])
+				UserStoreMessages.SubscribeToCollection(["uid", "username", "role", "active", "lastlogin", "nickname"])
 			);
 		}
 	}

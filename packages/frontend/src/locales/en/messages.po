@@ -14,12 +14,28 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ChangeNicknameModal.tsx:18
-msgid "user-change-nickname-modal-title"
+#: src/App.tsx:79
+#: src/layout/HeaderSection.tsx:51
+msgid "undefined-title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/App.tsx:27
+#: src/Dashboard.tsx:24
+msgid "dashboard-tab-label-quizzes"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/Dashboard.tsx:27
+msgid "dashboard-tab-label-users"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:56
+msgid "button-login-again"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/App.tsx:32
 msgid "app.could_not_refresh_token"
 msgstr ""
 
@@ -90,6 +106,11 @@ msgid "cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
+#: src/components/modals/ChangeNicknameModal.tsx:18
+msgid "user-change-nickname-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/components/modals/ChangeRoleModal.tsx:20
 msgid "user-set-user-role-modal-title"
 msgstr ""
@@ -100,12 +121,12 @@ msgid "user-set-role"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:82
+#: src/layout/HeaderSection.tsx:111
 msgid "header.logout"
 msgstr "Logout"
 
 #. js-lingui-explicit-id
-#: src/Login.tsx:10
+#: src/Login.tsx:15
 msgid "login-page.login"
 msgstr "Login"
 
@@ -128,3 +149,15 @@ msgstr ""
 #: src/Data.tsx:7
 #~ msgid "login-page.validation-warning.email.not-valid"
 #~ msgstr ""
+
+#~ msgid "error-message-no-server-connection"
+#~ msgstr "Unable to connect to server. Please try to log in again."
+
+#~ msgid "error-message-no-server-connection-title"
+#~ msgstr "No server connection"
+
+#~ msgid "error-message-user-deactivated"
+#~ msgstr "Your account was deactivated. Please consult your administrator for further support."
+
+#~ msgid "error-message-user-deactivated-title"
+#~ msgstr "User deactivated"

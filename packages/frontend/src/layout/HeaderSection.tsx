@@ -1,13 +1,15 @@
-import { Container, Dropdown, Nav, Navbar, Form, InputGroup } from "react-bootstrap";
+import { Container, Dropdown, Nav, Navbar, Form, InputGroup, Modal, Button } from "react-bootstrap";
 import { useStatefulActor } from "ts-actors-react";
 import { User, UserStoreMessages } from "@recapp/models";
 import { LocaleSelect } from "../components/layout/LocaleSelect";
 import { Trans } from "@lingui/react";
+import { i18n } from "@lingui/core";
 import { BoxArrowRight, Pencil } from "react-bootstrap-icons";
 import { InitialsBubble } from "../components/InitialsBubble";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, useEffect, useState } from "react";
 import { ChangeNicknameModal } from "../components/modals/ChangeNicknameModal";
 import { actorUris } from "../actorUris";
+import { ErrorModal } from "../components/modals/ErrorModal";
 
 export const HEADER_HEIGHT = 40;
 
@@ -38,12 +40,13 @@ export const HeaderSection: React.FC = () => {
 				const role = `(${user.role})`;
 				const changeName = (nickname: string) => {
 					actor.forEach(a =>
-						a.send(actorUris.UserStore, UserStoreMessages.UpdateUser({ uid: user.uid, nickname }))
+						a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, nickname }))
 					);
 					setNameModal(false);
 				};
 				return (
 					<header>
+						<ErrorModal />
 						<ChangeNicknameModal
 							show={nameModal}
 							defaultValue={user.nickname ?? ""}

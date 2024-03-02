@@ -25,13 +25,11 @@ export const quizElementSchema = zod
 
 export type QuizElement = zod.infer<typeof quizElementSchema>;
 
-export const elementGroupSchema = zod
-	.object({
-		name: zod.string(), // Group name/title
-		elements: zod.array(quizElementSchema), // Which elements belong to this group
-		statistics: groupStatisticsSchema.optional(), // Last statistics for this group (if any)
-	})
-	.merge(idEntitySchema);
+export const elementGroupSchema = zod.object({
+	name: zod.string(), // Group name/title
+	elements: zod.array(quizElementSchema), // Which elements belong to this group
+	statistics: groupStatisticsSchema.optional(), // Last statistics for this group (if any)
+});
 
 export type ElementGroup = zod.infer<typeof elementGroupSchema>;
 
@@ -69,8 +67,8 @@ export const quizSchema = zod
 		activeComments: zod.boolean(), // Are student queries allowed after the quiz has been started
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
-		teachers: zod.set(uidSchema),
-		students: zod.set(uidSchema),
+		teachers: zod.array(uidSchema),
+		students: zod.array(uidSchema),
 	})
 	.merge(idEntitySchema);
 

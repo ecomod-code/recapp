@@ -12,6 +12,7 @@ import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
 import { pick } from "rambda";
+import { v4 } from "uuid";
 
 type State = {
 	cache: Map<Id, Comment>;
@@ -21,7 +22,7 @@ type State = {
 	lastTouched: Map<Id, Timestamp>;
 };
 
-type ResultType = Unit | Error | Comment;
+type ResultType = Unit | Error | Comment | Id;
 
 /**
  * Actor representing the comments of a single quiz. This will be started as a child of the corresponding quiz actor
@@ -50,9 +51,11 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 	}
 
 	public async receive(from: ActorRef, message: CommentActorMessage): Promise<ResultType> {
+		console.log("COMMENTACTOR", from.name, message);
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		return await CommentActorMessages.match<Promise<ResultType>>(message, {
 			Create: async comment => {
+				(comment as Comment).uid = v4() as Id;
 				const commentToCreate = commentSchema.parse(comment);
 				await this.storeEntity(commentToCreate);
 				for (const [subscriber, properties] of this.state.collectionSubscribers) {
@@ -66,7 +69,32 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 				for (const subscriber of this.state.subscribers.get(commentToCreate.uid) ?? new Set()) {
 					this.send(subscriber, new CommentUpdateMessage(commentToCreate));
 				}
-				return unit();
+				return commentToCreate.uid;
+			},
+			Upvote: async ({ commentId, userId }) => {
+				const existingComment = await this.getEntity(commentId);
+				return existingComment
+					.map<Promise<Comment | Error>>(async commentToUpdate => {
+						if (commentToUpdate.upvoters.some(u => u === userId)) {
+							return commentToUpdate;
+						}
+						commentToUpdate.updated = toTimestamp();
+						commentToUpdate.upvoters.push(userId);
+						await this.storeEntity(commentToUpdate);
+						for (const [subscriber, properties] of this.state.collectionSubscribers) {
+							this.send(
+								subscriber,
+								new CommentUpdateMessage(
+									properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
+								)
+							);
+						}
+						for (const subscriber of this.state.subscribers.get(commentToUpdate.uid) ?? new Set()) {
+							this.send(subscriber, new CommentUpdateMessage(commentToUpdate));
+						}
+						return commentToUpdate;
+					})
+					.orElse(Promise.resolve(new Error("Comment not found")));
 			},
 			Update: async comment => {
 				const existingComment = await this.getEntity(comment.uid);

@@ -52,16 +52,16 @@ export const UserCard: React.FC<{ user: User; ownUser: Maybe<User> }> = ({ user,
 	const [, actor] = useStatefulActor<{ users: User[] }>("UserAdmin");
 	const toggleActivate = () => {
 		actor.forEach(a =>
-			a.send(actorUris.UserStore, UserStoreMessages.UpdateUser({ uid: user.uid, active: !user.active }))
+			a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, active: !user.active }))
 		);
 		setModal(false);
 	};
 	const changeRole = (role: UserRole) => {
-		actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.UpdateUser({ uid: user.uid, role })));
+		actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, role })));
 		setModal(false);
 	};
 	const changeName = (username: string) => {
-		actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.UpdateUser({ uid: user.uid, username })));
+		actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, username })));
 		setModal(false);
 	};
 	const close = () => {

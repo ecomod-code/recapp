@@ -1,4 +1,13 @@
-import { ActorUri, Id, Quiz, QuizActorMessage, QuizActorMessages, QuizUpdateMessage, quizSchema } from "@recapp/models";
+import {
+	ActorUri,
+	Id,
+	Quiz,
+	QuizActorMessage,
+	QuizActorMessages,
+	QuizUpdateMessage,
+	quizSchema,
+	toId,
+} from "@recapp/models";
 import { SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, toTimestamp, unit } from "itu-utils";
@@ -7,6 +16,8 @@ import { maybe } from "tsmonads";
 import { create } from "mutative";
 import { identity, pick } from "rambda";
 import { v4 } from "uuid";
+import { QuestionActor } from "./QuestionActor";
+import { UUID } from "mongodb";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -23,6 +34,7 @@ type ResultType = any;
  */
 export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultType> {
 	private commentActors = new Map<Id, ActorRef>();
+	private questionActors = new Map<Id, ActorRef>();
 	// private questionActors = new Map<Id, ActorRef>();
 
 	protected override state: State = {
@@ -45,6 +57,13 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		const comments = await this.system.createActor(CommentActor, { name: `Comment_${uid}`, parent: this.ref }, uid);
 		this.logger.debug(`Comments actor ${comments.name} created`);
 		this.commentActors.set(uid, comments);
+		const questions = await this.system.createActor(
+			QuestionActor,
+			{ name: `Question_${uid}`, parent: this.ref },
+			uid
+		);
+		this.logger.debug(`Question actor ${questions.name} created`);
+		this.questionActors.set(uid, questions);
 	}
 
 	protected override async afterEntityRemovedFromCache(uid: Id) {
@@ -59,10 +78,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
-					if (!quiz.uid) {
-						quiz.uid = v4() as Id;
-					}
-					(quiz as Quiz).uniqueLink = `/quiz/${quiz.uid}`;
+					const uid = toId(v4());
+					(quiz as Quiz).uid = uid;
+					(quiz as Quiz).uniqueLink = `/quiz/${UUID}`;
 					const quizToCreate = quizSchema.parse(quiz);
 					await this.storeEntity(quizToCreate);
 					for (const [subscriber, properties] of this.state.collectionSubscribers) {
@@ -74,7 +92,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					for (const subscriber of this.state.subscribers.get(quizToCreate.uid) ?? new Set()) {
 						this.send(subscriber, new QuizUpdateMessage(quizToCreate));
 					}
-					return quiz.uid;
+					return uid;
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);

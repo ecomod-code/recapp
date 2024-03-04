@@ -50,7 +50,12 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		const session: Session = await this.ask(
 			createActorUri("SessionStore"),
 			SessionStoreMessages.GetSessionForClient(extractSystemName(from.name))
-		);
+		)
+			.then(s => s as Session)
+			.catch((e: Error): Session => {
+				console.error(e);
+				return { role: "STUDENT", uid: "" } as Session;
+			});
 		return [session.role, session.uid];
 	};
 

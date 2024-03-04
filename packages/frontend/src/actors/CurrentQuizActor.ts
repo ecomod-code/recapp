@@ -10,69 +10,83 @@ import {
 	User,
 	CommentActorMessages,
 	toId,
+	QuestionUpdateMessage,
+	Question,
+	QuestionActorMessages,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
+import { i18n } from "@lingui/core";
+import { actorUris } from "../actorUris";
+import unionize, { UnionOf, ofType } from "unionize";
 
-export class AddComment {
-	public readonly type = "AddComment" as const;
-	constructor(public readonly comment: Omit<Comment, "uid" | "authorName" | "authorId">) {}
-}
+export const CurrentQuizMessages = unionize(
+	{
+		CreateQuiz: ofType<Id>(),
+		SetUser: ofType<User>(),
+		SetQuiz: ofType<Id>(),
+		UpvoteComment: ofType<Id>(),
+		FinishComment: ofType<Id>(),
+		AddComment: ofType<Omit<Comment, "uid" | "authorName" | "authorId">>(),
+		AddQuestion: ofType<Omit<Question, "uid" | "authorName" | "authorId">>(),
+		UpdateQuestion: ofType<Partial<Question> & { uid: Id }>(),
+	},
+	{ value: "value" }
+);
 
-export class FinishComment {
-	public readonly type = "FinishComment" as const;
-	constructor(public readonly commentId: Id) {}
-}
+export type CurrentQuizMessage = UnionOf<typeof CurrentQuizMessages>;
 
-export class UpdvoteComment {
-	public readonly type = "UpvoteComment" as const;
-	constructor(public readonly commentId: Id) {}
-}
+type MessageType = QuizUpdateMessage | CommentUpdateMessage | QuestionUpdateMessage | CurrentQuizMessage;
 
-export class SetQuiz {
-	public readonly type = "SetQuiz" as const;
-	constructor(public readonly quizId: Id) {}
-}
-
-export class SetUser {
-	public readonly type = "SetUser" as const;
-	constructor(public readonly user: User) {}
-}
-
-type MessageType =
-	| QuizUpdateMessage
-	| CommentUpdateMessage
-	| AddComment
-	| FinishComment
-	| UpdvoteComment
-	| SetUser
-	| SetQuiz;
-
-export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Quiz; comments: Comment[] }> {
+export class CurrentQuizActor extends StatefulActor<
+	MessageType,
+	Unit,
+	{ quiz: Quiz; comments: Comment[]; questions: Question[] }
+> {
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { quiz: {} as Quiz, comments: [] };
+		this.state = { quiz: {} as Quiz, comments: [], questions: [] };
 	}
 
-	async afterStart(): Promise<void> {
-		// If quiz doesn't exist, create it
-		try {
-			const exists: boolean = await this.ask(
-				"actors://recapp-backend/QuizActor",
-				QuizActorMessages.Has("demo-quiz" as Id)
-			);
-			if (!exists) {
-				await this.send(
-					"actors://recapp-backend/QuizActor",
-					QuizActorMessages.Create({
-						uid: "demo-quiz" as Id,
-						title: "Ein DEMO-Quiz",
-						description: "Ein Beispiel",
+	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
+		if (message.tag === "QuizUpdateMessage") {
+			this.updateState(draft => {
+				draft.quiz = { ...draft.quiz, ...message.quiz };
+			});
+			return nothing();
+		} else if (message.tag === "CommentUpdateMessage") {
+			this.updateState(draft => {
+				draft.comments = draft.comments.filter(u => u.uid != message.comment.uid);
+				draft.comments.push(message.comment as Comment);
+				draft.comments.sort((a, b) => a.uid.localeCompare(b.uid));
+			});
+			return nothing();
+		} else if (message.tag === "QuestionUpdateMessage") {
+			this.updateState(draft => {
+				draft.questions = draft.questions.filter(u => u.uid != message.question.uid);
+				draft.questions.push(message.question as Question);
+				draft.questions.sort((a, b) => a.uid.localeCompare(b.uid));
+			});
+			return nothing();
+		}
+		return maybe(message);
+	}
+
+	async receive(_from: ActorRef, message: MessageType): Promise<Unit> {
+		const maybeLocalMessage = await this.handleRemoteUpdates(message);
+
+		// Deal with local messages
+		maybeLocalMessage.forEach(m =>
+			CurrentQuizMessages.match(m, {
+				CreateQuiz: async creator => {
+					const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
+						title: i18n._("new-quiz-title"),
+						description: i18n._("new-quiz-description"),
 						state: "ACTIVE",
-						groups: [{ name: "DEFAULT", elements: [] }],
+						groups: [{ name: i18n._("new-quiz-group"), questions: [] }],
 						studentQuestions: true,
 						studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
 						allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
@@ -80,126 +94,97 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 						allowedQuestionTypes: { MULTIPLE: true, SINGLE: true, TEXT: true },
 						shuffleQuestions: false,
 						activeComments: true,
-						teachers: [toId("hendrik.belitz")],
+						teachers: [creator],
 						students: [],
 						created: toTimestamp(),
 						updated: toTimestamp(),
-					})
-				);
-			}
-		} catch (e) {
-			console.error(e);
-			throw e;
-		}
-	}
-
-	async receive(_from: ActorRef, message: MessageType): Promise<any> {
-		switch (message.type) {
-			case "QuizUpdateMessage": {
-				this.updateState(draft => {
-					draft.quiz = { ...draft.quiz, ...message.quiz };
-				});
-				break;
-			}
-			case "CommentUpdateMessage": {
-				this.updateState(draft => {
-					draft.comments = draft.comments.filter(u => u.uid != message.comment.uid);
-					draft.comments.push(message.comment as Comment);
-					draft.comments.sort((a, b) => a.uid.localeCompare(b.uid));
-				});
-				break;
-			}
-			case "AddComment": {
-				console.log("ADD", this.user, message);
-				this.user.forEach(u => {
-					this.send(
-						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-						CommentActorMessages.Create({
-							authorName: u.username,
-							authorId: u.uid,
-							...message.comment,
-						})
-					);
-				});
-				break;
-			}
-			case "FinishComment": {
-				this.send(
-					"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-					CommentActorMessages.Update({
-						uid: message.commentId,
-						answered: true,
-					})
-				);
-				break;
-			}
-			case "UpvoteComment": {
-				this.user.forEach(u => {
-					this.send(
-						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-						CommentActorMessages.Upvote({
-							commentId: message.commentId,
-							userId: u.uid,
-						})
-					);
-				});
-				break;
-			}
-			case "AddComment": {
-				this.user.forEach(u => {
-					this.send(
-						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-						CommentActorMessages.Create({
-							authorName: u.username,
-							authorId: u.uid,
-							...message.comment,
-						})
-					);
-				});
-				break;
-			}
-			case "SetUser": {
-				this.user = maybe(message.user);
-				this.quiz.forEach(q => {
-					this.send(this.actorRef!, new SetQuiz(q));
-				});
-				break;
-			}
-			case "SetQuiz": {
-				try {
-					this.quiz.forEach(q => {
-						this.send("actors://recapp-backend/QuizActor", QuizActorMessages.UnsubscribeFrom(q));
-					});
-					this.quiz.forEach(q => {
+					};
+					const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
+					this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));
+				},
+				AddComment: async comment => {
+					this.user.forEach(u => {
 						this.send(
-							"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-							CommentActorMessages.UnsubscribeFromCollection()
+							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							CommentActorMessages.Create({
+								authorName: u.username,
+								authorId: u.uid,
+								...comment,
+							})
 						);
 					});
-					this.quiz = maybe(message.quizId);
-					const quizData: Quiz = await this.ask(
-						"actors://recapp-backend/QuizActor",
-						QuizActorMessages.Get(message.quizId)
-					);
-					await this.send(
-						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-						CommentActorMessages.GetAll()
-					);
-					this.updateState(draft => {
-						draft.quiz = quizData;
+				},
+				AddQuestion: async question => {
+					this.user.forEach(u => {
+						this.send(
+							`${actorUris.QuestionActorPrefix}${this.quiz}`,
+							QuestionActorMessages.Create({
+								authorName: u.username,
+								authorId: u.uid,
+								...question,
+							})
+						);
 					});
-					this.send("actors://recapp-backend/QuizActor", QuizActorMessages.SubscribeTo(message.quizId));
+				},
+				UpdateQuestion: async question => {
+					this.send(`${actorUris.QuestionActorPrefix}${this.quiz}`, QuestionActorMessages.Update(question));
+				},
+				FinishComment: async uid => {
 					this.send(
-						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
-						CommentActorMessages.SubscribeToCollection()
+						`${actorUris.CommentActorPrefix}${this.quiz}`,
+						CommentActorMessages.Update({
+							uid,
+							answered: true,
+						})
 					);
-				} catch (e) {
-					console.error(e);
-				}
-				console.log("SETQUIZ", this.state);
-				break;
-			}
-		}
+				},
+				UpvoteComment: async commentId => {
+					this.user.forEach(u => {
+						this.send(
+							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							CommentActorMessages.Upvote({
+								commentId,
+								userId: u.uid,
+							})
+						);
+					});
+				},
+				SetUser: async user => {
+					this.user = maybe(user);
+					this.quiz.forEach(q => {
+						this.send(this.actorRef!, CurrentQuizMessages.SetQuiz(q));
+					});
+				},
+				SetQuiz: async uid => {
+					try {
+						this.state = { ...this.state, comments: [], questions: [] };
+						this.quiz.forEach(q => {
+							this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
+						});
+						this.quiz.forEach(q => {
+							this.send(
+								`${actorUris.CommentActorPrefix}${this.quiz}`,
+								CommentActorMessages.UnsubscribeFromCollection()
+							);
+						});
+						this.quiz = maybe(uid);
+						const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
+						await this.send(`${actorUris.CommentActorPrefix}${this.quiz}`, CommentActorMessages.GetAll());
+						this.updateState(draft => {
+							draft.quiz = quizData;
+						});
+						this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
+						this.send(
+							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							CommentActorMessages.SubscribeToCollection()
+						);
+					} catch (e) {
+						console.error(e);
+					}
+				},
+			})
+		);
+
 		return unit();
 	}
 }

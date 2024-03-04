@@ -11,7 +11,7 @@ export const Layout = (props: Props) => {
 			<div className="fixed-top">
 				<HeaderSection />
 			</div>
-			<Container style={{ marginTop: 60 }}>
+			<Container style={{ marginTop: 60, width: "100vh" }}>
 				<main
 					style={{
 						width: "100%",

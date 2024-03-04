@@ -51,7 +51,6 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 	}
 
 	public async receive(from: ActorRef, message: CommentActorMessage): Promise<ResultType> {
-		console.log("COMMENTACTOR", from.name, message);
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		return await CommentActorMessages.match<Promise<ResultType>>(message, {
 			Create: async comment => {

@@ -15,10 +15,13 @@ import { create } from "mutative";
 import { identity, pick } from "rambda";
 import { SubscribableActor } from "./SubscribableActor";
 import { AccessRole } from "./StoringActor";
+import { maybe } from "tsmonads";
 
 type ListedUser = Omit<User, "quizUsage">;
 
-type ResultType = User | ListedUser[] | Error | Unit | UserRole | boolean;
+type Teacher = Pick<User, "uid" | "nickname" | "username">;
+
+type ResultType = User | ListedUser[] | Teacher[] | Error | Unit | UserRole | boolean;
 
 type State = {
 	cache: Map<Id, User>;
@@ -26,6 +29,8 @@ type State = {
 	collectionSubscribers: Map<ActorUri, string[]>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
+	nicknames: Set<string>; // Index of all nicknames
+	teachers: Map<Id, Teacher>; // Index of all teachers and admins
 };
 
 export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultType> {
@@ -35,14 +40,27 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 		collectionSubscribers: new Map(),
 		lastSeen: new Map(),
 		lastTouched: new Map(),
+		nicknames: new Set(),
+		teachers: new Map(),
 	};
 
 	public constructor(name: string, system: ActorSystem) {
 		super(name, system, "users");
 	}
 
-	protected override updateIndices(_draft: State, _user: User): void {
-		return;
+	public override async afterStart(): Promise<void> {
+		const db = await this.connector.db();
+		const users = (await db
+			.collection<User>(this.collectionName)
+			.find({}, { uid: 1, username: 1, nickname: 1 } as any)
+			.toArray()) as Teacher[];
+		this.state.nicknames = new Set(users.map(u => u.nickname).filter(Boolean) as string[]);
+		this.state.teachers = new Map(users.map(u => [u.uid, u]));
+	}
+
+	protected override updateIndices(draft: State, user: User): void {
+		maybe(user.nickname).forEach(draft.nicknames.add);
+		draft.teachers.set(user.uid, { uid: user.uid, username: user.username, nickname: user.nickname });
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
@@ -112,7 +130,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						return new Error(`Operation not allowed`);
 					}
 					const db = await this.connector.db();
-					const users = await db.collection<User>(this.collectionName).find().toArray();
+					const users = await db.collection<User>(this.collectionName).find({}).toArray();
 					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
 						this.send(from, new UserUpdateMessage(rest));
@@ -164,6 +182,15 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
 					return unit();
+				},
+				GetTeachers: async () => {
+					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
+						return new Error(`Operation not allowed`);
+					}
+					return Array.from(this.state.teachers.values());
+				},
+				IsNicknameUnique: async nickname => {
+					return !this.state.nicknames.has(nickname);
 				},
 				default: async () => {
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);

@@ -4,7 +4,7 @@ import { Quiz } from "../data/quiz";
 
 export const QuizActorMessages = unionize(
 	{
-		Create: ofType<Omit<Quiz, "uniqueLink">>(), // Create a new quiz, returns the quiz uid (generated if not set)
+		Create: ofType<Omit<Quiz, "uniqueLink" | "uid">>(), // Create a new quiz, returns the quiz uid (generated if not set)
 		Update: ofType<Partial<Quiz> & { uid: Id }>(), // Update quiz data, answers updated Quiz
 		GetAll: {}, // Get all quizzes accessible by the requester, will send back all quizzes in this list to the requester
 		Has: ofType<Id>(), // Check if quiz exists, answers with boolean
@@ -22,7 +22,7 @@ export const QuizActorMessages = unionize(
 
 /** Message send to the client on quiz subscriptions */
 export class QuizUpdateMessage {
-	public readonly type = "QuizUpdateMessage" as const;
+	public readonly tag = "QuizUpdateMessage" as const;
 	constructor(public readonly quiz: Partial<Quiz>) {}
 }
 

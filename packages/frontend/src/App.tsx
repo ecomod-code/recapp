@@ -10,7 +10,9 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { minutes } from "itu-utils";
 import Axios from "axios";
 import "./App.css";
+import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
+import { QuizPage } from "./pages/QuizPage";
 
 const updateToken = () => {
 	const mm = () => {
@@ -47,6 +49,10 @@ const router = createBrowserRouter([
 			{
 				path: "/Dashboard",
 				element: <Dashboard />,
+			},
+			{
+				path: "/Dashboard/Quiz",
+				element: <QuizPage />,
 			},
 		],
 	},

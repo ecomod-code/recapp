@@ -3,7 +3,7 @@ import { UserAdminPanel } from "./UserAdminPanel";
 import { Tab, Tabs } from "react-bootstrap";
 import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
-import { Editor } from "./Editor";
+import { Quizzes } from "./QuizzesPanel";
 import { User } from "@recapp/models";
 import { useStatefulActor } from "ts-actors-react";
 import { ErrorMessages } from "./actors/ErrorActor";
@@ -22,7 +22,7 @@ export const Dashboard: React.FC = () => {
 		<React.StrictMode>
 			<Tabs defaultActiveKey="users" className="mb-3 w-100 h-100">
 				<Tab eventKey="quizzes" title={i18n._("dashboard-tab-label-quizzes")}>
-					<Editor quizId="demo-quiz" />
+					<Quizzes />
 				</Tab>
 				<Tab eventKey="users" title={i18n._("dashboard-tab-label-users")}>
 					<UserAdminPanel />

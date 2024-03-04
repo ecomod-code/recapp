@@ -12,9 +12,12 @@ export const answerSchema = zod
 
 export type Answer = zod.infer<typeof answerSchema>;
 
-export const quizElementSchema = zod
+export const questionSchema = zod
 	.object({
 		text: zod.string(), // Element text
+		authorId: uidSchema,
+		authorName: zod.string().optional(),
+		quiz: uidSchema,
 		explanation: zod.string().optional(), // Optional explanatory text
 		answers: zod.array(answerSchema), // Answers (empty for text question element)
 		approved: zod.boolean(), // Whether the teacher has approved this question
@@ -23,19 +26,19 @@ export const quizElementSchema = zod
 	})
 	.merge(idEntitySchema);
 
-export type QuizElement = zod.infer<typeof quizElementSchema>;
+export type Question = zod.infer<typeof questionSchema>;
 
-export const elementGroupSchema = zod.object({
+export const questionGroupSchema = zod.object({
 	name: zod.string(), // Group name/title
-	elements: zod.array(quizElementSchema), // Which elements belong to this group
+	questions: zod.array(questionSchema), // Which elements belong to this group
 	statistics: groupStatisticsSchema.optional(), // Last statistics for this group (if any)
 });
 
-export type ElementGroup = zod.infer<typeof elementGroupSchema>;
+export type QuestionGroup = zod.infer<typeof questionGroupSchema>;
 
-export const elementTypesSchema = zod.enum(["SINGLE", "MULTIPLE", "TEXT"]);
+export const questionTypesSchema = zod.enum(["SINGLE", "MULTIPLE", "TEXT"]);
 
-export type ElementType = zod.infer<typeof elementTypesSchema>;
+export type QuestionType = zod.infer<typeof questionTypesSchema>;
 
 export const runOptionsSchema = zod.object({
 	runningEntity: uidSchema.optional(), // Which question/group should be run when the quiz is started? If empty, run whole quiz
@@ -48,21 +51,21 @@ export const quizSchema = zod
 		state: zod.enum(["EDITING", "ACTIVE", "STARTED", "STOPPED"]), // State machine state
 		uniqueLink: zod.string(), // Unique link for this quiz
 		runOptions: runOptionsSchema.optional(), // If running, the current run options are given here
-		groups: zod.array(elementGroupSchema), // Groups belonging to this quiz
+		groups: zod.array(questionGroupSchema), // Groups belonging to this quiz
 		studentQuestions: zod.boolean(), // Whether to allow students to create their own quiz elements
 		studentParticipationSettings: zod.record<typeof userParticipationSchema, ZodBoolean>(
 			userParticipationSchema,
 			zod.boolean()
 		), // How students can participate in this quiz (anonymous, with a nickname, with their real name)
-		allowedQuestionTypesSettings: zod.record<typeof elementTypesSchema, ZodBoolean>(
-			elementTypesSchema,
+		allowedQuestionTypesSettings: zod.record<typeof questionTypesSchema, ZodBoolean>(
+			questionTypesSchema,
 			zod.boolean()
 		), // Which element types are allowed in this quiz
 		studentParticipation: zod.record<typeof userParticipationSchema, ZodBoolean>(
 			userParticipationSchema,
 			zod.boolean()
 		), // Which participation options are allowed after activating/running this quiz (overrides the settings above)
-		allowedQuestionTypes: zod.record<typeof elementTypesSchema, ZodBoolean>(elementTypesSchema, zod.boolean()), // Which quiz elements are allowed after activating this quiz (overrides the settings above)
+		allowedQuestionTypes: zod.record<typeof questionTypesSchema, ZodBoolean>(questionTypesSchema, zod.boolean()), // Which quiz elements are allowed after activating this quiz (overrides the settings above)
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
 		activeComments: zod.boolean(), // Are student queries allowed after the quiz has been started
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
@@ -77,7 +80,7 @@ export type Quiz = zod.infer<typeof quizSchema>;
 export const testPackage = zod.object({
 	studentId: uidSchema,
 	quizId: uidSchema,
-	elements: zod.array(quizElementSchema),
+	elements: zod.array(questionSchema),
 });
 
 export const examAnswer = zod.object({

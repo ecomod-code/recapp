@@ -16,7 +16,7 @@ export const CommentActorMessages = unionize(
 
 /** Message send to the client on quiz subscriptions */
 export class CommentUpdateMessage {
-	public readonly type = "CommentUpdateMessage" as const;
+	public readonly tag = "CommentUpdateMessage" as const;
 	constructor(public readonly comment: Partial<Comment>) {}
 }
 

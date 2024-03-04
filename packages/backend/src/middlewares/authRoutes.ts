@@ -155,7 +155,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 		async idToken => {
 			try {
 				const { exp, sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				if (fromTimestamp(exp! * 1000) > DateTime.local().plus(minutes(15))) {
+				if (fromTimestamp(exp! * 1000) > DateTime.local().minus(minutes(45))) {
 					console.log("Refresh not needed yet");
 					ctx.body = "O.K.";
 					return; // We do not need to refresh the token yet
@@ -164,10 +164,10 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				const client = await getOidc();
 				const system = Container.get<ActorSystem>("actor-system");
 				const sessionStore = createActorUri("SessionStore");
-				const session: Error | Session = await system.ask(
-					sessionStore,
-					SessionStoreMessages.GetSessionForUserId(sub as Id)
-				);
+				const session: Error | Session = await system
+					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
+					.then(s => s as Session)
+					.catch((e: Error) => e);
 				if (session instanceof Error) {
 					throw session;
 				}

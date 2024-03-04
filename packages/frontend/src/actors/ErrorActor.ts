@@ -16,7 +16,8 @@ export const ErrorMessages = unionize(
 export type ErrorMessage = UnionOf<typeof ErrorMessages>;
 
 const errorIds = {
-	"user was deactivated": "error-message-user-deactivated",
+	deactivated: "error-message-user-deactivated",
+	expired: "error-message-session-expired",
 	rpc: "error-message-no-server-connection",
 	unknown: "error-unknown-error-occured",
 };
@@ -38,7 +39,12 @@ export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: strin
 		return "";
 	};
 
+	public override async afterStart(): Promise<void> {
+		console.warn("AFTERSTART", this.name);
+	}
+
 	public async receive(_from: ActorRef, message: ErrorMessage): Promise<Unit> {
+		console.log(_from, JSON.stringify(message), JSON.stringify(ErrorMessages.SetError(new Error("fdgjfhgdfjhg"))));
 		ErrorMessages.match(message, {
 			SetError: error => {
 				console.error(error);

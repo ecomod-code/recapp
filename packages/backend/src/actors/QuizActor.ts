@@ -42,7 +42,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	}
 
 	protected override async afterEntityWasCached(uid: Id) {
-		const comments = await this.system.createActor(CommentActor, { name: `Comment_${uid}` }, uid);
+		const comments = await this.system.createActor(CommentActor, { name: `Comment_${uid}`, parent: this.ref }, uid);
 		this.logger.debug(`Comments actor ${comments.name} created`);
 		this.commentActors.set(uid, comments);
 	}

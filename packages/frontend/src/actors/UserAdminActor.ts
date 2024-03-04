@@ -8,6 +8,11 @@ export class UserAdminActor extends StatefulActor<any, any, { users: User[] }> {
 		this.state = { users: [] };
 	}
 
+	override send<S>(to: string | ActorRef, message: S): void {
+		console.log("SENDING", message);
+		super.send(to, message);
+	}
+
 	async afterStart(): Promise<void> {
 		const result: User = await this.ask("actors://recapp-backend/UserStore", UserStoreMessages.GetAll());
 		if (this.state.users.length === 0 && result) {

@@ -155,7 +155,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 		async idToken => {
 			try {
 				const { exp, sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				if (fromTimestamp(exp! * 1000) > DateTime.utc().plus(minutes(15))) {
+				if (fromTimestamp(exp! * 1000) > DateTime.local().plus(minutes(15))) {
 					console.log("Refresh not needed yet");
 					ctx.body = "O.K.";
 					return; // We do not need to refresh the token yet
@@ -186,7 +186,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				ctx.body = "O.K.";
 			} catch (e) {
 				console.error(e);
-				throw e;
+				ctx.throw(401, "Invalid token");
 			}
 		},
 		() => ctx.throw(401, "Invalid token")

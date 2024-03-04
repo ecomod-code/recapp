@@ -113,7 +113,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 				console.log("ADD", this.user, message);
 				this.user.forEach(u => {
 					this.send(
-						"actors://recapp-backend/Comment_demo-quiz",
+						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 						CommentActorMessages.Create({
 							authorName: u.username,
 							authorId: u.uid,
@@ -125,7 +125,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 			}
 			case "FinishComment": {
 				this.send(
-					"actors://recapp-backend/Comment_demo-quiz",
+					"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 					CommentActorMessages.Update({
 						uid: message.commentId,
 						answered: true,
@@ -136,7 +136,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 			case "UpvoteComment": {
 				this.user.forEach(u => {
 					this.send(
-						"actors://recapp-backend/Comment_demo-quiz",
+						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 						CommentActorMessages.Upvote({
 							commentId: message.commentId,
 							userId: u.uid,
@@ -148,7 +148,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 			case "AddComment": {
 				this.user.forEach(u => {
 					this.send(
-						"actors://recapp-backend/Comment_demo-quiz",
+						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 						CommentActorMessages.Create({
 							authorName: u.username,
 							authorId: u.uid,
@@ -172,7 +172,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 					});
 					this.quiz.forEach(q => {
 						this.send(
-							"actors://recapp-backend/Comment_demo-quiz",
+							"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 							CommentActorMessages.UnsubscribeFromCollection()
 						);
 					});
@@ -181,13 +181,16 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, { quiz: Q
 						"actors://recapp-backend/QuizActor",
 						QuizActorMessages.Get(message.quizId)
 					);
-					await this.send("actors://recapp-backend/Comment_demo-quiz", CommentActorMessages.GetAll());
+					await this.send(
+						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
+						CommentActorMessages.GetAll()
+					);
 					this.updateState(draft => {
 						draft.quiz = quizData;
 					});
 					this.send("actors://recapp-backend/QuizActor", QuizActorMessages.SubscribeTo(message.quizId));
 					this.send(
-						"actors://recapp-backend/Comment_demo-quiz",
+						"actors://recapp-backend/QuizActor/Comment_demo-quiz",
 						CommentActorMessages.SubscribeToCollection()
 					);
 				} catch (e) {

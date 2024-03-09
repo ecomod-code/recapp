@@ -2,46 +2,29 @@
 	--bs-navbar-brand-color: "white"
 }
 
-#root {
-  /*max-width: 1280px;*/
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+@media (max-width: 576px) {
+	:root {
+		.row {
+			padding-right: 0;
+			padding-left: 0;
+		}
+		.row>* {
+			padding-right: 0;
+			padding-left: 0;
+		}
+		.container {
+			padding-right: 4px;
+			padding-left: 4px;
+		}
+	}
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+.form-check-input {
+	border: 2px solid grey !important; /* Change the border color */
+   }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
+   /* Add a border to the radio button when checked */
+   .form-check-input:checked {
+	border: 1px solid var(--bs-primary-rgb) !important; /* Change the border color */
+   }
+   

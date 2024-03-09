@@ -14,11 +14,11 @@ export type Answer = zod.infer<typeof answerSchema>;
 
 export const questionSchema = zod
 	.object({
-		text: zod.string(), // Element text
-		authorId: uidSchema,
-		authorName: zod.string().optional(),
-		quiz: uidSchema,
-		explanation: zod.string().optional(), // Optional explanatory text
+		text: zod.string(), // Question text
+		authorId: uidSchema, // Author id
+		authorName: zod.string().optional(), // Display name of the author (may also be a nickname or ANONYMOUS)
+		quiz: uidSchema, // Quiz the question belongs
+		hint: zod.string().optional(), // Optional explanatory text/hint
 		answers: zod.array(answerSchema), // Answers (empty for text question element)
 		approved: zod.boolean(), // Whether the teacher has approved this question
 		editMode: zod.boolean(), // Whether the question is currently edited by a teacher or its author
@@ -48,7 +48,7 @@ export const quizSchema = zod
 	.object({
 		title: zod.string(), // Quiz title
 		description: zod.string(), // Description of quiz
-		state: zod.enum(["EDITING", "ACTIVE", "STARTED", "STOPPED"]), // State machine state
+		state: zod.enum(["EDITING", "ACTIVE", "STARTED", "STOPPED"]), // State machine state (only teachers edit, teachers and students create questions and comments, quiz mode, read-only-mode)
 		uniqueLink: zod.string(), // Unique link for this quiz
 		runOptions: runOptionsSchema.optional(), // If running, the current run options are given here
 		groups: zod.array(questionGroupSchema), // Groups belonging to this quiz
@@ -61,17 +61,12 @@ export const quizSchema = zod
 			questionTypesSchema,
 			zod.boolean()
 		), // Which element types are allowed in this quiz
-		studentParticipation: zod.record<typeof userParticipationSchema, ZodBoolean>(
-			userParticipationSchema,
-			zod.boolean()
-		), // Which participation options are allowed after activating/running this quiz (overrides the settings above)
-		allowedQuestionTypes: zod.record<typeof questionTypesSchema, ZodBoolean>(questionTypesSchema, zod.boolean()), // Which quiz elements are allowed after activating this quiz (overrides the settings above)
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
-		activeComments: zod.boolean(), // Are student queries allowed after the quiz has been started
+		activeComments: zod.boolean(), // ARe student comments allowed after the quiz has been started
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
-		teachers: zod.array(uidSchema),
-		students: zod.array(uidSchema),
+		teachers: zod.array(uidSchema), // Teachers who can access and change the quiz
+		students: zod.array(uidSchema), // Students participating in this quiz
 	})
 	.merge(idEntitySchema);
 

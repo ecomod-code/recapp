@@ -10,14 +10,12 @@ import { CurrentQuizActor } from "../../actors/CurrentQuizActor";
 import { Button, Modal } from "react-bootstrap";
 import { serializeError } from "serialize-error";
 import { ErrorActor } from "../../actors/ErrorActor";
+import { cookie } from "../../utils";
 
 export const Root = () => {
 	const [init, setInit] = useState(false);
 	const [rpcError, setRpcError] = useState<string>("");
-	const system = useActorSystem(
-		`${import.meta.env.VITE_BACKEND_URI.replace("http", "ws")}`,
-		document.cookie.split(";")[0].split("=")[1]
-	);
+	const system = useActorSystem(`${import.meta.env.VITE_BACKEND_URI.replace("http", "ws")}`, cookie("bearer"));
 	useEffect(() => {
 		if (!init) {
 			system.forEach(async s => {
@@ -64,8 +62,8 @@ export const Root = () => {
 	if (!init) {
 		return null;
 	}
-	if (!document.cookie.includes("bearer")) {
-		navigate("/login", { replace: true });
+	if (!cookie("bearer")) {
+		navigate("/", { replace: true });
 	}
 	return (
 		<SystemContext.Provider value={system}>

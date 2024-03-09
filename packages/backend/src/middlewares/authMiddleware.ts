@@ -34,15 +34,17 @@ export const authenticationMiddleware = (request: IncomingMessage, next: (err: E
 	const tokenValid = maybe(request.headers["sec-websocket-protocol"])
 		.map(bearerValid)
 		.orElse(Promise.resolve("" as Id)) as Promise<Id>;
-	tokenValid.then(uid => {
-		if (!uid) {
-			next(authorizationError());
-			return;
-		}
-		Container.get<ActorSystem>("actor-system").send(
-			createActorUri("SessionStore"),
-			SessionStoreMessages.StoreSession({ uid, actorSystem })
-		);
-		next(undefined);
-	});
+	tokenValid
+		.then(uid => {
+			if (!uid) {
+				next(authorizationError());
+				return;
+			}
+			Container.get<ActorSystem>("actor-system").send(
+				createActorUri("SessionStore"),
+				SessionStoreMessages.StoreSession({ uid, actorSystem })
+			);
+			next(undefined);
+		})
+		.catch(e => next(e));
 };

@@ -54,22 +54,31 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	}
 
 	protected override async afterEntityWasCached(uid: Id) {
-		const comments = await this.system.createActor(CommentActor, { name: `Comment_${uid}`, parent: this.ref }, uid);
-		this.logger.debug(`Comments actor ${comments.name} created`);
-		this.commentActors.set(uid, comments);
-		const questions = await this.system.createActor(
-			QuestionActor,
-			{ name: `Question_${uid}`, parent: this.ref },
-			uid
-		);
-		this.logger.debug(`Question actor ${questions.name} created`);
-		this.questionActors.set(uid, questions);
+		if (!this.commentActors.has(uid)) {
+			const comments = await this.system.createActor(
+				CommentActor,
+				{ name: `Comment_${uid}`, parent: this.ref },
+				uid
+			);
+			this.logger.debug(`Comments actor ${comments.name} created`);
+			this.commentActors.set(uid, comments);
+		}
+		if (!this.questionActors.has(uid)) {
+			const questions = await this.system.createActor(
+				QuestionActor,
+				{ name: `Question_${uid}`, parent: this.ref },
+				uid
+			);
+			this.logger.debug(`Question actor ${questions.name} created`);
+			this.questionActors.set(uid, questions);
+		}
 	}
 
 	protected override async afterEntityRemovedFromCache(uid: Id) {
 		maybe(this.commentActors.get(uid)).forEach(c => {
 			this.removeChild(c);
 			this.commentActors.delete(uid);
+			this.questionActors.delete(uid);
 		});
 	}
 

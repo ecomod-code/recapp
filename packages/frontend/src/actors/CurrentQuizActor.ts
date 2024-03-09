@@ -90,8 +90,6 @@ export class CurrentQuizActor extends StatefulActor<
 						studentQuestions: true,
 						studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
 						allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
-						studentParticipation: { ANONYMOUS: true, NAME: true, NICKNAME: true },
-						allowedQuestionTypes: { MULTIPLE: true, SINGLE: true, TEXT: true },
 						shuffleQuestions: false,
 						activeComments: true,
 						teachers: [creator],
@@ -105,7 +103,7 @@ export class CurrentQuizActor extends StatefulActor<
 				AddComment: async comment => {
 					this.user.forEach(u => {
 						this.send(
-							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.Create({
 								authorName: u.username,
 								authorId: u.uid,
@@ -117,7 +115,7 @@ export class CurrentQuizActor extends StatefulActor<
 				AddQuestion: async question => {
 					this.user.forEach(u => {
 						this.send(
-							`${actorUris.QuestionActorPrefix}${this.quiz}`,
+							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							QuestionActorMessages.Create({
 								authorName: u.username,
 								authorId: u.uid,
@@ -127,11 +125,14 @@ export class CurrentQuizActor extends StatefulActor<
 					});
 				},
 				UpdateQuestion: async question => {
-					this.send(`${actorUris.QuestionActorPrefix}${this.quiz}`, QuestionActorMessages.Update(question));
+					this.send(
+						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+						QuestionActorMessages.Update(question)
+					);
 				},
 				FinishComment: async uid => {
 					this.send(
-						`${actorUris.CommentActorPrefix}${this.quiz}`,
+						`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						CommentActorMessages.Update({
 							uid,
 							answered: true,
@@ -141,7 +142,7 @@ export class CurrentQuizActor extends StatefulActor<
 				UpvoteComment: async commentId => {
 					this.user.forEach(u => {
 						this.send(
-							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.Upvote({
 								commentId,
 								userId: u.uid,
@@ -163,13 +164,16 @@ export class CurrentQuizActor extends StatefulActor<
 						});
 						this.quiz.forEach(q => {
 							this.send(
-								`${actorUris.CommentActorPrefix}${this.quiz}`,
+								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								CommentActorMessages.UnsubscribeFromCollection()
 							);
 						});
 						this.quiz = maybe(uid);
 						const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
-						await this.send(`${actorUris.CommentActorPrefix}${this.quiz}`, CommentActorMessages.GetAll());
+						await this.send(
+							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							CommentActorMessages.GetAll()
+						);
 						this.updateState(draft => {
 							draft.quiz = quizData;
 						});

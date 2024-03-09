@@ -13,10 +13,14 @@ import "./App.css";
 import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
 import { QuizPage } from "./pages/QuizPage";
+import { Activate } from "./Activate";
+import { cookie } from "./utils";
+import { RunningQuiz } from "./pages/RunningQuiz";
+import { QuestionEdit } from "./pages/QuestionEdit";
 
 const updateToken = () => {
 	const mm = () => {
-		const hasToken = document.cookie.includes("bearer");
+		const hasToken = !!cookie("bearer");
 		if (hasToken) {
 			Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
 				.then(() => {
@@ -42,6 +46,10 @@ const router = createBrowserRouter([
 		element: <Login />,
 	},
 	{
+		path: "/activate",
+		element: <Activate />,
+	},
+	{
 		path: "/Dashboard",
 		element: <Root />,
 		// errorElement: <ErrorPage />,
@@ -53,6 +61,14 @@ const router = createBrowserRouter([
 			{
 				path: "/Dashboard/Quiz",
 				element: <QuizPage />,
+			},
+			{
+				path: "/Dashboard/Running",
+				element: <RunningQuiz />,
+			},
+			{
+				path: "/Dashboard/Question",
+				element: <QuestionEdit />,
 			},
 		],
 	},

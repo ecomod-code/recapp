@@ -9,6 +9,7 @@ import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } 
 import { Timestamp, fromTimestamp, hours, minutes, toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
+import { debug } from "itu-utils";
 
 const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET } = process.env;
 
@@ -114,6 +115,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					);
 					role = user.role;
 				}
+				const expires = DateTime.fromMillis((tokenSet.expires_at ?? -1) * 1000).toUTC();
 				const sessionStore = createActorUri("SessionStore");
 				system.send(
 					sessionStore,
@@ -122,12 +124,12 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 						accessToken: tokenSet.access_token ?? "",
 						refreshToken: tokenSet.refresh_token ?? "",
 						uid: decoded.sub as Id,
-						expires: new Timestamp((tokenSet.expires_at ?? -1) * 1000),
+						expires: toTimestamp(expires),
 						role,
 					})
 				);
 			} catch (e) {
-				console.error(e);
+				console.error("authProviderCallback", e);
 				throw e;
 			}
 			ctx.set("Set-Cookie", `bearer=${tokenSet.id_token}; path=/; max-age=${hours(2).valueOf() / 1000}`);
@@ -148,7 +150,8 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 
 export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 	const maybeIdToken = maybe<string>(ctx.request.headers.cookie)
-		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=(.+)(;|$)/.exec(cookie)))
+		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=([^;]+)/.exec(cookie)))
+		.map(s => debug(s, s.join(", ")))
 		.flatMap(match => maybe(match[1]));
 
 	await maybeIdToken.match(
@@ -167,9 +170,13 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				const session: Error | Session = await system
 					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
 					.then(s => s as Session)
-					.catch((e: Error) => e);
+					.catch((e: Error) => {
+						console.error("JGJHGZUWTUWFJSFSFTF!9!");
+						return e;
+					});
+				console.error("HECGHJGDHJGJHDG");
 				if (session instanceof Error) {
-					throw session;
+					ctx.throw(401, "Session unknown");
 				}
 				const newTokenSet = await client.refresh(session.refreshToken);
 				system.send(

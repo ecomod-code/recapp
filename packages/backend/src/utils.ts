@@ -26,10 +26,14 @@ export const bearerValid = async (idTokenString: string): Promise<Id> => {
 	const userId = maybe(jwt.decode(idTokenString.replace("Authorization,", "").trim()) as jwt.JwtPayload)
 		.flatMap(token => maybe(token.sub as Id))
 		.orUndefined();
-	if (userId) {
-		await system.ask(createActorUri("SessionStore"), SessionStoreMessages.GetSessionForUserId(userId));
-		return Promise.resolve(userId);
-	} else {
+	try {
+		if (userId) {
+			await system.ask(createActorUri("SessionStore"), SessionStoreMessages.GetSessionForUserId(userId));
+			return Promise.resolve(userId);
+		} else {
+			return Promise.reject(new Error("Unknown user"));
+		}
+	} catch {
 		return Promise.reject(new Error("Unknown user"));
 	}
 };

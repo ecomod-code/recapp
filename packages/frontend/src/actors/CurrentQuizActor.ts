@@ -91,7 +91,7 @@ export class CurrentQuizActor extends StatefulActor<
 						studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
 						allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
 						shuffleQuestions: false,
-						activeComments: true,
+						studentComments: true,
 						teachers: [creator],
 						students: [],
 						created: toTimestamp(),

@@ -14,28 +14,168 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/App.tsx:79
-#: src/layout/HeaderSection.tsx:51
+#: src/actors/CurrentQuizActor.ts:86
+msgid "new-quiz-title"
+msgstr "Title"
+
+#. js-lingui-explicit-id
+#: src/actors/CurrentQuizActor.ts:87
+msgid "new-quiz-description"
+msgstr "Beschreibung"
+
+#. js-lingui-explicit-id
+#: src/actors/CurrentQuizActor.ts:89
+msgid "new-quiz-group"
+msgstr "Gruppe"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNicknameModal.tsx:25
+msgid "error-nickname-to-short"
+msgstr "Pseudonym ist nicht lang genug"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNicknameModal.tsx:33
+msgid "error-nickname-already-used"
+msgstr "Pseudonym ist bereits vergeben"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:21
+msgid "new-quiz"
+msgstr "Neues Quiz"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:27
+msgid "quiz-title"
+msgstr "Titel"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:41
+msgid "error-quiz-title-too-short"
+msgstr "Titel ist zu kurz"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:49
+msgid "quiz-description"
+msgstr "Beschreibung"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:59
+msgid "quiz-allows-student-comments"
+msgstr "Studentische Kommentare im Quizmodus erlauben"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:69
+msgid "quiz-allows-student-questions"
+msgstr "Fragen durch Studierende erstellen lassen"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:81
+msgid "quiz-student-participation"
+msgstr "Studentische Teilnamemöglichkeiten"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:83
+msgid "quiz-allows-anonymous-participation"
+msgstr "Anonyme Teilnahme"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:98
+msgid "quiz-allows-participation-via-nickname"
+msgstr "Teilnahme mit Pseudonym"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:113
+msgid "quiz-allows-participation-via-realname"
+msgstr "Teilnahme mit echtem Namen"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:129
+msgid "quiz-allowed-question-types"
+msgstr "Erlaubte Fragentypen"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:131
+msgid "quiz-allows-text-questions"
+msgstr "Freitextfragen erlauben"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:146
+msgid "quiz-allows-single-choice-questions"
+msgstr "Single-Choice Fragen erlauben"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:161
+msgid "quiz-allows-multiple-choice-realname"
+msgstr "Multiple-Choice Fragen erlauben"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:177
+msgid "quiz-enable-question-shufflling"
+msgstr "Fragen im Quizmodus mischen"
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:189
+msgid "create-quiz-button"
+msgstr "Quiz anlegen"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:135
+msgid "quiz-tab-label-data"
+msgstr "Quizdaten"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:145
+msgid "number-of-quiz-participants"
+msgstr "Zahl der Teilnehmenden"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:148
+msgid "teachers-in-quiz"
+msgstr "Lehrpersonen mit Zugriff"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:152
+msgid "number-of-quiz-questions"
+msgstr "Zahl der Fragen"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:160
+msgid "quiz-tab-label-questions"
+msgstr "Quizfragen"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:369
+msgid "quiz-tab-label-statistics"
+msgstr "Statistische Auswertung"
+
+#. js-lingui-explicit-id
+#: src/QuizzesPanel.tsx:64
+msgid "button-new-quiz"
+msgstr "Neues Quiz"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ErrorModal.tsx:25
+#: src/components/navigation/Root.tsx:56
 msgid "undefined-title"
 msgstr "undefined-title"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:24
+#: src/Dashboard.tsx:35
 msgid "dashboard-tab-label-quizzes"
 msgstr "Quizze"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:27
+#: src/Dashboard.tsx:38
 msgid "dashboard-tab-label-users"
 msgstr "Benutzer"
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:56
+#: src/components/modals/ErrorModal.tsx:30
 msgid "button-login-again"
 msgstr "Erneut anmelden"
 
 #. js-lingui-explicit-id
-#: src/App.tsx:32
+#: src/App.tsx:31
 msgid "app.could_not_refresh_token"
 msgstr "Anmeldung konnte nicht aktualisiert werden"
 
@@ -94,19 +234,19 @@ msgstr "Benutzernamen ändern"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:25
-#: src/components/modals/ChangeNicknameModal.tsx:29
+#: src/components/modals/ChangeNicknameModal.tsx:49
 msgid "okay"
 msgstr "O.K."
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:28
-#: src/components/modals/ChangeNicknameModal.tsx:32
+#: src/components/modals/ChangeNicknameModal.tsx:52
 #: src/components/modals/ChangeRoleModal.tsx:44
 msgid "cancel"
 msgstr "Abbruch"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ChangeNicknameModal.tsx:18
+#: src/components/modals/ChangeNicknameModal.tsx:41
 msgid "user-change-nickname-modal-title"
 msgstr "Pseudonym ändern"
 
@@ -121,12 +261,13 @@ msgid "user-set-role"
 msgstr "Rolle aktualisieren"
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:111
+#: src/layout/HeaderSection.tsx:85
 msgid "header.logout"
 msgstr "Abmelden"
 
 #. js-lingui-explicit-id
-#: src/Login.tsx:15
+#: src/Activate.tsx:28
+#: src/Login.tsx:31
 msgid "login-page.login"
 msgstr "Anmelden"
 
@@ -141,17 +282,17 @@ msgid "user-admin-panel-search-text"
 msgstr "Suchtext"
 
 #. js-lingui-explicit-id
-msgid "error-message-no-server-connection"
-msgstr "Es konnte keine Verbindung mit dem Server hergestellt werden. Bitte melden Sie sich neu an."
+#~ msgid "error-message-no-server-connection"
+#~ msgstr "Es konnte keine Verbindung mit dem Server hergestellt werden. Bitte melden Sie sich neu an."
 
 #. js-lingui-explicit-id
-msgid "error-message-no-server-connection-title"
-msgstr "Keine Serververbindung"
+#~ msgid "error-message-no-server-connection-title"
+#~ msgstr "Keine Serververbindung"
 
 #. js-lingui-explicit-id
-msgid "error-message-user-deactivated"
-msgstr "Ihr Benutzer wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+#~ msgid "error-message-user-deactivated"
+#~ msgstr "Ihr Benutzer wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
 
 #. js-lingui-explicit-id
-msgid "error-message-user-deactivated-title"
-msgstr "Nutzer gesperrt"
+#~ msgid "error-message-user-deactivated-title"
+#~ msgstr "Nutzer gesperrt"

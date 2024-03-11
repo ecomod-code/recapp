@@ -53,6 +53,7 @@ export const quizSchema = zod
 		runOptions: runOptionsSchema.optional(), // If running, the current run options are given here
 		groups: zod.array(questionGroupSchema), // Groups belonging to this quiz
 		studentQuestions: zod.boolean(), // Whether to allow students to create their own quiz elements
+		studentComments: zod.boolean(), // ARe student comments allowed after the quiz has been started
 		studentParticipationSettings: zod.record<typeof userParticipationSchema, ZodBoolean>(
 			userParticipationSchema,
 			zod.boolean()
@@ -62,7 +63,6 @@ export const quizSchema = zod
 			zod.boolean()
 		), // Which element types are allowed in this quiz
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
-		activeComments: zod.boolean(), // ARe student comments allowed after the quiz has been started
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
 		teachers: zod.array(uidSchema), // Teachers who can access and change the quiz

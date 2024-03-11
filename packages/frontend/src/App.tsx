@@ -17,6 +17,7 @@ import { Activate } from "./Activate";
 import { cookie } from "./utils";
 import { RunningQuiz } from "./pages/RunningQuiz";
 import { QuestionEdit } from "./pages/QuestionEdit";
+import { CreateQuiz } from "./pages/CreateQuiz";
 
 const updateToken = () => {
 	const mm = () => {
@@ -69,6 +70,10 @@ const router = createBrowserRouter([
 			{
 				path: "/Dashboard/Question",
 				element: <QuestionEdit />,
+			},
+			{
+				path: "/Dashboard/CreateQuiz",
+				element: <CreateQuiz />,
 			},
 		],
 	},

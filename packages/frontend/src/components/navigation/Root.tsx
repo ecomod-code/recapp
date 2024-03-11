@@ -4,13 +4,18 @@ import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { Layout } from "../../layout/Layout";
 import { useActorSystem, SystemContext } from "ts-actors-react";
+
 import { UserAdminActor } from "../../actors/UserAdminActor";
 import { LocalUserActor } from "../../actors/LocalUserActor";
+import { CreateQuizActor } from "../../actors/CreateQuizActor";
 import { CurrentQuizActor } from "../../actors/CurrentQuizActor";
+import { ErrorActor } from "../../actors/ErrorActor";
+
 import { Button, Modal } from "react-bootstrap";
 import { serializeError } from "serialize-error";
-import { ErrorActor } from "../../actors/ErrorActor";
 import { cookie } from "../../utils";
+import { actorUris } from "../../actorUris";
+import { toActorUri } from "@recapp/models";
 
 export const Root = () => {
 	const [init, setInit] = useState(false);
@@ -20,10 +25,16 @@ export const Root = () => {
 		if (!init) {
 			system.forEach(async s => {
 				try {
-					await s.createActor(ErrorActor, { name: "ErrorActor" });
-					await s.createActor(UserAdminActor, { name: "UserAdmin" });
-					await s.createActor(LocalUserActor, { name: "LocalUser" });
-					await s.createActor(CurrentQuizActor, { name: "CurrentQuiz" });
+					const ea = await s.createActor(ErrorActor, { name: "ErrorActor" });
+					actorUris["ErrorActor"] = toActorUri(ea.name);
+					const ua = await s.createActor(UserAdminActor, { name: "UserAdmin" });
+					actorUris["UserAdmin"] = toActorUri(ua.name);
+					const lu = await s.createActor(LocalUserActor, { name: "LocalUser" });
+					actorUris["LocalUser"] = toActorUri(lu.name);
+					const cuq = await s.createActor(CurrentQuizActor, { name: "CurrentQuiz" });
+					actorUris["CurrentQuiz"] = toActorUri(cuq.name);
+					const crq = await s.createActor(CreateQuizActor, { name: "CreateQuiz" });
+					actorUris["CreateQuiz"] = toActorUri(crq.name);
 
 					setInit(true);
 

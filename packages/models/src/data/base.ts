@@ -1,5 +1,6 @@
 import { Timestamp } from "itu-utils";
 import zod from "zod";
+import { keys } from "rambda";
 
 export const timestampSchema = zod
 	.object({
@@ -26,3 +27,15 @@ export const idEntitySchema = zod.object({
 	updated: timestampSchema,
 	archived: timestampSchema.optional(), // Only set if the the entity was archived ("deleted")
 });
+
+export type Validator<T> = {
+	[Property in keyof T]: boolean;
+};
+
+export const validationOkay = <T>(validation: Validator<T>): boolean => {
+	const validationKeys = keys(validation);
+	for (const k of validationKeys) {
+		if (!validation[k]) return false;
+	}
+	return true;
+};

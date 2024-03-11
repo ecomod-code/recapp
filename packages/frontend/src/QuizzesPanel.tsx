@@ -1,7 +1,6 @@
 import React from "react";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
-import { AddComment, SetQuiz, SetUser } from "./actors/CurrentQuizActor";
 import { Quiz, User, toId, Comment } from "@recapp/models";
 import {
 	Badge,
@@ -50,6 +49,7 @@ const QuizCard: React.FC = () => {
 };
 
 export const Quizzes: React.FC = () => {
+	const nav = useNavigate();
 	return (
 		<Container fluid>
 			<Container fluid style={{ maxHeight: "70vh", overflowY: "auto" }}>
@@ -60,7 +60,7 @@ export const Quizzes: React.FC = () => {
 				<QuizCard />
 				<QuizCard />
 			</Container>
-			<Button>
+			<Button onClick={() => nav("/Dashboard/CreateQuiz")}>
 				<Trans id="button-new-quiz" />
 			</Button>
 		</Container>

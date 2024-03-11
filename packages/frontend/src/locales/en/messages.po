@@ -14,28 +14,168 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/App.tsx:79
-#: src/layout/HeaderSection.tsx:51
+#: src/actors/CurrentQuizActor.ts:86
+msgid "new-quiz-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actors/CurrentQuizActor.ts:87
+msgid "new-quiz-description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/actors/CurrentQuizActor.ts:89
+msgid "new-quiz-group"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNicknameModal.tsx:25
+msgid "error-nickname-to-short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeNicknameModal.tsx:33
+msgid "error-nickname-already-used"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:21
+msgid "new-quiz"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:27
+msgid "quiz-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:41
+msgid "error-quiz-title-too-short"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:49
+msgid "quiz-description"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:59
+msgid "quiz-allows-student-comments"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:69
+msgid "quiz-allows-student-questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:81
+msgid "quiz-student-participation"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:83
+msgid "quiz-allows-anonymous-participation"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:98
+msgid "quiz-allows-participation-via-nickname"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:113
+msgid "quiz-allows-participation-via-realname"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:129
+msgid "quiz-allowed-question-types"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:131
+msgid "quiz-allows-text-questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:146
+msgid "quiz-allows-single-choice-questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:161
+msgid "quiz-allows-multiple-choice-realname"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:177
+msgid "quiz-enable-question-shufflling"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/CreateQuiz.tsx:189
+msgid "create-quiz-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:135
+msgid "quiz-tab-label-data"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:145
+msgid "number-of-quiz-participants"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:148
+msgid "teachers-in-quiz"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:152
+msgid "number-of-quiz-questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:160
+msgid "quiz-tab-label-questions"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:369
+msgid "quiz-tab-label-statistics"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/QuizzesPanel.tsx:64
+msgid "button-new-quiz"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ErrorModal.tsx:25
+#: src/components/navigation/Root.tsx:56
 msgid "undefined-title"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:24
+#: src/Dashboard.tsx:35
 msgid "dashboard-tab-label-quizzes"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:27
+#: src/Dashboard.tsx:38
 msgid "dashboard-tab-label-users"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:56
+#: src/components/modals/ErrorModal.tsx:30
 msgid "button-login-again"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/App.tsx:32
+#: src/App.tsx:31
 msgid "app.could_not_refresh_token"
 msgstr ""
 
@@ -94,19 +234,19 @@ msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:25
-#: src/components/modals/ChangeNicknameModal.tsx:29
+#: src/components/modals/ChangeNicknameModal.tsx:49
 msgid "okay"
 msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:28
-#: src/components/modals/ChangeNicknameModal.tsx:32
+#: src/components/modals/ChangeNicknameModal.tsx:52
 #: src/components/modals/ChangeRoleModal.tsx:44
 msgid "cancel"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/modals/ChangeNicknameModal.tsx:18
+#: src/components/modals/ChangeNicknameModal.tsx:41
 msgid "user-change-nickname-modal-title"
 msgstr ""
 
@@ -121,12 +261,13 @@ msgid "user-set-role"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:111
+#: src/layout/HeaderSection.tsx:85
 msgid "header.logout"
 msgstr "Logout"
 
 #. js-lingui-explicit-id
-#: src/Login.tsx:15
+#: src/Activate.tsx:28
+#: src/Login.tsx:31
 msgid "login-page.login"
 msgstr "Login"
 

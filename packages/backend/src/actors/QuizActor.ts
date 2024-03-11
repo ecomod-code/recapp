@@ -87,9 +87,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
+					if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
+						return new Error("Unprivileged acess to quiz creation");
+					}
 					const uid = toId(v4());
 					(quiz as Quiz).uid = uid;
-					(quiz as Quiz).uniqueLink = `/quiz/${UUID}`;
+					(quiz as Quiz).uniqueLink = `/activate?quiz=${uid}`;
 					const quizToCreate = quizSchema.parse(quiz);
 					await this.storeEntity(quizToCreate);
 					for (const [subscriber, properties] of this.state.collectionSubscribers) {

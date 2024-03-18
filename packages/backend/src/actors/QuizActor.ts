@@ -17,7 +17,6 @@ import { create } from "mutative";
 import { identity, pick } from "rambda";
 import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
-import { UUID } from "mongodb";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -83,6 +82,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	}
 
 	public async receive(from: ActorRef, message: QuizActorMessage): Promise<ResultType> {
+		console.log("QUIZACTOR", from.name, message);
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
@@ -163,19 +163,19 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					const quiz = await this.getEntity(uid);
 					return quiz.hasValue;
 				},
-				Update: async comment => {
-					const existingComment = await this.getEntity(comment.uid);
-					return existingComment
+				Update: async quiz => {
+					const existingQuiz = await this.getEntity(quiz.uid);
+					const result = await existingQuiz
 						.map(async c => {
-							if (["TEACHER", "ADMIN"].includes(clientUserRole)) {
-								return new Error("Invalid write access to comment");
+							if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
+								return new Error("Invalid write access to quiz");
 							}
 							if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
 								return new Error("Quiz not shared with teacher");
 							}
 							c.updated = toTimestamp();
-							const { created, ...updateDelta } = c;
-							const quizToUpdate = quizSchema.parse({ ...updateDelta, ...comment });
+							const { created, ...updateDelta } = quiz;
+							const quizToUpdate = quizSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(quizToUpdate);
 							for (const [subscriber, properties] of this.state.collectionSubscribers) {
 								this.send(
@@ -190,7 +190,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							}
 							return quizToUpdate;
 						})
-						.orElse(Promise.resolve(new Error("Comment not found")));
+						.orElse(Promise.resolve(new Error("Quiz not found")));
+					console.log("QUIZACTOR", "Sending back", result);
+					return result;
 				},
 				GetAll: async () => {
 					const db = await this.connector.db();

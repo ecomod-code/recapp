@@ -23,7 +23,7 @@ export const UserStoreMessages = unionize(
 
 /** Message send to the client on user subscriptions */
 export class UserUpdateMessage {
-	public readonly type = "UserUpdateMessage" as const;
+	public readonly tag = "UserUpdateMessage" as const;
 	constructor(public readonly user: Partial<User>) {}
 }
 

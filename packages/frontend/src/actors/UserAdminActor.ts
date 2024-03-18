@@ -24,7 +24,8 @@ export class UserAdminActor extends StatefulActor<any, any, { users: User[] }> {
 	}
 
 	async receive(_from: ActorRef, message: UserUpdateMessage): Promise<any> {
-		if (message.type == "UserUpdateMessage") {
+		console.log("USERADMIN", _from.name, message);
+		if (message.tag == "UserUpdateMessage") {
 			this.updateState(draft => {
 				draft.users = draft.users.filter(u => u.uid != message.user.uid);
 				draft.users.push(message.user as User);

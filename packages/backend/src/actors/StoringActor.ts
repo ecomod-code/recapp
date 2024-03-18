@@ -119,12 +119,13 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		const result = await db
 			.collection<Entity>(this.collectionName)
 			.updateOne({ uid: entity.uid }, { $set: entity }, { upsert: true });
+		this.state = create(this.state, draft => {
+			draft.cache.set(entity.uid, entity as Draft<Entity>);
+			draft.lastTouched.set(entity.uid, toTimestamp());
+		});
 		if (result.upsertedCount === 1 || result.modifiedCount === 1) {
 			return entity;
 		}
-		this.state = create(this.state, draft => {
-			draft.lastTouched.set(entity.uid, toTimestamp());
-		});
 		throw new Error("FATAL: Storing a session failed");
 	};
 

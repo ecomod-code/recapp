@@ -64,9 +64,10 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
+		console.log("USERSTORE", from.name, message);
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
-			return await UserStoreMessages.match<Promise<ResultType>>(message, {
+			const result = await UserStoreMessages.match<Promise<ResultType>>(message, {
 				Create: async user => {
 					const validation = userSchema.safeParse(user);
 					if (!validation.success) {
@@ -196,6 +197,8 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);
 				},
 			});
+			console.log("To ", from.name, result);
+			return result;
 		} catch (e) {
 			console.error(from, message, e);
 			throw e;

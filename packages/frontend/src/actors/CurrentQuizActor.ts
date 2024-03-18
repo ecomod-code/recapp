@@ -13,6 +13,7 @@ import {
 	QuestionUpdateMessage,
 	Question,
 	QuestionActorMessages,
+	QuestionGroup,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
@@ -29,6 +30,7 @@ export const CurrentQuizMessages = unionize(
 		FinishComment: ofType<Id>(),
 		AddComment: ofType<Omit<Comment, "uid" | "authorName" | "authorId">>(),
 		AddQuestion: ofType<Omit<Question, "uid" | "authorName" | "authorId">>(),
+		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<Partial<Question> & { uid: Id }>(),
 	},
 	{ value: "value" }
@@ -170,7 +172,7 @@ export class CurrentQuizActor extends StatefulActor<
 						});
 						this.quiz = maybe(uid);
 						const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
-						await this.send(
+						this.send(
 							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.GetAll()
 						);
@@ -185,6 +187,9 @@ export class CurrentQuizActor extends StatefulActor<
 					} catch (e) {
 						console.error(e);
 					}
+				},
+				Update: async quiz => {
+					this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: this.state.quiz.uid, ...quiz }));
 				},
 			})
 		);

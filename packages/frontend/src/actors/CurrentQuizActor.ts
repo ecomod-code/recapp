@@ -29,9 +29,12 @@ export const CurrentQuizMessages = unionize(
 		UpvoteComment: ofType<Id>(),
 		FinishComment: ofType<Id>(),
 		AddComment: ofType<Omit<Comment, "uid" | "authorName" | "authorId">>(),
-		AddQuestion: ofType<Omit<Question, "uid" | "authorName" | "authorId">>(),
+		AddQuestion: ofType<{
+			question: Omit<Question, "uid" | "authorName" | "authorId" | "created" | "updated">;
+			group: string;
+		}>(),
 		Update: ofType<Partial<Quiz>>(),
-		UpdateQuestion: ofType<Partial<Question> & { uid: Id }>(),
+		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
 	},
 	{ value: "value" }
 );
@@ -54,6 +57,7 @@ export class CurrentQuizActor extends StatefulActor<
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
+		console.log("CURRENTQUIZ", message);
 		if (message.tag === "QuizUpdateMessage") {
 			this.updateState(draft => {
 				draft.quiz = { ...draft.quiz, ...message.quiz };
@@ -114,23 +118,47 @@ export class CurrentQuizActor extends StatefulActor<
 						);
 					});
 				},
-				AddQuestion: async question => {
-					this.user.forEach(u => {
-						this.send(
-							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							QuestionActorMessages.Create({
-								authorName: u.username,
-								authorId: u.uid,
-								...question,
-							})
-						);
-					});
+				AddQuestion: async ({ question, group }) => {
+					try {
+						await this.user.map(async u => {
+							const uid: Id = await this.ask(
+								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								QuestionActorMessages.Create({
+									authorName: u.username,
+									authorId: u.uid,
+									...question,
+								})
+							);
+							const groups = this.state.quiz.groups;
+							const addTo = groups.find(g => g.name === group);
+							addTo?.questions.push(uid);
+							this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+						});
+					} catch (e) {
+						alert(e);
+						throw e;
+					}
 				},
-				UpdateQuestion: async question => {
-					this.send(
+				UpdateQuestion: async ({ question, group }) => {
+					await this.send(
 						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						QuestionActorMessages.Update(question)
 					);
+					if (!group) {
+						return;
+					}
+					const groups = this.state.quiz.groups.map(g => {
+						if (g.questions.includes(question.uid)) {
+							g.questions = g.questions.filter(q => q !== question.uid);
+						}
+						return g;
+					});
+					const addTo = groups.find(g => g.name === group);
+					addTo?.questions.push(question.uid);
+					if (!addTo) {
+						alert(groups.map(g => g.name).join(";") + " does not contain " + group);
+					}
+					this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 				},
 				FinishComment: async uid => {
 					this.send(
@@ -169,6 +197,10 @@ export class CurrentQuizActor extends StatefulActor<
 								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								CommentActorMessages.UnsubscribeFromCollection()
 							);
+							this.send(
+								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								QuestionActorMessages.UnsubscribeFromCollection()
+							);
 						});
 						this.quiz = maybe(uid);
 						const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
@@ -176,13 +208,21 @@ export class CurrentQuizActor extends StatefulActor<
 							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.GetAll()
 						);
+						this.send(
+							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							QuestionActorMessages.GetAll()
+						);
 						this.updateState(draft => {
 							draft.quiz = quizData;
 						});
 						this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
 						this.send(
-							`${actorUris.CommentActorPrefix}${this.quiz}`,
+							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.SubscribeToCollection()
+						);
+						this.send(
+							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							QuestionActorMessages.SubscribeToCollection()
 						);
 					} catch (e) {
 						console.error(e);

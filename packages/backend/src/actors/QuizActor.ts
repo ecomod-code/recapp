@@ -175,6 +175,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							}
 							c.updated = toTimestamp();
 							const { created, ...updateDelta } = quiz;
+							console.log("DELTA", JSON.stringify(updateDelta, undefined, 4));
 							const quizToUpdate = quizSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(quizToUpdate);
 							for (const [subscriber, properties] of this.state.collectionSubscribers) {
@@ -191,7 +192,6 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							return quizToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Quiz not found")));
-					console.log("QUIZACTOR", "Sending back", result);
 					return result;
 				},
 				GetAll: async () => {

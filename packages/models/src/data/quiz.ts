@@ -3,18 +3,19 @@ import { idEntitySchema, timestampSchema, uidSchema } from "./base";
 import { userParticipationSchema } from "./user";
 import { textElementStatisticsSchema, choiceElementStatisticsSchema, groupStatisticsSchema } from "./statistics";
 
-export const answerSchema = zod
-	.object({
-		text: zod.string(), // Text of answer option
-		correct: zod.boolean(), // Whether this is an correct answer
-	})
-	.merge(idEntitySchema);
+export const answerSchema = zod.object({
+	text: zod.string(), // Text of answer option
+	correct: zod.boolean(), // Whether this is an correct answer
+});
 
 export type Answer = zod.infer<typeof answerSchema>;
+
+export const questionTypesSchema = zod.enum(["SINGLE", "MULTIPLE", "TEXT"]);
 
 export const questionSchema = zod
 	.object({
 		text: zod.string(), // Question text
+		type: questionTypesSchema,
 		authorId: uidSchema, // Author id
 		authorName: zod.string().optional(), // Display name of the author (may also be a nickname or ANONYMOUS)
 		quiz: uidSchema, // Quiz the question belongs
@@ -30,13 +31,11 @@ export type Question = zod.infer<typeof questionSchema>;
 
 export const questionGroupSchema = zod.object({
 	name: zod.string(), // Group name/title
-	questions: zod.array(questionSchema), // Which elements belong to this group
+	questions: zod.array(uidSchema), // Which elements belong to this group
 	statistics: groupStatisticsSchema.optional(), // Last statistics for this group (if any)
 });
 
 export type QuestionGroup = zod.infer<typeof questionGroupSchema>;
-
-export const questionTypesSchema = zod.enum(["SINGLE", "MULTIPLE", "TEXT"]);
 
 export type QuestionType = zod.infer<typeof questionTypesSchema>;
 

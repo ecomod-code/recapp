@@ -9,7 +9,7 @@ import remarkRehype from "remark-rehype";
 import { i18n } from "@lingui/core";
 import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, QuestionGroup } from "@recapp/models";
+import { Quiz, User, toId, Comment, Question, QuestionGroup, Id } from "@recapp/models";
 import {
 	Badge,
 	Offcanvas,
@@ -28,45 +28,54 @@ import {
 import { ArrowDown, ArrowUp, ChatFill, Check, Pencil } from "react-bootstrap-icons";
 import { CurrentQuizActor, CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useNavigation, useSearchParams } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { add, isEmpty, keys } from "rambda";
 import { debug } from "itu-utils";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
-const Question = (props: { text: string }) => {
+const Question = (props: {
+	question: Question;
+	moveUp: () => void;
+	moveDown: () => void;
+	approve: () => void;
+	edit: () => void;
+}) => {
 	return (
 		<Card className="p-0">
 			<Card.Body as="div" className="p-0 m-0 d-flex flex-row align-items-center">
 				<div className="d-flex flex-column h-100 me-1">
 					<div>
-						<Button variant="light" size="sm">
+						<Button variant="light" size="sm" onClick={props.moveUp}>
 							<ArrowUp />
 						</Button>
 					</div>
 					<div className="flex-grow-1">&nbsp;</div>
 					<div>
-						<Button variant="light" size="sm">
+						<Button variant="light" size="sm" onClick={props.moveDown}>
 							<ArrowDown />
 						</Button>
 					</div>
 				</div>
 				<div
 					className="flex-grow-1 text-start p-2 me-2"
-					style={{ backgroundColor: "#f5f5f5", borderRadius: 4 }}
-					dangerouslySetInnerHTML={{ __html: props.text }}
+					dangerouslySetInnerHTML={{ __html: props.question.text }}
 				/>
 				<div className="d-flex flex-column h-100">
 					<Badge as="div" className="mt-2 me-2" bg="info">
-						Freitext
+						{props.question.type}
 					</Badge>
-					<div className="me-2"> von Ikke </div>
-					<div className="mt-5">
-						<Button className="m-2">
+					<div className="me-2"> von {props.question.authorName} </div>
+					<div className="mt-0">
+						<Button className="m-2" onClick={props.edit}>
 							<Pencil />
 						</Button>
-						<Button className="m-2" variant="success">
+						<Button
+							className="m-2"
+							variant={props.question.approved ? "success" : "warning"}
+							onClick={props.approve}
+						>
 							<Check />
 						</Button>
 					</div>
@@ -77,9 +86,12 @@ const Question = (props: { text: string }) => {
 };
 
 export const QuizPage: React.FC = () => {
+	const nav = useNavigate();
 	const quizId = useSearchParams()[0].get("q");
 	const [localUser] = useStatefulActor<{ user: User }>("LocalUser");
-	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[] }>("CurrentQuiz");
+	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
+		"CurrentQuiz"
+	);
 	useEffect(() => {
 		if (!quizId) {
 			return;
@@ -97,26 +109,7 @@ export const QuizPage: React.FC = () => {
 		name: "",
 	});
 
-	/* const [value, setValue] = useState<string | undefined>(`Hallo $a+b^2$
-
-${"```"}math
-a = c^2 \\sum X \\int xdx  
-${"```"}`);
-	const [rendered, setRendered] = useState<string>("");
-
-	useEffect(() => {
-		const f = async () => {
-			const result = await unified()
-				.use(remarkParse)
-				.use(remarkMath)
-				.use(remarkRehype)
-				.use(rehypeKatex)
-				.use(rehypeStringify)
-				.process(value);
-			setRendered(result.toString());
-		};
-		f();
-	}, [value]); */
+	const questions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -153,7 +146,45 @@ ${"```"}`);
 					tryQuizActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update({ groups: newGroups })));
 				};
 
-				console.log(quizData.quiz);
+				const moveQuestion = (groupName: string, qId: Id, upwards: boolean) => {
+					let newOrder: Id[] = [];
+					const group = quizData.quiz.groups.find(g => g.name === groupName)!;
+					const questionIndex = group.questions.findIndex(g => g === qId);
+					const changeIndex = upwards ? questionIndex - 1 : questionIndex + 1;
+					group.questions.forEach((qid, index) => {
+						if (index === questionIndex) {
+							return;
+						}
+						if (index === changeIndex) {
+							if (upwards) {
+								newOrder.push(group.questions[questionIndex]);
+								newOrder.push(qid);
+							} else {
+								newOrder.push(qid);
+								newOrder.push(group.questions[questionIndex]);
+							}
+						} else {
+							newOrder.push(qid);
+						}
+					});
+					group.questions = newOrder;
+					tryQuizActor.forEach(a =>
+						a.send(a.name, CurrentQuizMessages.Update({ groups: quizData.quiz.groups }))
+					);
+				};
+
+				const approveQuestion = (uid: Id) => {
+					tryQuizActor.forEach(a =>
+						a.send(
+							a.name,
+							CurrentQuizMessages.UpdateQuestion({ question: { uid, approved: true }, group: "" })
+						)
+					);
+				};
+
+				const editQuestion = (uid: Id, group: string) => {
+					nav(`/Dashboard/Question?q=${uid}&g=${group}`);
+				};
 
 				return (
 					<Container fluid>
@@ -265,14 +296,47 @@ ${"```"}`);
 																	className="d-flex flex-column"
 																	style={{ maxHeight: "70vh", overflowY: "auto" }}
 																>
-																	{questionGroup.questions.map(question => {
-																		return (
-																			<Question
-																				key={question.uid}
-																				text={question.text}
-																			/>
-																		);
-																	})}
+																	{questionGroup.questions
+																		.map(q => questions.find(qu => qu.uid === q))
+																		.filter(Boolean)
+																		.map((q, i) => {
+																			return (
+																				<Question
+																					question={q!}
+																					key={q!.uid}
+																					approve={() =>
+																						approveQuestion(q!.uid)
+																					}
+																					edit={() =>
+																						editQuestion(
+																							q!.uid,
+																							questionGroup.name
+																						)
+																					}
+																					moveUp={() => {
+																						if (i > 0)
+																							moveQuestion(
+																								questionGroup.name,
+																								q!.uid,
+																								true
+																							);
+																					}}
+																					moveDown={() => {
+																						if (
+																							i <
+																							questionGroup.questions
+																								.length -
+																								1
+																						)
+																							moveQuestion(
+																								questionGroup.name,
+																								q!.uid,
+																								false
+																							);
+																					}}
+																				/>
+																			);
+																		})}
 																</div>
 															</Accordion.Body>
 														</Accordion.Item>
@@ -289,7 +353,9 @@ ${"```"}`);
 											<Button
 												className="m-2"
 												style={{ width: "12rem" }}
-												onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+												onClick={() => {
+													nav("/Dashboard/Question");
+												}}
 											>
 												Neue Frage
 											</Button>

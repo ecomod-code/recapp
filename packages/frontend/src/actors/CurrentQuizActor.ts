@@ -144,6 +144,7 @@ export class CurrentQuizActor extends StatefulActor<
 						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						QuestionActorMessages.Update(question)
 					);
+					console.log("CURRENTQUIZ", question, group);
 					if (!group) {
 						return;
 					}

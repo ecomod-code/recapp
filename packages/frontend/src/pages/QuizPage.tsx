@@ -25,7 +25,7 @@ import {
 	Tabs,
 	Form,
 } from "react-bootstrap";
-import { ArrowDown, ArrowUp, ChatFill, Check, Pencil } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, ChatFill, Check, Pencil, TrainFront } from "react-bootstrap-icons";
 import { CurrentQuizActor, CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
 import { useNavigate, useNavigation, useSearchParams } from "react-router-dom";
@@ -35,12 +35,14 @@ import { add, isEmpty, keys } from "rambda";
 import { debug } from "itu-utils";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
-const Question = (props: {
+import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
+const QuestionCard = (props: {
 	question: Question;
 	moveUp: () => void;
 	moveDown: () => void;
 	approve: () => void;
 	edit: () => void;
+	changeGroup: () => void;
 }) => {
 	return (
 		<Card className="p-0">
@@ -70,6 +72,9 @@ const Question = (props: {
 					<div className="mt-0">
 						<Button className="m-2" onClick={props.edit}>
 							<Pencil />
+						</Button>
+						<Button className="m-2" onClick={props.changeGroup}>
+							<TrainFront />
 						</Button>
 						<Button
 							className="m-2"
@@ -108,6 +113,10 @@ export const QuizPage: React.FC = () => {
 		showNameModal: false,
 		name: "",
 	});
+	const [changeGroup, setChangeGroup] = useState({
+		qId: "",
+		currentGroup: "",
+	});
 
 	const questions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 
@@ -119,6 +128,7 @@ export const QuizPage: React.FC = () => {
 					const newGroups = [...quizData.quiz.groups];
 					const editedGroup = newGroups.find(g => g.name === currentGroup.name);
 					if (editedGroup) editedGroup.name = name;
+					else newGroups.push({ name, questions: [] });
 					setCurrentGroup({ showNameModal: false, name: "" });
 					tryQuizActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update({ groups: newGroups })));
 				};
@@ -173,11 +183,11 @@ export const QuizPage: React.FC = () => {
 					);
 				};
 
-				const approveQuestion = (uid: Id) => {
+				const approveQuestion = (uid: Id, approved: boolean) => {
 					tryQuizActor.forEach(a =>
 						a.send(
 							a.name,
-							CurrentQuizMessages.UpdateQuestion({ question: { uid, approved: true }, group: "" })
+							CurrentQuizMessages.UpdateQuestion({ question: { uid, approved: !approved }, group: "" })
 						)
 					);
 				};
@@ -188,6 +198,24 @@ export const QuizPage: React.FC = () => {
 
 				return (
 					<Container fluid>
+						<ChangeGroupModal
+							show={!!changeGroup.currentGroup}
+							groups={quizData.quiz.groups.map(g => g.name)}
+							currentGroup={changeGroup.currentGroup}
+							onClose={() => setChangeGroup({ currentGroup: "", qId: "" })}
+							onSubmit={newGroup => {
+								tryQuizActor.forEach(actor =>
+									actor.send(
+										actor.name,
+										CurrentQuizMessages.UpdateQuestion({
+											question: { uid: toId(changeGroup.qId) },
+											group: newGroup,
+										})
+									)
+								);
+								setChangeGroup({ currentGroup: "", qId: "" });
+							}}
+						/>
 						<CreateGroupModal
 							show={currentGroup.showNameModal}
 							invalidValues={quizData.quiz.groups.map(g => g.name).filter(n => n !== currentGroup.name)}
@@ -301,11 +329,14 @@ export const QuizPage: React.FC = () => {
 																		.filter(Boolean)
 																		.map((q, i) => {
 																			return (
-																				<Question
+																				<QuestionCard
 																					question={q!}
 																					key={q!.uid}
 																					approve={() =>
-																						approveQuestion(q!.uid)
+																						approveQuestion(
+																							q!.uid,
+																							q!.approved
+																						)
 																					}
 																					edit={() =>
 																						editQuestion(
@@ -333,6 +364,13 @@ export const QuizPage: React.FC = () => {
 																								q!.uid,
 																								false
 																							);
+																					}}
+																					changeGroup={() => {
+																						setChangeGroup({
+																							qId: q!.uid,
+																							currentGroup:
+																								questionGroup.name,
+																						});
 																					}}
 																				/>
 																			);

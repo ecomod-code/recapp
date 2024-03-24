@@ -53,6 +53,7 @@ export const quizSchema = zod
 		uniqueLink: zod.string(), // Unique link for this quiz
 		runOptions: runOptionsSchema.optional(), // If running, the current run options are given here
 		groups: zod.array(questionGroupSchema), // Groups belonging to this quiz
+		comments: zod.array(uidSchema),
 		studentQuestions: zod.boolean(), // Whether to allow students to create their own quiz elements
 		studentComments: zod.boolean(), // ARe student comments allowed after the quiz has been started
 		studentParticipationSettings: zod.record<typeof userParticipationSchema, ZodBoolean>(

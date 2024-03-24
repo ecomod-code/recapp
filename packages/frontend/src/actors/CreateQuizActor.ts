@@ -93,6 +93,7 @@ export class CreateQuizActor extends StatefulActor<CreateQuizMessage, Unit | Err
 						...this.state.quiz,
 						groups: [{ name: "DEFAULT", questions: [] }],
 						teachers: [teacher],
+						comments: [],
 						created: toTimestamp(),
 						updated: toTimestamp(),
 					};

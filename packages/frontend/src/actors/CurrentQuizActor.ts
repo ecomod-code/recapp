@@ -102,13 +102,15 @@ export class CurrentQuizActor extends StatefulActor<
 						students: [],
 						created: toTimestamp(),
 						updated: toTimestamp(),
+						comments: [],
 					};
 					const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
 					this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));
 				},
 				AddComment: async comment => {
-					this.user.forEach(u => {
-						this.send(
+					this.user.map(async u => {
+						const comments = this.state.quiz.comments ? [...this.state.quiz.comments] : [];
+						const uid: Id = await this.ask(
 							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 							CommentActorMessages.Create({
 								authorName: u.username,
@@ -116,6 +118,9 @@ export class CurrentQuizActor extends StatefulActor<
 								...comment,
 							})
 						);
+						comments.push(uid);
+						alert(comments.join(";"));
+						this.send(this.ref!, CurrentQuizMessages.Update({ comments: comments }));
 					});
 				},
 				AddQuestion: async ({ question, group }) => {

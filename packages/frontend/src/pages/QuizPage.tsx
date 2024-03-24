@@ -2,8 +2,8 @@ import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, toId, Comment, Question, QuestionGroup, Id } from "@recapp/models";
-import { Badge, Button, Card, Container, Row, Accordion, Breadcrumb, Tab, Tabs, Form } from "react-bootstrap";
-import { ArrowDown, ArrowUp, ChatFill, Check, Pencil, TrainFront } from "react-bootstrap-icons";
+import { Badge, Button, Card, Container, Row, Accordion, Breadcrumb, Tab, Tabs } from "react-bootstrap";
+import { ArrowDown, ArrowUp, Check, Pencil, TrainFront } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -12,6 +12,10 @@ import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
 import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
+import { toTimestamp } from "itu-utils";
+import { MarkdownModal } from "../components/modals/MarkdownModal";
+import { debug } from "itu-utils";
+
 const QuestionCard = (props: {
 	question: Question;
 	moveUp: () => void;
@@ -79,6 +83,7 @@ const QuestionCard = (props: {
 
 export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
+	const [showMDModal, setShowMDModal] = useState(false);
 	const quizId = useSearchParams()[0].get("q");
 	const [localUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
@@ -106,6 +111,7 @@ export const QuizPage: React.FC = () => {
 	});
 
 	const questions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
+	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -195,8 +201,30 @@ export const QuizPage: React.FC = () => {
 
 				const disableForStudent = localUser.map(u => allowed(u.user)).orElse(true);
 
+				const addComment = (value: string) => {
+					localUser.forEach(lu => {
+						const c: Omit<Comment, "authorId" | "authorName" | "uid"> = {
+							text: value,
+							created: toTimestamp(),
+							updated: toTimestamp(),
+							upvoters: [],
+							answered: false,
+							relatedQuiz: quizData.quiz.uid,
+						};
+						tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
+					});
+					setShowMDModal(false);
+				};
+
 				return (
 					<Container fluid>
+						<MarkdownModal
+							titleId="new-comment-title"
+							editorValue=""
+							show={showMDModal}
+							onClose={() => setShowMDModal(false)}
+							onSubmit={addComment}
+						/>
 						<ChangeGroupModal
 							show={!!changeGroup.currentGroup}
 							groups={quizData.quiz.groups.map(g => g.name)}
@@ -230,236 +258,236 @@ export const QuizPage: React.FC = () => {
 								</Breadcrumb.Item>
 							</Breadcrumb>
 						</Row>
-						<Tabs defaultActiveKey="questions" className="mb-3 w-100 h-100">
-							{!disableForStudent && (
-								<Tab eventKey="quizdata" title={i18n._("quiz-tab-label-data")}>
-									<QuizData />
-								</Tab>
-							)}
-							<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
-								<Row>
-									<div className="d-flex flex-column h-100 w-100">
-										<div style={{ backgroundColor: "#f5f5f5" }}>
-											<div
-												className="d-xs-none d-sm-none d-md-none d-lg-flex flex-row"
-												style={{
-													maxHeight: "19rem",
-													overflowY: "hidden",
-													overflowX: "auto",
-												}}
-											>
-												{mbQuiz
-													.map(q => q.comments)
-													.map(c =>
-														c.map(cmt => (
-															<div key={cmt.uid} style={{ width: "18rem" }}>
-																<CommentCard comment={cmt} />
-															</div>
-														))
-													)
-													.orElse([<Fragment />])}
+						<Row>
+							<Tabs defaultActiveKey="questions" className="mb-3 w-100">
+								{!disableForStudent && (
+									<Tab eventKey="quizdata" title={i18n._("quiz-tab-label-data")}>
+										<QuizData />
+									</Tab>
+								)}
+								<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
+									<Row>
+										<div className="d-flex flex-column h-100 w-100">
+											{/*<div style={{ backgroundColor: "#f5f5f5" }}>
+												<div
+													className="d-xs-none d-sm-none d-md-none d-lg-flex flex-row"
+													style={{
+														maxHeight: "19rem",
+														overflowY: "hidden",
+														overflowX: "auto",
+													}}
+												>
+													{mbQuiz
+														.map(q => q.comments)
+														.map(c =>
+															c.map(cmt => (
+																<div key={cmt.uid} style={{ width: "18rem" }}>
+																	<CommentCard comment={cmt} />
+																</div>
+															))
+														)
+														.orElse([<Fragment />])}
+												</div>
+															</div>*/}
+											<div className="flex-grow-1">
+												<Accordion defaultActiveKey="0">
+													{quizData.quiz.groups.map((questionGroup, index) => {
+														return (
+															<Accordion.Item
+																key={questionGroup.name}
+																eventKey={questionGroup.name}
+															>
+																<Accordion.Header>
+																	<div
+																		className="d-flex w-100 align-items-center"
+																		style={{ margin: "-0.5rem" }}
+																	>
+																		<div className="d-flex flex-column h-100 me-1">
+																			<div>
+																				<Button
+																					variant="light"
+																					size="sm"
+																					disabled={index === 0}
+																					onClick={() =>
+																						moveGroup(
+																							questionGroup.name,
+																							true
+																						)
+																					}
+																				>
+																					<ArrowUp />
+																				</Button>
+																			</div>
+																			<div>&nbsp;</div>
+																			<div>
+																				<Button
+																					variant="light"
+																					size="sm"
+																					disabled={
+																						index ===
+																						quizData.quiz.groups.length - 1
+																					}
+																					onClick={() =>
+																						moveGroup(
+																							questionGroup.name,
+																							false
+																						)
+																					}
+																				>
+																					<ArrowDown />
+																				</Button>
+																			</div>
+																		</div>
+																		<div className="flex-grow-1">
+																			<strong>{questionGroup.name}</strong>
+																		</div>
+																		<Button
+																			as="div"
+																			className="me-4"
+																			onClick={() =>
+																				setCurrentGroup({
+																					showNameModal: true,
+																					name: questionGroup.name,
+																				})
+																			}
+																		>
+																			<Pencil />
+																		</Button>
+																	</div>
+																</Accordion.Header>
+																<Accordion.Body className="p-2">
+																	<div
+																		className="d-flex flex-column"
+																		style={{ maxHeight: "70vh", overflowY: "auto" }}
+																	>
+																		{questionGroup.questions
+																			.map(q =>
+																				questions.find(qu => qu.uid === q)
+																			)
+																			.filter(Boolean)
+																			.map((q, i) => {
+																				return (
+																					<QuestionCard
+																						question={q!}
+																						key={q!.uid}
+																						approve={() =>
+																							approveQuestion(
+																								q!.uid,
+																								q!.approved
+																							)
+																						}
+																						edit={() =>
+																							editQuestion(
+																								q!.uid,
+																								questionGroup.name
+																							)
+																						}
+																						moveUp={() => {
+																							if (i > 0)
+																								moveQuestion(
+																									questionGroup.name,
+																									q!.uid,
+																									true
+																								);
+																						}}
+																						moveDown={() => {
+																							if (
+																								i <
+																								questionGroup.questions
+																									.length -
+																									1
+																							)
+																								moveQuestion(
+																									questionGroup.name,
+																									q!.uid,
+																									false
+																								);
+																						}}
+																						changeGroup={() => {
+																							setChangeGroup({
+																								qId: q!.uid,
+																								currentGroup:
+																									questionGroup.name,
+																							});
+																						}}
+																						currentUserUid={localUser
+																							.map(u => u.user.uid)
+																							.orElse(toId(""))}
+																						disabled={disableForStudent}
+																					/>
+																				);
+																			})}
+																	</div>
+																</Accordion.Body>
+															</Accordion.Item>
+														);
+													})}
+												</Accordion>
+												<Button
+													className="m-2"
+													style={{ width: "12rem" }}
+													onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+													disabled={disableForStudent}
+												>
+													Gruppe hinzufügen
+												</Button>
+												<Button
+													className="m-2"
+													style={{ width: "12rem" }}
+													onClick={() => {
+														nav("/Dashboard/Question");
+													}}
+													disabled={disableForStudent && !quizData.quiz.studentQuestions}
+												>
+													Neue Frage
+												</Button>
+												<Button
+													className="m-2"
+													style={{ width: "12rem" }}
+													onClick={() => setShowMDModal(true)}
+												>
+													Neuer Kommentar
+												</Button>
 											</div>
 										</div>
-										<div className="flex-grow-1">
-											<Accordion defaultActiveKey="0">
-												{quizData.quiz.groups.map((questionGroup, index) => {
-													return (
-														<Accordion.Item
-															key={questionGroup.name}
-															eventKey={questionGroup.name}
-														>
-															<Accordion.Header>
-																<div
-																	className="d-flex w-100 align-items-center"
-																	style={{ margin: "-0.5rem" }}
-																>
-																	<div className="d-flex flex-column h-100 me-1">
-																		<div>
-																			<Button
-																				variant="light"
-																				size="sm"
-																				disabled={index === 0}
-																				onClick={() =>
-																					moveGroup(questionGroup.name, true)
-																				}
-																			>
-																				<ArrowUp />
-																			</Button>
-																		</div>
-																		<div>&nbsp;</div>
-																		<div>
-																			<Button
-																				variant="light"
-																				size="sm"
-																				disabled={
-																					index ===
-																					quizData.quiz.groups.length - 1
-																				}
-																				onClick={() =>
-																					moveGroup(questionGroup.name, false)
-																				}
-																			>
-																				<ArrowDown />
-																			</Button>
-																		</div>
-																	</div>
-																	<div className="flex-grow-1">
-																		<strong>{questionGroup.name}</strong>
-																	</div>
-																	<Button
-																		as="div"
-																		className="me-4"
-																		onClick={() =>
-																			setCurrentGroup({
-																				showNameModal: true,
-																				name: questionGroup.name,
-																			})
-																		}
-																	>
-																		<Pencil />
-																	</Button>
-																</div>
-															</Accordion.Header>
-															<Accordion.Body className="p-2">
-																<div
-																	className="d-flex flex-column"
-																	style={{ maxHeight: "70vh", overflowY: "auto" }}
-																>
-																	{questionGroup.questions
-																		.map(q => questions.find(qu => qu.uid === q))
-																		.filter(Boolean)
-																		.map((q, i) => {
-																			return (
-																				<QuestionCard
-																					question={q!}
-																					key={q!.uid}
-																					approve={() =>
-																						approveQuestion(
-																							q!.uid,
-																							q!.approved
-																						)
-																					}
-																					edit={() =>
-																						editQuestion(
-																							q!.uid,
-																							questionGroup.name
-																						)
-																					}
-																					moveUp={() => {
-																						if (i > 0)
-																							moveQuestion(
-																								questionGroup.name,
-																								q!.uid,
-																								true
-																							);
-																					}}
-																					moveDown={() => {
-																						if (
-																							i <
-																							questionGroup.questions
-																								.length -
-																								1
-																						)
-																							moveQuestion(
-																								questionGroup.name,
-																								q!.uid,
-																								false
-																							);
-																					}}
-																					changeGroup={() => {
-																						setChangeGroup({
-																							qId: q!.uid,
-																							currentGroup:
-																								questionGroup.name,
-																						});
-																					}}
-																					currentUserUid={localUser
-																						.map(u => u.user.uid)
-																						.orElse(toId(""))}
-																					disabled={disableForStudent}
-																				/>
-																			);
-																		})}
-																</div>
-															</Accordion.Body>
-														</Accordion.Item>
-													);
-												})}
-											</Accordion>
-											<Button
-												className="m-2"
-												style={{ width: "12rem" }}
-												onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
-												disabled={disableForStudent}
-											>
-												Gruppe hinzufügen
-											</Button>
-											<Button
-												className="m-2"
-												style={{ width: "12rem" }}
-												onClick={() => {
-													nav("/Dashboard/Question");
-												}}
-												disabled={disableForStudent && !quizData.quiz.studentQuestions}
-											>
-												Neue Frage
-											</Button>
-										</div>
-									</div>
-								</Row>
-								{/* <Row>
-							<div className="d-flex flex-column flex-grow-1">
-								<div data-color-mode="light">
-									<MDEditor
-										commands={[
-											commands.bold,
-											commands.italic,
-											commands.strikethrough,
-											commands.divider,
-											commands.link,
-											commands.quote,
-											commands.code,
-											commands.divider,
-											commands.unorderedListCommand,
-											commands.orderedListCommand,
-											commands.checkedListCommand,
-											commands.divider,
-											commands.help,
-										]}
-										extraCommands={[]}
-										value={value}
-										onChange={setValue}
-										height="100%"
-										components={{ preview: (_source, _state, _dispath) => <></> }}
-										preview="edit"
-									/>
-								</div>
-								<div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
+									</Row>
+								</Tab>
+								<Tab eventKey="statistics" title={i18n._("quiz-tab-label-statistics")}>
+									Statistiken
+								</Tab>
+							</Tabs>
+						</Row>
+						<Row>
+							<div
+								className="d-flex flex-row"
+								style={{
+									maxHeight: "19rem",
+									overflowY: "hidden",
+									overflowX: "auto",
+									backgroundColor: "#f5f5f5",
+								}}
+							>
+								{mbQuiz
+									.flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
+									.map(
+										q =>
+											(q.comments ?? [])
+												.map(c => debug(comments.find(cmt => cmt.uid === c)!))
+												.filter(Boolean) as Comment[]
+									)
+									.map(c =>
+										c.map(cmt => (
+											<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+												<CommentCard comment={cmt} />
+											</div>
+										))
+									)
+									.orElse([<Fragment />])}
 							</div>
-						</Row> */}
-							</Tab>
-							<Tab eventKey="statistics" title={i18n._("quiz-tab-label-statistics")}>
-								Statistiken
-							</Tab>
-						</Tabs>
+						</Row>
 					</Container>
 				);
 			},
 			() => null
 		);
-
-	/*const addComment = () => {
-		localUser.forEach(lu => {
-			const c: Omit<Comment, "authorId" | "authorName" | "uid"> = {
-				text: value ?? "",
-				created: toTimestamp(),
-				updated: toTimestamp(),
-				upvoters: [],
-				answered: false,
-				relatedQuiz: quiz.map(q => q.quiz.uid).orElse(toId("")),
-			};
-			console.log("QA", quizActor);
-			quizActor.forEach(q => q.send(q, new AddComment(c)));
-		});
-	};*/
 };

@@ -82,7 +82,6 @@ export const QuestionEdit: React.FC = () => {
 
 		const groups = quiz?.quiz?.groups?.map(g => g.name);
 		if (groups) {
-			alert(JSON.stringify(quiz?.quiz.allowedQuestionTypesSettings));
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
 				.map(k => k as QuestionType);

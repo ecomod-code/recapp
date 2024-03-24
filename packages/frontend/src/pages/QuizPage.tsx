@@ -183,7 +183,17 @@ export const QuizPage: React.FC = () => {
 					nav(`/Dashboard/Question?q=${uid}&g=${group}`);
 				};
 
-				const disableForStudent = localUser.map(u => u.user.role === "STUDENT").orElse(true);
+				const allowed = (user: User) => {
+					if (user.role === "STUDENT") {
+						return false;
+					}
+					if (user.role === "TEACHER" && !quizData.quiz.teachers.includes(user.uid)) {
+						return false;
+					}
+					return true;
+				};
+
+				const disableForStudent = localUser.map(u => allowed(u.user)).orElse(true);
 
 				return (
 					<Container fluid>

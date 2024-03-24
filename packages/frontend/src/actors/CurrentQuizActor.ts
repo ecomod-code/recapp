@@ -189,6 +189,9 @@ export class CurrentQuizActor extends StatefulActor<
 				},
 				SetQuiz: async uid => {
 					try {
+						if (uid === this.state.quiz.uid) {
+							return;
+						}
 						this.state = { ...this.state, comments: [], questions: [] };
 						this.quiz.forEach(q => {
 							this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));

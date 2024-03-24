@@ -119,6 +119,7 @@ export class CurrentQuizActor extends StatefulActor<
 					});
 				},
 				AddQuestion: async ({ question, group }) => {
+					question.editMode = false;
 					try {
 						await this.user.map(async u => {
 							const uid: Id = await this.ask(
@@ -140,6 +141,7 @@ export class CurrentQuizActor extends StatefulActor<
 					}
 				},
 				UpdateQuestion: async ({ question, group }) => {
+					question.editMode = false;
 					await this.send(
 						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						QuestionActorMessages.Update(question)

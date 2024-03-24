@@ -1,38 +1,14 @@
-import MDEditor, { commands } from "@uiw/react-md-editor";
-import { Fragment, ReactNode, useEffect, useState } from "react";
-import "katex/dist/katex.css";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
+import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
-import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, toId, Comment, Question, QuestionGroup, Id } from "@recapp/models";
-import {
-	Badge,
-	Offcanvas,
-	Button,
-	Card,
-	Container,
-	Row,
-	Accordion,
-	AccordionItem,
-	AccordionBody,
-	Breadcrumb,
-	Tab,
-	Tabs,
-	Form,
-} from "react-bootstrap";
+import { Badge, Button, Card, Container, Row, Accordion, Breadcrumb, Tab, Tabs, Form } from "react-bootstrap";
 import { ArrowDown, ArrowUp, ChatFill, Check, Pencil, TrainFront } from "react-bootstrap-icons";
-import { CurrentQuizActor, CurrentQuizMessages } from "../actors/CurrentQuizActor";
+import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { useNavigate, useNavigation, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
-import { Trans } from "@lingui/react";
-import { add, isEmpty, keys } from "rambda";
-import { debug } from "itu-utils";
+import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
 import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
@@ -43,19 +19,21 @@ const QuestionCard = (props: {
 	approve: () => void;
 	edit: () => void;
 	changeGroup: () => void;
+	disabled: boolean;
+	currentUserUid: Id;
 }) => {
 	return (
 		<Card className="p-0">
 			<Card.Body as="div" className="p-0 m-0 d-flex flex-row align-items-center">
 				<div className="d-flex flex-column h-100 me-1">
 					<div>
-						<Button variant="light" size="sm" onClick={props.moveUp}>
+						<Button variant="light" size="sm" onClick={props.moveUp} disabled={props.disabled}>
 							<ArrowUp />
 						</Button>
 					</div>
 					<div className="flex-grow-1">&nbsp;</div>
 					<div>
-						<Button variant="light" size="sm" onClick={props.moveDown}>
+						<Button variant="light" size="sm" onClick={props.moveDown} disabled={props.disabled}>
 							<ArrowDown />
 						</Button>
 					</div>
@@ -70,16 +48,25 @@ const QuestionCard = (props: {
 					</Badge>
 					<div className="me-2"> von {props.question.authorName} </div>
 					<div className="mt-0">
-						<Button className="m-2" onClick={props.edit}>
+						<Button
+							className="m-2"
+							onClick={props.edit}
+							disabled={
+								props.question.editMode ||
+								(props.disabled &&
+									(props.question.authorId !== props.currentUserUid || props.question.approved))
+							}
+						>
 							<Pencil />
 						</Button>
-						<Button className="m-2" onClick={props.changeGroup}>
+						<Button className="m-2" onClick={props.changeGroup} disabled={props.disabled}>
 							<TrainFront />
 						</Button>
 						<Button
 							className="m-2"
 							variant={props.question.approved ? "success" : "warning"}
 							onClick={props.approve}
+							disabled={props.disabled}
 						>
 							<Check />
 						</Button>
@@ -196,6 +183,8 @@ export const QuizPage: React.FC = () => {
 					nav(`/Dashboard/Question?q=${uid}&g=${group}`);
 				};
 
+				const disableForStudent = localUser.map(u => u.user.role === "STUDENT").orElse(true);
+
 				return (
 					<Container fluid>
 						<ChangeGroupModal
@@ -232,9 +221,11 @@ export const QuizPage: React.FC = () => {
 							</Breadcrumb>
 						</Row>
 						<Tabs defaultActiveKey="questions" className="mb-3 w-100 h-100">
-							<Tab eventKey="quizdata" title={i18n._("quiz-tab-label-data")}>
-								<QuizData />
-							</Tab>
+							{!disableForStudent && (
+								<Tab eventKey="quizdata" title={i18n._("quiz-tab-label-data")}>
+									<QuizData />
+								</Tab>
+							)}
 							<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
 								<Row>
 									<div className="d-flex flex-column h-100 w-100">
@@ -372,6 +363,10 @@ export const QuizPage: React.FC = () => {
 																								questionGroup.name,
 																						});
 																					}}
+																					currentUserUid={localUser
+																						.map(u => u.user.uid)
+																						.orElse(toId(""))}
+																					disabled={disableForStudent}
 																				/>
 																			);
 																		})}
@@ -385,6 +380,7 @@ export const QuizPage: React.FC = () => {
 												className="m-2"
 												style={{ width: "12rem" }}
 												onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+												disabled={disableForStudent}
 											>
 												Gruppe hinzufügen
 											</Button>
@@ -394,6 +390,7 @@ export const QuizPage: React.FC = () => {
 												onClick={() => {
 													nav("/Dashboard/Question");
 												}}
+												disabled={disableForStudent && !quizData.quiz.studentQuestions}
 											>
 												Neue Frage
 											</Button>

@@ -91,6 +91,7 @@ export class CreateQuizActor extends StatefulActor<CreateQuizMessage, Unit | Err
 					const teacher: Id = await this.ask(actorUris["LocalUser"], "uid");
 					const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
 						...this.state.quiz,
+						groups: [{ name: "DEFAULT", questions: [] }],
 						teachers: [teacher],
 						created: toTimestamp(),
 						updated: toTimestamp(),

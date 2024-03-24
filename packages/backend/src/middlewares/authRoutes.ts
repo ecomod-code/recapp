@@ -163,6 +163,9 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				const { exp, sub } = jwt.decode(idToken) as jwt.JwtPayload;
 				if (fromTimestamp(exp! * 1000) > DateTime.local().minus(minutes(45))) {
 					console.log("Refresh not needed yet");
+					console.log(
+						`Session ${fromTimestamp(exp! * 1000).toISO()} < ${DateTime.local().minus(minutes(45))}`
+					);
 					ctx.body = "O.K.";
 					return; // We do not need to refresh the token yet
 				}
@@ -174,10 +177,8 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
 					.then(s => s as Session)
 					.catch((e: Error) => {
-						console.error("JGJHGZUWTUWFJSFSFTF!9!");
 						return e;
 					});
-				console.error("HECGHJGDHJGJHDG");
 				if (session instanceof Error) {
 					ctx.throw(401, "Session unknown");
 				}

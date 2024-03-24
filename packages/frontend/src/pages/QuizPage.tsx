@@ -185,12 +185,12 @@ export const QuizPage: React.FC = () => {
 
 				const allowed = (user: User) => {
 					if (user.role === "STUDENT") {
-						return false;
+						return true;
 					}
 					if (user.role === "TEACHER" && !quizData.quiz.teachers.includes(user.uid)) {
-						return false;
+						return true;
 					}
-					return true;
+					return false;
 				};
 
 				const disableForStudent = localUser.map(u => allowed(u.user)).orElse(true);

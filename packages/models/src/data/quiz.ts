@@ -12,6 +12,8 @@ export type Answer = zod.infer<typeof answerSchema>;
 
 export const questionTypesSchema = zod.enum(["SINGLE", "MULTIPLE", "TEXT"]);
 
+export type QuestionTypes = zod.infer<typeof questionTypesSchema>;
+
 export const questionSchema = zod
 	.object({
 		text: zod.string(), // Question text

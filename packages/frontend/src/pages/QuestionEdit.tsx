@@ -9,7 +9,7 @@ import remarkRehype from "remark-rehype";
 import { i18n } from "@lingui/core";
 import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, Question, questionSchema, Id } from "@recapp/models";
+import { Quiz, User, toId, Comment, Question, questionSchema, Id, QuestionType } from "@recapp/models";
 import {
 	Badge,
 	Offcanvas,
@@ -42,32 +42,37 @@ import { CommentCard } from "../components/cards/CommentCard";
 import { matchRoutes, useNavigate, useNavigation, useSearchParams } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
-import { add, isEmpty } from "rambda";
+import { add, isEmpty, keys } from "rambda";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
 import { DateTime } from "luxon";
 
 export const QuestionEdit: React.FC = () => {
-	const questionId = useSearchParams()[0].get("q");
-	const formerGroup = useSearchParams()[0].get("g");
+	const urlSearchParams = useSearchParams()[0];
+	const questionId = urlSearchParams.get("q");
+	const formerGroup = urlSearchParams.get("g");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
-	const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID">>({
-		text: "",
-		type: "TEXT",
-		authorId: toId(""),
-		answers: [],
-		approved: false,
-		editMode: true,
-		quiz: toId(""),
-	});
+	const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id }>(
+		{
+			text: "",
+			type: "TEXT",
+			authorId: toId(""),
+			answers: [],
+			approved: false,
+			editMode: true,
+			quiz: toId(""),
+		}
+	);
 	const [hint, setHint] = useState(false);
 	const [groups, setGroups] = useState<string[]>([]);
 	const [selectedGroup, setSelectedGroup] = useState("");
+	const [allowedQuestionTypes, setAllowedQuestionTypes] = useState<string[]>([]);
 	const nav = useNavigate();
+	const isStudent = mbUser.map(u => u.user.role === "STUDENT").orElse(true);
 
 	useEffect(() => {
 		if (mbQuiz.isEmpty()) {
@@ -77,11 +82,18 @@ export const QuestionEdit: React.FC = () => {
 
 		const groups = quiz?.quiz?.groups?.map(g => g.name);
 		if (groups) {
+			alert(JSON.stringify(quiz?.quiz.allowedQuestionTypesSettings));
+			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
+				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
+				.map(k => k as QuestionType);
+			const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
+			setAllowedQuestionTypes(aqt);
 			if (questionId) {
-				const editQuestion = quiz?.questions?.find(q => q.uid === questionId) ?? {};
-				setQuestion({ ...question, ...editQuestion });
+				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
+				setQuestion({ ...question, ...editQuestion, type: newType });
+				setHint(!!editQuestion.hint);
 			} else {
-				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId("") });
+				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
 			}
 			if (formerGroup) {
 				setSelectedGroup(formerGroup);
@@ -94,15 +106,15 @@ export const QuestionEdit: React.FC = () => {
 
 	const [rendered, setRendered] = useState<string>("");
 	const [showMDModal, setShowMDModal] = useState(false);
-	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "" });
+	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
 
 	const handleClose = () => {
 		setShowMDModal(false);
-		setShowTextModal({ property: "", titleId: "" });
+		setShowTextModal({ property: "", titleId: "", editorText: "" });
 	};
 	const handleShow = (property: string = "", titleId: string = "") => {
 		setShowMDModal(true);
-		setShowTextModal({ property, titleId });
+		setShowTextModal({ property, titleId, editorText: "" });
 	};
 
 	useEffect(() => {
@@ -145,7 +157,11 @@ export const QuestionEdit: React.FC = () => {
 	};
 
 	const editAnswer = (index: number) => {
-		setShowTextModal({ titleId: "edit-answer-text", property: `answer-${index}` });
+		setShowTextModal({
+			titleId: "edit-answer-text",
+			property: `answer-${index}`,
+			editorText: question.answers[index].text,
+		});
 	};
 
 	const submit = async () => {
@@ -186,7 +202,7 @@ export const QuestionEdit: React.FC = () => {
 			<TextModal
 				titleId={showTextModal.titleId}
 				show={!!showTextModal.titleId}
-				editorValue={(question as any)[showTextModal.property]}
+				editorValue={showTextModal.editorText}
 				onClose={handleClose}
 				onSubmit={text => {
 					if (showTextModal.property.startsWith("answer-")) {
@@ -227,7 +243,7 @@ export const QuestionEdit: React.FC = () => {
 					>
 						{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 					</Breadcrumb.Item>
-					<Breadcrumb.Item>Neue Frage</Breadcrumb.Item>
+					<Breadcrumb.Item>{!!question.uid ? "Frage" : "Neue Frage"}</Breadcrumb.Item>
 				</Breadcrumb>
 			</div>
 			<Row>
@@ -237,13 +253,14 @@ export const QuestionEdit: React.FC = () => {
 							<Card className="p-0">
 								<Card.Header className="text-start d-flex flex-row">
 									<div className="align-self-center">
-										<strong>Neue Frage</strong>
+										<strong>{!!question.uid ? "Frage" : "Neue Frage"}</strong>
 									</div>
 									<div className="flex-grow-1"></div>
 									<div className="align-self-center">
 										<Form.Select
 											value={selectedGroup}
 											onChange={event => setSelectedGroup(event.target.value)}
+											disabled={isStudent}
 										>
 											{groups.map(g => (
 												<option key={g} value={g}>
@@ -262,9 +279,15 @@ export const QuestionEdit: React.FC = () => {
 												}))
 											}
 										>
-											<option value="SINGLE">Einzelauswahl</option>
-											<option value="MULTIPLE">Mehrfachauswahl</option>
-											<option value="TEXT">Freitext</option>
+											{allowedQuestionTypes.includes("SINGLE") && (
+												<option value="SINGLE">Einzelauswahl</option>
+											)}
+											{allowedQuestionTypes.includes("MULTIPLE") && (
+												<option value="MULTIPLE">Mehrfachauswahl</option>
+											)}
+											{allowedQuestionTypes.includes("TEXT") && (
+												<option value="TEXT">Freitext</option>
+											)}
 										</Form.Select>
 									</div>
 									<div className="m-1">
@@ -310,7 +333,11 @@ export const QuestionEdit: React.FC = () => {
 										<Button
 											disabled={!hint}
 											onClick={() =>
-												setShowTextModal({ property: "hint", titleId: "edit-hint-title" })
+												setShowTextModal({
+													property: "hint",
+													titleId: "edit-hint-title",
+													editorText: question.hint ?? "",
+												})
 											}
 										>
 											<Pencil />

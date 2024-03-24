@@ -14,6 +14,18 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+msgid "edit-question-title"
+msgstr "Frage bearbeiten"
+
+#. js-lingui-explicit-id
+msgid "edit-hint-title"
+msgstr "Hinweistext bearbeiten"
+
+#. js-lingui-explicit-id
+msgid "edit-answer-text"
+msgstr "Antwort bearbeiten"
+
+#. js-lingui-explicit-id
 #: src/components/modals/ChangeGroupModal.tsx:24
 msgid "change-group-of-question-title"
 msgstr "Fragengruppe ändern"
@@ -26,7 +38,7 @@ msgstr "Gruppe ändern"
 #. js-lingui-explicit-id
 #: src/components/modals/CreateGroupModal.tsx:26
 msgid "quiz-create-new-group-modal-title"
-msgstr "Neue Fragengruppe anlegen"
+msgstr "Name der Fragengruppe"
 
 #. js-lingui-explicit-id
 #: src/components/modals/CreateGroupModal.tsx:41

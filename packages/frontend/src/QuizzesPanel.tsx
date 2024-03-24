@@ -44,9 +44,13 @@ export const Quizzes: React.FC = () => {
 	return (
 		<Container fluid>
 			<Container fluid style={{ maxHeight: "70vh", overflowY: "auto" }}>
-				{quizzes.map(q => {
-					return <QuizCard key={q.uid} quiz={q} />;
-				})}
+				{quizzes
+					.sort((a, b) => {
+						return b.updated?.value! - a.updated?.value!;
+					})
+					.map(q => {
+						return <QuizCard key={q.uid} quiz={q} />;
+					})}
 			</Container>
 			<Button onClick={() => nav("/Dashboard/CreateQuiz")}>
 				<Trans id="button-new-quiz" />

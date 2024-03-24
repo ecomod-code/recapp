@@ -118,7 +118,8 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					);
 					role = user.role;
 				}
-				const expires = DateTime.fromMillis((tokenSet.expires_at ?? -1) * 1000).toUTC();
+				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+				console.log("Setting expiry to", expires.toISO());
 				const sessionStore = createActorUri("SessionStore");
 				system.send(
 					sessionStore,

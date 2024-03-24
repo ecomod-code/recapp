@@ -395,7 +395,7 @@ export const QuestionEdit: React.FC = () => {
 						.map(c =>
 							c.map(cmt => (
 								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-									<CommentCard comment={cmt} />
+									<CommentCard comment={cmt} onAccept={() => {}} onUpvote={() => {}} />
 								</div>
 							))
 						)

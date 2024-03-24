@@ -52,100 +52,106 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 
 	public async receive(from: ActorRef, message: CommentActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
-		return await CommentActorMessages.match<Promise<ResultType>>(message, {
-			Create: async comment => {
-				(comment as Comment).uid = v4() as Id;
-				const commentToCreate = commentSchema.parse(comment);
-				await this.storeEntity(commentToCreate);
-				for (const [subscriber, properties] of this.state.collectionSubscribers) {
-					this.send(
-						subscriber,
-						new CommentUpdateMessage(
-							properties.length > 0 ? pick(properties, commentToCreate) : commentToCreate
-						)
-					);
-				}
-				for (const subscriber of this.state.subscribers.get(commentToCreate.uid) ?? new Set()) {
-					this.send(subscriber, new CommentUpdateMessage(commentToCreate));
-				}
-				return commentToCreate.uid;
-			},
-			Upvote: async ({ commentId, userId }) => {
-				const existingComment = await this.getEntity(commentId);
-				return existingComment
-					.map<Promise<Comment | Error>>(async commentToUpdate => {
-						if (commentToUpdate.upvoters.some(u => u === userId)) {
+		try {
+			return await CommentActorMessages.match<Promise<ResultType>>(message, {
+				Create: async comment => {
+					(comment as Comment).uid = v4() as Id;
+					const commentToCreate = commentSchema.parse(comment);
+					await this.storeEntity(commentToCreate);
+					for (const [subscriber, properties] of this.state.collectionSubscribers) {
+						this.send(
+							subscriber,
+							new CommentUpdateMessage(
+								properties.length > 0 ? pick(properties, commentToCreate) : commentToCreate
+							)
+						);
+					}
+					for (const subscriber of this.state.subscribers.get(commentToCreate.uid) ?? new Set()) {
+						this.send(subscriber, new CommentUpdateMessage(commentToCreate));
+					}
+					return commentToCreate.uid;
+				},
+				Upvote: async ({ commentId, userId }) => {
+					const existingComment = await this.getEntity(commentId);
+					return existingComment
+						.map<Promise<Comment | Error>>(async commentToUpdate => {
+							if (commentToUpdate.upvoters.some(u => u === userId)) {
+								return commentToUpdate;
+							}
+							commentToUpdate.updated = toTimestamp();
+							commentToUpdate.upvoters.push(userId);
+							await this.storeEntity(commentToUpdate);
+							for (const [subscriber, properties] of this.state.collectionSubscribers) {
+								this.send(
+									subscriber,
+									new CommentUpdateMessage(
+										properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
+									)
+								);
+							}
+							for (const subscriber of this.state.subscribers.get(commentToUpdate.uid) ?? new Set()) {
+								this.send(subscriber, new CommentUpdateMessage(commentToUpdate));
+							}
 							return commentToUpdate;
-						}
-						commentToUpdate.updated = toTimestamp();
-						commentToUpdate.upvoters.push(userId);
-						await this.storeEntity(commentToUpdate);
-						for (const [subscriber, properties] of this.state.collectionSubscribers) {
-							this.send(
-								subscriber,
-								new CommentUpdateMessage(
-									properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
-								)
-							);
-						}
-						for (const subscriber of this.state.subscribers.get(commentToUpdate.uid) ?? new Set()) {
-							this.send(subscriber, new CommentUpdateMessage(commentToUpdate));
-						}
-						return commentToUpdate;
-					})
-					.orElse(Promise.resolve(new Error("Comment not found")));
-			},
-			Update: async comment => {
-				const existingComment = await this.getEntity(comment.uid);
-				return existingComment
-					.map(async c => {
-						if (["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
-							return new Error("Invalid write access to comment");
-						}
-						c.updated = toTimestamp();
-						const { relatedQuiz, relatedQuestion, created, authorId, authorName, ...updateDelta } = c;
-						const commentToUpdate = commentSchema.parse({ ...updateDelta, ...comment });
-						await this.storeEntity(commentToUpdate);
-						for (const [subscriber, properties] of this.state.collectionSubscribers) {
-							this.send(
-								subscriber,
-								new CommentUpdateMessage(
-									properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
-								)
-							);
-						}
-						for (const subscriber of this.state.subscribers.get(commentToUpdate.uid) ?? new Set()) {
-							this.send(subscriber, new CommentUpdateMessage(commentToUpdate));
-						}
-						return commentToUpdate;
-					})
-					.orElse(Promise.resolve(new Error("Comment not found")));
-			},
-			GetAll: async () => {
-				const db = await this.connector.db();
-				const comments = await db
-					.collection<Comment>(this.collectionName)
-					.find({ relatedQuiz: this.uid })
-					.toArray();
-				comments.forEach(comment => {
-					const { _id, ...rest } = comment;
-					this.send(from, new CommentUpdateMessage(rest));
-				});
-				return unit();
-			},
-			SubscribeToCollection: async () => {
-				this.state = create(this.state, draft => {
-					draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-					draft.collectionSubscribers.set(from.name as ActorUri, []);
-				});
-				return unit();
-			},
-			UnsubscribeFromCollection: async () => {
-				this.state = create(this.state, draft => {
-					draft.collectionSubscribers.delete(from.name as ActorUri);
-				});
-				return unit();
-			},
-		});
+						})
+						.orElse(Promise.resolve(new Error("Comment not found")));
+				},
+				Update: async comment => {
+					const existingComment = await this.getEntity(comment.uid);
+					return existingComment
+						.map(async c => {
+							if (["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+								return new Error("Invalid write access to comment");
+							}
+							comment.updated = toTimestamp();
+							const { relatedQuiz, relatedQuestion, created, authorId, authorName, ...updateDelta } =
+								comment;
+							const commentToUpdate = commentSchema.parse({ ...c, ...updateDelta });
+							await this.storeEntity(commentToUpdate);
+							for (const [subscriber, properties] of this.state.collectionSubscribers) {
+								this.send(
+									subscriber,
+									new CommentUpdateMessage(
+										properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
+									)
+								);
+							}
+							for (const subscriber of this.state.subscribers.get(commentToUpdate.uid) ?? new Set()) {
+								this.send(subscriber, new CommentUpdateMessage(commentToUpdate));
+							}
+							return commentToUpdate;
+						})
+						.orElse(Promise.resolve(new Error("Comment not found")));
+				},
+				GetAll: async () => {
+					const db = await this.connector.db();
+					const comments = await db
+						.collection<Comment>(this.collectionName)
+						.find({ relatedQuiz: this.uid })
+						.toArray();
+					comments.forEach(comment => {
+						const { _id, ...rest } = comment;
+						this.send(from, new CommentUpdateMessage(rest));
+					});
+					return unit();
+				},
+				SubscribeToCollection: async () => {
+					this.state = create(this.state, draft => {
+						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
+						draft.collectionSubscribers.set(from.name as ActorUri, []);
+					});
+					return unit();
+				},
+				UnsubscribeFromCollection: async () => {
+					this.state = create(this.state, draft => {
+						draft.collectionSubscribers.delete(from.name as ActorUri);
+					});
+					return unit();
+				},
+			});
+		} catch (e) {
+			console.error(e);
+			throw e;
+		}
 	}
 }

@@ -23,6 +23,7 @@ const newQuiz: NewQuiz = {
 	description: "",
 	studentComments: true,
 	studentQuestions: true,
+	comments: [],
 	studentParticipationSettings: {
 		ANONYMOUS: true,
 		NAME: true,
@@ -43,6 +44,7 @@ const newQuiz: NewQuiz = {
 const startValidation: Validator<NewQuiz> = {
 	title: true,
 	description: true,
+	comments: true,
 	studentComments: true,
 	studentQuestions: true,
 	studentParticipationSettings: true,

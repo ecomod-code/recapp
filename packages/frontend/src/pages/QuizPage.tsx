@@ -7,7 +7,7 @@ import { ArrowDown, ArrowUp, Check, Pencil, TrainFront } from "react-bootstrap-i
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { maybe, nothing } from "tsmonads";
+import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
@@ -15,6 +15,13 @@ import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
 import { toTimestamp } from "itu-utils";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { debug } from "itu-utils";
+
+const sortComments = (a: Comment, b: Comment) => {
+	if (a.answered && !b.answered) return 1;
+	if (!a.answered && b.answered) return -1;
+	if (a.upvoters.length !== b.upvoters.length) return b.upvoters.length - a.upvoters.length;
+	return b.updated.value - a.updated.value;
+};
 
 const QuestionCard = (props: {
 	question: Question;
@@ -85,7 +92,7 @@ export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
 	const quizId = useSearchParams()[0].get("q");
-	const [localUser] = useStatefulActor<{ user: User }>("LocalUser");
+	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);
@@ -94,7 +101,7 @@ export const QuizPage: React.FC = () => {
 			return;
 		}
 		tryQuizActor.forEach(q => {
-			localUser.forEach(lu => {
+			mbLocalUser.forEach(lu => {
 				q.send(q, CurrentQuizMessages.SetUser(lu.user));
 				q.send(q, CurrentQuizMessages.SetQuiz(toId(quizId)));
 			});
@@ -112,6 +119,19 @@ export const QuizPage: React.FC = () => {
 
 	const questions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
+	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
+
+	const upvoteComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.UpvoteComment(commentId));
+		});
+	};
+
+	const finishComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.FinishComment(commentId));
+		});
+	};
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -199,10 +219,10 @@ export const QuizPage: React.FC = () => {
 					return false;
 				};
 
-				const disableForStudent = localUser.map(u => allowed(u.user)).orElse(true);
+				const disableForStudent = mbLocalUser.map(u => allowed(u.user)).orElse(true);
 
 				const addComment = (value: string) => {
-					localUser.forEach(lu => {
+					mbLocalUser.forEach(lu => {
 						const c: Omit<Comment, "authorId" | "authorName" | "uid"> = {
 							text: value,
 							created: toTimestamp(),
@@ -410,7 +430,7 @@ export const QuizPage: React.FC = () => {
 																									questionGroup.name,
 																							});
 																						}}
-																						currentUserUid={localUser
+																						currentUserUid={mbLocalUser
 																							.map(u => u.user.uid)
 																							.orElse(toId(""))}
 																						disabled={disableForStudent}
@@ -476,9 +496,13 @@ export const QuizPage: React.FC = () => {
 												.filter(Boolean) as Comment[]
 									)
 									.map(c =>
-										c.map(cmt => (
+										c.sort(sortComments).map(cmt => (
 											<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-												<CommentCard comment={cmt} />
+												<CommentCard
+													comment={cmt}
+													onUpvote={() => upvoteComment(cmt.uid)}
+													onAccept={() => finishComment(cmt.uid)}
+												/>
 											</div>
 										))
 									)

@@ -56,7 +56,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		if (!this.commentActors.has(uid)) {
 			const comments = await this.system.createActor(
 				CommentActor,
-				{ name: `Comment_${uid}`, parent: this.ref },
+				{ name: `Comment_${uid}`, parent: this.ref, strategy: "Restart" },
 				uid
 			);
 			this.logger.debug(`Comments actor ${comments.name} created`);
@@ -65,7 +65,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		if (!this.questionActors.has(uid)) {
 			const questions = await this.system.createActor(
 				QuestionActor,
-				{ name: `Question_${uid}`, parent: this.ref },
+				{ name: `Question_${uid}`, parent: this.ref, strategy: "Restart" },
 				uid
 			);
 			this.logger.debug(`Question actor ${questions.name} created`);

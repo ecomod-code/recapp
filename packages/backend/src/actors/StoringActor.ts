@@ -2,7 +2,7 @@ import { Id, Session, SessionStoreMessages, UserRole } from "@recapp/models";
 import { Actor, ActorRef, ActorSystem } from "ts-actors";
 import Container from "typedi";
 import { DbClient } from "../DbClient";
-import { Maybe, maybe } from "tsmonads";
+import { Maybe, maybe, nothing } from "tsmonads";
 import { Document } from "mongodb";
 import { Draft, create } from "mutative";
 import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-utils";
@@ -89,19 +89,20 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 	protected getEntity = async (uid: Id): Promise<Maybe<Entity>> => {
 		const maybeEntity = maybe(this.state.cache.get(uid));
 		const result = await maybeEntity.match(
-			entity => Promise.resolve(maybe(entity)),
+			async entity => maybe(entity),
 			async () => {
 				const db = await this.connector.db();
 				const entity = await db.collection<Entity>(this.collectionName).findOne({ uid });
-				return maybe(entity as Entity | null).map(e => {
+				if (entity) {
 					this.state = create(this.state, draft => {
 						const currentEntity = draft.cache.get(uid) ?? ({} as Entity);
-						this.updateIndices(draft as { cache: Map<Id, Entity> }, e);
-						draft.cache.set(uid, { ...currentEntity, ...e } as Draft<Entity>);
+						this.updateIndices(draft as { cache: Map<Id, Entity> }, entity as Entity);
+						draft.cache.set(uid, { ...currentEntity, ...entity } as Draft<Entity>);
 					});
-					this.afterEntityWasCached(uid);
-					return this.state.cache.get(uid)!;
-				});
+					await this.afterEntityWasCached(uid);
+					return maybe(this.state.cache.get(uid));
+				}
+				return nothing();
 			}
 		);
 		this.state = create(this.state, draft => {

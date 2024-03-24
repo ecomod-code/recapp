@@ -10,7 +10,11 @@ import { Button, Card } from "react-bootstrap";
 import { fromTimestamp } from "itu-utils";
 import { Check, HandThumbsUp } from "react-bootstrap-icons";
 
-export const CommentCard: React.FC<{ comment: Comment }> = ({ comment }) => {
+export const CommentCard: React.FC<{ comment: Comment; onUpvote: () => void; onAccept: () => void }> = ({
+	comment,
+	onUpvote,
+	onAccept,
+}) => {
 	const [text, setText] = useState("");
 	useEffect(() => {
 		const f = async () => {
@@ -33,7 +37,7 @@ export const CommentCard: React.FC<{ comment: Comment }> = ({ comment }) => {
 						{fromTimestamp(comment.updated).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}
 					</div>
 					<div>
-						<Button variant="primary">
+						<Button variant="primary" onClick={onUpvote}>
 							<HandThumbsUp color="white" className="pb-1 m-1" />
 							&nbsp;{comment.upvoters.length}
 						</Button>
@@ -49,7 +53,7 @@ export const CommentCard: React.FC<{ comment: Comment }> = ({ comment }) => {
 				<div className="d-flex flex-row align-items-center">
 					<div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
 					<div>
-						<Button variant="success" className="m-1">
+						<Button variant="success" className="m-1" onClick={onAccept} disabled={comment.answered}>
 							<Check color="white" />
 						</Button>
 					</div>

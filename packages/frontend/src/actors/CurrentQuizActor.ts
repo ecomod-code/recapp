@@ -119,7 +119,6 @@ export class CurrentQuizActor extends StatefulActor<
 							})
 						);
 						comments.push(uid);
-						alert(comments.join(";"));
 						this.send(this.ref!, CurrentQuizMessages.Update({ comments: comments }));
 					});
 				},
@@ -163,9 +162,6 @@ export class CurrentQuizActor extends StatefulActor<
 					});
 					const addTo = groups.find(g => g.name === group);
 					addTo?.questions.push(question.uid);
-					if (!addTo) {
-						alert(groups.map(g => g.name).join(";") + " does not contain " + group);
-					}
 					this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 				},
 				FinishComment: async uid => {

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt from "jsonwebtoken";
-import { Issuer, Client } from "openid-client";
+import { Issuer, Client, ClientMetadata } from "openid-client";
 import Container from "typedi";
 import koa from "koa";
 import { ActorSystem } from "ts-actors";
@@ -11,7 +11,7 @@ import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 import { debug } from "itu-utils";
 
-const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET } = process.env;
+const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI } = process.env;
 
 export const getOidc = async () => {
 	if (!Container.has("oidc")) {
@@ -22,12 +22,15 @@ export const getOidc = async () => {
 
 const initOidc = async () => {
 	const issuer = await Issuer.discover(`${OPENID_PROVIDER}/${ISSUER}/`);
-	const client = new issuer.Client({
+	const options: ClientMetadata = {
 		client_id: OID_CLIENT_ID ?? "",
 		client_secret: OID_CLIENT_SECRET ?? "",
-		redirect_uris: [`${BACKEND_URI}/auth/callback`],
 		response_types: ["code"],
-	});
+	};
+	if (REDIRECT_URI) {
+		options.redirect_uris = [`${BACKEND_URI}${REDIRECT_URI}`];
+	}
+	const client = new issuer.Client(options);
 	Container.set("oidc", client);
 };
 

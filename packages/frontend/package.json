@@ -10,7 +10,7 @@
 		"preview": "vite preview",
 		"extract": "lingui extract",
 		"compile": "lingui compile",
-		"postbuild": "chown -R o+r ./dist"
+		"postbuild": "chmod -R o+r ./dist"
 	},
 	"dependencies": {
 		"@lingui/cli": "^4.7.1",

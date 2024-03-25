@@ -22,7 +22,7 @@ import { QuizActor } from "./actors/QuizActor";
 const config = {
 	port: parseInt(process.env.SERVER_PORT ?? "3123"),
 	host: process.env.SERVER_HOST ?? "127.0.0.1",
-	frontend: process.env.FRONTEND_DASHBOARD ?? "http://localhost:5173/Dashboard",
+	frontend: process.env.FRONTEND_URI ? process.env.FRONTEND_URI + "/Dashboard" : "http://localhost:5173/Dashboard",
 };
 
 Container.set<string[]>("api-keys", process.env.API_KEYS?.split(",") ?? []);

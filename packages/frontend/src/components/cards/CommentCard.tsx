@@ -30,7 +30,7 @@ export const CommentCard: React.FC<{ comment: Comment; onUpvote: () => void; onA
 		f();
 	}, [comment.text]);
 	return (
-		<Card className="p-0 m-1" style={{ width: "18rem" }} key={comment.uid}>
+		<Card className="p-0 m-1" style={{ width: "18rem", minHeight: 250 }} key={comment.uid}>
 			<Card.Title className="p-1 ps-2 text-bg-light text-start">
 				<div className="d-flex flex-row align-items-center">
 					<div className="flex-grow-1 fs-6">

@@ -12,9 +12,8 @@ import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
 import { CreateGroupModal } from "../components/modals/CreateGroupModal";
 import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
-import { toTimestamp } from "itu-utils";
+import { toTimestamp, debug } from "itu-utils";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
-import { debug } from "itu-utils";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -424,6 +423,12 @@ export const QuizPage: React.FC = () => {
 																								);
 																						}}
 																						changeGroup={() => {
+																							if (
+																								quizData.quiz.groups
+																									.length < 2
+																							) {
+																								return;
+																							}
 																							setChangeGroup({
 																								qId: q!.uid,
 																								currentGroup:

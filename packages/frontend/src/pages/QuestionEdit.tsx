@@ -46,6 +46,14 @@ import { add, isEmpty, keys } from "rambda";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
 import { DateTime } from "luxon";
+import { toTimestamp } from "itu-utils";
+
+const sortComments = (a: Comment, b: Comment) => {
+	if (a.answered && !b.answered) return 1;
+	if (!a.answered && b.answered) return -1;
+	if (a.upvoters.length !== b.upvoters.length) return b.upvoters.length - a.upvoters.length;
+	return b.updated.value - a.updated.value;
+};
 
 export const QuestionEdit: React.FC = () => {
 	const urlSearchParams = useSearchParams()[0];
@@ -104,16 +112,17 @@ export const QuestionEdit: React.FC = () => {
 	}, [mbQuiz.hasValue]);
 
 	const [rendered, setRendered] = useState<string>("");
-	const [showMDModal, setShowMDModal] = useState(false);
+	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
 	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
 
 	const handleClose = () => {
-		setShowMDModal(false);
+		setShowMDModal({ type: "", titleId: "" });
 		setShowTextModal({ property: "", titleId: "", editorText: "" });
 	};
-	const handleShow = (property: string = "", titleId: string = "") => {
-		setShowMDModal(true);
-		setShowTextModal({ property, titleId, editorText: "" });
+
+	const handleMDShow = (type: string, titleId: string) => {
+		setShowTextModal({ property: "", titleId: "", editorText: "" });
+		setShowMDModal({ type, titleId });
 	};
 
 	useEffect(() => {
@@ -177,9 +186,9 @@ export const QuestionEdit: React.FC = () => {
 			() => {}
 		);
 
-		await tryQuizActor.map(async actor => {
+		tryQuizActor.forEach(actor => {
 			if (questionId) {
-				await actor.send(
+				actor.send(
 					actor.name,
 					CurrentQuizMessages.UpdateQuestion({
 						question: { ...quizQuestion, uid: toId(questionId) },
@@ -187,7 +196,7 @@ export const QuestionEdit: React.FC = () => {
 					})
 				);
 			} else {
-				await actor.send(
+				actor.send(
 					actor.name,
 					CurrentQuizMessages.AddQuestion({ question: quizQuestion, group: selectedGroup })
 				);
@@ -195,6 +204,34 @@ export const QuestionEdit: React.FC = () => {
 		});
 		nav(-1);
 	};
+
+	const upvoteComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.UpvoteComment(commentId));
+		});
+	};
+
+	const finishComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.FinishComment(commentId));
+		});
+	};
+
+	const addComment = (value: string) => {
+		const c: Omit<Comment, "authorId" | "authorName" | "uid"> = {
+			text: value,
+			created: toTimestamp(),
+			updated: toTimestamp(),
+			upvoters: [],
+			answered: false,
+			relatedQuiz: question.quiz,
+			relatedQuestion: question.uid,
+		};
+		tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
+		handleClose();
+	};
+
+	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
 	return (
 		<Container fluid>
@@ -219,12 +256,16 @@ export const QuestionEdit: React.FC = () => {
 				}}
 			/>
 			<MarkdownModal
-				titleId="edit-question-text"
-				editorValue={question.text}
-				show={showMDModal}
+				titleId={showMDModal.titleId}
+				editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
+				show={!!showMDModal.titleId}
 				onClose={handleClose}
 				onSubmit={text => {
-					setQuestion(state => ({ ...state, text }));
+					if (showMDModal.type === "QUESTION") {
+						setQuestion(state => ({ ...state, text }));
+					} else {
+						addComment(text);
+					}
 					handleClose();
 				}}
 			/>
@@ -294,11 +335,18 @@ export const QuestionEdit: React.FC = () => {
 											<Check />
 										</Button>
 										&nbsp;
-										<Button variant="primary" onClick={() => handleShow()}>
+										<Button
+											variant="primary"
+											onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+										>
 											<Pencil />
 										</Button>
 										&nbsp;
-										<Button variant="secondary">
+										<Button
+											variant="warning"
+											disabled={!question.uid}
+											onClick={() => handleMDShow("COMMENT", "edit-comment-text")}
+										>
 											<PersonRaisedHand />
 										</Button>
 									</div>
@@ -381,6 +429,15 @@ export const QuestionEdit: React.FC = () => {
 				<Row>
 					<div className="flew-grow-1">&nbsp;</div>
 				</Row>
+			</Row>
+			<Row>
+				<div className="d-flex flex-column h-100 w-100">
+					<Button className="m-3" onClick={submit}>
+						Frage speichern
+					</Button>
+				</div>
+			</Row>
+			<Row>
 				<div
 					className="d-flex flex-row"
 					style={{
@@ -391,22 +448,36 @@ export const QuestionEdit: React.FC = () => {
 					}}
 				>
 					{mbQuiz
-						.map(q => q.comments)
+						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+						.map(
+							q =>
+								(q.comments ?? [])
+									.map(c => {
+										const result = comments.find(
+											cmt => cmt.uid === c && cmt.relatedQuestion === questionId
+										);
+										console.log(
+											comments.map(c => c.relatedQuestion).join(";"),
+											questionId,
+											question.uid,
+											result
+										);
+										return result;
+									})
+									.filter(Boolean) as Comment[]
+						)
 						.map(c =>
-							c.map(cmt => (
+							c.sort(sortComments).map(cmt => (
 								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-									<CommentCard comment={cmt} onAccept={() => {}} onUpvote={() => {}} />
+									<CommentCard
+										comment={cmt}
+										onUpvote={() => upvoteComment(cmt.uid)}
+										onAccept={() => finishComment(cmt.uid)}
+									/>
 								</div>
 							))
 						)
 						.orElse([<Fragment />])}
-				</div>
-			</Row>
-			<Row>
-				<div className="d-flex flex-column h-100 w-100">
-					<Button className="m-3" onClick={submit}>
-						Frage speichern
-					</Button>
 				</div>
 			</Row>
 		</Container>

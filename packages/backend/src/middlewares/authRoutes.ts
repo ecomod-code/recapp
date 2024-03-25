@@ -105,7 +105,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					const u: User = await system.ask(userStore, UserStoreMessages.Get(uid));
 					if (!u.active) {
 						ctx.status = 401;
-						ctx.redirect("http://localhost:5173/?error=userdeactivated"); // TODO: FRONTEND_URI ?? "");
+						ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated"); // TODO: FRONTEND_URI ?? "");
 						return;
 					}
 					const user: User = await system.ask(
@@ -137,7 +137,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 				throw e;
 			}
 			ctx.set("Set-Cookie", `bearer=${tokenSet.id_token}; path=/; max-age=${hours(2).valueOf() / 1000}`);
-			ctx.redirect("http://localhost:5173/Dashboard"); // TODO: FRONTEND_URI ?? "");
+			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "/Dashboard");
 		},
 		() => ctx.throw(401, "Unable to sign in.")
 	);
@@ -149,7 +149,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
  */
 export const authLogout = async (ctx: koa.Context): Promise<void> => {
 	ctx.set("Set-Cookie", `bearer=; path=/; max-age=0; httponly`);
-	ctx.redirect("http://localhost:5173/");
+	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
 
 export const authRefresh = async (ctx: koa.Context): Promise<void> => {

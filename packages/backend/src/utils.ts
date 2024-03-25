@@ -9,7 +9,7 @@ import jwt from "jsonwebtoken";
 
 export const systemName = "recapp-backend";
 
-export const createActorUri = (actorName: string): ActorUri => {
+export const createActorUri = (actorName: "SessionStore" | "UserStore" | "QuizActor"): ActorUri => {
 	return `actors://${join(systemName, actorName)}` as ActorUri;
 };
 

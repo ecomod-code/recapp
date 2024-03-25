@@ -5,6 +5,7 @@ import {
 	QuizActorMessage,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	UserStoreMessages,
 	quizSchema,
 	toId,
 } from "@recapp/models";
@@ -17,6 +18,7 @@ import { create } from "mutative";
 import { identity, pick } from "rambda";
 import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
+import { createActorUri } from "../utils";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -88,7 +90,11 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
 					if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
-						return new Error("Unprivileged access to quiz creation");
+						// Students can also create quizzes. This will automatically upgrade them to a teacher role
+						this.send(
+							createActorUri("UserStore"),
+							UserStoreMessages.Update({ uid: clientUserId, role: "TEACHER" })
+						);
 					}
 					const uid = toId(v4());
 					(quiz as Quiz).uid = uid;

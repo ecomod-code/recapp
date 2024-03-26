@@ -19,6 +19,7 @@ import { identity, pick } from "rambda";
 import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
 import { createActorUri } from "../utils";
+import { keys } from "rambda";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -183,13 +184,18 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 				Update: async quiz => {
 					const existingQuiz = await this.getEntity(quiz.uid);
+					console.log("UPDATING", JSON.stringify(existingQuiz), "WITH", JSON.stringify(quiz));
 					const result = await existingQuiz
 						.map(async c => {
-							if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
-								return new Error("Invalid write access to quiz");
-							}
-							if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
-								return new Error("Quiz not shared with teacher");
+							if (!(keys(quiz).length === 2 && quiz.groups)) {
+								if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
+									console.error(clientUserRole, "is not TEACHER or ADMIN");
+									return new Error("Invalid write access to quiz");
+								}
+								if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
+									console.error(clientUserId, "is not in teacher list", c.teachers);
+									return new Error("Quiz not shared with teacher");
+								}
 							}
 							c.updated = toTimestamp();
 							const { created, ...updateDelta } = quiz;
@@ -214,7 +220,13 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 				GetAll: async () => {
 					const db = await this.connector.db();
-					const quizzes = await db.collection<Quiz>(this.collectionName).find({}).toArray();
+					const quizzes = (await db.collection<Quiz>(this.collectionName).find({}).toArray()).filter(
+						(q: Quiz) =>
+							clientUserRole === "ADMIN" ||
+							q.teachers.includes(clientUserId) ||
+							q.students.includes(clientUserId)
+					);
+
 					quizzes.forEach(q => {
 						const { _id, ...rest } = q;
 						this.send(from, new QuizUpdateMessage(rest));
@@ -226,6 +238,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					maybeQuiz.forEach(quiz => {
 						if (
 							!(
+								clientUserRole === "ADMIN" ||
 								quiz.teachers.some(i => i === clientUserId) ||
 								quiz.students.some(i => i === clientUserId)
 							)

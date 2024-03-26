@@ -33,7 +33,7 @@ export const Dashboard: React.FC = () => {
 
 	return (
 		<React.StrictMode>
-			<Tabs defaultActiveKey="users" className="mb-3 w-100 h-100">
+			<Tabs defaultActiveKey={isAdmin ? "users" : "quizzes"} className="mb-3 w-100 h-100">
 				<Tab eventKey="quizzes" title={i18n._("dashboard-tab-label-quizzes")}>
 					<Quizzes />
 				</Tab>

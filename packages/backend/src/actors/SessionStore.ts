@@ -28,11 +28,11 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 	}
 
 	private sessionValid = (session: Session, client?: Id) => {
-		if (session.expires.value > toTimestamp().value) {
+		if (session.refreshExpires.value > toTimestamp().value) {
 			return maybe(session);
 		}
 		this.logger.warn(
-			`Accessed session ${session.uid} that expired ${fromTimestamp(session.expires).toISO()} < ${fromTimestamp(toTimestamp()).toISO()}`
+			`Accessed session ${session.uid} that expired ${fromTimestamp(session.refreshExpires).toISO()} < ${fromTimestamp(toTimestamp()).toISO()}`
 		);
 		if (client) {
 			this.send(`actors://${client}/ErrorActor`, {

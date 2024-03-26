@@ -290,27 +290,6 @@ export const QuizPage: React.FC = () => {
 								<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
 									<Row>
 										<div className="d-flex flex-column h-100 w-100">
-											{/*<div style={{ backgroundColor: "#f5f5f5" }}>
-												<div
-													className="d-xs-none d-sm-none d-md-none d-lg-flex flex-row"
-													style={{
-														maxHeight: "19rem",
-														overflowY: "hidden",
-														overflowX: "auto",
-													}}
-												>
-													{mbQuiz
-														.map(q => q.comments)
-														.map(c =>
-															c.map(cmt => (
-																<div key={cmt.uid} style={{ width: "18rem" }}>
-																	<CommentCard comment={cmt} />
-																</div>
-															))
-														)
-														.orElse([<Fragment />])}
-												</div>
-															</div>*/}
 											<div className="flex-grow-1">
 												<Accordion defaultActiveKey="0">
 													{quizData.quiz.groups.map((questionGroup, index) => {
@@ -361,7 +340,11 @@ export const QuizPage: React.FC = () => {
 																			</div>
 																		</div>
 																		<div className="flex-grow-1">
-																			<strong>{questionGroup.name}</strong>
+																			<strong>{questionGroup.name} </strong>
+																		</div>
+																		<div>
+																			{questionGroup.questions.length}{" "}
+																			Frage(n)&nbsp;&nbsp;
 																		</div>
 																		<Button
 																			as="div"

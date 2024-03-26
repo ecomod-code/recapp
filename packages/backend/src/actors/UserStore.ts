@@ -1,6 +1,8 @@
 import {
 	ActorUri,
 	Id,
+	Session,
+	SessionStoreMessages,
 	User,
 	UserRole,
 	UserStoreMessage,
@@ -16,6 +18,7 @@ import { identity, pick } from "rambda";
 import { SubscribableActor } from "./SubscribableActor";
 import { AccessRole } from "./StoringActor";
 import { maybe } from "tsmonads";
+import { createActorUri } from "../utils";
 
 type ListedUser = Omit<User, "quizUsage">;
 
@@ -242,6 +245,20 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 			newUser = { ...oldUser, ...userToStore } as User;
 			newUser.updated = toTimestamp();
 			draft.cache.set(userToStore.uid, newUser);
+
+			// If the role has changed, also update the session store
+			if (oldUser.role !== newUser.role) {
+				(
+					this.ask(
+						createActorUri("SessionStore"),
+						SessionStoreMessages.GetSessionForUserId(newUser.uid)
+					) as Promise<Session>
+				).then((session: Session) => {
+					session.role = newUser.role;
+					this.send(createActorUri("SessionStore"), SessionStoreMessages.StoreSession(session));
+				});
+			}
+
 			for (const [subscriber, properties] of this.state.collectionSubscribers) {
 				this.send(
 					subscriber,

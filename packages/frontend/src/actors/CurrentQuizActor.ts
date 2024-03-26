@@ -126,6 +126,10 @@ export class CurrentQuizActor extends StatefulActor<
 					question.editMode = false;
 					try {
 						await this.user.map(async u => {
+							if (this.state.quiz.teachers.includes(u.uid)) {
+								console.debug("Auto-approving question");
+								question.approved = true; // Teacher questions are automatically approved
+							}
 							const uid: Id = await this.ask(
 								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuestionActorMessages.Create({

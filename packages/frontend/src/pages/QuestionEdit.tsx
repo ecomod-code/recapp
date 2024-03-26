@@ -57,8 +57,8 @@ const sortComments = (a: Comment, b: Comment) => {
 
 export const QuestionEdit: React.FC = () => {
 	const { state } = useLocation();
-	const questionId = state.quizId;
-	const formerGroup = state.group;
+	const questionId = state?.quizId ?? "";
+	const formerGroup = state?.group ?? "";
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);

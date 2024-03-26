@@ -12,6 +12,7 @@ export const SharingMessages = unionize(
 	{
 		SetQuiz: ofType<Quiz>(),
 		AddEntry: ofType<string>(),
+		Clear: {},
 		Share: {},
 	},
 	{ value: "value" }
@@ -52,6 +53,11 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 						}
 					}
 				);
+			},
+			Clear: () => {
+				this.updateState(draft => {
+					draft.teachers = draft.teachers.filter(t => !!t.uid);
+				});
 			},
 			Share: () => {
 				this.state.quiz.match(

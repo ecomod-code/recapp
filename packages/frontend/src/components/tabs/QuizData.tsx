@@ -4,7 +4,7 @@ import { Quiz, Comment } from "@recapp/models";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
-import { Pencil, Share } from "react-bootstrap-icons";
+import { Pencil, Share, Trash } from "react-bootstrap-icons";
 import { useEffect, useState } from "react";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 import { SharingMessages, SharingState } from "../../actors/SharingActor";
@@ -13,7 +13,6 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 	const [name, setName] = useState("");
 	const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
 	useEffect(() => {
-		console.log("SHARE", quiz);
 		tryActor.forEach(actor => actor.send(actor, SharingMessages.SetQuiz(quiz)));
 	}, [quiz]);
 
@@ -33,6 +32,10 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 		onClose();
 	};
 
+	const clear = () => {
+		tryActor.forEach(actor => actor.send(actor, SharingMessages.Clear()));
+	};
+
 	return mbShare
 		.map(s => s.teachers)
 		.match(
@@ -43,7 +46,15 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 							Lehrpersonen zum Teilen auswählen
 						</Modal.Title>
 						<Modal.Body>
-							<div>
+							<div className="mb-2 mt-2" style={{ minHeight: 48 }}>
+								<div style={{ position: "absolute", right: 8 }}>
+									<Button className="me-2" variant="warning" onClick={clear}>
+										<Trash />
+									</Button>
+								</div>
+								{teachers.length === 0 && (
+									<span style={{ color: "lightgray" }}>Hinzuzufügende Personen</span>
+								)}
 								{teachers.map(t => {
 									return (
 										<div key={t.query} style={{ color: !!t.uid ? "green" : "red" }}>
@@ -54,12 +65,13 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 							</div>
 							<Form.Control
 								value={name}
+								placeholder="ID, Email oder Pseudonym"
 								onChange={event => {
 									const name = event.target.value;
 									setName(name);
 								}}
 							/>
-							<Button variant="primary" onClick={add}>
+							<Button variant="primary" onClick={add} className="mt-4">
 								Hinzufügen
 							</Button>
 						</Modal.Body>

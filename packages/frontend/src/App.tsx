@@ -20,23 +20,23 @@ import { QuestionEdit } from "./pages/QuestionEdit";
 import { CreateQuiz } from "./pages/CreateQuiz";
 
 const updateToken = () => {
-	const mm = () => {
-		const hasToken = !!cookie("bearer");
-		if (hasToken) {
-			Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
-				.then(() => {
-					setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
-				})
-				.catch(() => {
-					alert(i18n._("app.could_not_refresh_token"));
-					window.location.href = "/";
-				});
-		}
-		window.removeEventListener("mousemove", mm);
-		window.removeEventListener("touchstart", mm);
-	};
-	window.addEventListener("mousemove", mm);
-	window.addEventListener("touchstart", mm);
+	//const mm = () => {
+	const hasToken = !!cookie("bearer");
+	if (hasToken) {
+		Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
+			.then(() => {
+				setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
+			})
+			.catch(() => {
+				alert(i18n._("app.could_not_refresh_token"));
+				window.location.href = "/";
+			});
+	}
+	//	window.removeEventListener("mousemove", mm);
+	//		window.removeEventListener("touchstart", mm);
+	//	};
+	//	window.addEventListener("mousemove", mm);
+	//	window.addEventListener("touchstart", mm);
 };
 
 setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());

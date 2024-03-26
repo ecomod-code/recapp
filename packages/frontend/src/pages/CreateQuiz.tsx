@@ -17,7 +17,7 @@ export const CreateQuiz: React.FC = () => {
 		([system, actor, state]) => {
 			const createQuiz = async () => {
 				const uid = await system.ask(actorUris["CreateQuiz"], CreateQuizMessages.CreateQuiz());
-				nav("/Dashboard/Quiz?q=" + uid);
+				nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: uid } });
 			};
 			const { quiz, validation } = state;
 			return (

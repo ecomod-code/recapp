@@ -22,7 +22,10 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz> }> = ({ quiz }) => {
 			</Card.Body>
 			<Card.Footer>
 				<div className="d-flex flex-row justify-content-end">
-					<Button variant="primary" onClick={() => nav(`/Dashboard/quiz?q=${quiz.uid ?? ""}`)}>
+					<Button
+						variant="primary"
+						onClick={() => nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } })}
+					>
 						<Pencil />
 					</Button>
 					<Button className="ms-3" variant="secondary">

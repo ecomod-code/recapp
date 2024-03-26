@@ -6,7 +6,7 @@ import { Badge, Button, Card, Container, Row, Accordion, Breadcrumb, Tab, Tabs }
 import { ArrowDown, ArrowUp, Check, Pencil, TrainFront } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
@@ -90,7 +90,8 @@ const QuestionCard = (props: {
 export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
-	const quizId = useSearchParams()[0].get("q");
+	const { state } = useLocation();
+	const quizId: Id = state.quizId;
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
@@ -205,7 +206,7 @@ export const QuizPage: React.FC = () => {
 				};
 
 				const editQuestion = (uid: Id, group: string) => {
-					nav(`/Dashboard/Question?q=${uid}&g=${group}`);
+					nav({ pathname: "/Dashboard/Question" }, { state: { quizId: uid, group } });
 				};
 
 				const allowed = (user: User) => {
@@ -271,7 +272,9 @@ export const QuizPage: React.FC = () => {
 						/>
 						<Row>
 							<Breadcrumb>
-								<Breadcrumb.Item href="/Dashboard">Dashboard</Breadcrumb.Item>
+								<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
+									Dashboard
+								</Breadcrumb.Item>
 								<Breadcrumb.Item>
 									{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 								</Breadcrumb.Item>
@@ -460,7 +463,7 @@ export const QuizPage: React.FC = () => {
 													className="m-2"
 													style={{ width: "12rem" }}
 													onClick={() => {
-														nav("/Dashboard/Question");
+														nav({ pathname: "/Dashboard/Question" });
 													}}
 													disabled={disableForStudent && !quizData.quiz.studentQuestions}
 												>

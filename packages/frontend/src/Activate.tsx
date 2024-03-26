@@ -11,7 +11,7 @@ export const Activate: React.FC = () => {
 
 	useEffect(() => {
 		if (cookie("bearer")) {
-			nav("/Dashboard/Quiz?q=" + quiz);
+			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz } });
 		} else {
 			document.cookie = "activatedQuiz=" + quiz;
 		}

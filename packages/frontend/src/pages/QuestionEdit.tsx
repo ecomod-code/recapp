@@ -39,7 +39,7 @@ import {
 } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { matchRoutes, useNavigate, useNavigation, useSearchParams } from "react-router-dom";
+import { matchRoutes, useLocation, useNavigate, useNavigation, useSearchParams } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { add, isEmpty, keys } from "rambda";
@@ -56,9 +56,9 @@ const sortComments = (a: Comment, b: Comment) => {
 };
 
 export const QuestionEdit: React.FC = () => {
-	const urlSearchParams = useSearchParams()[0];
-	const questionId = urlSearchParams.get("q");
-	const formerGroup = urlSearchParams.get("g");
+	const { state } = useLocation();
+	const questionId = state.quizId;
+	const formerGroup = state.group;
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);
@@ -274,12 +274,18 @@ export const QuestionEdit: React.FC = () => {
 				style={{ marginLeft: "-0.5rem", marginRight: "-0.5rem" }}
 			>
 				<Breadcrumb>
-					<Breadcrumb.Item href="/Dashboard">Dashboard</Breadcrumb.Item>
+					<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>Dashboard</Breadcrumb.Item>
 					<Breadcrumb.Item
-						href={`/Dashboard/quiz${mbQuiz
-							.flatMap(q => maybe(q.quiz?.uid))
-							.map(s => "?q=" + s)
-							.orElse("")}`}
+						onClick={() =>
+							nav(
+								{ pathname: "/Dashboard/quiz" },
+								{
+									state: {
+										quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
+									},
+								}
+							)
+						}
 					>
 						{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 					</Breadcrumb.Item>

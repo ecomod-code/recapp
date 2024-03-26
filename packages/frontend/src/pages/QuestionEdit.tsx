@@ -99,6 +99,15 @@ export const QuestionEdit: React.FC = () => {
 				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
 				setQuestion({ ...question, ...editQuestion, type: newType });
 				setHint(!!editQuestion.hint);
+				tryQuizActor.forEach(actor =>
+					actor.send(
+						actor,
+						CurrentQuizMessages.UpdateQuestion({
+							question: { uid: questionId, editMode: true },
+							group: formerGroup,
+						})
+					)
+				);
 			} else {
 				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
 			}

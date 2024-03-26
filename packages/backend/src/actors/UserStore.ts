@@ -8,6 +8,7 @@ import {
 	UserStoreMessage,
 	UserStoreMessages,
 	UserUpdateMessage,
+	toId,
 	uidSchema,
 	userSchema,
 } from "@recapp/models";
@@ -24,7 +25,7 @@ type ListedUser = Omit<User, "quizUsage">;
 
 type Teacher = Pick<User, "uid" | "nickname" | "username">;
 
-type ResultType = User | ListedUser[] | Teacher[] | Error | Unit | UserRole | boolean;
+type ResultType = User | ListedUser[] | Teacher[] | Error | Unit | UserRole | boolean | Id;
 
 type State = {
 	cache: Map<Id, User>;
@@ -195,6 +196,20 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				},
 				IsNicknameUnique: async nickname => {
 					return !this.state.nicknames.has(nickname);
+				},
+				Find: async ({ query, role }) => {
+					const db = await this.connector.db();
+					const users = await db.collection<User>(this.collectionName).find({}).toArray();
+					const user = users.find(u => u.nickname === query || u.uid === query);
+					console.log(user, users);
+					if (user) {
+						if (role === "STUDENT") {
+							return user.uid;
+						} else if (user.role !== "STUDENT") {
+							return user.uid;
+						}
+					}
+					return toId("");
 				},
 				default: async () => {
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);

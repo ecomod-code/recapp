@@ -1,12 +1,13 @@
 import { unionize, ofType, UnionOf } from "unionize";
 import { Id } from "../data/base";
-import { User } from "../data/user";
+import { User, UserRole } from "../data/user";
 
 export const UserStoreMessages = unionize(
 	{
 		Create: ofType<User>(), // Create a new user
 		Update: ofType<Partial<User> & { uid: Id }>(), // Update user data, answers updated User
 		Has: ofType<Id>(), // Whether the user exists, answers boolean
+		Find: ofType<{ query: string; role: UserRole }>(), // FInd a user matching the given nickname, id oder email, returns the user id if found
 		GetAll: {}, // Request all users accessible by the requester, users will be returned in UserUpdateMessages to the sender
 		Get: ofType<Id>(), // Get user, answers with User
 		GetOwn: {}, // Return the info of the requesting user, answers with User

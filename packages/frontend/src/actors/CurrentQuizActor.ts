@@ -149,7 +149,9 @@ export class CurrentQuizActor extends StatefulActor<
 					}
 				},
 				UpdateQuestion: async ({ question, group }) => {
-					question.editMode = false;
+					if (!question.editMode) {
+						question.editMode = false;
+					}
 					await this.send(
 						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						QuestionActorMessages.Update(question)

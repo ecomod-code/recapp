@@ -1,18 +1,93 @@
 import { i18n } from "@lingui/core";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, Comment } from "@recapp/models";
-import { Button, Form, InputGroup } from "react-bootstrap";
+import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
 import { Pencil, Share } from "react-bootstrap-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
+import { SharingMessages, SharingState } from "../../actors/SharingActor";
+
+const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({ quiz, show, onClose }) => {
+	const [name, setName] = useState("");
+	const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
+	useEffect(() => {
+		console.log("SHARE", quiz);
+		tryActor.forEach(actor => actor.send(actor, SharingMessages.SetQuiz(quiz)));
+	}, [quiz]);
+
+	const add = () => {
+		tryActor.forEach(actor => actor.send(actor, SharingMessages.AddEntry(name)));
+		setName("");
+	};
+
+	const share = () => {
+		tryActor.forEach(actor => actor.send(actor, SharingMessages.Share()));
+		setName("");
+		onClose();
+	};
+
+	const cancel = () => {
+		setName("");
+		onClose();
+	};
+
+	return mbShare
+		.map(s => s.teachers)
+		.match(
+			teachers => {
+				return (
+					<Modal show={show}>
+						<Modal.Title className="p-1 ps-2 text-bg-primary">
+							Lehrpersonen zum Teilen auswählen
+						</Modal.Title>
+						<Modal.Body>
+							<div>
+								{teachers.map(t => {
+									return (
+										<div key={t.query} style={{ color: !!t.uid ? "green" : "red" }}>
+											{t.query}
+										</div>
+									);
+								})}
+							</div>
+							<Form.Control
+								value={name}
+								onChange={event => {
+									const name = event.target.value;
+									setName(name);
+								}}
+							/>
+							<Button variant="primary" onClick={add}>
+								Hinzufügen
+							</Button>
+						</Modal.Body>
+						<Modal.Footer>
+							<Button variant="primary" onClick={share}>
+								Mit bestätigten Nutzern teilen
+							</Button>
+							<Button variant="warning" onClick={cancel}>
+								Abbruch
+							</Button>
+						</Modal.Footer>
+					</Modal>
+				);
+			},
+			() => null
+		);
+};
 
 export const QuizData: React.FC = () => {
 	const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false });
+	const [shareModal, setShareModal] = useState(false);
 	const [mbQuiz, tryActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[] }>("CurrentQuiz");
 
 	const update = (q: Partial<Quiz>) => tryActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update(q)));
+
+	const closeShare = () => {
+		setShareModal(false);
+	};
 
 	return mbQuiz
 		.flatMap(q => (!!q.quiz.uid ? maybe(q.quiz) : nothing()))
@@ -20,6 +95,7 @@ export const QuizData: React.FC = () => {
 			quiz => {
 				return (
 					<Form>
+						<ShareQuizModal show={shareModal} onClose={closeShare} quiz={quiz} />
 						<CreateGroupModal
 							show={textEdit.show}
 							invalidValues={[]}
@@ -83,7 +159,7 @@ export const QuizData: React.FC = () => {
 							<InputGroup>
 								<Form.Control type="text" value={(quiz.teachers ?? []).join(", ")} disabled />
 								<div>
-									<Button>
+									<Button onClick={() => setShareModal(true)}>
 										<Share />
 									</Button>
 								</div>

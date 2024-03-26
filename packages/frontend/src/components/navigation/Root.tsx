@@ -16,6 +16,7 @@ import { serializeError } from "serialize-error";
 import { cookie } from "../../utils";
 import { actorUris } from "../../actorUris";
 import { toActorUri } from "@recapp/models";
+import { SharingActor } from "../../actors/SharingActor";
 
 export const Root = () => {
 	const [init, setInit] = useState(false);
@@ -35,6 +36,8 @@ export const Root = () => {
 					actorUris["CurrentQuiz"] = toActorUri(cuq.name);
 					const crq = await s.createActor(CreateQuizActor, { name: "CreateQuiz" });
 					actorUris["CreateQuiz"] = toActorUri(crq.name);
+					const qsa = await s.createActor(SharingActor, { name: "QuizSharing" });
+					actorUris["QuizSharing"] = toActorUri(qsa.name);
 
 					setInit(true);
 

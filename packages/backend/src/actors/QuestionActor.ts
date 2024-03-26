@@ -54,6 +54,9 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 	public async receive(from: ActorRef, message: QuestionActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		console.debug("QUESTIONACTOR", from.name, message);
+		if (typeof message === "string" && message === "SHUTDOWN") {
+			this.shutdown();
+		}
 		try {
 			return await QuestionActorMessages.match<Promise<ResultType>>(message, {
 				Create: async question => {

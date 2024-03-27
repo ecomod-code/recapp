@@ -9,7 +9,7 @@ export const Login: React.FC = () => {
 	const error = document.location.search.includes("error=userdeactivated");
 	useEffect(() => {
 		if (cookie("bearer")) {
-			nav("/Dashboard");
+			nav({ pathname: "/Dashboard" });
 		}
 	});
 	return (

@@ -211,7 +211,14 @@ export const QuestionEdit: React.FC = () => {
 				);
 			}
 		});
-		nav(-1);
+		nav(
+			{ pathname: "/Dashboard/quiz" },
+			{
+				state: {
+					quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
+				},
+			}
+		);
 	};
 
 	const upvoteComment = (commentId: Id) => {

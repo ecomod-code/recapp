@@ -55,7 +55,7 @@ export const Quizzes: React.FC = () => {
 						return <QuizCard key={q.uid} quiz={q} />;
 					})}
 			</Container>
-			<Button onClick={() => nav("/Dashboard/CreateQuiz")}>
+			<Button onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}>
 				<Trans id="button-new-quiz" />
 			</Button>
 		</Container>

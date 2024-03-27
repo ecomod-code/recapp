@@ -98,6 +98,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 							created: toTimestamp(),
 							updated: toTimestamp(),
 							username: decoded.name,
+							email: decoded.email,
 							active: true,
 							quizUsage: new Map(),
 						})
@@ -113,6 +114,8 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 						userStore,
 						UserStoreMessages.Update({
 							uid,
+							username: decoded.name,
+							email: decoded.email,
 							lastLogin: toTimestamp(),
 							updated: toTimestamp(),
 						})

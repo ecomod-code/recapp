@@ -3,65 +3,35 @@ import { useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { Layout } from "../../layout/Layout";
-import { useActorSystem, SystemContext } from "ts-actors-react";
-
-import { UserAdminActor } from "../../actors/UserAdminActor";
-import { LocalUserActor } from "../../actors/LocalUserActor";
-import { CreateQuizActor } from "../../actors/CreateQuizActor";
-import { CurrentQuizActor } from "../../actors/CurrentQuizActor";
-import { ErrorActor } from "../../actors/ErrorActor";
+import { SystemContext } from "ts-actors-react";
 
 import { Button, Modal } from "react-bootstrap";
-import { serializeError } from "serialize-error";
 import { cookie } from "../../utils";
-import { actorUris } from "../../actorUris";
-import { toActorUri } from "@recapp/models";
-import { SharingActor } from "../../actors/SharingActor";
-import { TokenActor } from "../../actors/TokenActor";
+import { system } from "../../system";
+import { ActorSystem } from "ts-actors";
+import { Try, fromError, fromValue } from "tsmonads";
 
 export const Root = () => {
-	const [init, setInit] = useState(false);
+	const [init, setInit] = useState<Try<ActorSystem>>(fromError(new Error()));
 	const [rpcError, setRpcError] = useState<string>("");
-	const system = useActorSystem(`${import.meta.env.VITE_BACKEND_URI.replace("http", "ws")}`, cookie("bearer"));
-	useEffect(() => {
-		if (!init) {
-			system.forEach(async s => {
-				try {
-					const ea = await s.createActor(ErrorActor, { name: "ErrorActor" });
-					actorUris["ErrorActor"] = toActorUri(ea.name);
-					const ua = await s.createActor(UserAdminActor, { name: "UserAdmin" });
-					actorUris["UserAdmin"] = toActorUri(ua.name);
-					const lu = await s.createActor(LocalUserActor, { name: "LocalUser" });
-					actorUris["LocalUser"] = toActorUri(lu.name);
-					const cuq = await s.createActor(CurrentQuizActor, { name: "CurrentQuiz" });
-					actorUris["CurrentQuiz"] = toActorUri(cuq.name);
-					const crq = await s.createActor(CreateQuizActor, { name: "CreateQuiz" });
-					actorUris["CreateQuiz"] = toActorUri(crq.name);
-					const qsa = await s.createActor(SharingActor, { name: "QuizSharing" });
-					actorUris["QuizSharing"] = toActorUri(qsa.name);
-					const ta = await s.createActor(TokenActor, { name: "TokenActor" });
-					actorUris["TokenActor"] = toActorUri(ta.name);
 
-					setInit(true);
-
-					const sa = s.getActorRef(`actors://${s.systemName}`);
-				} catch (e) {
-					console.error(e);
-				}
-			});
-			system.onFailure(e => {
-				const err = serializeError(e);
-				if (!err.message?.toLocaleLowerCase().includes("not initialized")) {
-					setRpcError("error-message-no-server-connection");
-				}
-			});
-		}
-	}, [init, system]);
 	const navigate = useNavigate();
 	const onRpcError = () => {
 		setRpcError("");
 		document.location.href = `${import.meta.env.VITE_BACKEND_URI}/auth/logout`;
 	};
+
+	useEffect(() => {
+		const run = async () => {
+			try {
+				const s: ActorSystem = await system;
+				setInit(fromValue(s));
+			} catch (e) {
+				setInit(fromError(e as Error));
+			}
+		};
+		run();
+	}, []);
 
 	if (rpcError !== "") {
 		return (
@@ -83,7 +53,7 @@ export const Root = () => {
 		navigate("/", { replace: true });
 	}
 	return (
-		<SystemContext.Provider value={system}>
+		<SystemContext.Provider value={init}>
 			<Layout>
 				<Outlet />
 			</Layout>

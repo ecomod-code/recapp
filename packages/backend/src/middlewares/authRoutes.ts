@@ -6,7 +6,7 @@ import koa from "koa";
 import { ActorSystem } from "ts-actors";
 import { createActorUri } from "../utils";
 import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
-import { Timestamp, fromTimestamp, minutes, toTimestamp, debug } from "itu-utils";
+import { fromTimestamp, minutes, toTimestamp, debug } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 
@@ -123,7 +123,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					role = user.role;
 				}
 				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
-				const refreshExpires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+				const refreshExpires = DateTime.fromMillis((decodedRefresh.exp ?? -1) * 1000).toUTC();
 				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
 				const sessionStore = createActorUri("SessionStore");
 				system.send(
@@ -190,6 +190,11 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					ctx.throw(401, "Session unknown");
 				}
 				const newTokenSet = await client.refresh(session.refreshToken);
+				const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;
+				const decodedRefresh = jwt.decode(newTokenSet.refresh_token ?? "") as jwt.JwtPayload;
+				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+				const refreshExpires = DateTime.fromMillis((decodedRefresh.exp ?? -1) * 1000).toUTC();
+				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
 				system.send(
 					sessionStore,
 					SessionStoreMessages.StoreSession({
@@ -197,15 +202,12 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 						idToken: newTokenSet.id_token ?? "",
 						accessToken: newTokenSet.access_token ?? "",
 						refreshToken: newTokenSet.refresh_token ?? "",
-						idExpires: new Timestamp(newTokenSet.expires_at ?? -1),
-						refreshExpires: session.refreshExpires,
+						idExpires: toTimestamp(expires),
+						refreshExpires: toTimestamp(refreshExpires),
 					})
 				);
 				console.log(`User ${sub} token was refreshed`);
-				ctx.set(
-					"Set-Cookie",
-					`bearer=${newTokenSet.id_token}; path=/; expires=${fromTimestamp(session.refreshExpires).toHTTP()}`
-				);
+				ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
 				ctx.body = "O.K.";
 			} catch (e) {
 				console.error(e);

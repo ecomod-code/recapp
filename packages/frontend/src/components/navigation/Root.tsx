@@ -17,6 +17,7 @@ import { cookie } from "../../utils";
 import { actorUris } from "../../actorUris";
 import { toActorUri } from "@recapp/models";
 import { SharingActor } from "../../actors/SharingActor";
+import { TokenActor } from "../../actors/TokenActor";
 
 export const Root = () => {
 	const [init, setInit] = useState(false);
@@ -38,6 +39,8 @@ export const Root = () => {
 					actorUris["CreateQuiz"] = toActorUri(crq.name);
 					const qsa = await s.createActor(SharingActor, { name: "QuizSharing" });
 					actorUris["QuizSharing"] = toActorUri(qsa.name);
+					const ta = await s.createActor(TokenActor, { name: "TokenActor" });
+					actorUris["TokenActor"] = toActorUri(ta.name);
 
 					setInit(true);
 

@@ -7,39 +7,14 @@ import { getStoredSelectedLocal } from "./components/layout/LocaleSelect";
 import { I18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { minutes } from "itu-utils";
-import Axios from "axios";
 import "./App.css";
 import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
 import { QuizPage } from "./pages/QuizPage";
 import { Activate } from "./Activate";
-import { cookie } from "./utils";
 import { RunningQuiz } from "./pages/RunningQuiz";
 import { QuestionEdit } from "./pages/QuestionEdit";
 import { CreateQuiz } from "./pages/CreateQuiz";
-
-const updateToken = () => {
-	//const mm = () => {
-	const hasToken = !!cookie("bearer");
-	if (hasToken) {
-		Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
-			.then(() => {
-				setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
-			})
-			.catch(() => {
-				alert(i18n._("app.could_not_refresh_token"));
-				window.location.href = "/";
-			});
-	}
-	//	window.removeEventListener("mousemove", mm);
-	//		window.removeEventListener("touchstart", mm);
-	//	};
-	//	window.addEventListener("mousemove", mm);
-	//	window.addEventListener("touchstart", mm);
-};
-
-setTimeout(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
 
 const router = createBrowserRouter([
 	{

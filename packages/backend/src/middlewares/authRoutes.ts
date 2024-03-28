@@ -6,7 +6,7 @@ import koa from "koa";
 import { ActorSystem } from "ts-actors";
 import { createActorUri } from "../utils";
 import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
-import { fromTimestamp, minutes, toTimestamp, debug } from "itu-utils";
+import { toTimestamp, debug } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 
@@ -84,7 +84,6 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			let role: UserRole = "STUDENT";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
 			const decodedRefresh = jwt.decode(tokenSet.refresh_token ?? "") as jwt.JwtPayload;
-			console.log(decoded, decodedRefresh);
 			const uid: Id = decoded.sub as Id;
 			try {
 				const userExists = await system.ask(userStore, UserStoreMessages.Has(uid));
@@ -123,7 +122,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 					role = user.role;
 				}
 				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
-				const refreshExpires = DateTime.fromMillis((decodedRefresh.exp ?? -1) * 1000).toUTC();
+				const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
 				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
 				const sessionStore = createActorUri("SessionStore");
 				system.send(
@@ -167,15 +166,15 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 	await maybeIdToken.match(
 		async idToken => {
 			try {
-				const { exp, sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				if (fromTimestamp(exp! * 1000) < DateTime.local().minus(minutes(45))) {
+				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
+				/* if (fromTimestamp(exp! * 1000) < DateTime.local().minus(minutes(45))) {
 					console.log("Refresh not needed yet");
 					console.log(
 						`Session ${fromTimestamp(exp! * 1000).toISO()} < ${DateTime.local().minus(minutes(45))}`
 					);
 					ctx.body = "O.K.";
 					return; // We do not need to refresh the token yet
-				}
+				} */
 				// Refresh the token
 				const client = await getOidc();
 				const system = Container.get<ActorSystem>("actor-system");
@@ -193,7 +192,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;
 				const decodedRefresh = jwt.decode(newTokenSet.refresh_token ?? "") as jwt.JwtPayload;
 				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
-				const refreshExpires = DateTime.fromMillis((decodedRefresh.exp ?? -1) * 1000).toUTC();
+				const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
 				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
 				system.send(
 					sessionStore,

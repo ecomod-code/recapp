@@ -58,27 +58,31 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	protected override async afterEntityWasCached(uid: Id) {
 		// const maybeCommentActor = maybe(this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Comment_${uid}`)));
 		// maybeCommentActor.forEach(ca => this.commentActors.set(uid, ca));
-		if (!this.commentActors.has(uid)) {
-			const comments = await this.system.createActor(
-				CommentActor,
-				{ name: `Comment_${uid}`, parent: this.ref, strategy: "Restart" },
-				uid
-			);
-			this.logger.debug(`Comments actor ${comments.name} created`);
-			this.commentActors.set(uid, comments);
-		}
-		// const maybeQuestionActor = maybe(
-		//	this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Question_${uid}`))
-		//);
-		//maybeQuestionActor.forEach(ca => this.questionActors.set(uid, ca));
-		if (!this.questionActors.has(uid)) {
-			const questions = await this.system.createActor(
-				QuestionActor,
-				{ name: `Question_${uid}`, parent: this.ref, strategy: "Restart" },
-				uid
-			);
-			this.logger.debug(`Question actor ${questions.name} created`);
-			this.questionActors.set(uid, questions);
+		try {
+			if (!this.commentActors.has(uid)) {
+				const comments = await this.system.createActor(
+					CommentActor,
+					{ name: `Comment_${uid}`, parent: this.ref, strategy: "Restart" },
+					uid
+				);
+				this.logger.debug(`Comments actor ${comments.name} created`);
+				this.commentActors.set(uid, comments);
+			}
+			// const maybeQuestionActor = maybe(
+			//	this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Question_${uid}`))
+			//);
+			//maybeQuestionActor.forEach(ca => this.questionActors.set(uid, ca));
+			if (!this.questionActors.has(uid)) {
+				const questions = await this.system.createActor(
+					QuestionActor,
+					{ name: `Question_${uid}`, parent: this.ref, strategy: "Restart" },
+					uid
+				);
+				this.logger.debug(`Question actor ${questions.name} created`);
+				this.questionActors.set(uid, questions);
+			}
+		} catch (e) {
+			this.logger.error(JSON.stringify(e));
 		}
 	}
 

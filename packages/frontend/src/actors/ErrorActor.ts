@@ -3,6 +3,8 @@ import { ActorRef, ActorSystem } from "ts-actors";
 import { StatefulActor } from "ts-actors-react";
 import unionize, { UnionOf, ofType } from "unionize";
 import { keys } from "rambda";
+import { actorUris } from "../actorUris";
+import { SessionStoreMessages } from "@recapp/models";
 
 export const ErrorMessages = unionize(
 	{
@@ -24,6 +26,7 @@ const errorIds = {
 
 export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: string }> {
 	protected state = { error: "" };
+	protected pingTimer: any;
 
 	public constructor(name: string, system: ActorSystem) {
 		super(name, system);
@@ -40,7 +43,13 @@ export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: strin
 	};
 
 	public override async afterStart(): Promise<void> {
-		console.warn("AFTERSTART", this.name);
+		this.pingTimer = setInterval(() => {
+			this.send(actorUris["SessionStore"], SessionStoreMessages.Ping());
+		}, 30000);
+	}
+
+	public override async beforeShutdown(): Promise<void> {
+		clearInterval(this.pingTimer);
 	}
 
 	public async receive(_from: ActorRef, message: ErrorMessage): Promise<Unit> {

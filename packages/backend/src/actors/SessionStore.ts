@@ -94,6 +94,10 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 				});
 				return this.deleteEntity(userId);
 			},
+			Ping: async () => {
+				this.logger.debug(`Ping from ${from.name}`);
+				return unit();
+			},
 			default: async () => new Error(`Unknown message from ${from.name}`),
 		});
 		return result;

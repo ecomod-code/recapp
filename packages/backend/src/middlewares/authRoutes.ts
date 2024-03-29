@@ -6,7 +6,7 @@ import koa from "koa";
 import { ActorSystem } from "ts-actors";
 import { createActorUri } from "../utils";
 import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
-import { toTimestamp, debug } from "itu-utils";
+import { toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 
@@ -160,7 +160,6 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 	const maybeIdToken = maybe<string>(ctx.request.headers.cookie)
 		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=([^;]+)/.exec(cookie)))
-		.map(s => debug(s, s.join(", ")))
 		.flatMap(match => maybe(match[1]));
 
 	await maybeIdToken.match(

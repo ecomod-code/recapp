@@ -13,7 +13,7 @@ export const Login: React.FC = () => {
 		}
 	});
 	return (
-		<div className="text-center w-100 d-flex flex-column">
+		<div className="text-center w-100 d-flex flex-column vh-100">
 			<Modal show={error}>
 				<Modal.Title className="ps-2 p-1 text-bg-primary">Login-Fehler</Modal.Title>
 				<Modal.Body>Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator.</Modal.Body>
@@ -31,8 +31,12 @@ export const Login: React.FC = () => {
 					<Trans id="login-page.login" />
 				</Button>
 			</div>
-			<div className="m-4 d-flex flex-row justify-items-center w-100 flex-grow-1">
-				<div className="align-self-end">
+			<div className="m-4 d-flex flex-row justify-items-center flex-grow-1 align-items-end">
+				<div>
+					<img width="300" src="./GOE_Logo_Quer_Farbe_RGB.png" />
+				</div>
+				<div className="flex-grow-1">&nbsp;</div>
+				<div>
 					<img width="300" src="./MWK-Wappen-RGB_Gefördert-durch_02.png" />
 				</div>
 			</div>

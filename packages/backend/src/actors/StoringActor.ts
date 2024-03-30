@@ -9,7 +9,7 @@ import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-ut
 import { DateTime } from "luxon";
 import { systemEquals, createActorUri, extractSystemName } from "../utils";
 
-export const CLEANUP_INTERVAL = 2; // When to cleanup old entries
+export const CLEANUP_INTERVAL = hours(2);
 
 export type AccessRole = UserRole | "SYSTEM";
 
@@ -27,7 +27,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		protected readonly collectionName: string
 	) {
 		super(name, system);
-		this.checkInterval = setInterval(this.cleanup.bind(this), hours(CLEANUP_INTERVAL).valueOf());
+		this.checkInterval = setInterval(this.cleanup.bind(this), CLEANUP_INTERVAL.valueOf());
 	}
 
 	public override async afterStart(): Promise<void> {
@@ -65,7 +65,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 
 	protected cleanup() {
 		this.logger.debug(`Running cache and subscription cleanups for ${this.name}`);
-		const cleanupTimestamp = DateTime.utc().minus(hours(CLEANUP_INTERVAL));
+		const cleanupTimestamp = DateTime.utc().minus(CLEANUP_INTERVAL);
 
 		// Clear old entries from cache to save memory
 		this.state = create(this.state, draft => {

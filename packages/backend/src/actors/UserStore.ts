@@ -16,7 +16,7 @@ import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { create } from "mutative";
 import { identity, pick } from "rambda";
-import { SubscribableActor } from "./SubscribableActor";
+import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { AccessRole } from "./StoringActor";
 import { maybe } from "tsmonads";
 import { createActorUri } from "../utils";
@@ -30,7 +30,7 @@ type ResultType = User | ListedUser[] | Teacher[] | Error | Unit | UserRole | bo
 type State = {
 	cache: Map<Id, User>;
 	subscribers: Map<Id, Set<ActorUri>>;
-	collectionSubscribers: Map<ActorUri, string[]>;
+	collectionSubscribers: Map<ActorUri, CollecionSubscription>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
 	nicknames: Set<string>; // Index of all nicknames
@@ -93,10 +93,14 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					this.state = create(this.state, draft => {
 						draft.cache.set(userToStore.uid, userToStore);
 					});
-					for (const [subscriber, properties] of this.state.collectionSubscribers) {
+					for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 						this.send(
 							subscriber,
-							new UserUpdateMessage(properties.length > 0 ? pick(properties, userToStore) : userToStore)
+							new UserUpdateMessage(
+								subscription.properties.length > 0
+									? pick(subscription.properties, userToStore)
+									: userToStore
+							)
 						);
 					}
 					for (const subscriber of this.state.subscribers.get(userToStore.uid) ?? new Set()) {
@@ -170,7 +174,11 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						draft.collectionSubscribers.set(from.name as ActorUri, requestedProperties);
+						draft.collectionSubscribers.set(from.name as ActorUri, {
+							properties: requestedProperties,
+							userId: clientUserId,
+							userRole: clientUserRole,
+						});
 					});
 					return unit();
 				},
@@ -274,10 +282,12 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				});
 			}
 
-			for (const [subscriber, properties] of this.state.collectionSubscribers) {
+			for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 				this.send(
 					subscriber,
-					new UserUpdateMessage(properties.length > 0 ? pick(properties, newUser) : newUser)
+					new UserUpdateMessage(
+						subscription.properties.length > 0 ? pick(subscription.properties, newUser) : newUser
+					)
 				);
 				draft.lastSeen.set(subscriber, toTimestamp());
 			}

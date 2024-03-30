@@ -9,7 +9,7 @@ import {
 	quizSchema,
 	toId,
 } from "@recapp/models";
-import { SubscribableActor } from "./SubscribableActor";
+import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, toTimestamp, unit } from "itu-utils";
 import { CommentActor } from "./CommentActor";
@@ -20,11 +20,12 @@ import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
 import { createActorUri } from "../utils";
 import { keys } from "rambda";
+import { AccessRole } from "./StoringActor";
 
 type State = {
 	cache: Map<Id, Quiz>;
 	subscribers: Map<Id, Set<ActorUri>>;
-	collectionSubscribers: Map<ActorUri, string[]>;
+	collectionSubscribers: Map<ActorUri, CollecionSubscription>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
 };
@@ -99,6 +100,26 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		});
 	}
 
+	private sendUpdateToSubscribers = (update: Quiz, userRole: AccessRole, userId: Id) => {
+		for (const [subscriber, subscription] of this.state.collectionSubscribers) {
+			if (userRole === "STUDENT" && !update.students.includes(userId)) {
+				continue;
+			}
+			if (userRole === "TEACHER" && ![...update.students, ...update.teachers].includes(userId)) {
+				continue;
+			}
+
+			const globalUpdateMessage = new QuizUpdateMessage(
+				subscription.properties.length > 0 ? pick(subscription.properties, update) : update
+			);
+
+			this.send(subscriber, globalUpdateMessage);
+		}
+		for (const subscriber of this.state.subscribers.get(update.uid) ?? new Set()) {
+			this.send(subscriber, new QuizUpdateMessage(update));
+		}
+	};
+
 	public async receive(from: ActorRef, message: QuizActorMessage): Promise<ResultType> {
 		console.log("QUIZACTOR", from.name, message);
 		try {
@@ -118,15 +139,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					const quizToCreate = quizSchema.parse(quiz);
 					await this.afterEntityWasCached(uid);
 					await this.storeEntity(quizToCreate);
-					for (const [subscriber, properties] of this.state.collectionSubscribers) {
-						this.send(
-							subscriber,
-							new QuizUpdateMessage(properties.length > 0 ? pick(properties, quizToCreate) : quizToCreate)
-						);
-					}
-					for (const subscriber of this.state.subscribers.get(quizToCreate.uid) ?? new Set()) {
-						this.send(subscriber, new QuizUpdateMessage(quizToCreate));
-					}
+					this.sendUpdateToSubscribers(quizToCreate, clientUserRole, clientUserId);
 					return uid;
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
@@ -134,15 +147,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					q.map(async entity => {
 						entity.teachers.push(teacher);
 						await this.storeEntity(entity);
-						for (const [subscriber, properties] of this.state.collectionSubscribers) {
-							this.send(
-								subscriber,
-								new QuizUpdateMessage(properties.length > 0 ? pick(properties, entity) : entity)
-							);
-						}
-						for (const subscriber of this.state.subscribers.get(entity.uid) ?? new Set()) {
-							this.send(subscriber, new QuizUpdateMessage(entity));
-						}
+						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
 					});
 				},
 				AddStudent: async ({ quiz, student }) => {
@@ -150,15 +155,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					q.map(async entity => {
 						entity.students.push(student);
 						await this.storeEntity(entity);
-						for (const [subscriber, properties] of this.state.collectionSubscribers) {
-							this.send(
-								subscriber,
-								new QuizUpdateMessage(properties.length > 0 ? pick(properties, entity) : entity)
-							);
-						}
-						for (const subscriber of this.state.subscribers.get(entity.uid) ?? new Set()) {
-							this.send(subscriber, new QuizUpdateMessage(entity));
-						}
+						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
 					});
 				},
 				RemoveUser: async ({ quiz, user }) => {
@@ -167,15 +164,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						entity.students = entity.students.filter(s => s !== user);
 						entity.teachers = entity.teachers.filter(s => s !== user);
 						await this.storeEntity(entity);
-						for (const [subscriber, properties] of this.state.collectionSubscribers) {
-							this.send(
-								subscriber,
-								new QuizUpdateMessage(properties.length > 0 ? pick(properties, entity) : entity)
-							);
-						}
-						for (const subscriber of this.state.subscribers.get(entity.uid) ?? new Set()) {
-							this.send(subscriber, new QuizUpdateMessage(entity));
-						}
+						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
 					});
 				},
 				Get: async uid => {
@@ -191,14 +180,16 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					console.log("UPDATING", JSON.stringify(existingQuiz), "WITH", JSON.stringify(quiz));
 					const result = await existingQuiz
 						.map(async c => {
-							if (!(keys(quiz).length === 2 && quiz.groups)) {
-								if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
-									console.error(clientUserRole, "is not TEACHER or ADMIN");
-									return new Error("Invalid write access to quiz");
-								}
-								if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
-									console.error(clientUserId, "is not in teacher list", c.teachers);
-									return new Error("Quiz not shared with teacher");
+							if (!(keys(quiz).length === 2)) {
+								if (!quiz.students && !quiz.comments && !quiz.groups) {
+									if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
+										console.error(clientUserRole, "is not TEACHER or ADMIN");
+										return new Error("Invalid write access to quiz");
+									}
+									if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
+										console.error(clientUserId, "is not in teacher list", c.teachers, keys(quiz));
+										return new Error("Quiz not shared with teacher");
+									}
 								}
 							}
 							c.updated = toTimestamp();
@@ -206,17 +197,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							console.log("DELTA", JSON.stringify(updateDelta, undefined, 4));
 							const quizToUpdate = quizSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(quizToUpdate);
-							for (const [subscriber, properties] of this.state.collectionSubscribers) {
-								this.send(
-									subscriber,
-									new QuizUpdateMessage(
-										properties.length > 0 ? pick(properties, quizToUpdate) : quizToUpdate
-									)
-								);
-							}
-							for (const subscriber of this.state.subscribers.get(quizToUpdate.uid) ?? new Set()) {
-								this.send(subscriber, new QuizUpdateMessage(quizToUpdate));
-							}
+							this.sendUpdateToSubscribers(quizToUpdate, clientUserRole, clientUserId);
 							return quizToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Quiz not found")));
@@ -269,7 +250,11 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				SubscribeToCollection: async (requestedProperties: string[]) => {
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						draft.collectionSubscribers.set(from.name as ActorUri, requestedProperties);
+						draft.collectionSubscribers.set(from.name as ActorUri, {
+							properties: requestedProperties,
+							userId: clientUserId,
+							userRole: clientUserRole,
+						});
 					});
 					return unit(); // TODO: Muss die Zuweisungen der Quizze berücksichtigen!
 				},
@@ -278,6 +263,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
 					return unit();
+				},
+				default: async () => {
+					this.logger.error(`Unknown message from ${from.name} in QuizActor: ${JSON.stringify(message)}`);
 				},
 			});
 		} catch (e) {

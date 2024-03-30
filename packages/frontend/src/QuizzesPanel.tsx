@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, Id } from "@recapp/models";
+import { Quiz, User, Id, QuestionGroup } from "@recapp/models";
 import { Badge, Button, Card, Container } from "react-bootstrap";
-import { ChatFill, Check, Pencil, Share, SignStop, Stop } from "react-bootstrap-icons";
-import { useNavigate, useNavigation } from "react-router-dom";
+import { Pencil, Share, SignStop } from "react-bootstrap-icons";
+import { useNavigate } from "react-router-dom";
+import { ShareModal } from "./components/modals/ShareModal";
 
-const QuizCard: React.FC<{ quiz: Partial<Quiz> }> = ({ quiz }) => {
+const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
+	groups.reduce((count, group) => count + (group?.questions?.length ?? 0), 0);
+
+const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void }> = ({ quiz, onShare }) => {
 	const nav = useNavigate();
 	return (
 		<Card className="m-2 p-0">
@@ -14,6 +18,7 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz> }> = ({ quiz }) => {
 			<Card.Body>
 				<div className="d-flex">
 					<div>{quiz.students?.length ?? 0} Teilnehmende&nbsp;</div>
+					<div>{getNumberOfQuestions(quiz.groups ?? [])} Fragen&nbsp;</div>
 					<div className="flex-grow-1" />
 					<Badge as="div" bg="success">
 						{quiz.state}
@@ -28,7 +33,7 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz> }> = ({ quiz }) => {
 					>
 						<Pencil />
 					</Button>
-					<Button className="ms-3" variant="secondary">
+					<Button className="ms-3" variant="secondary" onClick={onShare}>
 						<Share />
 					</Button>
 					<Button className="ms-3" variant="danger">
@@ -42,17 +47,19 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz> }> = ({ quiz }) => {
 
 export const Quizzes: React.FC = () => {
 	const nav = useNavigate();
+	const [shareModal, setShareModal] = useState("");
 	const [state] = useStatefulActor<{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>> }>("LocalUser");
 	const quizzes: Array<Partial<Quiz>> = state.map(s => Array.from(s.quizzes.values())).orElse([]);
 	return (
 		<Container fluid>
+			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
 			<Container fluid style={{ maxHeight: "70vh", overflowY: "auto" }}>
 				{quizzes
-					.sort((a, b) => {
+					.toSorted((a, b) => {
 						return b.updated?.value! - a.updated?.value!;
 					})
 					.map(q => {
-						return <QuizCard key={q.uid} quiz={q} />;
+						return <QuizCard key={q.uid} quiz={q} onShare={() => setShareModal(q.uniqueLink!)} />;
 					})}
 			</Container>
 			<Button onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}>

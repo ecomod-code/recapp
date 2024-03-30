@@ -66,9 +66,10 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 							...q.teachers,
 							...(this.state.teachers.map(t => t.uid).filter(Boolean) as Id[]),
 						];
+						const students = q.students.filter(s => !teachers.includes(s));
 						this.ask<unknown, Quiz>(
 							actorUris["QuizActor"],
-							QuizActorMessages.Update({ uid: q.uid, teachers })
+							QuizActorMessages.Update({ uid: q.uid, teachers, students })
 						).catch(e => {
 							this.send(actorUris["ErrorActor"], ErrorMessages.SetError(e));
 						});

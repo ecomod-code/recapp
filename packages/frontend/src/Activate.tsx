@@ -11,22 +11,39 @@ export const Activate: React.FC = () => {
 
 	useEffect(() => {
 		if (cookie("bearer")) {
-			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz } });
+			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz, activate: true } });
 		} else {
 			document.cookie = "activatedQuiz=" + quiz;
 		}
 	});
 	return (
-		<div>
+		<div className="text-center w-100 d-flex flex-column vh-100">
 			<Modal show={error}>
 				<Modal.Title className="ps-2 p-1 text-bg-primary">Login-Fehler</Modal.Title>
 				<Modal.Body>Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator.</Modal.Body>
 			</Modal>
-			<h1>RECAPP</h1>
-			<h2>Melde dich an, um am Quiz teilzunehmen.</h2>
-			<Button variant="primary" href={`${import.meta.env.VITE_BACKEND_URI}/auth/login`}>
-				<Trans id="login-page.login" />
-			</Button>
+			<div>
+				<h1>RECAPP</h1>
+			</div>
+			<div>
+				<Button
+					variant="primary"
+					href={`${import.meta.env.VITE_BACKEND_URI}/auth/login`}
+					className="m-4"
+					style={{ maxWidth: "30%" }}
+				>
+					<Trans id="login-page.login" />
+				</Button>
+			</div>
+			<div className="m-4 d-flex flex-row justify-items-center flex-grow-1 align-items-end">
+				<div>
+					<img width="300" src="./GOE_Logo_Quer_Farbe_RGB.png" />
+				</div>
+				<div className="flex-grow-1">&nbsp;</div>
+				<div>
+					<img width="300" src="./MWK-Wappen-RGB_Gefördert-durch_02.png" />
+				</div>
+			</div>
 		</div>
 	);
 };

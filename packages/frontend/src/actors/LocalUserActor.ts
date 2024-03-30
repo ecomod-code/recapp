@@ -29,7 +29,7 @@ export class LocalUserActor extends StatefulActor<
 			this.send(actorUris.QuizActor, QuizActorMessages.GetAll());
 			this.send(
 				actorUris.QuizActor,
-				QuizActorMessages.SubscribeToCollection(["uid", "title", "state", "students"])
+				QuizActorMessages.SubscribeToCollection(["uid", "title", "state", "students", "groups"])
 			);
 		}
 		this.updateState(draft => {

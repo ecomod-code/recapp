@@ -19,7 +19,7 @@ export const Dashboard: React.FC = () => {
 		const quiz = cookie("activatedQuiz");
 		if (quiz) {
 			document.cookie = "activatedQuiz=";
-			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz } });
+			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz, activate: true } });
 		}
 	});
 

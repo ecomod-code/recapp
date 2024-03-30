@@ -7,7 +7,7 @@ import {
 	Id,
 	commentSchema,
 } from "@recapp/models";
-import { SubscribableActor } from "./SubscribableActor";
+import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
@@ -17,7 +17,7 @@ import { v4 } from "uuid";
 type State = {
 	cache: Map<Id, Comment>;
 	subscribers: Map<Id, Set<ActorUri>>;
-	collectionSubscribers: Map<ActorUri, string[]>;
+	collectionSubscribers: Map<ActorUri, CollecionSubscription>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
 };
@@ -61,11 +61,13 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 					(comment as Comment).uid = v4() as Id;
 					const commentToCreate = commentSchema.parse(comment);
 					await this.storeEntity(commentToCreate);
-					for (const [subscriber, properties] of this.state.collectionSubscribers) {
+					for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 						this.send(
 							subscriber,
 							new CommentUpdateMessage(
-								properties.length > 0 ? pick(properties, commentToCreate) : commentToCreate
+								subscription.properties.length > 0
+									? pick(subscription.properties, commentToCreate)
+									: commentToCreate
 							)
 						);
 					}
@@ -84,11 +86,13 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 							commentToUpdate.updated = toTimestamp();
 							commentToUpdate.upvoters.push(userId);
 							await this.storeEntity(commentToUpdate);
-							for (const [subscriber, properties] of this.state.collectionSubscribers) {
+							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 								this.send(
 									subscriber,
 									new CommentUpdateMessage(
-										properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
+										subscription.properties.length > 0
+											? pick(subscription.properties, commentToUpdate)
+											: commentToUpdate
 									)
 								);
 							}
@@ -111,11 +115,13 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 								comment;
 							const commentToUpdate = commentSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(commentToUpdate);
-							for (const [subscriber, properties] of this.state.collectionSubscribers) {
+							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 								this.send(
 									subscriber,
 									new CommentUpdateMessage(
-										properties.length > 0 ? pick(properties, commentToUpdate) : commentToUpdate
+										subscription.properties.length > 0
+											? pick(subscription.properties, commentToUpdate)
+											: commentToUpdate
 									)
 								);
 							}
@@ -141,7 +147,11 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 				SubscribeToCollection: async () => {
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						draft.collectionSubscribers.set(from.name as ActorUri, []);
+						draft.collectionSubscribers.set(from.name as ActorUri, {
+							properties: [],
+							userId: clientUserId,
+							userRole: clientUserRole,
+						});
 					});
 					return unit();
 				},

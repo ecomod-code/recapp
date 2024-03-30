@@ -14,6 +14,7 @@ import { CreateGroupModal } from "../components/modals/CreateGroupModal";
 import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
 import { toTimestamp, debug } from "itu-utils";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
+import { ShareModal } from "../components/modals/ShareModal";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -90,8 +91,10 @@ const QuestionCard = (props: {
 export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
+	const [shareModal, setShareModal] = useState("");
 	const { state } = useLocation();
 	const quizId: Id = state.quizId;
+	const activate = state.activate;
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
@@ -99,6 +102,15 @@ export const QuizPage: React.FC = () => {
 	useEffect(() => {
 		if (!quizId) {
 			return;
+		}
+		if (activate) {
+			tryQuizActor.forEach(q => {
+				mbLocalUser.forEach(lu => {
+					alert(activate);
+					q.send(q, CurrentQuizMessages.Activate({ userId: lu.user.uid, quizId }));
+					q.send(q, CurrentQuizMessages.SetQuiz(toId(quizId)));
+				});
+			});
 		}
 		tryQuizActor.forEach(q => {
 			mbLocalUser.forEach(lu => {
@@ -238,6 +250,7 @@ export const QuizPage: React.FC = () => {
 
 				return (
 					<Container fluid>
+						<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
 						<MarkdownModal
 							titleId="new-comment-title"
 							editorValue=""
@@ -290,6 +303,19 @@ export const QuizPage: React.FC = () => {
 								<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
 									<Row>
 										<div className="d-flex flex-column h-100 w-100">
+											<div className="d-flex flex-row mb-4">
+												<div>
+													{quizData.questions.length} Fragen, {quizData.quiz.students.length}{" "}
+													Studierende
+												</div>
+												<div className="flex-grow-1">&nbsp;</div>
+												<div>
+													<Button onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
+														QR-Code anzeigen
+													</Button>
+												</div>
+											</div>
+
 											<div className="flex-grow-1">
 												<Accordion defaultActiveKey="0">
 													{quizData.quiz.groups.map((questionGroup, index) => {

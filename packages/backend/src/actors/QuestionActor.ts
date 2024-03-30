@@ -8,28 +8,33 @@ import {
 	questionSchema,
 	toId,
 } from "@recapp/models";
-import { SubscribableActor } from "./SubscribableActor";
+import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
+import { Timestamp, Unit, minutes, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
 import { pick } from "rambda";
 import { v4 } from "uuid";
+import { DateTime } from "luxon";
+import { maybe } from "tsmonads";
 
 type State = {
 	cache: Map<Id, Question>;
 	subscribers: Map<Id, Set<ActorUri>>;
-	collectionSubscribers: Map<ActorUri, string[]>;
+	collectionSubscribers: Map<ActorUri, CollecionSubscription>;
 	lastSeen: Map<ActorUri, Timestamp>;
 	lastTouched: Map<Id, Timestamp>;
 };
 
 type ResultType = Unit | Error | Question | Id;
 
+const STALLED_QUESTION_INTERVAL = minutes(15);
+const STALLED_QUESTION_CHECK_INTERVAL = minutes(5);
+
 /**
  * Actor representing the comments of a single quiz. This will be started as a child of the corresponding quiz actor
  */
 export class QuestionActor extends SubscribableActor<Question, QuestionActorMessage, ResultType> {
-	// private questionActors = new Map<Id, ActorRef>();
+	private checkStalledQuestionsInterval: NodeJS.Timeout;
 
 	protected override state: State = {
 		cache: new Map(),
@@ -43,12 +48,32 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 		return;
 	}
 
+	private checkStalledQuestions = () => {
+		// Remove questions that are blocked from editing, but seemed not be updated in the last STALLED_QUESTION_INTERVAL. (e.g. because a client lost the connection)
+		const cutOff = toTimestamp(DateTime.utc().minus(STALLED_QUESTION_INTERVAL));
+		const idsToReset = Array.from(this.state.cache.values())
+			.filter(question => question.editMode && question.updated < cutOff)
+			.map(q => q.uid);
+		idsToReset.map(id => {
+			maybe(this.state.cache.get(id)).forEach(question => this.storeEntity({ ...question, editMode: false }));
+		});
+	};
+
 	constructor(
 		name: string,
 		system: ActorSystem,
 		private uid: Id
 	) {
 		super(name, system, "questions");
+		this.checkStalledQuestionsInterval = setInterval(
+			this.checkStalledQuestions,
+			STALLED_QUESTION_CHECK_INTERVAL.valueOf()
+		);
+	}
+
+	public override async beforeShutdown(): Promise<void> {
+		super.beforeShutdown();
+		clearInterval(this.checkStalledQuestionsInterval);
 	}
 
 	public async receive(from: ActorRef, message: QuestionActorMessage): Promise<ResultType> {
@@ -65,11 +90,13 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 					(question as Question).updated = toTimestamp();
 					const questionToCreate = questionSchema.parse(question);
 					await this.storeEntity(questionToCreate);
-					for (const [subscriber, properties] of this.state.collectionSubscribers) {
+					for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 						this.send(
 							subscriber,
 							new QuestionUpdateMessage(
-								properties.length > 0 ? pick(properties, questionToCreate) : questionToCreate
+								subscription.properties.length > 0
+									? pick(subscription.properties, questionToCreate)
+									: questionToCreate
 							)
 						);
 					}
@@ -86,11 +113,13 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 							const { quiz, created, authorId, authorName, ...updateDelta } = question;
 							const questionToUpdate = questionSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(questionToUpdate);
-							for (const [subscriber, properties] of this.state.collectionSubscribers) {
+							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 								this.send(
 									subscriber,
 									new QuestionUpdateMessage(
-										properties.length > 0 ? pick(properties, questionToUpdate) : questionToUpdate
+										subscription.properties.length > 0
+											? pick(subscription.properties, questionToUpdate)
+											: questionToUpdate
 									)
 								);
 							}
@@ -116,7 +145,11 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 				SubscribeToCollection: async () => {
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						draft.collectionSubscribers.set(from.name as ActorUri, []);
+						draft.collectionSubscribers.set(from.name as ActorUri, {
+							properties: [],
+							userId: clientUserId,
+							userRole: clientUserRole,
+						});
 					});
 					return unit();
 				},

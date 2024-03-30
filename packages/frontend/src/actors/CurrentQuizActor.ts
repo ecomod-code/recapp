@@ -26,6 +26,7 @@ export const CurrentQuizMessages = unionize(
 		CreateQuiz: ofType<Id>(),
 		SetUser: ofType<User>(),
 		SetQuiz: ofType<Id>(),
+		Activate: ofType<{ userId: Id; quizId: Id }>(),
 		UpvoteComment: ofType<Id>(),
 		FinishComment: ofType<Id>(),
 		AddComment: ofType<Omit<Comment, "uid" | "authorName" | "authorId">>(),
@@ -57,7 +58,7 @@ export class CurrentQuizActor extends StatefulActor<
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
-		console.log("CURRENTQUIZ", message);
+		console.log("CURRENTQUIZ MESSAGE", message);
 		if (message.tag === "QuizUpdateMessage") {
 			this.updateState(draft => {
 				draft.quiz = { ...draft.quiz, ...message.quiz };
@@ -87,6 +88,14 @@ export class CurrentQuizActor extends StatefulActor<
 		// Deal with local messages
 		maybeLocalMessage.forEach(m =>
 			CurrentQuizMessages.match(m, {
+				Activate: async ({ userId, quizId }) => {
+					const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
+					const students = quiz.students;
+					if (!quiz.teachers.includes(userId)) {
+						students.push(userId);
+						this.send(this.ref, CurrentQuizMessages.Update({ uid: quizId, students }));
+					}
+				},
 				CreateQuiz: async creator => {
 					const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
 						title: i18n._("new-quiz-title"),
@@ -156,7 +165,6 @@ export class CurrentQuizActor extends StatefulActor<
 						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 						QuestionActorMessages.Update(question)
 					);
-					console.log("CURRENTQUIZ", question, group);
 					if (!group) {
 						return;
 					}

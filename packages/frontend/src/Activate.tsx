@@ -25,6 +25,7 @@ export const Activate: React.FC = () => {
 			<div>
 				<h1>RECAPP</h1>
 			</div>
+			<div>Melde dich an um am Quiz teilzunehmen.</div>
 			<div>
 				<Button
 					variant="primary"

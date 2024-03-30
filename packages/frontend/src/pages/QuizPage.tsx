@@ -324,7 +324,7 @@ export const QuizPage: React.FC = () => {
 																key={questionGroup.name}
 																eventKey={questionGroup.name}
 															>
-																<Accordion.Header>
+																<Accordion.Header as={"div"}>
 																	<div
 																		className="d-flex w-100 align-items-center"
 																		style={{ margin: "-0.5rem" }}
@@ -332,10 +332,17 @@ export const QuizPage: React.FC = () => {
 																		<div className="d-flex flex-column h-100 me-1">
 																			<div>
 																				<Button
+																					as="div"
 																					variant="light"
+																					className={
+																						disableForStudent
+																							? "disabled"
+																							: undefined
+																					}
 																					size="sm"
-																					disabled={index === 0}
 																					onClick={() =>
+																						index !== 0 &&
+																						!disableForStudent &&
 																						moveGroup(
 																							questionGroup.name,
 																							true
@@ -348,13 +355,20 @@ export const QuizPage: React.FC = () => {
 																			<div>&nbsp;</div>
 																			<div>
 																				<Button
+																					as="div"
 																					variant="light"
-																					size="sm"
-																					disabled={
-																						index ===
-																						quizData.quiz.groups.length - 1
+																					className={
+																						disableForStudent
+																							? "disabled"
+																							: undefined
 																					}
+																					size="sm"
 																					onClick={() =>
+																						index !==
+																							quizData.quiz.groups
+																								.length -
+																								1 &&
+																						!disableForStudent &&
 																						moveGroup(
 																							questionGroup.name,
 																							false
@@ -374,8 +388,12 @@ export const QuizPage: React.FC = () => {
 																		</div>
 																		<Button
 																			as="div"
-																			className="me-4"
+																			className={
+																				"me-4 " +
+																				(disableForStudent ? "disabled" : "")
+																			}
 																			onClick={() =>
+																				!disableForStudent &&
 																				setCurrentGroup({
 																					showNameModal: true,
 																					name: questionGroup.name,
@@ -384,6 +402,7 @@ export const QuizPage: React.FC = () => {
 																		>
 																			<Pencil />
 																		</Button>
+																		<div style={{ width: 32 }}></div>
 																	</div>
 																</Accordion.Header>
 																<Accordion.Body className="p-2">

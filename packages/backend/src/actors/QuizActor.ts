@@ -20,7 +20,6 @@ import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
 import { createActorUri } from "../utils";
 import { keys } from "rambda";
-import { AccessRole } from "./StoringActor";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -100,14 +99,19 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		});
 	}
 
-	private sendUpdateToSubscribers = (update: Quiz, userRole: AccessRole, userId: Id) => {
+	private sendUpdateToSubscribers = (update: Quiz) => {
 		for (const [subscriber, subscription] of this.state.collectionSubscribers) {
-			if (userRole === "STUDENT" && !update.students.includes(userId)) {
+			if (subscription.userRole === "STUDENT" && !update.students.includes(subscription.userId)) {
 				continue;
 			}
-			if (userRole === "TEACHER" && ![...update.students, ...update.teachers].includes(userId)) {
+			if (
+				subscription.userRole === "TEACHER" &&
+				![...update.students, ...update.teachers].includes(subscription.userId)
+			) {
 				continue;
 			}
+
+			console.log("SUBSCRIPTION SEND", subscriber, subscription.userRole, update.students, update.teachers);
 
 			const globalUpdateMessage = new QuizUpdateMessage(
 				subscription.properties.length > 0 ? pick(subscription.properties, update) : update
@@ -136,10 +140,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					const uid = toId(v4());
 					(quiz as Quiz).uid = uid;
 					(quiz as Quiz).uniqueLink = `/activate?quiz=${uid}`;
+					(quiz as Quiz).created = toTimestamp();
+					(quiz as Quiz).updated = toTimestamp();
 					const quizToCreate = quizSchema.parse(quiz);
 					await this.afterEntityWasCached(uid);
 					await this.storeEntity(quizToCreate);
-					this.sendUpdateToSubscribers(quizToCreate, clientUserRole, clientUserId);
+					this.sendUpdateToSubscribers(quizToCreate);
 					return uid;
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
@@ -147,7 +153,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					q.map(async entity => {
 						entity.teachers.push(teacher);
 						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
+						this.sendUpdateToSubscribers(entity);
 					});
 				},
 				AddStudent: async ({ quiz, student }) => {
@@ -155,7 +161,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					q.map(async entity => {
 						entity.students.push(student);
 						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
+						this.sendUpdateToSubscribers(entity);
 					});
 				},
 				RemoveUser: async ({ quiz, user }) => {
@@ -164,7 +170,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						entity.students = entity.students.filter(s => s !== user);
 						entity.teachers = entity.teachers.filter(s => s !== user);
 						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity, clientUserRole, clientUserId);
+						this.sendUpdateToSubscribers(entity);
 					});
 				},
 				Get: async uid => {
@@ -197,7 +203,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							console.log("DELTA", JSON.stringify(updateDelta, undefined, 4));
 							const quizToUpdate = quizSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(quizToUpdate);
-							this.sendUpdateToSubscribers(quizToUpdate, clientUserRole, clientUserId);
+							this.sendUpdateToSubscribers(quizToUpdate);
 							return quizToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Quiz not found")));
@@ -250,6 +256,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				SubscribeToCollection: async (requestedProperties: string[]) => {
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
+						console.log("SUBSCRIBING TO QUIITES", from.name, clientUserId, clientUserRole);
 						draft.collectionSubscribers.set(from.name as ActorUri, {
 							properties: requestedProperties,
 							userId: clientUserId,

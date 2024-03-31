@@ -148,7 +148,14 @@ ${"```"}`);
 						.map(c =>
 							c.map(cmt => (
 								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-									<CommentCard comment={cmt} onUpvote={() => {}} onAccept={() => {}} />
+									<CommentCard
+										userId={toId("")}
+										teachers={[]}
+										comment={cmt}
+										onDelete={() => {}}
+										onUpvote={() => {}}
+										onAccept={() => {}}
+									/>
 								</div>
 							))
 						)

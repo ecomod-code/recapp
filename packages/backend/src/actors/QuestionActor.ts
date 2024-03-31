@@ -11,12 +11,11 @@ import {
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { Timestamp, Unit, minutes, toTimestamp, unit } from "itu-utils";
+import { Timestamp, Unit, fromTimestamp, minutes, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
 import { pick } from "rambda";
 import { v4 } from "uuid";
 import { DateTime } from "luxon";
-import { maybe } from "tsmonads";
 
 type State = {
 	cache: Map<Id, Question>;
@@ -49,16 +48,25 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 		return;
 	}
 
-	private checkStalledQuestions = () => {
+	private checkStalledQuestions = async () => {
 		// Remove questions that are blocked from editing, but seemed not be updated in the last STALLED_QUESTION_INTERVAL. (e.g. because a client lost the connection)
-		const cutOff = toTimestamp(DateTime.utc().minus(STALLED_QUESTION_INTERVAL));
-		const idsToReset = Array.from(this.state.cache.values())
-			.filter(question => question.editMode && question.updated < cutOff)
+		const cutOff = DateTime.utc().minus(STALLED_QUESTION_INTERVAL);
+		const db = await this.connector.db();
+		const candidates = await db
+			.collection<Question>(this.collectionName)
+			.find({ editMode: true, quiz: this.uid })
+			.toArray();
+		const idsToReset = Array.from(candidates)
+			.filter(question => question.editMode && fromTimestamp(question.updated.value) < cutOff)
 			.map(q => q.uid);
 		console.log("QUESTIONACTOR - resetting the stalled questions", idsToReset);
-		idsToReset.map(id => {
-			maybe(this.state.cache.get(id)).forEach(question => this.storeEntity({ ...question, editMode: false }));
-		});
+		idsToReset.forEach(id =>
+			this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }))
+				.then(result => {
+					console.log("UPDATESTALLED", result);
+				})
+				.catch(e => console.error(e))
+		);
 	};
 
 	constructor(
@@ -68,9 +76,10 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 	) {
 		super(name, system, "questions");
 		this.checkStalledQuestionsInterval = setInterval(
-			this.checkStalledQuestions,
+			() => this.checkStalledQuestions(),
 			STALLED_QUESTION_CHECK_INTERVAL.valueOf()
 		);
+		this.checkStalledQuestions();
 	}
 
 	public override async beforeShutdown(): Promise<void> {
@@ -108,7 +117,10 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 					const existingQuestion = await this.getEntity(question.uid);
 					return existingQuestion
 						.map(async c => {
-							if (!["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+							if (
+								!["SYSTEM", "TEACHER", "ADMIN"].includes(clientUserRole) &&
+								clientUserId !== c.authorId
+							) {
 								return new Error("Invalid write access to comment");
 							}
 							c.updated = toTimestamp();

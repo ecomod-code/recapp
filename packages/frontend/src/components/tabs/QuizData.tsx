@@ -11,12 +11,7 @@ import { SharingMessages, SharingState } from "../../actors/SharingActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { toTimestamp } from "itu-utils";
 
-const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({
-	quiz,
-	teachnerNames,
-	show,
-	onClose,
-}) => {
+const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({ quiz, show, onClose }) => {
 	const [name, setName] = useState("");
 	const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
 	useEffect(() => {
@@ -109,6 +104,8 @@ export const QuizData: React.FC = () => {
 		setShareModal(false);
 	};
 
+	const tNames = mbQuiz.map(s => s.teacherNames.join(", ")).orElse("");
+
 	return mbQuiz
 		.flatMap(q => (!!q.quiz.uid ? maybe(q.quiz) : nothing()))
 		.match(
@@ -119,12 +116,6 @@ export const QuizData: React.FC = () => {
 					});
 					setArchiveModal(false);
 				};
-
-				const tNames = mbQuiz
-					.map(s => s.teacherNames)
-					.orElse([])
-					.join(", ");
-
 				return (
 					<Form>
 						<ShareQuizModal show={shareModal} onClose={closeShare} quiz={quiz} />

@@ -5,16 +5,19 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { Comment } from "@recapp/models";
+import { Comment, Id } from "@recapp/models";
 import { Button, Card } from "react-bootstrap";
 import { fromTimestamp } from "itu-utils";
-import { Check, HandThumbsUp } from "react-bootstrap-icons";
+import { Check, HandThumbsUp, Trash } from "react-bootstrap-icons";
 
-export const CommentCard: React.FC<{ comment: Comment; onUpvote: () => void; onAccept: () => void }> = ({
-	comment,
-	onUpvote,
-	onAccept,
-}) => {
+export const CommentCard: React.FC<{
+	comment: Comment;
+	userId: Id;
+	teachers: string[];
+	onUpvote: () => void;
+	onAccept: () => void;
+	onDelete: () => void;
+}> = ({ comment, onUpvote, onAccept, onDelete, teachers, userId }) => {
 	const [text, setText] = useState("");
 	useEffect(() => {
 		const f = async () => {
@@ -53,8 +56,21 @@ export const CommentCard: React.FC<{ comment: Comment; onUpvote: () => void; onA
 				<div className="d-flex flex-row align-items-center">
 					<div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
 					<div>
-						<Button variant="success" className="m-1" onClick={onAccept} disabled={comment.answered}>
+						<Button
+							variant="success"
+							className="m-1"
+							onClick={onAccept}
+							disabled={comment.answered || !teachers.includes(userId)}
+						>
 							<Check color="white" />
+						</Button>
+						<Button
+							variant="danger"
+							className="m-1"
+							onClick={onDelete}
+							disabled={comment.authorId !== userId && !teachers.includes(userId)}
+						>
+							<Trash color="white" />
 						</Button>
 					</div>
 				</div>

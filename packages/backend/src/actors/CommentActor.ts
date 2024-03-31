@@ -3,6 +3,7 @@ import {
 	Comment,
 	CommentActorMessage,
 	CommentActorMessages,
+	CommentDeletedMessage,
 	CommentUpdateMessage,
 	Id,
 	commentSchema,
@@ -55,6 +56,7 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
 		}
+		console.log("COMMENTACTOR", from.name, message);
 		try {
 			return await CommentActorMessages.match<Promise<ResultType>>(message, {
 				Create: async comment => {
@@ -160,6 +162,25 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
 					return unit();
+				},
+				Delete: async id => {
+					const existingComment = await this.getEntity(id);
+					return await existingComment
+						.map(async c => {
+							if (!["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+								return new Error("Invalid write access to comment");
+							}
+
+							await this.deleteEntity(id);
+							for (const [subscriber] of this.state.collectionSubscribers) {
+								this.send(subscriber, new CommentDeletedMessage(id));
+							}
+							for (const subscriber of this.state.subscribers.get(id) ?? new Set()) {
+								this.send(subscriber, new CommentDeletedMessage(id));
+							}
+							return unit();
+						})
+						.orElse(Promise.resolve(unit()));
 				},
 			});
 		} catch (e) {

@@ -7,6 +7,7 @@ import {
 	QuestionUpdateMessage,
 	questionSchema,
 	toId,
+	QuestionDeletedMessage,
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
@@ -54,6 +55,7 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 		const idsToReset = Array.from(this.state.cache.values())
 			.filter(question => question.editMode && question.updated < cutOff)
 			.map(q => q.uid);
+		console.log("QUESTIONACTOR - resetting the stalled questions", idsToReset);
 		idsToReset.map(id => {
 			maybe(this.state.cache.get(id)).forEach(question => this.storeEntity({ ...question, editMode: false }));
 		});
@@ -158,6 +160,25 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
 					return unit();
+				},
+				Delete: async id => {
+					const existingComment = await this.getEntity(id);
+					return await existingComment
+						.map(async c => {
+							if (["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+								return new Error("Invalid write access to question");
+							}
+
+							await this.deleteEntity(id);
+							for (const [subscriber] of this.state.collectionSubscribers) {
+								this.send(subscriber, new QuestionDeletedMessage(id));
+							}
+							for (const subscriber of this.state.subscribers.get(id) ?? new Set()) {
+								this.send(subscriber, new QuestionDeletedMessage(id));
+							}
+							return unit();
+						})
+						.orElse(Promise.resolve(unit()));
 				},
 			});
 		} catch (e) {

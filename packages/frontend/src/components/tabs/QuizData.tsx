@@ -3,13 +3,20 @@ import { useStatefulActor } from "ts-actors-react";
 import { Quiz, Comment } from "@recapp/models";
 import { Button, Form, InputGroup, Modal } from "react-bootstrap";
 import { maybe, nothing } from "tsmonads";
-import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
+import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Pencil, Share, Trash } from "react-bootstrap-icons";
 import { useEffect, useState } from "react";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 import { SharingMessages, SharingState } from "../../actors/SharingActor";
+import { YesNoModal } from "../modals/YesNoModal";
+import { toTimestamp } from "itu-utils";
 
-const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({ quiz, show, onClose }) => {
+const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({
+	quiz,
+	teachnerNames,
+	show,
+	onClose,
+}) => {
 	const [name, setName] = useState("");
 	const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
 	useEffect(() => {
@@ -93,7 +100,8 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 export const QuizData: React.FC = () => {
 	const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false });
 	const [shareModal, setShareModal] = useState(false);
-	const [mbQuiz, tryActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[] }>("CurrentQuiz");
+	const [archiveModal, setArchiveModal] = useState(false);
+	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 
 	const update = (q: Partial<Quiz>) => tryActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update(q)));
 
@@ -105,9 +113,28 @@ export const QuizData: React.FC = () => {
 		.flatMap(q => (!!q.quiz.uid ? maybe(q.quiz) : nothing()))
 		.match(
 			quiz => {
+				const archive = () => {
+					tryActor.forEach(actor => {
+						actor.send(actor, CurrentQuizMessages.Update({ uid: quiz.uid, archived: toTimestamp() }));
+					});
+					setArchiveModal(false);
+				};
+
+				const tNames = mbQuiz
+					.map(s => s.teacherNames)
+					.orElse([])
+					.join(", ");
+
 				return (
 					<Form>
 						<ShareQuizModal show={shareModal} onClose={closeShare} quiz={quiz} />
+						<YesNoModal
+							show={archiveModal}
+							onClose={() => setShareModal(false)}
+							onSubmit={archive}
+							titleId="archive-quiz-title"
+							textId="archive-quiz-title"
+						/>
 						<CreateGroupModal
 							show={textEdit.show}
 							invalidValues={[]}
@@ -169,7 +196,7 @@ export const QuizData: React.FC = () => {
 						<Form.Group className="mb-2">
 							<Form.Text>Lehrpersonen mit Zugriff</Form.Text>
 							<InputGroup>
-								<Form.Control type="text" value={(quiz.teachers ?? []).join(", ")} disabled />
+								<Form.Control type="text" value={tNames} disabled />
 								<div>
 									<Button onClick={() => setShareModal(true)}>
 										<Share />
@@ -262,6 +289,9 @@ export const QuizData: React.FC = () => {
 							checked={quiz.shuffleQuestions}
 							onChange={event => update({ shuffleQuestions: event.target.checked })}
 						/>
+						<Button variant="warning" onClick={() => setArchiveModal(true)}>
+							Quiz archivieren
+						</Button>
 					</Form>
 				);
 			},

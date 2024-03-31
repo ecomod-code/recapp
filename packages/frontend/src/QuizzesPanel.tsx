@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, Id, QuestionGroup } from "@recapp/models";
+import { Quiz, User, Id, QuestionGroup, toId } from "@recapp/models";
 import { Badge, Button, Card, Container } from "react-bootstrap";
-import { Pencil, Share, SignStop } from "react-bootstrap-icons";
+import { Pencil, Share, SignStop, Trash } from "react-bootstrap-icons";
 import { useNavigate } from "react-router-dom";
 import { ShareModal } from "./components/modals/ShareModal";
 import { fromTimestamp } from "itu-utils";
+import { YesNoModal } from "./components/modals/YesNoModal";
+import { ArchiveQuizMessage } from "./actors/LocalUserActor";
 
 const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
 	groups.reduce((count, group) => count + (group?.questions?.length ?? 0), 0);
 
-const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void }> = ({ quiz, onShare }) => {
+const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDelete?: () => void }> = ({
+	quiz,
+	onShare,
+	onDelete,
+}) => {
 	const nav = useNavigate();
 	return (
 		<Card className="m-2 p-0">
@@ -43,7 +49,10 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void }> = ({ quiz
 					<Button className="ms-3" variant="secondary" onClick={onShare}>
 						<Share />
 					</Button>
-					<Button className="ms-3" variant="danger">
+					<Button className="ms-3" variant="danger" onClick={onDelete}>
+						<Trash />
+					</Button>
+					<Button className="ms-3" variant="danger" disabled={!onDelete}>
 						<SignStop />
 					</Button>
 				</div>
@@ -55,9 +64,20 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void }> = ({ quiz
 export const Quizzes: React.FC = () => {
 	const nav = useNavigate();
 	const [shareModal, setShareModal] = useState("");
+	const [deleteModal, setDeleteModal] = useState(toId(""));
 	const [quizzes, setQuizzes] = useState<Array<Partial<Quiz>>>();
-	const [state] = useStatefulActor<{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>> }>("LocalUser");
+	const updateCounterRef = useRef<number>(0);
+	const [state, tryLocalUserActor] = useStatefulActor<{
+		user: User | undefined;
+		quizzes: Map<Id, Partial<Quiz>>;
+		updateCounter: number;
+	}>("LocalUser");
 	useEffect(() => {
+		const counter = state.map(s => s.updateCounter).orElse(0);
+		if (counter === updateCounterRef.current) {
+			return;
+		}
+		updateCounterRef.current = counter;
 		const q: Array<Partial<Quiz>> = state.map(s => Array.from(s.quizzes.values())).orElse([]);
 		setQuizzes(
 			q.toSorted((a, b) => {
@@ -66,12 +86,43 @@ export const Quizzes: React.FC = () => {
 		);
 	}, [state]);
 
+	const deleteAllowed = (quiz: Partial<Quiz>): true | undefined => {
+		const isAdmin = state
+			.map(s => s.user)
+			.map(u => u?.role === "ADMIN")
+			.orElse(false);
+		const isTeacher = state
+			.map(s => s.user)
+			.map(u => (u?.uid && quiz.teachers?.includes(u?.uid)) ?? false)
+			.orElse(false);
+		return isAdmin || isTeacher ? true : undefined;
+	};
+
+	const deleteQuestion = () => {
+		tryLocalUserActor.forEach(q => q.send(q, new ArchiveQuizMessage(deleteModal)));
+		setDeleteModal(toId(""));
+	};
+
 	return (
 		<Container fluid>
+			<YesNoModal
+				show={!!deleteModal}
+				titleId="archive-quiz-title"
+				textId="archive-quiz-text"
+				onClose={() => setDeleteModal(toId(""))}
+				onSubmit={deleteQuestion}
+			/>
 			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
 			<Container fluid style={{ maxHeight: "70vh", overflowY: "auto" }}>
 				{(quizzes ?? []).map(q => {
-					return <QuizCard key={q.uid} quiz={q} onShare={() => setShareModal(q.uniqueLink!)} />;
+					return (
+						<QuizCard
+							key={q.uid}
+							quiz={q}
+							onShare={() => setShareModal(q.uniqueLink!)}
+							onDelete={deleteAllowed(q) && (() => setDeleteModal(q.uid!))}
+						/>
+					);
 				})}
 			</Container>
 			<Button onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}>

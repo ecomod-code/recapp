@@ -3,10 +3,10 @@ import { i18n } from "@lingui/core";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, toId, Comment, Question, QuestionGroup, Id } from "@recapp/models";
 import { Badge, Button, Card, Container, Row, Accordion, Breadcrumb, Tab, Tabs } from "react-bootstrap";
-import { ArrowDown, ArrowUp, Check, Pencil, TrainFront } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, Check, Pencil, TrainFront, Trash } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 import { QuizData } from "../components/tabs/QuizData";
@@ -15,6 +15,7 @@ import { ChangeGroupModal } from "../components/modals/ChangeGroupModal";
 import { toTimestamp, debug } from "itu-utils";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { ShareModal } from "../components/modals/ShareModal";
+import { YesNoModal } from "../components/modals/YesNoModal";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -28,6 +29,7 @@ const QuestionCard = (props: {
 	moveUp: () => void;
 	moveDown: () => void;
 	approve: () => void;
+	delete: () => void;
 	edit: () => void;
 	changeGroup: () => void;
 	disabled: boolean;
@@ -81,6 +83,14 @@ const QuestionCard = (props: {
 						>
 							<Check />
 						</Button>
+						<Button
+							className="m-2"
+							variant={"danger"}
+							onClick={props.delete}
+							disabled={props.disabled || props.question.approved}
+						>
+							<Trash />
+						</Button>
 					</div>
 				</div>
 			</Card.Body>
@@ -92,6 +102,7 @@ export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
 	const [shareModal, setShareModal] = useState("");
+	const [deleteModal, setDeleteModal] = useState(toId(""));
 	const { state } = useLocation();
 	const quizId: Id = state.quizId;
 	const activate = state.activate;
@@ -129,9 +140,17 @@ export const QuizPage: React.FC = () => {
 		currentGroup: "",
 	});
 
-	const questions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
-	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
+	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
+	const unfilteredQuestions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
+	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
+	const questions = unfilteredQuestions.filter(q => {
+		const user: Id = localUser.map(l => l.uid).orElse(toId(""));
+		if (q.approved) return true;
+		if (q.authorId === user) return true;
+		if (teachers.includes(user)) return true;
+		return false;
+	});
 
 	const upvoteComment = (commentId: Id) => {
 		tryQuizActor.forEach(actor => {
@@ -140,8 +159,18 @@ export const QuizPage: React.FC = () => {
 	};
 
 	const finishComment = (commentId: Id) => {
+		const user: Id = localUser.map(l => l.uid).orElse(toId(""));
+		if (!teachers.includes(user)) {
+			return;
+		}
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.FinishComment(commentId));
+		});
+	};
+
+	const deleteComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
 		});
 	};
 
@@ -248,9 +277,21 @@ export const QuizPage: React.FC = () => {
 					setShowMDModal(false);
 				};
 
+				const deleteQuestion = () => {
+					tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.DeleteQuestion(deleteModal)));
+					setDeleteModal(toId(""));
+				};
+
 				return (
 					<Container fluid>
 						<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
+						<YesNoModal
+							show={!!deleteModal}
+							titleId="delete-question-title"
+							textId="delete-question-text"
+							onClose={() => setDeleteModal(toId(""))}
+							onSubmit={deleteQuestion}
+						/>
 						<MarkdownModal
 							titleId="new-comment-title"
 							editorValue=""
@@ -383,7 +424,7 @@ export const QuizPage: React.FC = () => {
 																			<strong>{questionGroup.name} </strong>
 																		</div>
 																		<div>
-																			{questionGroup.questions.length}{" "}
+																			{questionGroup.questions?.length ?? 0}{" "}
 																			Frage(n)&nbsp;&nbsp;
 																		</div>
 																		<Button
@@ -425,6 +466,9 @@ export const QuizPage: React.FC = () => {
 																								q!.uid,
 																								q!.approved
 																							)
+																						}
+																						delete={() =>
+																							setDeleteModal(q!.uid)
 																						}
 																						edit={() =>
 																							editQuestion(
@@ -535,9 +579,12 @@ export const QuizPage: React.FC = () => {
 										c.sort(sortComments).map(cmt => (
 											<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
 												<CommentCard
+													teachers={teachers}
+													userId={localUser.map(l => l.uid).orElse(toId(""))}
 													comment={cmt}
 													onUpvote={() => upvoteComment(cmt.uid)}
 													onAccept={() => finishComment(cmt.uid)}
+													onDelete={() => deleteComment(cmt.uid)}
 												/>
 											</div>
 										))

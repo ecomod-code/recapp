@@ -247,6 +247,12 @@ export const QuestionEdit: React.FC = () => {
 		handleClose();
 	};
 
+	const deleteComment = (commentId: Id) => {
+		tryQuizActor.forEach(actor => {
+			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
+		});
+	};
+
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
 	return (
@@ -290,9 +296,33 @@ export const QuestionEdit: React.FC = () => {
 				style={{ marginLeft: "-0.5rem", marginRight: "-0.5rem" }}
 			>
 				<Breadcrumb>
-					<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>Dashboard</Breadcrumb.Item>
 					<Breadcrumb.Item
-						onClick={() =>
+						onClick={() => {
+							tryQuizActor.forEach(actor =>
+								actor.send(
+									actor.name,
+									CurrentQuizMessages.UpdateQuestion({
+										question: { uid: toId(questionId), editMode: false },
+										group: selectedGroup,
+									})
+								)
+							);
+							nav({ pathname: "/Dashboard" });
+						}}
+					>
+						Dashboard
+					</Breadcrumb.Item>
+					<Breadcrumb.Item
+						onClick={() => {
+							tryQuizActor.forEach(actor =>
+								actor.send(
+									actor.name,
+									CurrentQuizMessages.UpdateQuestion({
+										question: { uid: toId(questionId), editMode: false },
+										group: selectedGroup,
+									})
+								)
+							);
 							nav(
 								{ pathname: "/Dashboard/quiz" },
 								{
@@ -300,8 +330,8 @@ export const QuestionEdit: React.FC = () => {
 										quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
 									},
 								}
-							)
-						}
+							);
+						}}
 					>
 						{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 					</Breadcrumb.Item>
@@ -492,9 +522,12 @@ export const QuestionEdit: React.FC = () => {
 							c.sort(sortComments).map(cmt => (
 								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
 									<CommentCard
+										userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+										teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
 										comment={cmt}
 										onUpvote={() => upvoteComment(cmt.uid)}
 										onAccept={() => finishComment(cmt.uid)}
+										onDelete={() => deleteComment(cmt.uid)}
 									/>
 								</div>
 							))

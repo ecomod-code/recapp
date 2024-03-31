@@ -219,6 +219,14 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					return toId("");
 				},
+				GetNames: async ids => {
+					const db = await this.connector.db();
+					const users = await db
+						.collection<User>(this.collectionName)
+						.find({ uid: { $in: ids } }, { username: 1, nickname: 1, uid: 1, _id: 0 } as any)
+						.toArray();
+					return users;
+				},
 				default: async () => {
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);
 				},

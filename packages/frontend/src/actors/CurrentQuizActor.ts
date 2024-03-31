@@ -13,7 +13,9 @@ import {
 	QuestionUpdateMessage,
 	Question,
 	QuestionActorMessages,
-	QuestionGroup,
+	QuestionDeletedMessage,
+	CommentDeletedMessage,
+	UserStoreMessages,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
@@ -34,6 +36,9 @@ export const CurrentQuizMessages = unionize(
 			question: Omit<Question, "uid" | "authorName" | "authorId" | "created" | "updated">;
 			group: string;
 		}>(),
+		DeleteQuestion: ofType<Id>(),
+		DeleteComment: ofType<Id>(),
+		GetTeacherNames: {},
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
 	},
@@ -42,19 +47,23 @@ export const CurrentQuizMessages = unionize(
 
 export type CurrentQuizMessage = UnionOf<typeof CurrentQuizMessages>;
 
-type MessageType = QuizUpdateMessage | CommentUpdateMessage | QuestionUpdateMessage | CurrentQuizMessage;
+type MessageType =
+	| QuizUpdateMessage
+	| CommentUpdateMessage
+	| QuestionUpdateMessage
+	| CurrentQuizMessage
+	| QuestionDeletedMessage
+	| CommentDeletedMessage;
 
-export class CurrentQuizActor extends StatefulActor<
-	MessageType,
-	Unit,
-	{ quiz: Quiz; comments: Comment[]; questions: Question[] }
-> {
+export type CurrentQuizState = { quiz: Quiz; comments: Comment[]; questions: Question[]; teacherNames: string[] };
+
+export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQuizState> {
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { quiz: {} as Quiz, comments: [], questions: [] };
+		this.state = { quiz: {} as Quiz, comments: [], questions: [], teacherNames: [] };
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
@@ -63,6 +72,9 @@ export class CurrentQuizActor extends StatefulActor<
 			this.updateState(draft => {
 				draft.quiz = { ...draft.quiz, ...message.quiz };
 			});
+			if (message.quiz.teachers) {
+				this.send(this.ref, CurrentQuizMessages.GetTeacherNames(message.quiz.teachers));
+			}
 			return nothing();
 		} else if (message.tag === "CommentUpdateMessage") {
 			this.updateState(draft => {
@@ -78,6 +90,16 @@ export class CurrentQuizActor extends StatefulActor<
 				draft.questions.sort((a, b) => a.uid.localeCompare(b.uid));
 			});
 			return nothing();
+		} else if (message.tag === "QuestionDeletedMessage") {
+			this.updateState(draft => {
+				draft.questions = draft.questions.filter(u => u.uid != message.id);
+			});
+			return nothing();
+		} else if (message.tag === "CommentDeletedMessage") {
+			this.updateState(draft => {
+				draft.comments = draft.comments.filter(u => u.uid != message.id);
+			});
+			return nothing();
 		}
 		return maybe(message);
 	}
@@ -86,175 +108,212 @@ export class CurrentQuizActor extends StatefulActor<
 		const maybeLocalMessage = await this.handleRemoteUpdates(message);
 
 		// Deal with local messages
-		maybeLocalMessage.forEach(m =>
-			CurrentQuizMessages.match(m, {
-				Activate: async ({ userId, quizId }) => {
-					const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
-					const students = quiz.students;
-					if (!quiz.teachers.includes(userId)) {
-						students.push(userId);
-						this.send(this.ref, CurrentQuizMessages.Update({ uid: quizId, students }));
-					}
-				},
-				CreateQuiz: async creator => {
-					const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
-						title: i18n._("new-quiz-title"),
-						description: i18n._("new-quiz-description"),
-						state: "ACTIVE",
-						groups: [{ name: i18n._("new-quiz-group"), questions: [] }],
-						studentQuestions: true,
-						studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
-						allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
-						shuffleQuestions: false,
-						studentComments: true,
-						teachers: [creator],
-						students: [],
-						created: toTimestamp(),
-						updated: toTimestamp(),
-						comments: [],
-					};
-					const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
-					this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));
-				},
-				AddComment: async comment => {
-					this.user.map(async u => {
-						const comments = this.state.quiz.comments ? [...this.state.quiz.comments] : [];
-						const uid: Id = await this.ask(
-							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							CommentActorMessages.Create({
-								authorName: u.username,
-								authorId: u.uid,
-								...comment,
-							})
-						);
-						comments.push(uid);
-						this.send(this.ref!, CurrentQuizMessages.Update({ comments: comments }));
-					});
-				},
-				AddQuestion: async ({ question, group }) => {
-					question.editMode = false;
-					try {
-						await this.user.map(async u => {
-							if (this.state.quiz.teachers.includes(u.uid)) {
-								console.debug("Auto-approving question");
-								question.approved = true; // Teacher questions are automatically approved
-							}
+		return maybeLocalMessage
+			.map(m =>
+				CurrentQuizMessages.match<Promise<Unit>>(m, {
+					Activate: async ({ userId, quizId }) => {
+						const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
+						const students = quiz.students;
+						if (!quiz.teachers.includes(userId)) {
+							students.push(userId);
+							this.send(this.ref, CurrentQuizMessages.Update({ uid: quizId, students }));
+						}
+						return unit();
+					},
+					CreateQuiz: async creator => {
+						const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
+							title: i18n._("new-quiz-title"),
+							description: i18n._("new-quiz-description"),
+							state: "ACTIVE",
+							groups: [{ name: i18n._("new-quiz-group"), questions: [] }],
+							studentQuestions: true,
+							studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
+							allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
+							shuffleQuestions: false,
+							studentComments: true,
+							teachers: [creator],
+							students: [],
+							created: toTimestamp(),
+							updated: toTimestamp(),
+							comments: [],
+						};
+						const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
+						this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));
+						return unit();
+					},
+					AddComment: async comment => {
+						this.user.map(async u => {
+							const comments = this.state.quiz.comments ? [...this.state.quiz.comments] : [];
 							const uid: Id = await this.ask(
-								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-								QuestionActorMessages.Create({
+								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								CommentActorMessages.Create({
 									authorName: u.username,
 									authorId: u.uid,
-									...question,
+									...comment,
 								})
 							);
-							const groups = this.state.quiz.groups;
-							const addTo = groups.find(g => g.name === group);
-							addTo?.questions.push(uid);
-							this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+							comments.push(uid);
+							this.send(this.ref, CurrentQuizMessages.Update({ comments: comments }));
 						});
-					} catch (e) {
-						alert(e);
-						throw e;
-					}
-				},
-				UpdateQuestion: async ({ question, group }) => {
-					if (!question.editMode) {
+						return unit();
+					},
+					DeleteComment: async id => {
+						await this.ask(
+							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							CommentActorMessages.Delete(id)
+						);
+						return unit();
+					},
+					DeleteQuestion: async id => {
+						await this.ask(
+							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							QuestionActorMessages.Delete(id)
+						);
+						return unit();
+					},
+					AddQuestion: async ({ question, group }) => {
 						question.editMode = false;
-					}
-					await this.send(
-						`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-						QuestionActorMessages.Update(question)
-					);
-					if (!group) {
-						return;
-					}
-					const groups = this.state.quiz.groups.map(g => {
-						if (g.questions.includes(question.uid)) {
-							g.questions = g.questions.filter(q => q !== question.uid);
+						try {
+							await this.user.map(async u => {
+								if (this.state.quiz.teachers.includes(u.uid)) {
+									console.debug("Auto-approving question");
+									question.approved = true; // Teacher questions are automatically approved
+								}
+								const uid: Id = await this.ask(
+									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									QuestionActorMessages.Create({
+										authorName: u.username,
+										authorId: u.uid,
+										...question,
+									})
+								);
+								const groups = this.state.quiz.groups;
+								const addTo = groups.find(g => g.name === group);
+								addTo?.questions.push(uid);
+								this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+							});
+						} catch (e) {
+							alert(e);
+							throw e;
 						}
-						return g;
-					});
-					const addTo = groups.find(g => g.name === group);
-					addTo?.questions.push(question.uid);
-					this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
-				},
-				FinishComment: async uid => {
-					this.send(
-						`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-						CommentActorMessages.Update({
-							uid,
-							answered: true,
-						})
-					);
-				},
-				UpvoteComment: async commentId => {
-					this.user.forEach(u => {
+						return unit();
+					},
+					UpdateQuestion: async ({ question, group }) => {
+						if (!question.editMode) {
+							question.editMode = false;
+						}
+						this.send(
+							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							QuestionActorMessages.Update(question)
+						);
+						if (!group) {
+							return unit();
+						}
+						const groups = this.state.quiz.groups.map(g => {
+							if (g.questions.includes(question.uid)) {
+								g.questions = g.questions.filter(q => q !== question.uid);
+							}
+							return g;
+						});
+						const addTo = groups.find(g => g.name === group);
+						addTo?.questions.push(question.uid);
+						this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+						return unit();
+					},
+					FinishComment: async uid => {
 						this.send(
 							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							CommentActorMessages.Upvote({
-								commentId,
-								userId: u.uid,
+							CommentActorMessages.Update({
+								uid,
+								answered: true,
 							})
 						);
-					});
-				},
-				SetUser: async user => {
-					this.user = maybe(user);
-					this.quiz.forEach(q => {
-						this.send(this.actorRef!, CurrentQuizMessages.SetQuiz(q));
-					});
-				},
-				SetQuiz: async uid => {
-					try {
-						if (uid === this.state.quiz.uid) {
-							return;
-						}
-						this.state = { ...this.state, comments: [], questions: [] };
-						this.quiz.forEach(q => {
-							this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
-						});
-						this.quiz.forEach(q => {
+						return unit();
+					},
+					UpvoteComment: async commentId => {
+						this.user.forEach(u => {
 							this.send(
 								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-								CommentActorMessages.UnsubscribeFromCollection()
+								CommentActorMessages.Upvote({
+									commentId,
+									userId: u.uid,
+								})
+							);
+						});
+						return unit();
+					},
+					SetUser: async user => {
+						this.user = maybe(user);
+						this.quiz.forEach(q => {
+							this.send(this.actorRef!, CurrentQuizMessages.SetQuiz(q));
+						});
+						return unit();
+					},
+					SetQuiz: async uid => {
+						try {
+							if (uid === this.state.quiz.uid) {
+								return unit();
+							}
+							this.state = { ...this.state, comments: [], questions: [] };
+							this.quiz.forEach(q => {
+								this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
+							});
+							this.quiz.forEach(q => {
+								this.send(
+									`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									CommentActorMessages.UnsubscribeFromCollection()
+								);
+								this.send(
+									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									QuestionActorMessages.UnsubscribeFromCollection()
+								);
+							});
+							this.quiz = maybe(uid);
+							const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
+							this.send(this.ref, CurrentQuizMessages.GetTeacherNames(quizData.teachers));
+							this.send(
+								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								CommentActorMessages.GetAll()
 							);
 							this.send(
 								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-								QuestionActorMessages.UnsubscribeFromCollection()
+								QuestionActorMessages.GetAll()
 							);
-						});
-						this.quiz = maybe(uid);
-						const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
-						this.send(
-							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							CommentActorMessages.GetAll()
-						);
-						this.send(
-							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							QuestionActorMessages.GetAll()
+							this.updateState(draft => {
+								draft.quiz = quizData;
+							});
+							this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
+							this.send(
+								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								CommentActorMessages.SubscribeToCollection()
+							);
+							this.send(
+								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								QuestionActorMessages.SubscribeToCollection()
+							);
+						} catch (e) {
+							console.error(e);
+						}
+						return unit();
+					},
+					Update: async quiz => {
+						this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: this.state.quiz.uid, ...quiz }));
+						return unit();
+					},
+					GetTeacherNames: async () => {
+						const names: any[] = await this.ask(
+							actorUris.UserStore,
+							UserStoreMessages.GetNames(this.state.quiz.teachers)
 						);
 						this.updateState(draft => {
-							draft.quiz = quizData;
+							draft.teacherNames = names.map(n =>
+								n.nickname ? `${n.username} (${n.nickname})` : n.username
+							) as string[];
 						});
-						this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
-						this.send(
-							`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							CommentActorMessages.SubscribeToCollection()
-						);
-						this.send(
-							`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-							QuestionActorMessages.SubscribeToCollection()
-						);
-					} catch (e) {
-						console.error(e);
-					}
-				},
-				Update: async quiz => {
-					this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: this.state.quiz.uid, ...quiz }));
-				},
-			})
-		);
-
-		return unit();
+						return unit();
+					},
+				})
+			)
+			.orElse(Promise.resolve(unit()));
 	}
 }

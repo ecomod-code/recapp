@@ -45,6 +45,19 @@ export const runOptionsSchema = zod.object({
 	runningEntity: uidSchema.optional(), // Which question/group should be run when the quiz is started? If empty, run whole quiz
 });
 
+/** A RUN is a quiz run for a single student. It holds the individual student's question order and his answers */
+export const quizRunSchema = zod
+	.object({
+		studentId: uidSchema, // Which student's run is this
+		quizId: uidSchema, // To which quiz does it belong
+		questions: zod.array(uidSchema), // Order of questions to ask
+		counter: zod.number().int(), // Current question that was not answered yet
+		answers: zod.array(zod.union([zod.string(), zod.array(zod.number())])), // The answers the student has given
+	})
+	.merge(idEntitySchema);
+
+export type QuizRun = zod.infer<typeof quizRunSchema>;
+
 export const quizSchema = zod
 	.object({
 		title: zod.string(), // Quiz title

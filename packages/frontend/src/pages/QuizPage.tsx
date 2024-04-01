@@ -34,19 +34,30 @@ const QuestionCard = (props: {
 	changeGroup: () => void;
 	disabled: boolean;
 	currentUserUid: Id;
+	editMode: boolean;
 }) => {
 	return (
 		<Card className="p-0">
 			<Card.Body as="div" className="p-0 m-0 d-flex flex-row align-items-center">
 				<div className="d-flex flex-column h-100 me-1">
 					<div>
-						<Button variant="light" size="sm" onClick={props.moveUp} disabled={props.disabled}>
+						<Button
+							variant="light"
+							size="sm"
+							onClick={props.moveUp}
+							disabled={props.disabled || !props.editMode}
+						>
 							<ArrowUp />
 						</Button>
 					</div>
 					<div className="flex-grow-1">&nbsp;</div>
 					<div>
-						<Button variant="light" size="sm" onClick={props.moveDown} disabled={props.disabled}>
+						<Button
+							variant="light"
+							size="sm"
+							onClick={props.moveDown}
+							disabled={props.disabled || !props.editMode}
+						>
 							<ArrowDown />
 						</Button>
 					</div>
@@ -67,19 +78,24 @@ const QuestionCard = (props: {
 							disabled={
 								props.question.editMode ||
 								(props.disabled &&
-									(props.question.authorId !== props.currentUserUid || props.question.approved))
+									(props.question.authorId !== props.currentUserUid || props.question.approved)) ||
+								!props.editMode
 							}
 						>
 							<Pencil />
 						</Button>
-						<Button className="m-2" onClick={props.changeGroup} disabled={props.disabled}>
+						<Button
+							className="m-2"
+							onClick={props.changeGroup}
+							disabled={props.disabled || !props.editMode}
+						>
 							<TrainFront />
 						</Button>
 						<Button
 							className="m-2"
 							variant={props.question.approved ? "success" : "warning"}
 							onClick={props.approve}
-							disabled={props.disabled}
+							disabled={props.disabled || !props.editMode}
 						>
 							<Check />
 						</Button>
@@ -87,7 +103,7 @@ const QuestionCard = (props: {
 							className="m-2"
 							variant={"danger"}
 							onClick={props.delete}
-							disabled={props.disabled || props.question.approved}
+							disabled={props.disabled || props.question.approved || !props.editMode}
 						>
 							<Trash />
 						</Button>
@@ -261,6 +277,7 @@ export const QuizPage: React.FC = () => {
 				};
 
 				const disableForStudent = mbLocalUser.map(u => allowed(u.user)).orElse(true);
+				const disableForStudentOrMode = disableForStudent || quizData.quiz.state !== "EDITING";
 
 				const addComment = (value: string) => {
 					mbLocalUser.forEach(lu => {
@@ -376,14 +393,14 @@ export const QuizPage: React.FC = () => {
 																					as="div"
 																					variant="light"
 																					className={
-																						disableForStudent
+																						disableForStudentOrMode
 																							? "disabled"
 																							: undefined
 																					}
 																					size="sm"
 																					onClick={() =>
 																						index !== 0 &&
-																						!disableForStudent &&
+																						!disableForStudentOrMode &&
 																						moveGroup(
 																							questionGroup.name,
 																							true
@@ -399,7 +416,7 @@ export const QuizPage: React.FC = () => {
 																					as="div"
 																					variant="light"
 																					className={
-																						disableForStudent
+																						disableForStudentOrMode
 																							? "disabled"
 																							: undefined
 																					}
@@ -409,7 +426,7 @@ export const QuizPage: React.FC = () => {
 																							quizData.quiz.groups
 																								.length -
 																								1 &&
-																						!disableForStudent &&
+																						!disableForStudentOrMode &&
 																						moveGroup(
 																							questionGroup.name,
 																							false
@@ -431,10 +448,12 @@ export const QuizPage: React.FC = () => {
 																			as="div"
 																			className={
 																				"me-4 " +
-																				(disableForStudent ? "disabled" : "")
+																				(disableForStudentOrMode
+																					? "disabled"
+																					: "")
 																			}
 																			onClick={() =>
-																				!disableForStudent &&
+																				!disableForStudentOrMode &&
 																				setCurrentGroup({
 																					showNameModal: true,
 																					name: questionGroup.name,
@@ -459,6 +478,10 @@ export const QuizPage: React.FC = () => {
 																			.map((q, i) => {
 																				return (
 																					<QuestionCard
+																						editMode={
+																							quizData.quiz.state ===
+																							"EDITING"
+																						}
 																						question={q!}
 																						key={q!.uid}
 																						approve={() =>
@@ -513,7 +536,9 @@ export const QuizPage: React.FC = () => {
 																						currentUserUid={mbLocalUser
 																							.map(u => u.user.uid)
 																							.orElse(toId(""))}
-																						disabled={disableForStudent}
+																						disabled={
+																							disableForStudentOrMode
+																						}
 																					/>
 																				);
 																			})}
@@ -527,7 +552,7 @@ export const QuizPage: React.FC = () => {
 													className="m-2"
 													style={{ width: "12rem" }}
 													onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
-													disabled={disableForStudent}
+													disabled={disableForStudentOrMode}
 												>
 													Gruppe hinzufügen
 												</Button>
@@ -537,7 +562,10 @@ export const QuizPage: React.FC = () => {
 													onClick={() => {
 														nav({ pathname: "/Dashboard/Question" });
 													}}
-													disabled={disableForStudent && !quizData.quiz.studentQuestions}
+													disabled={
+														(disableForStudentOrMode && !quizData.quiz.studentQuestions) ||
+														quizData.quiz.state !== "EDITING"
+													}
 												>
 													Neue Frage
 												</Button>

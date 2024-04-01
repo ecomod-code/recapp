@@ -9,3 +9,4 @@ export * from "./messages/userStore";
 export * from "./messages/commentActor";
 export * from "./messages/questionActor";
 export * from "./messages/quizActor";
+export * from "./messages/quizRunActor";

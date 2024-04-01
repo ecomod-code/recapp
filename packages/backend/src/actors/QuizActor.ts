@@ -20,6 +20,7 @@ import { v4 } from "uuid";
 import { QuestionActor } from "./QuestionActor";
 import { createActorUri } from "../utils";
 import { keys } from "rambda";
+import { QuizRunActor } from "./QuizRunActor";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -37,7 +38,7 @@ type ResultType = any;
 export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultType> {
 	private commentActors = new Map<Id, ActorRef>();
 	private questionActors = new Map<Id, ActorRef>();
-	// private questionActors = new Map<Id, ActorRef>();
+	private runActors = new Map<Id, ActorRef>();
 
 	protected override state: State = {
 		cache: new Map(),
@@ -81,6 +82,15 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				this.logger.debug(`Question actor ${questions.name} created`);
 				this.questionActors.set(uid, questions);
 			}
+			if (!this.runActors.has(uid)) {
+				const quizRuns = await this.system.createActor(
+					QuizRunActor,
+					{ name: `QuizRun_${uid}`, parent: this.ref, strategy: "Restart" },
+					uid
+				);
+				this.logger.debug(`Quiz run actor ${quizRuns.name} created`);
+				this.runActors.set(uid, quizRuns);
+			}
 		} catch (e) {
 			this.logger.error(JSON.stringify(e));
 		}
@@ -96,6 +106,11 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			this.removeChild(c);
 			this.send(c, "SHUTDOWN");
 			this.questionActors.delete(uid);
+		});
+		maybe(this.runActors.get(uid)).forEach(c => {
+			this.removeChild(c);
+			this.send(c, "SHUTDOWN");
+			this.runActors.delete(uid);
 		});
 	}
 
@@ -142,6 +157,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					(quiz as Quiz).uniqueLink = `/activate?quiz=${uid}`;
 					(quiz as Quiz).created = toTimestamp();
 					(quiz as Quiz).updated = toTimestamp();
+					(quiz as Quiz).state = "EDITING";
 					const quizToCreate = quizSchema.parse(quiz);
 					await this.afterEntityWasCached(uid);
 					await this.storeEntity(quizToCreate);

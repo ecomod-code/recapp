@@ -13,6 +13,19 @@ import { ArchiveQuizMessage } from "./actors/LocalUserActor";
 const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
 	groups.reduce((count, group) => count + (group?.questions?.length ?? 0), 0);
 
+const getBG = (state: "EDITING" | "STOPPED" | "STARTED" | "ACTIVE"): string => {
+	switch (state) {
+		case "EDITING":
+			return "primary";
+		case "STARTED":
+			return "success";
+		case "STOPPED":
+			return "warning";
+		default:
+			return "secondary";
+	}
+};
+
 const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDelete?: () => void }> = ({
 	quiz,
 	onShare,
@@ -33,7 +46,7 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDelete?: 
 						)
 					</div>
 					<div className="flex-grow-1" />
-					<Badge as="div" bg="success">
+					<Badge as="div" bg={getBG(quiz.state ?? "ACTIVE")}>
 						{quiz.state}
 					</Badge>
 				</div>
@@ -51,9 +64,6 @@ const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDelete?: 
 					</Button>
 					<Button className="ms-3" variant="danger" onClick={onDelete}>
 						<Trash />
-					</Button>
-					<Button className="ms-3" variant="danger" disabled={!onDelete}>
-						<SignStop />
 					</Button>
 				</div>
 			</Card.Footer>

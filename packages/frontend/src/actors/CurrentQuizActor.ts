@@ -16,6 +16,7 @@ import {
 	QuestionDeletedMessage,
 	CommentDeletedMessage,
 	UserStoreMessages,
+	QuizRunActorMessages,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
@@ -41,6 +42,7 @@ export const CurrentQuizMessages = unionize(
 		GetTeacherNames: {},
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
+		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED">(),
 	},
 	{ value: "value" }
 );
@@ -120,11 +122,41 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 						}
 						return unit();
 					},
+					ChangeState: async newState => {
+						if (newState === "STARTED") {
+							if (["ACTIVE", "EDITING", "STOPPED"].includes(this.state.quiz.state)) {
+								this.send(
+									actorUris.QuizActor,
+									QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "STARTED" })
+								);
+								this.send(
+									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									QuizRunActorMessages.Clear()
+								);
+							}
+						} else if (newState === "STOPPED") {
+							if (["STARTED", "EDITING"].includes(this.state.quiz.state)) {
+								this.send(
+									actorUris.QuizActor,
+									QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "STOPPED" })
+								);
+							}
+						} else if (newState === "EDITING") {
+							if (this.state.quiz.state !== "EDITING") {
+								this.send(
+									actorUris.QuizActor,
+									QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "EDITING" })
+								);
+							}
+						}
+
+						return unit();
+					},
 					CreateQuiz: async creator => {
 						const quizData: Omit<Quiz, "uid" | "uniqueLink"> = {
 							title: i18n._("new-quiz-title"),
 							description: i18n._("new-quiz-description"),
-							state: "ACTIVE",
+							state: "EDITING",
 							groups: [{ name: i18n._("new-quiz-group"), questions: [] }],
 							studentQuestions: true,
 							studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },

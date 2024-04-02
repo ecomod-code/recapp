@@ -13,6 +13,7 @@ import { toTimestamp, debug } from "itu-utils";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { QuestionsTab } from "../components/tabs/QuestionsTab";
 import { RunningQuiz } from "../components/tabs/RunningQuiz";
+import { actorUris } from "../actorUris";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -37,7 +38,6 @@ export const QuizPage: React.FC = () => {
 		if (activate) {
 			tryQuizActor.forEach(q => {
 				mbLocalUser.forEach(lu => {
-					alert(activate);
 					q.send(q, CurrentQuizMessages.Activate({ userId: lu.user.uid, quizId }));
 					q.send(q, CurrentQuizMessages.SetQuiz(toId(quizId)));
 				});
@@ -108,21 +108,12 @@ export const QuizPage: React.FC = () => {
 					setShowMDModal(false);
 				};
 
-				function logQuestion(questionId: Id, answer: string | boolean[]): Promise<boolean> {
-					const actor = tryQuizActor.toMaybe().orUndefined();
-					if (actor)
-						return system
-							.map(
-								s =>
-									s.ask(
-										actor,
-										CurrentQuizMessages.LogAnswer({ questionId, answer })
-									) as Promise<boolean>
-							)
-							.toMaybe()
-							.orElse(Promise.resolve(false));
-					return Promise.resolve(false);
-				}
+				const logQuestion = (questionId: Id, answer: string | boolean[]) => {
+					console.log("SYS", system, "URI", actorUris["CurrentQuiz"]);
+					tryQuizActor.forEach(actor =>
+						actor.send(actorUris["CurrentQuiz"], CurrentQuizMessages.LogAnswer({ questionId, answer }))
+					);
+				};
 
 				return (
 					<Container fluid>
@@ -152,7 +143,7 @@ export const QuizPage: React.FC = () => {
 									</Tab>
 								)}
 								<Tab eventKey="questions" title={i18n._("quiz-tab-label-questions")}>
-									{disableForStudent ? (
+									{disableForStudent && quizData.quiz.state === "STARTED" ? (
 										<RunningQuiz quizState={quizData} logQuestion={logQuestion} />
 									) : (
 										<QuestionsTab

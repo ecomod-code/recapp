@@ -12,10 +12,11 @@ import { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { MessageModal } from "../modals/MessageModal";
 import { Id } from "@recapp/models";
 import MDEditor, { commands } from "@uiw/react-md-editor";
+import { last } from "rambda";
 
 export const RunningQuiz: React.FC<{
 	quizState: CurrentQuizState;
-	logQuestion: (questionId: Id, answer: string | boolean[]) => Promise<boolean>;
+	logQuestion: (questionId: Id, answer: string | boolean[]) => void;
 }> = ({ quizState, logQuestion }) => {
 	const [answered, setAnswered] = useState(false);
 	const [rendered, setRendered] = useState<string>("");
@@ -23,8 +24,22 @@ export const RunningQuiz: React.FC<{
 	const [textAnswer, setTextAnswer] = useState("");
 	const [answers, setAnswers] = useState<boolean[]>([]);
 	const { run, questions } = quizState;
-	const questionText = questions[run?.counter ?? 0].text;
+	console.log(
+		"QUES",
+		quizState.questions.length,
+		"RUN",
+		quizState.run,
+		"ENTRY",
+		quizState.run?.counter,
+		"FOO",
+		quizState.questions[0]
+	);
+
+	const questionText = questions.at(run?.counter ?? 0)?.text;
 	useEffect(() => {
+		if (!questionText) {
+			return;
+		}
 		const f = async () => {
 			const result = await unified()
 				.use(remarkParse)
@@ -38,11 +53,19 @@ export const RunningQuiz: React.FC<{
 		f();
 	}, [questionText]);
 
+	useEffect(() => {
+		setCorrect(last(quizState.run?.correct ?? []) ?? false);
+	}, [quizState.run?.correct.length]);
+
+	if (!quizState.run || !quizState.questions) {
+		return null;
+	}
+
 	const logQuestionClicked = () => {
 		logQuestion(
 			questions[run?.counter ?? 0].uid,
 			questions[run?.counter ?? 0].type === "TEXT" ? textAnswer : answers
-		).then(setCorrect);
+		);
 		setAnswered(true);
 	};
 
@@ -53,19 +76,21 @@ export const RunningQuiz: React.FC<{
 	};
 
 	const updateAnswer = (index: number, value: boolean) => {
-		if (answers.length === 0) {
-			const a = new Array(questions[run?.counter ?? 0].answers.length);
+		const answersCopy = questions[run?.counter ?? 0].type === "SINGLE" ? answers.map(() => false) : [...answers];
+		if (answersCopy.length === 0) {
+			const a = new Array(questions[run?.counter ?? 0].answers.length).map(() => false);
 			a[index] = value;
+			console.log("ANSWERS NEW", a);
 			setAnswers(a);
 		} else {
-			const a = [...answers];
+			const a = answersCopy;
 			a[index] = value;
+			console.log("ANSWERS", a);
 			setAnswers(a);
 		}
 	};
-
 	const currentQuestion = questions[run?.counter ?? 0];
-	const questionType = questions[run?.counter ?? 0].type;
+	const questionType = questions[run?.counter ?? 0]?.type;
 
 	return (
 		<Row>
@@ -151,7 +176,7 @@ export const RunningQuiz: React.FC<{
 					</Card.Header>
 					<Card.Body>
 						<div className="p-2 text-start h-30">
-							{questions.length} Fragen beantwortet. Davon ${run?.correct.filter(Boolean).length ?? 0}{" "}
+							{questions.length} Fragen beantwortet. Davon {run?.correct.filter(Boolean).length ?? 0}{" "}
 							richtige Antworten.
 						</div>
 						`

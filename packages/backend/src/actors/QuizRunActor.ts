@@ -57,7 +57,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
 		}
-		console.log("QUIZRUNACTOR", from.name, message);
+		console.log("QUIZRUNACTOR", from.name, JSON.stringify(message, undefined, 4));
 		try {
 			return await QuizRunActorMessages.match<Promise<ResultType>>(message, {
 				GetForUser: async ({ studentId, questions }) => {
@@ -82,6 +82,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 								answers: [],
 								created: toTimestamp(),
 								updated: toTimestamp(),
+								correct: [],
 							};
 							await this.storeEntity(run);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
@@ -124,7 +125,8 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 				},
 				Clear: async () => {
 					const db = await this.connector.db();
-					await db.collection<QuizRun>(this.collectionName).deleteMany({ quizId: this.uid });
+					const result = await db.collection<QuizRun>(this.collectionName).deleteMany({ quizId: this.uid });
+					console.warn(result);
 					this.state.cache = new Map();
 					this.state.subscribers.forEach(subscriberSet =>
 						subscriberSet.forEach(subscriber => this.send(subscriber, new QuizRunDeletedMessage()))

@@ -12,7 +12,7 @@ import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
 import { QuizPage } from "./pages/QuizPage";
 import { Activate } from "./Activate";
-import { RunningQuiz } from "./pages/RunningQuiz";
+import { RunningQuiz } from "./components/tabs/RunningQuiz";
 import { QuestionEdit } from "./pages/QuestionEdit";
 import { CreateQuiz } from "./pages/CreateQuiz";
 

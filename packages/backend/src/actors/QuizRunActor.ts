@@ -12,8 +12,9 @@ import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
-import { pick } from "rambda";
+import { identity, pick } from "rambda";
 import { v4 } from "uuid";
+import { maybe } from "tsmonads";
 
 type State = {
 	cache: Map<Id, QuizRun>;
@@ -59,24 +60,42 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 		console.log("QUIZRUNACTOR", from.name, message);
 		try {
 			return await QuizRunActorMessages.match<Promise<ResultType>>(message, {
-				Create: async run => {
-					(run as QuizRun).uid = v4() as Id;
-					const runToCreate = quizRunSchema.parse(run);
-					await this.storeEntity(runToCreate);
-					for (const [subscriber, subscription] of this.state.collectionSubscribers) {
-						this.send(
-							subscriber,
-							new QuizRunUpdateMessage(
-								subscription.properties.length > 0
-									? pick(subscription.properties, runToCreate)
-									: runToCreate
-							)
-						);
-					}
-					for (const subscriber of this.state.subscribers.get(runToCreate.uid) ?? new Set()) {
-						this.send(subscriber, new QuizRunUpdateMessage(runToCreate));
-					}
-					return runToCreate.uid;
+				GetForUser: async ({ studentId, questions }) => {
+					const db = await this.connector.db();
+					const mbRunId = maybe(
+						await db
+							.collection<QuizRun>(this.collectionName)
+							.findOne({ studentId }, { uid: 1, _id: 0 } as any)
+					);
+					const result = mbRunId.match<Promise<QuizRun | Error>>(
+						async runId => {
+							const run = await this.getEntity(runId.uid);
+							return run.match<QuizRun | Error>(identity, () => new Error());
+						},
+						async () => {
+							const run: QuizRun = {
+								uid: v4() as Id,
+								studentId,
+								quizId: this.uid,
+								counter: 0,
+								questions,
+								answers: [],
+								created: toTimestamp(),
+								updated: toTimestamp(),
+							};
+							await this.storeEntity(run);
+							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
+								this.send(
+									subscriber,
+									new QuizRunUpdateMessage(
+										subscription.properties.length > 0 ? pick(subscription.properties, run) : run
+									)
+								);
+							}
+							return run;
+						}
+					);
+					return result;
 				},
 				Update: async run => {
 					const existingRun = await this.getEntity(run.uid);

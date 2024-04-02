@@ -16,7 +16,7 @@ export const ShareModal: React.FC<Props> = ({ quizLink, onClose }) => {
 			</Modal.Title>
 			<Modal.Body>
 				<div className="d-flex flex-column flex-grow-1 align-items-center">
-					<QrCode level="H" value={ql} style={{ height: "80%", width: "80%" }} renderAs="svg" />
+					<QrCode level="H" value={ql} style={{ height: "60%", width: "60%" }} renderAs="svg" />
 					<div className="mt-4">
 						<a href={ql}>{ql}</a>
 					</div>

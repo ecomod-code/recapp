@@ -17,6 +17,8 @@ import {
 	CommentDeletedMessage,
 	UserStoreMessages,
 	QuizRunActorMessages,
+	QuizRun,
+	QuizRunUpdateMessage,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
@@ -43,6 +45,8 @@ export const CurrentQuizMessages = unionize(
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
 		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED">(),
+		StartQuiz: {}, // Start quiz for a participating student
+		LogAnswer: ofType<{ questionId: Id; answer: string | boolean[] }>(), // Sets the answer for the current quiz question, returns whether the answer was correct
 	},
 	{ value: "value" }
 );
@@ -55,17 +59,24 @@ type MessageType =
 	| QuestionUpdateMessage
 	| CurrentQuizMessage
 	| QuestionDeletedMessage
-	| CommentDeletedMessage;
+	| CommentDeletedMessage
+	| QuizRunUpdateMessage;
 
-export type CurrentQuizState = { quiz: Quiz; comments: Comment[]; questions: Question[]; teacherNames: string[] };
+export type CurrentQuizState = {
+	quiz: Quiz;
+	comments: Comment[];
+	questions: Question[];
+	teacherNames: string[];
+	run?: QuizRun;
+};
 
-export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQuizState> {
+export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean, CurrentQuizState> {
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { quiz: {} as Quiz, comments: [], questions: [], teacherNames: [] };
+		this.state = { quiz: {} as Quiz, comments: [], questions: [], teacherNames: [], run: undefined };
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
@@ -76,6 +87,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 			});
 			if (message.quiz.teachers) {
 				this.send(this.ref, CurrentQuizMessages.GetTeacherNames(message.quiz.teachers));
+			}
+			if (message.quiz.state === "STARTED" && !this.state.run) {
+				this.send(this.ref, CurrentQuizMessages.StartQuiz());
 			}
 			return nothing();
 		} else if (message.tag === "CommentUpdateMessage") {
@@ -102,17 +116,22 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 				draft.comments = draft.comments.filter(u => u.uid != message.id);
 			});
 			return nothing();
+		} else if (message.tag === "QuizRunUpdateMessage") {
+			this.updateState(draft => {
+				draft.run = { ...draft.run, ...message.run } as QuizRun;
+			});
+			return nothing();
 		}
 		return maybe(message);
 	}
 
-	async receive(_from: ActorRef, message: MessageType): Promise<Unit> {
+	async receive(_from: ActorRef, message: MessageType): Promise<Unit | boolean> {
 		const maybeLocalMessage = await this.handleRemoteUpdates(message);
 
 		// Deal with local messages
 		return maybeLocalMessage
 			.map(m =>
-				CurrentQuizMessages.match<Promise<Unit>>(m, {
+				CurrentQuizMessages.match<Promise<Unit | boolean>>(m, {
 					Activate: async ({ userId, quizId }) => {
 						const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
 						const students = quiz.students;
@@ -121,6 +140,49 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 							this.send(this.ref, CurrentQuizMessages.Update({ uid: quizId, students }));
 						}
 						return unit();
+					},
+					StartQuiz: async () => {
+						const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
+						const questions = this.state.quiz.groups.reduce(
+							(q, group) => [...q, ...group.questions],
+							[] as Id[]
+						);
+
+						const run: QuizRun = await this.ask(
+							`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+							QuizRunActorMessages.GetForUser({ studentId, questions })
+						);
+						this.updateState(draft => {
+							draft.run = run;
+						});
+						return unit();
+					},
+					LogAnswer: async ({ questionId, answer }) => {
+						if (this.state.run) {
+							const answers = [...this.state.run.answers, answer];
+							const question = this.state.questions.find(q => q.uid === questionId)!;
+							let answerCorrect = false;
+							if (question.type === "TEXT") {
+								answerCorrect = true;
+							} else {
+								answerCorrect = (answer as boolean[])
+									.map((a, i) => a === question.answers[i].correct)
+									.some(Boolean);
+							}
+							const correct = [...this.state.run.correct, answerCorrect];
+
+							this.send(
+								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								QuizRunActorMessages.Update({
+									uid: this.state.run.uid,
+									answers,
+									counter: this.state.run.counter + 1,
+									correct,
+								})
+							);
+							return answerCorrect;
+						}
+						return false;
 					},
 					ChangeState: async newState => {
 						if (newState === "STARTED") {
@@ -312,6 +374,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 								QuestionActorMessages.GetAll()
 							);
 							this.updateState(draft => {
+								draft.run = undefined;
 								draft.quiz = quizData;
 							});
 							this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
@@ -323,6 +386,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit, CurrentQu
 								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuestionActorMessages.SubscribeToCollection()
 							);
+							if (quizData.state === "STARTED") {
+								this.send(this.ref, CurrentQuizMessages.StartQuiz());
+							}
 						} catch (e) {
 							console.error(e);
 						}

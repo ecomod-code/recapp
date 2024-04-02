@@ -4,8 +4,8 @@ import { Id } from "../data/base";
 
 export const QuizRunActorMessages = unionize(
 	{
-		Create: ofType<Omit<QuizRun, "uid" | "created" | "updated">>(), // Create a new comment, returns the comment uid
 		Update: ofType<Partial<QuizRun> & { uid: Id }>(), // Update comment data, answers updated Comment
+		GetForUser: ofType<{ studentId: Id; questions: Id[] }>(), // Return a run for the given user id. Will be created if it doesn't exist yet
 		Clear: {},
 		SubscribeToCollection: {}, // Subscribe to all changes, sends back all updates to requester. Returns only the requested properties.
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes

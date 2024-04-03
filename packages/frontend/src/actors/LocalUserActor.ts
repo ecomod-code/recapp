@@ -8,6 +8,7 @@ import {
 	User,
 	UserStoreMessages,
 	UserUpdateMessage,
+	toId,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { actorUris } from "../actorUris";
@@ -39,6 +40,7 @@ export class LocalUserActor extends StatefulActor<
 					"title",
 					"state",
 					"students",
+					"teachers",
 					"groups",
 					"updated",
 					"archived",
@@ -69,7 +71,11 @@ export class LocalUserActor extends StatefulActor<
 					if (message.quiz.archived) {
 						draft.quizzes.delete(message.quiz.uid);
 					} else {
-						draft.quizzes.set(message.quiz.uid, message.quiz);
+						const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));
+						const isStudent = message.quiz.students?.includes(this.state.user?.uid ?? toId(""));
+						if (this.state.user?.role === "ADMIN" || isTeacher || isStudent) {
+							draft.quizzes.set(message.quiz.uid, message.quiz);
+						}
 					}
 					draft.updateCounter++;
 				}

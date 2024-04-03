@@ -119,6 +119,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 			});
 			return nothing();
 		} else if (message.tag === "QuizRunUpdateMessage") {
+			if (message.run.studentId !== this.user.map(u => u.uid).orElse(toId(""))) {
+				// Update is not meant for us
+				return nothing();
+			}
 			this.updateState(draft => {
 				draft.run = { ...draft.run, ...message.run } as QuizRun;
 			});

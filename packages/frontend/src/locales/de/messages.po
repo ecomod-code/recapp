@@ -201,7 +201,7 @@ msgstr "Fragen durch Studierende erstellen lassen"
 #: src/components/tabs/QuizData.tsx:105
 #: src/pages/CreateQuiz.tsx:88
 msgid "quiz-student-participation"
-msgstr "Studentische Teilnamemöglichkeiten"
+msgstr "Studentische Teilnahmemöglichkeiten"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:108

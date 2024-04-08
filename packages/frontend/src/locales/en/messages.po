@@ -14,29 +14,41 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
+msgid "edit-question-title"
+msgstr "Edit question"
+
+#. js-lingui-explicit-id
+msgid "edit-hint-title"
+msgstr "Edit hint text"
+
+#. js-lingui-explicit-id
+msgid "edit-answer-text"
+msgstr "Edit answer"
+
+#. js-lingui-explicit-id
 #: src/components/modals/ChangeGroupModal.tsx:24
 msgid "change-group-of-question-title"
-msgstr ""
+msgstr "Change question group"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeGroupModal.tsx:39
 msgid "change-group"
-msgstr ""
+msgstr "Change group"
 
 #. js-lingui-explicit-id
 #: src/components/modals/CreateGroupModal.tsx:26
 msgid "quiz-create-new-group-modal-title"
-msgstr ""
+msgstr "Name of question group"
 
 #. js-lingui-explicit-id
 #: src/components/modals/CreateGroupModal.tsx:41
 msgid "quiz-create-new-group-error-group-name-empty"
-msgstr ""
+msgstr "Group name must not be empty"
 
 #. js-lingui-explicit-id
 #: src/components/modals/CreateGroupModal.tsx:42
 msgid "quiz-create-new-group-error-group-name-not-unique"
-msgstr ""
+msgstr "Group name must not be empty"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:28
@@ -47,70 +59,70 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:92
 msgid "new-quiz-title"
-msgstr ""
+msgstr "Title"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:93
 msgid "new-quiz-description"
-msgstr ""
+msgstr "Description"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:95
 msgid "new-quiz-group"
-msgstr ""
+msgstr "Group"
 
 #. js-lingui-explicit-id
 #: src/App.tsx:31
 msgid "app.could_not_refresh_token"
-msgstr ""
+msgstr "Login could not be updated"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:30
 #: src/components/modals/ChangeRoleModal.tsx:34
 msgid "role-name-admin"
-msgstr ""
+msgstr "Admin"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:34
 #: src/components/modals/ChangeRoleModal.tsx:29
 msgid "role-name-teacher"
-msgstr ""
+msgstr "Teacher"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:38
 #: src/components/modals/ChangeRoleModal.tsx:25
 msgid "role-name-student"
-msgstr ""
+msgstr "Student"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:126
 msgid "user-last-login: {date}"
-msgstr ""
+msgstr "Last login: {date}"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-deactivate-user-button"
-msgstr ""
+msgstr "Deactivate user"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-activate-user-button"
-msgstr ""
+msgstr "Activate user"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:19
 msgid "user-change-active-flag-modal-title"
-msgstr ""
+msgstr "Change user status"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:23
 msgid "yes"
-msgstr ""
+msgstr "Yes"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:26
 msgid "no"
-msgstr ""
+msgstr "No"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeGroupModal.tsx:42
@@ -121,12 +133,12 @@ msgstr ""
 #: src/components/modals/MarkdownModal.tsx:100
 #: src/components/modals/TextModal.tsx:50
 msgid "cancel"
-msgstr ""
+msgstr "Cancel"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:18
 msgid "user-change-username-modal-title"
-msgstr ""
+msgstr "Change username"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNameModal.tsx:25
@@ -135,119 +147,119 @@ msgstr ""
 #: src/components/modals/MarkdownModal.tsx:91
 #: src/components/modals/TextModal.tsx:41
 msgid "okay"
-msgstr ""
+msgstr "O.K."
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNicknameModal.tsx:25
 msgid "error-nickname-to-short"
-msgstr ""
+msgstr "Pseudonym is not long enough"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNicknameModal.tsx:33
 msgid "error-nickname-already-used"
-msgstr ""
+msgstr "Pseudonym is already taken"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNicknameModal.tsx:41
 msgid "user-change-nickname-modal-title"
-msgstr ""
+msgstr "Change pseudonym"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeRoleModal.tsx:20
 msgid "user-set-user-role-modal-title"
-msgstr ""
+msgstr "Change user role"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeRoleModal.tsx:41
 msgid "user-set-role"
-msgstr ""
+msgstr "Update role"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ErrorModal.tsx:25
 #: src/components/navigation/Root.tsx:63
 msgid "undefined-title"
-msgstr ""
+msgstr "undefined title"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ErrorModal.tsx:30
 msgid "button-login-again"
-msgstr ""
+msgstr "Log in again"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:94
 #: src/pages/CreateQuiz.tsx:65
 msgid "quiz-allows-student-comments"
-msgstr ""
+msgstr "Allow student comments in quiz mode"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:100
 #: src/pages/CreateQuiz.tsx:76
 msgid "quiz-allows-student-questions"
-msgstr ""
+msgstr "Have students create questions"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:105
 #: src/pages/CreateQuiz.tsx:88
 msgid "quiz-student-participation"
-msgstr ""
+msgstr "Student participation options"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:108
 #: src/pages/CreateQuiz.tsx:91
 msgid "quiz-allows-anonymous-participation"
-msgstr ""
+msgstr "Anonymous participation"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:119
 #: src/pages/CreateQuiz.tsx:107
 msgid "quiz-allows-participation-via-nickname"
-msgstr ""
+msgstr "Participation with pseudonym"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:129
 #: src/pages/CreateQuiz.tsx:123
 msgid "quiz-allows-participation-via-realname"
-msgstr ""
+msgstr "Participation with real name"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:139
 #: src/pages/CreateQuiz.tsx:139
 msgid "quiz-allowed-question-types"
-msgstr ""
+msgstr "Allowed question types"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:142
 #: src/pages/CreateQuiz.tsx:142
 msgid "quiz-allows-text-questions"
-msgstr ""
+msgstr "Allow free-text questions"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:152
 #: src/pages/CreateQuiz.tsx:158
 msgid "quiz-allows-single-choice-questions"
-msgstr ""
+msgstr "Allow single-choice questions"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:162
 #: src/pages/CreateQuiz.tsx:174
 msgid "quiz-allows-multiple-choice-realname"
-msgstr ""
+msgstr "Allow multiple-choice questions"
 
 #. js-lingui-explicit-id
 #: src/components/tabs/QuizData.tsx:173
 #: src/pages/CreateQuiz.tsx:191
 msgid "quiz-enable-question-shufflling"
-msgstr ""
+msgstr "Shuffle questions in quiz mode"
 
 #. js-lingui-explicit-id
 #: src/Dashboard.tsx:35
 msgid "dashboard-tab-label-quizzes"
-msgstr ""
+msgstr "Quizzes"
 
 #. js-lingui-explicit-id
 #: src/Dashboard.tsx:38
 msgid "dashboard-tab-label-users"
-msgstr ""
+msgstr "Users"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:85
@@ -257,91 +269,85 @@ msgstr "Logout"
 #. js-lingui-explicit-id
 #: src/pages/CreateQuiz.tsx:28
 msgid "new-quiz"
-msgstr ""
+msgstr "New quiz"
 
 #. js-lingui-explicit-id
 #: src/pages/CreateQuiz.tsx:35
 msgid "quiz-title"
-msgstr ""
+msgstr "Title"
 
 #. js-lingui-explicit-id
 #: src/pages/CreateQuiz.tsx:45
 msgid "error-quiz-title-too-short"
-msgstr ""
+msgstr "Title is too short"
 
 #. js-lingui-explicit-id
 #: src/pages/CreateQuiz.tsx:54
 msgid "quiz-description"
-msgstr ""
+msgstr "Description"
 
 #. js-lingui-explicit-id
 #: src/pages/CreateQuiz.tsx:208
 msgid "create-quiz-button"
-msgstr ""
+msgstr "Create quiz"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:234
 msgid "quiz-tab-label-data"
-msgstr ""
+msgstr "Quiz data"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:237
 msgid "quiz-tab-label-questions"
-msgstr ""
+msgstr "Quiz questions"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:433
 msgid "quiz-tab-label-statistics"
-msgstr ""
+msgstr "Statistical evaluation"
 
 #. js-lingui-explicit-id
 #: src/QuizzesPanel.tsx:52
 msgid "button-new-quiz"
-msgstr ""
+msgstr "New quiz"
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:30
 msgid "user-admin-panel-title"
-msgstr ""
+msgstr "User administration"
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:38
 msgid "user-admin-panel-search-text"
-msgstr ""
+msgstr "Search text"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:145
 #~ msgid "number-of-quiz-participants"
-#~ msgstr ""
+#~ msgstr "Number of participants"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:148
 #~ msgid "teachers-in-quiz"
-#~ msgstr ""
+#~ msgstr "Teaching staff with access"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:152
 #~ msgid "number-of-quiz-questions"
-#~ msgstr ""
+#~ msgstr "Number of questions"
 
 #. js-lingui-explicit-id
-#: src/Data.tsx:11
-#~ msgid "dashboard.greet-user"
-#~ msgstr "Hello"
-
-#. js-lingui-explicit-id
-#: src/Data.tsx:7
-#~ msgid "login-page.validation-warning.email.not-valid"
-#~ msgstr ""
-
 #~ msgid "error-message-no-server-connection"
-#~ msgstr "Unable to connect to server. Please try to log in again."
+#~ msgstr "No connection to the server could be established. Please log in again."
 
+#. js-lingui-explicit-id
 #~ msgid "error-message-no-server-connection-title"
 #~ msgstr "No server connection"
 
+#. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated"
-#~ msgstr "Your account was deactivated. Please consult your administrator for further support."
+#~ msgstr "Your user has been deactivated. Please contact your administrator."
 
+#. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated-title"
 #~ msgstr "User deactivated"

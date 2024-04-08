@@ -14,6 +14,7 @@ import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { QuestionsTab } from "../components/tabs/QuestionsTab";
 import { RunningQuiz } from "../components/tabs/RunningQuiz";
 import { actorUris } from "../actorUris";
+import { QuizStats } from "../components/tabs/QuizStats";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -161,7 +162,7 @@ export const QuizPage: React.FC = () => {
 									</Button>
 								</Tab>
 								<Tab eventKey="statistics" title={i18n._("quiz-tab-label-statistics")}>
-									Statistiken
+									<QuizStats />
 								</Tab>
 							</Tabs>
 						</Row>

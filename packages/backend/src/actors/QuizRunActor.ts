@@ -65,11 +65,12 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 					const mbRunId = maybe(
 						await db
 							.collection<QuizRun>(this.collectionName)
-							.findOne({ studentId }, { uid: 1, _id: 0 } as any)
+							.findOne({ studentId, quizId: this.uid }, { uid: 1, _id: 0 } as any)
 					);
 					const result = mbRunId.match<Promise<QuizRun | Error>>(
 						async runId => {
 							const run = await this.getEntity(runId.uid);
+							console.log("Found existing run", run);
 							return run.match<QuizRun | Error>(identity, () => new Error());
 						},
 						async () => {
@@ -93,6 +94,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 									)
 								);
 							}
+							console.log("Created new run", run);
 							return run;
 						}
 					);
@@ -107,14 +109,16 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 							const runToUpdate = quizRunSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(runToUpdate);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
-								this.send(
-									subscriber,
-									new QuizRunUpdateMessage(
-										subscription.properties.length > 0
-											? pick(subscription.properties, runToUpdate)
-											: runToUpdate
-									)
-								);
+								if (runToUpdate.studentId === subscription.userId) {
+									this.send(
+										subscriber,
+										new QuizRunUpdateMessage(
+											subscription.properties.length > 0
+												? pick(subscription.properties, runToUpdate)
+												: runToUpdate
+										)
+									);
+								}
 							}
 							for (const subscriber of this.state.subscribers.get(runToUpdate.uid) ?? new Set()) {
 								this.send(subscriber, new QuizRunUpdateMessage(runToUpdate));

@@ -92,7 +92,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 						userStore,
 						UserStoreMessages.Create({
 							uid,
-							role: "STUDENT",
+							role: "TEACHER",
 							lastLogin: toTimestamp(),
 							created: toTimestamp(),
 							updated: toTimestamp(),

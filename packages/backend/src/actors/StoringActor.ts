@@ -9,7 +9,7 @@ import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-ut
 import { DateTime } from "luxon";
 import { systemEquals, createActorUri, extractSystemName } from "../utils";
 
-export const CLEANUP_INTERVAL = hours(2);
+export const CLEANUP_INTERVAL = hours(24);
 
 export type AccessRole = UserRole | "SYSTEM";
 

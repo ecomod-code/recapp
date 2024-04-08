@@ -7,4 +7,5 @@ export const actorUris: Record<string, ActorUri> = {
 	CommentActorPrefix: "actors://recapp-backend/QuizActor/Comment_" as ActorUri,
 	QuestionActorPrefix: "actors://recapp-backend/QuizActor/Question_" as ActorUri,
 	QuizRunActorPrefix: "actors://recapp-backend/QuizActor/QuizRun_" as ActorUri,
+	StatsActorPrefix: "actors://recapp-backend/QuizActor/Stats_" as ActorUri,
 };

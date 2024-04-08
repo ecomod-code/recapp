@@ -21,6 +21,7 @@ import { QuestionActor } from "./QuestionActor";
 import { createActorUri } from "../utils";
 import { keys } from "rambda";
 import { QuizRunActor } from "./QuizRunActor";
+import { StatisticsActor } from "./StatisticsActor";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -39,6 +40,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	private commentActors = new Map<Id, ActorRef>();
 	private questionActors = new Map<Id, ActorRef>();
 	private runActors = new Map<Id, ActorRef>();
+	private statisticsActors = new Map<Id, ActorRef>();
 
 	protected override state: State = {
 		cache: new Map(),
@@ -91,6 +93,15 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				this.logger.debug(`Quiz run actor ${quizRuns.name} created`);
 				this.runActors.set(uid, quizRuns);
 			}
+			if (!this.statisticsActors.has(uid)) {
+				const stats = await this.system.createActor(
+					StatisticsActor,
+					{ name: `Stats_${uid}`, parent: this.ref, strategy: "Restart" },
+					uid
+				);
+				this.logger.debug(`Stats actor ${stats.name} created`);
+				this.runActors.set(uid, stats);
+			}
 		} catch (e) {
 			this.logger.error(JSON.stringify(e));
 		}
@@ -111,6 +122,11 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			this.removeChild(c);
 			this.send(c, "SHUTDOWN");
 			this.runActors.delete(uid);
+		});
+		maybe(this.statisticsActors.get(uid)).forEach(c => {
+			this.removeChild(c);
+			this.send(c, "SHUTDOWN");
+			this.statisticsActors.delete(uid);
 		});
 	}
 
@@ -247,12 +263,16 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						if (
 							!(
 								clientUserRole === "ADMIN" ||
+								clientUserRole === "TEACHER" ||
+								clientUserRole === "STUDENT" ||
 								quiz.teachers.some(i => i === clientUserId) ||
 								quiz.students.some(i => i === clientUserId)
 							)
 						) {
+							console.error("DOnt subscribe", clientUserRole, quiz.students);
 							return; // No subscription for people who are not part of the quiz
 						}
+						console.warn("Subscribe", clientUserId, clientUserRole);
 						this.state = create(this.state, draft => {
 							const subscribers = draft.subscribers.get(uid) ?? new Set();
 							subscribers.add(from.name as ActorUri);

@@ -20,6 +20,14 @@ import {
 	QuizRun,
 	QuizRunUpdateMessage,
 	QuizRunDeletedMessage,
+	StatisticsUpdateMessage,
+	StatisticsDeletedMessage,
+	TextElementStatistics,
+	ChoiceElementStatistics,
+	GroupStatistics,
+	StatisticsActorMessages,
+	TextAnswer,
+	ChoiceAnswer,
 } from "@recapp/models";
 import { Unit, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
@@ -48,6 +56,9 @@ export const CurrentQuizMessages = unionize(
 		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED">(),
 		StartQuiz: {}, // Start quiz for a participating student
 		LogAnswer: ofType<{ questionId: Id; answer: string | boolean[] }>(), // Sets the answer for the current quiz question, returns whether the answer was correct
+		ActivateQuestionStats: ofType<Id>(),
+		ActivateGroupStats: ofType<string>(),
+		ActivateQuizStats: {},
 	},
 	{ value: "value" }
 );
@@ -62,12 +73,17 @@ type MessageType =
 	| QuestionDeletedMessage
 	| CommentDeletedMessage
 	| QuizRunUpdateMessage
-	| QuizRunDeletedMessage;
+	| QuizRunDeletedMessage
+	| StatisticsUpdateMessage
+	| StatisticsDeletedMessage;
 
 export type CurrentQuizState = {
 	quiz: Quiz;
 	comments: Comment[];
 	questions: Question[];
+	questionStats: TextElementStatistics | ChoiceElementStatistics | undefined;
+	groupStats: GroupStatistics | undefined;
+	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
 };
@@ -78,12 +94,24 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { quiz: {} as Quiz, comments: [], questions: [], teacherNames: [], run: undefined };
+		this.state = {
+			quiz: {} as Quiz,
+			comments: [],
+			questions: [],
+			teacherNames: [],
+			questionStats: undefined,
+			groupStats: undefined,
+			quizStats: undefined,
+			run: undefined,
+		};
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
 		console.log("CURRENTQUIZ MESSAGE", message);
 		if (message.tag === "QuizUpdateMessage") {
+			if (message.quiz.uid !== this.quiz.orElse(toId("-"))) {
+				return nothing();
+			}
 			this.updateState(draft => {
 				draft.quiz = { ...draft.quiz, ...message.quiz };
 			});
@@ -132,9 +160,60 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 				draft.run = undefined;
 			});
 			return nothing();
+		} else if (message.tag === "StatisticsUpdateMessage") {
+			if (message.stats.questionId === this.state.questionStats?.questionId) {
+				this.updateState(draft => {
+					draft.questionStats = { ...draft.questionStats, ...message.stats } as
+						| TextElementStatistics
+						| ChoiceElementStatistics;
+				});
+				return nothing();
+			} else if (this.state.groupStats && message.stats.groupName === this.state.groupStats.groupName) {
+				this.getGroupStats(this.state.groupStats.groupName);
+			} else if (this.state.quizStats) {
+				this.getQuizStats();
+			}
+			return nothing();
+		} else if (message.tag === "StatisticsDeletedMessage") {
+			this.updateState(draft => {
+				draft.questionStats = undefined;
+				draft.quizStats = undefined;
+				draft.groupStats = undefined;
+			});
+			return nothing();
 		}
 		return maybe(message);
 	}
+
+	private getGroupStats = async (name: string) => {
+		const gs: GroupStatistics = await this.ask(
+			`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+			StatisticsActorMessages.GetForGroup(name)
+		);
+		this.updateState(draft => {
+			draft.groupStats = gs;
+		});
+	};
+
+	private getQuizStats = async () => {
+		const gs: GroupStatistics = await this.ask(
+			`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+			StatisticsActorMessages.GetForQuiz()
+		);
+		this.updateState(draft => {
+			draft.quizStats = gs;
+		});
+	};
+
+	private getQuestionStats = async (id: Id) => {
+		const gs: TextElementStatistics | ChoiceElementStatistics = await this.ask(
+			`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+			StatisticsActorMessages.GetForQuestion(id)
+		);
+		this.updateState(draft => {
+			draft.questionStats = gs;
+		});
+	};
 
 	async receive(_from: ActorRef, message: MessageType): Promise<Unit | boolean> {
 		const maybeLocalMessage = await this.handleRemoteUpdates(message);
@@ -148,7 +227,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							const students = quiz.students;
 							if (!quiz.teachers.includes(userId) && !quiz.students.includes(userId)) {
 								students.push(userId);
-								this.send(this.ref, CurrentQuizMessages.Update({ uid: quizId, students }));
+								this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: quizId, students }));
+								this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(quizId));
 							}
 							return unit();
 						},
@@ -192,6 +272,35 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 										correct,
 									})
 								);
+
+								// Log stats
+								let stat: TextAnswer | ChoiceAnswer | undefined = undefined;
+								if (question.type === "TEXT") {
+									stat = {
+										tag: "TextAnswer",
+										questionId,
+										groupName:
+											this.state.quiz.groups.find(g => g.questions.includes(questionId))?.name ??
+											"DEFAULT",
+										answer: answer.toString(),
+										maxParticipants: this.state.quiz.students.length,
+									};
+								} else {
+									stat = {
+										tag: "ChoiceAnswer",
+										questionId,
+										groupName:
+											this.state.quiz.groups.find(g => g.questions.includes(questionId))?.name ??
+											"DEFAULT",
+										maxParticipants: this.state.quiz.students.length,
+										choices: answer as boolean[],
+										correct: answerCorrect,
+									};
+								}
+								this.send(
+									`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									StatisticsActorMessages.Update(stat)
+								);
 							}
 							return unit();
 						},
@@ -219,6 +328,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 									this.send(
 										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuizRunActorMessages.Clear()
+									);
+									this.send(
+										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										StatisticsActorMessages.Clear()
 									);
 								}
 							}
@@ -292,10 +405,18 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 											...question,
 										})
 									);
+									if (uid.toString() === "") {
+										// TODO Creatng the question failed.
+										console.error("Failed to create new question", question);
+										return;
+									}
 									const groups = this.state.quiz.groups;
 									const addTo = groups.find(g => g.name === group);
-									addTo?.questions.push(uid);
-									this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+									if (addTo) {
+										addTo.questions.push(uid);
+										addTo.questions = addTo.questions.filter(q => q !== "");
+										this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
+									}
 								});
 							} catch (e) {
 								alert(e);
@@ -304,6 +425,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							return unit();
 						},
 						UpdateQuestion: async ({ question, group }) => {
+							if (!question.uid) {
+								console.error("Failed to update question without id", question);
+								return unit();
+							}
 							if (!question.editMode) {
 								question.editMode = false;
 							}
@@ -372,6 +497,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuestionActorMessages.UnsubscribeFromCollection()
 									);
+									this.send(
+										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										QuizRunActorMessages.UnsubscribeFromCollection()
+									);
+									this.send(
+										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										StatisticsActorMessages.UnsubscribeFromCollection()
+									);
 								});
 								this.quiz = maybe(uid);
 								const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
@@ -386,6 +519,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								);
 								this.updateState(draft => {
 									draft.run = undefined;
+									draft.questionStats = undefined;
+									draft.groupStats = undefined;
+									draft.quizStats = undefined;
 									draft.quiz = quizData;
 								});
 								this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
@@ -401,9 +537,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									QuizRunActorMessages.SubscribeToCollection()
 								);
+								this.send(
+									`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									StatisticsActorMessages.SubscribeToCollection()
+								);
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
 								}
+								this.send(this.ref, CurrentQuizMessages.ActivateQuizStats());
 							} catch (e) {
 								console.error(e);
 							}
@@ -426,6 +567,30 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 									n.nickname ? `${n.username} (${n.nickname})` : n.username
 								) as string[];
 							});
+							return unit();
+						},
+						ActivateGroupStats: async name => {
+							this.updateState(draft => {
+								draft.questionStats = undefined;
+								draft.quizStats = undefined;
+							});
+							this.getGroupStats(name);
+							return unit();
+						},
+						ActivateQuizStats: async () => {
+							this.updateState(draft => {
+								draft.questionStats = undefined;
+								draft.groupStats = undefined;
+							});
+							this.getQuizStats();
+							return unit();
+						},
+						ActivateQuestionStats: async id => {
+							this.updateState(draft => {
+								draft.questionStats = undefined;
+								draft.quizStats = undefined;
+							});
+							this.getQuestionStats(id);
 							return unit();
 						},
 					})

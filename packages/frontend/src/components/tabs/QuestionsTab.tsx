@@ -110,6 +110,9 @@ export const QuestionsTab: React.FC<{
 	const unfilteredQuestions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 	const questions = unfilteredQuestions.filter(q => {
 		const user: Id = localUser.map(l => l.uid).orElse(toId(""));
+		if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {
+			return true;
+		}
 		if (q.approved) return true;
 		if (q.authorId === user) return true;
 		if (teachers.includes(user)) return true;

@@ -116,6 +116,7 @@ export const QuestionsTab: React.FC<{
 		if (q.approved) return true;
 		if (q.authorId === user) return true;
 		if (teachers.includes(user)) return true;
+		console.log("The following question will not be displayed", q, "for user ", user, " and teachers ", teachers);
 		return false;
 	});
 

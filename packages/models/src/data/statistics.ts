@@ -42,6 +42,7 @@ export const groupStatisticsSchema = zod.object({
 	maximumParticipants: zod.number().int(), // Total participants of current run
 	answers: zod.array(zod.number().int()), // Number of answers to all the questions
 	correctAnswers: zod.array(zod.number().int()), // Number correct answers to all the questions
+	questionIds: zod.array(uidSchema),
 });
 
 export type GroupStatistics = zod.infer<typeof groupStatisticsSchema>;

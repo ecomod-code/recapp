@@ -14,67 +14,25 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-msgid "edit-question-title"
-msgstr "Edit question"
-
-#. js-lingui-explicit-id
-msgid "edit-hint-title"
-msgstr "Edit hint text"
-
-#. js-lingui-explicit-id
-msgid "edit-answer-text"
-msgstr "Edit answer"
-
-#. js-lingui-explicit-id
-#: src/components/modals/ChangeGroupModal.tsx:24
-msgid "change-group-of-question-title"
-msgstr "Change question group"
-
-#. js-lingui-explicit-id
-#: src/components/modals/ChangeGroupModal.tsx:39
-msgid "change-group"
-msgstr "Change group"
-
-#. js-lingui-explicit-id
-#: src/components/modals/CreateGroupModal.tsx:26
-msgid "quiz-create-new-group-modal-title"
-msgstr "Name of question group"
-
-#. js-lingui-explicit-id
-#: src/components/modals/CreateGroupModal.tsx:41
-msgid "quiz-create-new-group-error-group-name-empty"
-msgstr "Group name must not be empty"
-
-#. js-lingui-explicit-id
-#: src/components/modals/CreateGroupModal.tsx:42
-msgid "quiz-create-new-group-error-group-name-not-unique"
-msgstr "Group name must not be empty"
-
-#. js-lingui-explicit-id
-#: src/Activate.tsx:28
+#: src/Activate.tsx:36
 #: src/Login.tsx:31
 msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:92
+#: src/actors/CurrentQuizActor.ts:352
 msgid "new-quiz-title"
 msgstr "Title"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:93
+#: src/actors/CurrentQuizActor.ts:353
 msgid "new-quiz-description"
 msgstr "Description"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:95
+#: src/actors/CurrentQuizActor.ts:355
 msgid "new-quiz-group"
 msgstr "Group"
-
-#. js-lingui-explicit-id
-#: src/App.tsx:31
-msgid "app.could_not_refresh_token"
-msgstr "Login could not be updated"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:30
@@ -125,6 +83,16 @@ msgid "no"
 msgstr "No"
 
 #. js-lingui-explicit-id
+#: src/components/modals/ChangeGroupModal.tsx:24
+msgid "change-group-of-question-title"
+msgstr "Change question group"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ChangeGroupModal.tsx:39
+msgid "change-group"
+msgstr "Change group"
+
+#. js-lingui-explicit-id
 #: src/components/modals/ChangeGroupModal.tsx:42
 #: src/components/modals/ChangeNameModal.tsx:28
 #: src/components/modals/ChangeNicknameModal.tsx:52
@@ -132,6 +100,7 @@ msgstr "No"
 #: src/components/modals/CreateGroupModal.tsx:64
 #: src/components/modals/MarkdownModal.tsx:100
 #: src/components/modals/TextModal.tsx:50
+#: src/components/modals/YesNoModal.tsx:40
 msgid "cancel"
 msgstr "Cancel"
 
@@ -145,7 +114,9 @@ msgstr "Change username"
 #: src/components/modals/ChangeNicknameModal.tsx:49
 #: src/components/modals/CreateGroupModal.tsx:55
 #: src/components/modals/MarkdownModal.tsx:91
+#: src/components/modals/MessageModal.tsx:32
 #: src/components/modals/TextModal.tsx:41
+#: src/components/modals/YesNoModal.tsx:32
 msgid "okay"
 msgstr "O.K."
 
@@ -175,8 +146,23 @@ msgid "user-set-role"
 msgstr "Update role"
 
 #. js-lingui-explicit-id
+#: src/components/modals/CreateGroupModal.tsx:26
+msgid "quiz-create-new-group-modal-title"
+msgstr "Name of question group"
+
+#. js-lingui-explicit-id
+#: src/components/modals/CreateGroupModal.tsx:41
+msgid "quiz-create-new-group-error-group-name-empty"
+msgstr "Group name must not be empty"
+
+#. js-lingui-explicit-id
+#: src/components/modals/CreateGroupModal.tsx:42
+msgid "quiz-create-new-group-error-group-name-not-unique"
+msgstr "Group name must not be empty"
+
+#. js-lingui-explicit-id
 #: src/components/modals/ErrorModal.tsx:25
-#: src/components/navigation/Root.tsx:63
+#: src/components/navigation/Root.tsx:39
 msgid "undefined-title"
 msgstr "undefined title"
 
@@ -186,78 +172,78 @@ msgid "button-login-again"
 msgstr "Log in again"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:94
+#: src/components/tabs/QuizData.tsx:278
 #: src/pages/CreateQuiz.tsx:65
 msgid "quiz-allows-student-comments"
 msgstr "Allow student comments in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:100
+#: src/components/tabs/QuizData.tsx:285
 #: src/pages/CreateQuiz.tsx:76
 msgid "quiz-allows-student-questions"
 msgstr "Have students create questions"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:105
+#: src/components/tabs/QuizData.tsx:291
 #: src/pages/CreateQuiz.tsx:88
 msgid "quiz-student-participation"
 msgstr "Student participation options"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:108
+#: src/components/tabs/QuizData.tsx:294
 #: src/pages/CreateQuiz.tsx:91
 msgid "quiz-allows-anonymous-participation"
 msgstr "Anonymous participation"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:119
+#: src/components/tabs/QuizData.tsx:306
 #: src/pages/CreateQuiz.tsx:107
 msgid "quiz-allows-participation-via-nickname"
 msgstr "Participation with pseudonym"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:129
+#: src/components/tabs/QuizData.tsx:317
 #: src/pages/CreateQuiz.tsx:123
 msgid "quiz-allows-participation-via-realname"
 msgstr "Participation with real name"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:139
+#: src/components/tabs/QuizData.tsx:328
 #: src/pages/CreateQuiz.tsx:139
 msgid "quiz-allowed-question-types"
 msgstr "Allowed question types"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:142
+#: src/components/tabs/QuizData.tsx:331
 #: src/pages/CreateQuiz.tsx:142
 msgid "quiz-allows-text-questions"
 msgstr "Allow free-text questions"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:152
+#: src/components/tabs/QuizData.tsx:342
 #: src/pages/CreateQuiz.tsx:158
 msgid "quiz-allows-single-choice-questions"
 msgstr "Allow single-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:162
+#: src/components/tabs/QuizData.tsx:353
 #: src/pages/CreateQuiz.tsx:174
 msgid "quiz-allows-multiple-choice-realname"
 msgstr "Allow multiple-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/tabs/QuizData.tsx:173
+#: src/components/tabs/QuizData.tsx:365
 #: src/pages/CreateQuiz.tsx:191
 msgid "quiz-enable-question-shufflling"
 msgstr "Shuffle questions in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:35
+#: src/Dashboard.tsx:37
 msgid "dashboard-tab-label-quizzes"
 msgstr "Quizzes"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:38
+#: src/Dashboard.tsx:41
 msgid "dashboard-tab-label-users"
 msgstr "Users"
 
@@ -292,22 +278,22 @@ msgid "create-quiz-button"
 msgstr "Create quiz"
 
 #. js-lingui-explicit-id
-#: src/pages/QuizPage.tsx:234
+#: src/pages/QuizPage.tsx:142
 msgid "quiz-tab-label-data"
 msgstr "Quiz data"
 
 #. js-lingui-explicit-id
-#: src/pages/QuizPage.tsx:237
+#: src/pages/QuizPage.tsx:146
 msgid "quiz-tab-label-questions"
 msgstr "Quiz questions"
 
 #. js-lingui-explicit-id
-#: src/pages/QuizPage.tsx:433
+#: src/pages/QuizPage.tsx:164
 msgid "quiz-tab-label-statistics"
 msgstr "Statistical evaluation"
 
 #. js-lingui-explicit-id
-#: src/QuizzesPanel.tsx:52
+#: src/QuizzesPanel.tsx:139
 msgid "button-new-quiz"
 msgstr "New quiz"
 
@@ -320,6 +306,23 @@ msgstr "User administration"
 #: src/UserAdminPanel.tsx:38
 msgid "user-admin-panel-search-text"
 msgstr "Search text"
+
+#. js-lingui-explicit-id
+#~ msgid "edit-question-title"
+#~ msgstr "Edit question"
+
+#. js-lingui-explicit-id
+#~ msgid "edit-hint-title"
+#~ msgstr "Edit hint text"
+
+#. js-lingui-explicit-id
+#~ msgid "edit-answer-text"
+#~ msgstr "Edit answer"
+
+#. js-lingui-explicit-id
+#: src/App.tsx:31
+#~ msgid "app.could_not_refresh_token"
+#~ msgstr "Login could not be updated"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:145
@@ -351,3 +354,39 @@ msgstr "Search text"
 #. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated-title"
 #~ msgstr "User deactivated"
+
+#. js-lingui-explicit-id
+msgid "archive-quiz-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "archive-quiz-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "title-set-quiz-mode-edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "info-set-quiz-mode-edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "title-set-quiz-mode-stopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "info-set-quiz-mode-stopped"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "warning-set-quiz-mode-started"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "info-set-quiz-mode-started"
+msgstr ""
+
+#. js-lingui-explicit-id
+msgid "title-set-quiz-mode-started"
+msgstr ""

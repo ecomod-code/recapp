@@ -2,47 +2,48 @@ import React, { useEffect } from "react";
 import { UserAdminPanel } from "./UserAdminPanel";
 import { Tab, Tabs } from "react-bootstrap";
 import { i18n } from "@lingui/core";
-import { Trans } from "@lingui/react";
-import { Quizzes } from "./QuizzesPanel";
+import { QuizzesPanel } from "./components/quizzes-panel/QuizzesPanel";
 import { User } from "@recapp/models";
 import { useStatefulActor } from "ts-actors-react";
 import { ErrorMessages } from "./actors/ErrorActor";
 import { useNavigate } from "react-router-dom";
 import { cookie } from "./utils";
 
+const tabClasses = "bg-content-container py-3";
+
 export const Dashboard: React.FC = () => {
-	const [_, errorActor] = useStatefulActor("ErrorActor");
-	const [state] = useStatefulActor<{ user: User }>("LocalUser");
-	const nav = useNavigate();
+    const [_, errorActor] = useStatefulActor("ErrorActor");
+    const [state] = useStatefulActor<{ user: User }>("LocalUser");
+    const nav = useNavigate();
 
-	useEffect(() => {
-		const quiz = cookie("activatedQuiz");
-		if (quiz) {
-			document.cookie = "activatedQuiz=";
-			nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz, activate: true } });
-		}
-	});
+    useEffect(() => {
+        const quiz = cookie("activatedQuiz");
+        if (quiz) {
+            document.cookie = "activatedQuiz=";
+            nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: quiz, activate: true } });
+        }
+    });
 
-	if (state.map(lu => !lu.user.active).orElse(false)) {
-		errorActor.forEach(actor =>
-			actor.send(actor, ErrorMessages.SetError(new Error("Error: User was deactivated")))
-		);
-	}
+    if (state.map(lu => !lu.user.active).orElse(false)) {
+        errorActor.forEach(actor =>
+            actor.send(actor, ErrorMessages.SetError(new Error("Error: User was deactivated")))
+        );
+    }
 
-	const isAdmin = state.map(lu => lu.user.role === "ADMIN").orElse(false);
+    const isAdmin = state.map(lu => lu.user.role === "ADMIN").orElse(false);
 
-	return (
-		<React.StrictMode>
-			<Tabs defaultActiveKey={isAdmin ? "users" : "quizzes"} className="mb-3 w-100 h-100">
-				<Tab eventKey="quizzes" title={i18n._("dashboard-tab-label-quizzes")}>
-					<Quizzes />
-				</Tab>
-				{isAdmin && (
-					<Tab eventKey="users" title={i18n._("dashboard-tab-label-users")}>
-						<UserAdminPanel />
-					</Tab>
-				)}
-			</Tabs>
-		</React.StrictMode>
-	);
+    return (
+        <React.StrictMode>
+            <Tabs defaultActiveKey={isAdmin ? "users" : "quizzes"} className="w-100 h-100">
+                <Tab eventKey="quizzes" className={tabClasses} title={i18n._("dashboard-tab-label-quizzes")}>
+                    <QuizzesPanel />
+                </Tab>
+                {isAdmin && (
+                    <Tab eventKey="users" className={tabClasses} title={i18n._("dashboard-tab-label-users")}>
+                        <UserAdminPanel />
+                    </Tab>
+                )}
+            </Tabs>
+        </React.StrictMode>
+    );
 };

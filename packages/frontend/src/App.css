@@ -1,35 +1,38 @@
 :root {
-	--bs-navbar-brand-color: "white"
+    --bs-navbar-brand-color: "white";
+}
+
+.bg-content-container {
+    background-color: #f5f5f5;
 }
 
 @media (max-width: 576px) {
-	:root {
-		.row {
-			padding-right: 0;
-			padding-left: 0;
-		}
-		.row>* {
-			padding-right: 0;
-			padding-left: 0;
-		}
-		.container {
-			padding-right: 4px;
-			padding-left: 4px;
-		}
-	}
+    :root {
+        .row {
+            padding-right: 0;
+            padding-left: 0;
+        }
+        .row > * {
+            padding-right: 0;
+            padding-left: 0;
+        }
+        .container {
+            padding-right: 4px;
+            padding-left: 4px;
+        }
+    }
 }
 
 .form-check-input {
-	border: 2px solid grey !important; /* Change the border color */
-   }
+    border: 2px solid grey !important; /* Change the border color */
+}
 
-   /* Add a border to the radio button when checked */
-   .form-check-input:checked {
-	border: 1px solid var(--bs-primary-rgb) !important; /* Change the border color */
-   }
-   
+/* Add a border to the radio button when checked */
+.form-check-input:checked {
+    border: 1px solid var(--bs-primary-rgb) !important; /* Change the border color */
+}
 
-   .modal-80w {
-	width: 80vw !important;
-	max-width: 80vw !important;
-   }
+.modal-80w {
+    width: 80vw !important;
+    max-width: 80vw !important;
+}

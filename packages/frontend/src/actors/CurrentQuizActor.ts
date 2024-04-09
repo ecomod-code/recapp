@@ -147,6 +147,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 			});
 			return nothing();
 		} else if (message.tag === "QuizRunUpdateMessage") {
+			if (message.run.quizId === this.quiz.orElse(toId("-"))) {
+				if (!this.state.questionStats) {
+					this.send(this.ref, CurrentQuizMessages.ActivateQuizStats());
+				} else {
+					this.send(this.ref, CurrentQuizMessages.ActivateQuestionStats(this.state.questionStats.questionId));
+				}
+			}
 			if (message.run.studentId !== this.user.map(u => u.uid).orElse(toId(""))) {
 				// Update is not meant for us
 				return nothing();
@@ -255,7 +262,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								const question = this.state.questions.find(q => q.uid === questionId)!;
 								let answerCorrect = false;
 								if (question.type === "TEXT") {
-									answerCorrect = true;
+									if (answer.length > 0) {
+										answerCorrect = true;
+									}
 								} else {
 									answerCorrect = (cleanedAnswers as boolean[])
 										.map((a, i) => a === question.answers[i].correct)

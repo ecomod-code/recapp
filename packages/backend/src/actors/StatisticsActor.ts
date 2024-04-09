@@ -102,10 +102,12 @@ export class StatisticsActor extends SubscribableActor<
 						maximumParticipants: 0,
 						answers: [],
 						correctAnswers: [],
+						questionIds: [],
 					};
 					stats.forEach(s => {
 						quizStats.maximumParticipants = s.maximumParticipants;
 						quizStats.answers.push(s.participants);
+						quizStats.questionIds.push(s.questionId);
 						if (s.tag === "ChoiceElementStatistics") {
 							quizStats.correctAnswers.push(s.passed);
 						} else {
@@ -127,10 +129,12 @@ export class StatisticsActor extends SubscribableActor<
 						maximumParticipants: 0,
 						answers: [],
 						correctAnswers: [],
+						questionIds: [],
 					};
 					stats.forEach(s => {
 						groupStats.maximumParticipants = s.maximumParticipants;
 						groupStats.answers.push(s.participants);
+						groupStats.questionIds.push(s.questionId);
 						if (s.tag === "ChoiceElementStatistics") {
 							groupStats.correctAnswers.push(s.passed);
 						} else {
@@ -140,11 +144,16 @@ export class StatisticsActor extends SubscribableActor<
 					return groupStats;
 				},
 				Update: async answer => {
-					const existingStats = await this.getEntity(answer.questionId);
+					const db = await this.connector.db();
+					const pre = await db
+						.collection<TextElementStatistics | ChoiceElementStatistics>(this.collectionName)
+						.findOne({ quizId: this.uid, questionId: answer.questionId });
+					const existingStats = pre ? await this.getEntity(pre.uid) : nothing();
 					const stats = existingStats.match(
 						stat => {
 							stat.updated = toTimestamp();
 							stat.participants = stat.participants + 1;
+							stat.maximumParticipants = Math.max(stat.maximumParticipants, answer.maxParticipants);
 							if (answer.tag === "TextAnswer") {
 								(stat as TextElementStatistics).answers.push(answer.answer);
 							} else {
@@ -152,10 +161,13 @@ export class StatisticsActor extends SubscribableActor<
 									(stat as ChoiceElementStatistics).passed =
 										(stat as ChoiceElementStatistics).passed + 1;
 								}
-								(stat as ChoiceElementStatistics).answers.map((a, i) =>
-									answer.choices[i] ? a + 1 : a
-								);
+								console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
+								(stat as ChoiceElementStatistics).answers = (
+									stat as ChoiceElementStatistics
+								).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
+								console.log("NEWCHOICES", stat.answers);
 							}
+							console.log("EXISTING CHOICE UPDATE from ", clientUserId);
 							return stat;
 						},
 						() => {
@@ -188,10 +200,12 @@ export class StatisticsActor extends SubscribableActor<
 									passed: answer.correct ? 1 : 0,
 									answers: answer.choices.map(c => (c ? 1 : 0)),
 								};
+								console.log("BRAND new choice from ", clientUserId);
 								return stat;
 							}
 						}
 					);
+					console.log("STATS", stats);
 					this.storeEntity(stats);
 					for (const [subscriber] of this.state.collectionSubscribers) {
 						this.send(subscriber, new StatisticsUpdateMessage(stats));

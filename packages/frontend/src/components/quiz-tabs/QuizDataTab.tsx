@@ -97,7 +97,7 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
         );
 };
 
-export const QuizData: React.FC = () => {
+export const QuizDataTab: React.FC = () => {
     const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false });
     const [shareModal, setShareModal] = useState(false);
     const [archiveModal, setArchiveModal] = useState(false);

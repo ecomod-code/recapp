@@ -9,7 +9,8 @@ import { ErrorMessages } from "./actors/ErrorActor";
 import { useNavigate } from "react-router-dom";
 import { cookie } from "./utils";
 
-const tabClasses = "bg-content-container py-3";
+// const tabClasses = "bg-content-container py-3";
+const tabClasses = "py-3";
 
 export const Dashboard: React.FC = () => {
     const [_, errorActor] = useStatefulActor("ErrorActor");

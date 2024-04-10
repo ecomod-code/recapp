@@ -12,59 +12,59 @@ import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
 import { QuizPage } from "./pages/QuizPage";
 import { Activate } from "./Activate";
-import { RunningQuiz } from "./components/tabs/RunningQuiz";
+// import { RunningQuizTab } from "./components/tabs/RunningQuizTab";
 import { QuestionEdit } from "./pages/QuestionEdit";
 import { CreateQuiz } from "./pages/CreateQuiz";
 
 const router = createBrowserRouter([
-	{
-		path: "/",
-		element: <Login />,
-	},
-	{
-		path: "/activate",
-		element: <Activate />,
-	},
-	{
-		path: "/Dashboard",
-		element: <Root />,
-		// errorElement: <ErrorPage />,
-		children: [
-			{
-				path: "/Dashboard",
-				element: <Dashboard />,
-			},
-			{
-				path: "/Dashboard/Quiz",
-				element: <QuizPage />,
-			},
-			{
-				path: "/Dashboard/Question",
-				element: <QuestionEdit />,
-			},
-			{
-				path: "/Dashboard/CreateQuiz",
-				element: <CreateQuiz />,
-			},
-		],
-	},
+    {
+        path: "/",
+        element: <Login />,
+    },
+    {
+        path: "/activate",
+        element: <Activate />,
+    },
+    {
+        path: "/Dashboard",
+        element: <Root />,
+        // errorElement: <ErrorPage />,
+        children: [
+            {
+                path: "/Dashboard",
+                element: <Dashboard />,
+            },
+            {
+                path: "/Dashboard/Quiz",
+                element: <QuizPage />,
+            },
+            {
+                path: "/Dashboard/Question",
+                element: <QuestionEdit />,
+            },
+            {
+                path: "/Dashboard/CreateQuiz",
+                element: <CreateQuiz />,
+            },
+        ],
+    },
 ]);
 
 const App: React.FC = () => {
-	useEffect(() => {
-		const storedLocal = getStoredSelectedLocal();
+    useEffect(() => {
+        const storedLocal = getStoredSelectedLocal();
 
-		if (storedLocal) {
-			dynamicActivate(storedLocal);
-		} else {
-			dynamicActivate(defaultLocale);
-		}
-	}, []);
-	return (
-		<I18nProvider i18n={i18n}>
-			<RouterProvider router={router} />
-		</I18nProvider>
-	);
+        if (storedLocal) {
+            dynamicActivate(storedLocal);
+        } else {
+            dynamicActivate(defaultLocale);
+        }
+    }, []);
+    return (
+        <I18nProvider i18n={i18n}>
+            <RouterProvider router={router} />
+        </I18nProvider>
+    );
 };
 
 export default App;

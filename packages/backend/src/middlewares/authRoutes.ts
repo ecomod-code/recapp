@@ -81,7 +81,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const tokenSet = await tokenSetPromise;
 			const system = Container.get<ActorSystem>("actor-system");
 			const userStore = createActorUri("UserStore");
-			let role: UserRole = "STUDENT";
+			let role: UserRole = "TEACHER";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
 			const decodedRefresh = jwt.decode(tokenSet.refresh_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;

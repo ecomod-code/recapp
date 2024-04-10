@@ -51,6 +51,9 @@ export const ChangeNicknameModal: React.FC<Props> = ({ show, defaultValue, onClo
 				<Button className="m-1" onClick={onClose}>
 					<Trans id="cancel" />
 				</Button>
+				<Button variant="warning" className="m-1" onClick={() => onSubmit("")}>
+					<Trans id="delete-nickname-button" />
+				</Button>
 			</Modal.Footer>
 		</Modal>
 	);

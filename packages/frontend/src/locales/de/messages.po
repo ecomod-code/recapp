@@ -500,3 +500,7 @@ msgstr "Mit bestätigten Nutzern teilen"
 #. js-lingui-explicit-id
 msgid "edit-title-text"
 msgstr "Text bearbeiten"
+
+#. js-lingui-explicit-id
+msgid "delete-nickname-button"
+msgstr "Pseudonym löschen"

@@ -37,10 +37,16 @@ export const HeaderSection: React.FC = () => {
 		.match(
 			user => {
 				const nickname = user?.nickname ?? "Nicht gesetzt";
-				const role = `(${user.role})`;
+				const role = user.role === "ADMIN" ? `(${user.role})` : "";
 				const changeName = (nickname: string) => {
 					actor.forEach(a =>
-						a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, nickname }))
+						a.send(
+							actorUris.UserStore,
+							UserStoreMessages.Update({
+								uid: user.uid,
+								nickname,
+							})
+						)
 					);
 					setNameModal(false);
 				};

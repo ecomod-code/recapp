@@ -9,6 +9,7 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
+import { ListGroupContainer } from "../components/ListGroupContainer";
 
 import { CreateQuizMessages, CreateQuizState } from "../actors/CreateQuizActor";
 import { actorUris } from "../actorUris";
@@ -230,14 +231,5 @@ export const CreateQuiz: React.FC = () => {
             );
         },
         () => null
-    );
-};
-
-const ListGroupContainer = (props: { header?: string } & PropsWithChildren) => {
-    return (
-        <Form.Group className="card" style={{ marginTop: "0.8rem" }}>
-            {props.header ? <div className="card-header bg-body-secondary">{props.header}</div> : null}
-            <div className="list-group list-group-flush">{props.children}</div>
-        </Form.Group>
     );
 };

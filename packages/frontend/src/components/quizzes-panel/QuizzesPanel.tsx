@@ -53,7 +53,7 @@ export const QuizzesPanel: React.FC = () => {
     };
 
     return (
-        <Container fluid>
+        <Container fluid className="p-0">
             <YesNoModal
                 show={!!deleteModal}
                 titleId="archive-quiz-title"

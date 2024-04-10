@@ -357,36 +357,36 @@ msgstr "Search text"
 
 #. js-lingui-explicit-id
 msgid "archive-quiz-title"
-msgstr ""
+msgstr "Archive quiz"
 
 #. js-lingui-explicit-id
 msgid "archive-quiz-text"
-msgstr ""
+msgstr "Would you like to archive this quiz? It will no longer be displayed in the overview, but can still be accessed via existing links and QR codes."
 
 #. js-lingui-explicit-id
 msgid "title-set-quiz-mode-edit"
-msgstr ""
+msgstr "Start edit mode"
 
 #. js-lingui-explicit-id
 msgid "info-set-quiz-mode-edit"
-msgstr ""
+msgstr "Statistics are invalidated when editing mode is started. Start editing?"
 
 #. js-lingui-explicit-id
 msgid "title-set-quiz-mode-stopped"
-msgstr ""
+msgstr "Freeze quiz"
 
 #. js-lingui-explicit-id
 msgid "info-set-quiz-mode-stopped"
-msgstr ""
+msgstr "Do you wish to temporarily freeze the quiz?"
 
 #. js-lingui-explicit-id
 msgid "warning-set-quiz-mode-started"
-msgstr ""
+msgstr "All statistics will be deleted when you start the quiz! Continue?"
 
 #. js-lingui-explicit-id
 msgid "info-set-quiz-mode-started"
-msgstr ""
+msgstr "Should the quiz mode be started?"
 
 #. js-lingui-explicit-id
 msgid "title-set-quiz-mode-started"
-msgstr ""
+msgstr "Start quiz mode"

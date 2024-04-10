@@ -11,6 +11,8 @@ import { Maybe } from "tsmonads";
 import { ChangeGroupModal } from "../modals/ChangeGroupModal";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 import { QuestionCard } from "../cards/QuestionCard";
+import { Trans } from "@lingui/react";
+import { i18n } from "@lingui/core";
 
 export const QuestionsTab: React.FC<{
 	quizData: CurrentQuizState;
@@ -158,11 +160,14 @@ export const QuestionsTab: React.FC<{
 			<div className="d-flex flex-column h-100 w-100">
 				<div className="d-flex flex-row mb-4">
 					<div>
-						{quizData.questions.length} Fragen, {quizData.quiz.students.length} Studierende
+						{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })} Fragen,{" "}
+						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
 					</div>
 					<div className="flex-grow-1">&nbsp;</div>
 					<div>
-						<Button onClick={() => setShareModal(quizData.quiz.uniqueLink)}>QR-Code anzeigen</Button>
+						<Button onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
+							<Trans id="quiz-show-qr-code-button" />
+						</Button>
 					</div>
 				</div>
 
@@ -209,7 +214,12 @@ export const QuestionsTab: React.FC<{
 											<div className="flex-grow-1">
 												<strong>{questionGroup.name} </strong>
 											</div>
-											<div>{questionGroup.questions?.length ?? 0} Frage(n)&nbsp;&nbsp;</div>
+											<div>
+												{i18n._("quiz-card-number-of-questions", {
+													count: questionGroup.questions?.length ?? 0,
+												})}
+												&nbsp;&nbsp;
+											</div>
 											<Button
 												as="div"
 												className={"me-4 " + (disableForStudentOrMode ? "disabled" : "")}
@@ -277,7 +287,7 @@ export const QuestionsTab: React.FC<{
 						onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
 						disabled={disableForStudentOrMode}
 					>
-						Gruppe hinzufügen
+						<Trans id="quiz-questions-tab-add-group-button" />
 					</Button>
 					<Button
 						className="m-2"
@@ -290,7 +300,7 @@ export const QuestionsTab: React.FC<{
 							quizData.quiz.state !== "EDITING"
 						}
 					>
-						Neue Frage
+						<Trans id="quiz-questions-tab-new-question-button" />
 					</Button>
 				</div>
 			</div>

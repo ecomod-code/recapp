@@ -57,7 +57,6 @@ export class LocalUserActor extends StatefulActor<
 		_from: ActorRef,
 		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage
 	): Promise<Unit | string> {
-		console.warn("LOCALUSER", _from.name, message);
 		if (typeof message === "string") {
 			if (message === "uid") return this.state.user?.uid ?? "";
 		} else if (message.tag == "UserUpdateMessage") {

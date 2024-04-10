@@ -372,13 +372,19 @@ export const QuestionEdit: React.FC = () => {
 											}
 										>
 											{allowedQuestionTypes.includes("SINGLE") && (
-												<option value="SINGLE">Einzelauswahl</option>
+												<option value="SINGLE">
+													<Trans id="single-choice-selection" />
+												</option>
 											)}
 											{allowedQuestionTypes.includes("MULTIPLE") && (
-												<option value="MULTIPLE">Mehrfachauswahl</option>
+												<option value="MULTIPLE">
+													<Trans id="multiple-choice-selection" />
+												</option>
 											)}
 											{allowedQuestionTypes.includes("TEXT") && (
-												<option value="TEXT">Freitext</option>
+												<option value="TEXT">
+													<Trans id="text-type-selection" />
+												</option>
 											)}
 										</Form.Select>
 									</div>
@@ -445,7 +451,7 @@ export const QuestionEdit: React.FC = () => {
 								</Card.Body>
 								{question.type !== "TEXT" && (
 									<Card.Footer>
-										Aktiviere alle <em>richtigen</em> Antworten
+										<Trans id="activate-all-correct-answers" />
 										<Form className="text-start mb-2 mt-2">
 											{question.answers.map((answer, i) => {
 												return (
@@ -471,7 +477,9 @@ export const QuestionEdit: React.FC = () => {
 												);
 											})}
 										</Form>
-										<Button onClick={addAnswer}>Antwort hinzufügen</Button>
+										<Button onClick={addAnswer}>
+											<Trans id="add-answer-button" />
+										</Button>
 									</Card.Footer>
 								)}
 							</Card>
@@ -485,7 +493,7 @@ export const QuestionEdit: React.FC = () => {
 			<Row>
 				<div className="d-flex flex-column h-100 w-100">
 					<Button className="m-3" onClick={submit}>
-						Frage speichern
+						<Trans id="save-question-button" />
 					</Button>
 				</div>
 			</Row>

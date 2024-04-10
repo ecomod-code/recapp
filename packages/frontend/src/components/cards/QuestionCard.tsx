@@ -1,6 +1,7 @@
 import { Question, Id } from "@recapp/models";
 import { Card, Button, Badge } from "react-bootstrap";
 import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash } from "react-bootstrap-icons";
+import { i18n } from "@lingui/core";
 
 export const QuestionCard = (props: {
 	question: Question;
@@ -48,7 +49,7 @@ export const QuestionCard = (props: {
 					<Badge as="div" className="mt-2 me-2" bg="info">
 						{props.question.type}
 					</Badge>
-					<div className="me-2"> von {props.question.authorName} </div>
+					<div className="me-2"> {i18n._("authored-by", { author: props.question.authorName })} </div>
 					<div className="mt-0">
 						<Button
 							className="m-2"

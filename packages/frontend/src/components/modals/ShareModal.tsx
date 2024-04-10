@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Modal } from "react-bootstrap";
 import QrCode from "qrcode.react";
+import { Trans } from "@lingui/react";
 
 interface Props {
 	quizLink: string;
@@ -12,7 +13,9 @@ export const ShareModal: React.FC<Props> = ({ quizLink, onClose }) => {
 	return (
 		<Modal show={!!quizLink} centered size="xl">
 			<Modal.Title className="p-1 ps-2 text-bg-primary">
-				<div>Studierende können sich jetzt über Code oder Link in das Quiz einschreiben</div>
+				<div>
+					<Trans id="share-qr-code-header" />
+				</div>
 			</Modal.Title>
 			<Modal.Body>
 				<div className="d-flex flex-column flex-grow-1 align-items-center">
@@ -30,7 +33,7 @@ export const ShareModal: React.FC<Props> = ({ quizLink, onClose }) => {
 						onClose();
 					}}
 				>
-					Schließen
+					<Trans id="close" />
 				</Button>
 			</Modal.Footer>
 		</Modal>

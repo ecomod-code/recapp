@@ -89,12 +89,14 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 
 	public async receive(from: ActorRef, message: QuestionActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
+		// MARK: This is interesting
 		console.debug("QUESTIONACTOR", from.name, message);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
 		}
 		try {
 			return await QuestionActorMessages.match<Promise<ResultType>>(message, {
+				// #region Message handling
 				Create: async question => {
 					(question as Question).uid = toId(v4());
 					(question as Question).created = toTimestamp();
@@ -193,6 +195,7 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 						.orElse(Promise.resolve(unit()));
 				},
 			});
+			//#endregion
 		} catch (e) {
 			console.error("QUESTIONACTOR", e);
 			throw e;

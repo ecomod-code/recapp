@@ -12,6 +12,7 @@ import Row from "react-bootstrap/Row";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Tabs from "react-bootstrap/Tabs";
 import Tab from "react-bootstrap/Tab";
+import { Plus } from "react-bootstrap-icons";
 import { CommentCard } from "../components/cards/CommentCard";
 import { QuizDataTab } from "../components/quiz-tabs/QuizDataTab";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
@@ -162,7 +163,54 @@ export const QuizPage: React.FC = () => {
                                 </Breadcrumb.Item>
                             </Breadcrumb>
                         </Row>
+
                         <Row>
+                            <div
+                                className="d-flex align-items-center border"
+                                style={{
+                                    maxHeight: "19rem",
+                                    overflowY: "hidden",
+                                    overflowX: "auto",
+                                    backgroundColor: "#f5f5f5",
+                                    minHeight: "16.5rem",
+                                }}
+                            >
+                                <div
+                                    className="d-flex flex-column justify-content-center align-items-center p-4"
+                                    style={{ width: "12rem", maxWidth: "95%" }}
+                                >
+                                    <Button variant="secondary" onClick={() => setShowMDModal(true)}>
+                                        <Plus size={100} />
+                                    </Button>
+                                    <span style={{ fontSize: "1.2rem", textAlign: "center" }}>Neuer Kommentar</span>
+                                </div>
+
+                                {mbQuiz
+                                    .flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
+                                    .map(
+                                        q =>
+                                            (q.comments ?? [])
+                                                .map(c => debug(comments.find(cmt => cmt.uid === c)!))
+                                                .filter(Boolean) as Comment[]
+                                    )
+                                    .map(c =>
+                                        c.sort(sortComments).map(cmt => (
+                                            <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                                <CommentCard
+                                                    teachers={teachers}
+                                                    userId={localUser.map(l => l.uid).orElse(toId(""))}
+                                                    comment={cmt}
+                                                    onUpvote={() => upvoteComment(cmt.uid)}
+                                                    onAccept={() => finishComment(cmt.uid)}
+                                                    onDelete={() => deleteComment(cmt.uid)}
+                                                />
+                                            </div>
+                                        ))
+                                    )
+                                    .orElse([<Fragment />])}
+                            </div>
+                        </Row>
+                        <Row className="mt-5">
                             <Tabs
                                 // defaultActiveKey="questions"
                                 className="mb-3 w-100"
@@ -189,49 +237,6 @@ export const QuizPage: React.FC = () => {
                                     <QuizStatsTab />
                                 </Tab>
                             </Tabs>
-                        </Row>
-
-                        <Row>
-                            {activeKey === "questions" ? (
-                                <div className="d-grid gap-2">
-                                    <Button variant="info" onClick={() => setShowMDModal(true)}>
-                                        Neuer Kommentar
-                                    </Button>
-                                </div>
-                            ) : null}
-                            <div
-                                className="d-flex flex-row"
-                                style={{
-                                    maxHeight: "19rem",
-                                    overflowY: "hidden",
-                                    overflowX: "auto",
-                                    backgroundColor: "#f5f5f5",
-                                }}
-                            >
-                                {mbQuiz
-                                    .flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
-                                    .map(
-                                        q =>
-                                            (q.comments ?? [])
-                                                .map(c => debug(comments.find(cmt => cmt.uid === c)!))
-                                                .filter(Boolean) as Comment[]
-                                    )
-                                    .map(c =>
-                                        c.sort(sortComments).map(cmt => (
-                                            <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-                                                <CommentCard
-                                                    teachers={teachers}
-                                                    userId={localUser.map(l => l.uid).orElse(toId(""))}
-                                                    comment={cmt}
-                                                    onUpvote={() => upvoteComment(cmt.uid)}
-                                                    onAccept={() => finishComment(cmt.uid)}
-                                                    onDelete={() => deleteComment(cmt.uid)}
-                                                />
-                                            </div>
-                                        ))
-                                    )
-                                    .orElse([<Fragment />])}
-                            </div>
                         </Row>
                     </Container>
                 );

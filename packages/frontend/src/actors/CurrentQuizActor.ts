@@ -459,12 +459,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 							return unit();
 						},
+						// MARK Comments
 						FinishComment: async uid => {
 							this.send(
 								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								CommentActorMessages.Update({
 									uid,
-									answered: true,
+									answered: !this.state.comments.find(c => c.uid === uid)?.answered,
 								})
 							);
 							return unit();
@@ -578,6 +579,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							});
 							return unit();
 						},
+						// MARK: Activate statistics
 						ActivateGroupStats: async name => {
 							this.updateState(draft => {
 								draft.questionStats = undefined;

@@ -57,10 +57,10 @@ export const CommentCard: React.FC<{
 					<div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
 					<div>
 						<Button
-							variant="success"
+							variant={comment.answered ? "secondary" : "success"}
 							className="m-1"
 							onClick={onAccept}
-							disabled={comment.answered || !teachers.includes(userId)}
+							disabled={!teachers.includes(userId)}
 						>
 							<Check color="white" />
 						</Button>

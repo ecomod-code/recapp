@@ -83,10 +83,11 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 					return existingComment
 						.map<Promise<Comment | Error>>(async commentToUpdate => {
 							if (commentToUpdate.upvoters.some(u => u === userId)) {
-								return commentToUpdate;
+								commentToUpdate.upvoters = commentToUpdate.upvoters.filter(u => u !== userId);
+							} else {
+								commentToUpdate.upvoters.push(userId);
 							}
 							commentToUpdate.updated = toTimestamp();
-							commentToUpdate.upvoters.push(userId);
 							await this.storeEntity(commentToUpdate);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 								this.send(

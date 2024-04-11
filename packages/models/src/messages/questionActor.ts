@@ -6,6 +6,7 @@ export const QuestionActorMessages = unionize(
 	{
 		Create: ofType<Omit<Question, "uid" | "created" | "updated">>(), // Create a new comment, returns the comment uid
 		Update: ofType<Partial<Question> & { uid: Id }>(), // Update comment data, answers updated Comment
+		Unstall: {}, // Remove the edit flag on all questions
 		GetAll: {}, // Get all quizzes accessible by the requester, will send back all comments in this list to the requester
 		Delete: ofType<Id>(),
 		SubscribeToCollection: {}, // Subscribe to all changes, sends back all updates to requester. Returns only the requested properties.

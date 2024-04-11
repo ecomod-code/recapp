@@ -22,6 +22,7 @@ export const QuestionsTab: React.FC<{
 	const nav = useNavigate();
 	const [shareModal, setShareModal] = useState("");
 	const [deleteModal, setDeleteModal] = useState(toId(""));
+	const [removeEditModal, setRemoveEditModal] = useState(toId(""));
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);
@@ -100,12 +101,26 @@ export const QuestionsTab: React.FC<{
 	};
 
 	const editQuestion = (uid: Id, group: string) => {
-		nav({ pathname: "/Dashboard/Question" }, { state: { quizId: uid, group } });
+		if (quizData.questions.find(q => q.uid === uid)?.editMode) {
+			setRemoveEditModal(uid);
+		} else {
+			nav({ pathname: "/Dashboard/Question" }, { state: { quizId: uid, group } });
+		}
 	};
 
 	const deleteQuestion = () => {
 		tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.DeleteQuestion(deleteModal)));
 		setDeleteModal(toId(""));
+	};
+
+	const removeEditFlag = () => {
+		tryQuizActor.forEach(q =>
+			q.send(
+				q,
+				CurrentQuizMessages.UpdateQuestion({ question: { uid: removeEditModal, editMode: false }, group: "" })
+			)
+		);
+		setRemoveEditModal(toId(""));
 	};
 
 	const teachers: string[] = quizData.quiz.teachers ?? [];
@@ -125,6 +140,13 @@ export const QuestionsTab: React.FC<{
 	return (
 		<Row>
 			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
+			<YesNoModal
+				show={!!removeEditModal}
+				titleId="remove-edit-mode-of-question-title"
+				textId="remove-edit-mode-of-question-text"
+				onClose={() => setRemoveEditModal(toId(""))}
+				onSubmit={removeEditFlag}
+			/>
 			<YesNoModal
 				show={!!deleteModal}
 				titleId="delete-question-title"

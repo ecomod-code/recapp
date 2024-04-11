@@ -54,8 +54,8 @@ export const QuestionCard = (props: {
 						<Button
 							className="m-2"
 							onClick={props.edit}
+							variant={props.question.editMode ? "secondary" : "primary"}
 							disabled={
-								props.question.editMode ||
 								(props.disabled &&
 									(props.question.authorId !== props.currentUserUid || props.question.approved)) ||
 								!props.editMode

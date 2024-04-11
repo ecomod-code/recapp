@@ -504,3 +504,11 @@ msgstr "Text bearbeiten"
 #. js-lingui-explicit-id
 msgid "delete-nickname-button"
 msgstr "Pseudonym löschen"
+
+#. js-lingui-explicit-id
+msgid "remove-edit-mode-of-question-title"
+msgstr "Editiermodus wieder aktivieren?"
+
+#. js-lingui-explicit-id
+msgid "remove-edit-mode-of-question-text"
+msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"

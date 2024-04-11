@@ -11,7 +11,7 @@ import {
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { Timestamp, Unit, fromTimestamp, minutes, toTimestamp, unit } from "itu-utils";
+import { Timestamp, Unit, fromTimestamp, hours, minutes, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
 import { pick } from "rambda";
 import { v4 } from "uuid";
@@ -51,6 +51,11 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 	private checkStalledQuestions = async () => {
 		// Remove questions that are blocked from editing, but seemed not be updated in the last STALLED_QUESTION_INTERVAL. (e.g. because a client lost the connection)
 		const cutOff = DateTime.utc().minus(STALLED_QUESTION_INTERVAL);
+		await this.unstallQuestions(cutOff);
+	};
+
+	private unstallQuestions = async (cutOff: DateTime) => {
+		// Remove questions that are blocked from editing, but seemed not be updated in the last STALLED_QUESTION_INTERVAL. (e.g. because a client lost the connection)
 		const db = await this.connector.db();
 		const candidates = await db
 			.collection<Question>(this.collectionName)
@@ -145,6 +150,11 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 							return questionToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Question not found")));
+				},
+				Unstall: async () => {
+					const cutOff = DateTime.utc().minus(hours(5));
+					await this.unstallQuestions(cutOff);
+					return unit();
 				},
 				GetAll: async () => {
 					const db = await this.connector.db();

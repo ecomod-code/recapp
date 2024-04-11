@@ -331,6 +331,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							} else if (newState === "EDITING") {
 								if (this.state.quiz.state !== "EDITING") {
 									this.send(
+										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										QuestionActorMessages.Unstall()
+									);
+									this.send(
 										actorUris.QuizActor,
 										QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "EDITING" })
 									);

@@ -307,8 +307,6 @@ msgstr "Benutzerverwaltung"
 msgid "user-admin-panel-search-text"
 msgstr "Suchtext"
 
-
-
 #. js-lingui-explicit-id
 #~ msgid "edit-question-title"
 #~ msgstr "Frage bearbeiten"

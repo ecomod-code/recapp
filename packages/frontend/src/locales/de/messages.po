@@ -307,8 +307,6 @@ msgstr "Benutzerverwaltung"
 msgid "user-admin-panel-search-text"
 msgstr "Suchtext"
 
-
-
 #. js-lingui-explicit-id
 #~ msgid "edit-question-title"
 #~ msgstr "Frage bearbeiten"
@@ -434,8 +432,8 @@ msgid "text-type-selection"
 msgstr "Freitext"
 
 #. js-lingui-explicit-id
-msgid "von {author}"
-msgstr "authored-by"
+msgid "authored-by"
+msgstr "von {author}" 
 
 #. js-lingui-explicit-id
 msgid "start-quiz-mode-button"

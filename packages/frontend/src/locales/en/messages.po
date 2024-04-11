@@ -390,3 +390,115 @@ msgstr "Should the quiz mode be started?"
 #. js-lingui-explicit-id
 msgid "title-set-quiz-mode-started"
 msgstr "Start quiz mode"
+
+#. js-lingui-explicit-id
+msgid "quiz-card-number-of-participants"
+msgstr "{count} participants "
+
+#. js-lingui-explicit-id
+msgid "quiz-card-number-of-questions"
+msgstr "{count} questions"
+
+#. js-lingui-explicit-id
+msgid "quiz-card-last-change"
+msgstr "Last change"
+
+#. js-lingui-explicit-id
+msgid "comment-row-new-comment-button"
+msgstr "New comment"
+
+#. js-lingui-explicit-id
+msgid "quiz-questions-tab-add-group-button"
+msgstr "Add group"
+
+#. js-lingui-explicit-id
+msgid "quiz-questions-tab-new-question-button"
+msgstr "New question"
+
+#. js-lingui-explicit-id
+msgid "quiz-show-qr-code-button"
+msgstr "Show QR code"
+
+#. js-lingui-explicit-id
+msgid "single-choice-selection"
+msgstr "Single choice"
+
+#. js-lingui-explicit-id
+msgid "multiple-choice-selection"
+msgstr "Multiple choice"
+
+#. js-lingui-explicit-id
+msgid "text-type-selection"
+msgstr "Free text"
+
+#. js-lingui-explicit-id
+msgid "authored-by"
+msgstr "by {author}"
+
+#. js-lingui-explicit-id
+msgid "start-quiz-mode-button"
+msgstr "Start quiz"
+
+#. js-lingui-explicit-id
+msgid "freeze-quiz-button"
+msgstr "Freeze quiz"
+
+#. js-lingui-explicit-id
+msgid "edit-quiz-button"
+msgstr "Edit quiz"
+
+#. js-lingui-explicit-id
+msgid "archive-quiz-button"
+msgstr "Archive quiz"
+
+#. js-lingui-explicit-id
+msgid "save-question-button"
+msgstr "Save question"
+
+#. js-lingui-explicit-id
+msgid "add-answer-button"
+msgstr "Add answer"
+
+#. js-lingui-explicit-id
+msgid "activate-all-correct-answers"
+msgstr "Activate all correct answers"
+
+#. js-lingui-explicit-id
+msgid "teachers"
+msgstr "Teachers"
+
+#. js-lingui-explicit-id
+msgid "number-of-participants"
+msgstr "Number of participants"
+
+#. js-lingui-explicit-id
+msgid "share-qr-code-header"
+msgstr "Students can now register for the quiz via code or link"
+
+#. js-lingui-explicit-id
+msgid "close"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+msgid "share-with-teachers-modal-title"
+msgstr "Select teachers for sharing"
+
+#. js-lingui-explicit-id
+msgid "share-with-teachers-persons-to-add"
+msgstr "People to be added"
+
+#. js-lingui-explicit-id
+msgid "add"
+msgstr "Add"
+
+#. js-lingui-explicit-id
+msgid "share-with-confirmed-users"
+msgstr "Share with confirmed users"
+
+#. js-lingui-explicit-id
+msgid "edit-title-text"
+msgstr "Edit text"
+
+#. js-lingui-explicit-id
+msgid "delete-nickname-button"
+msgstr "Delete pseudonym"

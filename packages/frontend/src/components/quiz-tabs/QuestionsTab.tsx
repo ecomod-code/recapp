@@ -275,11 +275,20 @@ export const QuestionsTab: React.FC<{
                                             </div>
                                         </Accordion.Header>
                                     </div>
-                                    <Accordion.Body className="p-2">
+
+                                    <Accordion.Body className={`p-2 accordion-active-bg-color`}>
                                         <div
                                             className="d-flex flex-column"
                                             style={{ maxHeight: "70vh", overflowY: "auto" }}
                                         >
+                                            {questionGroup.questions.length === 0 ? (
+                                                <p
+                                                    className="d-flex justify-content-center align-items-center m-0 bg-white "
+                                                    style={{ fontSize: 18, height: 80 }}
+                                                >
+                                                    No questions added yet
+                                                </p>
+                                            ) : null}
                                             {questionGroup.questions
                                                 .map(q => questions.find(qu => qu.uid === q))
                                                 .filter(Boolean)

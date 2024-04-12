@@ -14,33 +14,13 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:375
-msgid "question-edit.button-tooltip.check"
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.button-tooltip.edit-or-add-pseudonym"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:383
-msgid "question-edit.button-tooltip.edit-title-text"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:391
-msgid "question-edit.button-tooltip.edit-comment-text"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:427
-msgid "question-edit.button-tooltip.edit-hint-title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:460
-msgid "question-edit.button-tooltip.edit-answer"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:466
-msgid "question-edit.button-tooltip.delete-answer"
+#: src/layout/HeaderSection.tsx:103
+msgid "header-section.button-tooltip.logout"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -455,7 +435,7 @@ msgid "dashboard-tab-label-users"
 msgstr "Users"
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:91
+#: src/layout/HeaderSection.tsx:107
 msgid "header.logout"
 msgstr "Logout"
 
@@ -495,9 +475,39 @@ msgid "text-type-selection"
 msgstr "Free text"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:375
+msgid "question-edit.button-tooltip.check"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:383
+msgid "question-edit.button-tooltip.edit-title-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:391
+msgid "question-edit.button-tooltip.edit-comment-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:427
+msgid "question-edit.button-tooltip.edit-hint-title"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Activate all correct answers"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:460
+msgid "question-edit.button-tooltip.edit-answer"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:466
+msgid "question-edit.button-tooltip.delete-answer"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477

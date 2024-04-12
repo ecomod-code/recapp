@@ -14,34 +14,14 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:375
-msgid "question-edit.button-tooltip.check"
-msgstr "Neil: icon button tooltip:check"
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.button-tooltip.edit-or-add-pseudonym"
+msgstr "Neil: icon button tooltip:edit-or-add-pseudonym"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:383
-msgid "question-edit.button-tooltip.edit-title-text"
-msgstr "Neil: icon button tooltip:edit-title-text"
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:391
-msgid "question-edit.button-tooltip.edit-comment-text"
-msgstr "Neil: icon button tooltip:edit-comment-text"
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:427
-msgid "question-edit.button-tooltip.edit-hint-title"
-msgstr "Neil: icon button tooltip:edit-hint-title"
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:460
-msgid "question-edit.button-tooltip.edit-answer"
-msgstr "Neil: icon button tooltip:edit-answer"
-
-#. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:466
-msgid "question-edit.button-tooltip.delete-answer"
-msgstr "Neil: icon button tooltip:delete-answer"
+#: src/layout/HeaderSection.tsx:103
+msgid "header-section.button-tooltip.logout"
+msgstr "Neil: icon button tooltip:logout"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -455,7 +435,7 @@ msgid "dashboard-tab-label-users"
 msgstr "Benutzer"
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:91
+#: src/layout/HeaderSection.tsx:107
 msgid "header.logout"
 msgstr "Abmelden"
 
@@ -495,9 +475,39 @@ msgid "text-type-selection"
 msgstr "Freitext"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:375
+msgid "question-edit.button-tooltip.check"
+msgstr "Neil: icon button tooltip:check"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:383
+msgid "question-edit.button-tooltip.edit-title-text"
+msgstr "Neil: icon button tooltip:edit-title-text"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:391
+msgid "question-edit.button-tooltip.edit-comment-text"
+msgstr "Neil: icon button tooltip:edit-comment-text"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:427
+msgid "question-edit.button-tooltip.edit-hint-title"
+msgstr "Neil: icon button tooltip:edit-hint-title"
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:460
+msgid "question-edit.button-tooltip.edit-answer"
+msgstr "Neil: icon button tooltip:edit-answer"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:466
+msgid "question-edit.button-tooltip.delete-answer"
+msgstr "Neil: icon button tooltip:delete-answer"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477

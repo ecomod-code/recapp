@@ -260,7 +260,7 @@ export const QuestionsTab: React.FC<{
                                                 position: "absolute",
                                                 zIndex: 10,
                                                 top: 0,
-                                                left: 0,
+                                                left: 4,
                                                 bottom: 0,
                                                 width: BUTTON_CONTAINER_WIDTH,
 
@@ -325,14 +325,14 @@ export const QuestionsTab: React.FC<{
                                         </Accordion.Header>
                                     </div>
 
-                                    <Accordion.Body className={`p-2 accordion-active-bg-color`}>
+                                    <Accordion.Body className={`p-1 ps-3 accordion-active-bg-color`}>
                                         <div
                                             className="d-flex flex-column"
                                             style={{ maxHeight: "70vh", overflowY: "auto" }}
                                         >
                                             {questionGroup.questions.length === 0 ? (
                                                 <p
-                                                    className="d-flex justify-content-center align-items-center m-0 bg-white "
+                                                    className="d-flex justify-content-center align-items-center m-0 bg-white me-2"
                                                     style={{ fontSize: 18, height: 80 }}
                                                 >
                                                     <Trans id="quiz-questions-tab-empty-group-message" />
@@ -341,23 +341,24 @@ export const QuestionsTab: React.FC<{
                                             {questionGroup.questions
                                                 .map(q => questions.find(qu => qu.uid === q))
                                                 .filter(Boolean)
-                                                .map((q, i) => {
+                                                .map((q, i, arr) => {
+                                                    const isFirst = i === 0;
+                                                    const isLast = i === arr.length - 1;
+
                                                     return (
                                                         <QuestionCard
+                                                            key={q!.uid}
                                                             editMode={quizData.quiz.state === "EDITING"}
                                                             question={q!}
-                                                            key={q!.uid}
                                                             approve={() => approveQuestion(q!.uid, q!.approved)}
                                                             delete={() => setDeleteModal(q!.uid)}
                                                             edit={() => editQuestion(q!.uid, questionGroup.name)}
-                                                            moveUp={() => {
-                                                                if (i > 0)
-                                                                    moveQuestion(questionGroup.name, q!.uid, true);
-                                                            }}
-                                                            moveDown={() => {
-                                                                if (i < questionGroup.questions.length - 1)
-                                                                    moveQuestion(questionGroup.name, q!.uid, false);
-                                                            }}
+                                                            moveUp={() =>
+                                                                moveQuestion(questionGroup.name, q!.uid, true)
+                                                            }
+                                                            moveDown={() =>
+                                                                moveQuestion(questionGroup.name, q!.uid, false)
+                                                            }
                                                             changeGroup={() => {
                                                                 if (quizData.quiz.groups.length < 2) {
                                                                     return;
@@ -369,6 +370,8 @@ export const QuestionsTab: React.FC<{
                                                             }}
                                                             currentUserUid={localUser.map(u => u.uid).orElse(toId(""))}
                                                             disabled={disableForStudentOrMode}
+                                                            isFirst={isFirst}
+                                                            isLast={isLast}
                                                         />
                                                     );
                                                 })}

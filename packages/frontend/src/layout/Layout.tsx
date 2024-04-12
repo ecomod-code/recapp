@@ -15,7 +15,7 @@ export const Layout = (props: Props) => {
                 <main
                     style={{
                         width: "100%",
-                        padding: "0 12px",
+                        padding: "0 12px 80px",
                     }}
                 >
                     {props.children}

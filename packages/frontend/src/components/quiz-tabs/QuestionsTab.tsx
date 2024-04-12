@@ -1,4 +1,4 @@
-import { CSSProperties, PropsWithChildren, useState } from "react";
+import React, { CSSProperties, PropsWithChildren, useState } from "react";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { Id, Question, QuestionGroup, Quiz, User, toId } from "@recapp/models";
@@ -53,7 +53,7 @@ export const QuestionsTab: React.FC<{
     };
 
     const moveGroup = (name: string, upwards: boolean) => {
-        let newGroups: QuestionGroup[] = [];
+        const newGroups: QuestionGroup[] = [];
         const groupIndex = quizData.quiz.groups.findIndex(g => g.name === name);
         const changeIndex = upwards ? groupIndex - 1 : groupIndex + 1;
         quizData.quiz.groups.forEach((group, index) => {
@@ -76,7 +76,7 @@ export const QuestionsTab: React.FC<{
     };
 
     const moveQuestion = (groupName: string, qId: Id, upwards: boolean) => {
-        let newOrder: Id[] = [];
+        const newOrder: Id[] = [];
         const group = quizData.quiz.groups.find(g => g.name === groupName)!;
         const questionIndex = group.questions.findIndex(g => g === qId);
         const changeIndex = upwards ? questionIndex - 1 : questionIndex + 1;
@@ -221,7 +221,7 @@ export const QuestionsTab: React.FC<{
                                             style={{
                                                 position: "absolute",
                                                 zIndex: 10,
-                                                right: 0,
+                                                right: 1,
                                                 bottom: 1,
                                                 pointerEvents: "none",
                                             }}
@@ -325,7 +325,7 @@ export const QuestionsTab: React.FC<{
                                         </Accordion.Header>
                                     </div>
 
-                                    <Accordion.Body className={`p-1 ps-3 accordion-active-bg-color`}>
+                                    <Accordion.Body className="p-1 ps-3 accordion-active-bg-color">
                                         <div
                                             className="d-flex flex-column"
                                             style={{ maxHeight: "70vh", overflowY: "auto" }}

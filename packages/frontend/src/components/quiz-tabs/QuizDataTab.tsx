@@ -67,7 +67,7 @@ const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void 
 								)}
 								{teachers.map(t => {
 									return (
-										<div key={t.query} style={{ color: !!t.uid ? "green" : "red" }}>
+										<div key={t.query} style={{ color: t.uid ? "green" : "red" }}>
 											{t.query}
 										</div>
 									);
@@ -155,7 +155,7 @@ export const QuizDataTab: React.FC = () => {
 	};
 
 	return mbQuiz
-		.flatMap(q => (!!q.quiz.uid ? maybe(q.quiz) : nothing()))
+		.flatMap(q => (q.quiz.uid ? maybe(q.quiz) : nothing()))
 		.match(
 			quiz => {
 				const archive = () => {

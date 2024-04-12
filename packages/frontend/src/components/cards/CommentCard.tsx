@@ -63,12 +63,7 @@ export const CommentCard: React.FC<{
 					<div>
 						{comment.relatedQuestion && questionText && (
 							<TooltipWrapper title={questionText ?? ""}>
-								<Button
-									variant="secondary"
-									className="m-1"
-									onClick={onJumpToQuestion}
-									disabled={!teachers.includes(userId)}
-								>
+								<Button variant="secondary" className="m-1" onClick={onJumpToQuestion}>
 									<Question color="white" />
 								</Button>
 							</TooltipWrapper>

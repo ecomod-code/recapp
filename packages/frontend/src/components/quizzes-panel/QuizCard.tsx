@@ -55,7 +55,7 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
                 <Card.Footer>
                     <div className="d-flex flex-row justify-content-end">
                         <ButtonWithTooltip
-                            title={i18n._("quiz-card-button-tooltip-edit")}
+                            title={i18n._("quiz-card.button-tooltip.edit")}
                             variant="primary"
                             onClick={() => nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } })}
                         >
@@ -63,7 +63,7 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
                         </ButtonWithTooltip>
 
                         <ButtonWithTooltip
-                            title={i18n._("quiz-card-button-tooltip-share")}
+                            title={i18n._("quiz-card.button-tooltip.share")}
                             className="ms-2"
                             variant="secondary"
                             onClick={onShare}
@@ -72,7 +72,7 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
                         </ButtonWithTooltip>
 
                         <ButtonWithTooltip
-                            title={i18n._("quiz-card-button-tooltip-delete")}
+                            title={i18n._("quiz-card.button-tooltip.delete")}
                             variant="danger"
                             className="ms-2"
                             onClick={onDelete}

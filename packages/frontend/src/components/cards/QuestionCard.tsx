@@ -4,6 +4,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash } from "react-bootstrap-icons";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 
 type Props = {
     question: Question;
@@ -55,7 +56,8 @@ export const QuestionCard = (props: Props) => {
                     </Badge>
                     <div className="me-2"> {i18n._("authored-by", { author: props.question.authorName })} </div>
                     <div className="mt-0">
-                        <Button
+                        <ButtonWithTooltip
+                            title={i18n._("question-card.button-tooltip.edit")}
                             className="m-2"
                             onClick={props.edit}
                             variant={props.question.editMode ? "secondary" : "primary"}
@@ -66,30 +68,33 @@ export const QuestionCard = (props: Props) => {
                             }
                         >
                             <Pencil />
-                        </Button>
-                        <Button
+                        </ButtonWithTooltip>
+                        <ButtonWithTooltip
+                            title={i18n._("question-card.button-tooltip.change-group")}
                             className="m-2"
                             onClick={props.changeGroup}
                             disabled={props.disabled || !props.editMode}
                         >
                             <TrainFront />
-                        </Button>
-                        <Button
+                        </ButtonWithTooltip>
+                        <ButtonWithTooltip
+                            title={i18n._("question-card.button-tooltip.approve")}
                             className="m-2"
                             variant={props.question.approved ? "success" : "warning"}
                             onClick={props.approve}
                             disabled={props.disabled || !props.editMode}
                         >
                             <Check />
-                        </Button>
-                        <Button
+                        </ButtonWithTooltip>
+                        <ButtonWithTooltip
+                            title={i18n._("question-card.button-tooltip.delete")}
                             className="m-2"
                             variant={"danger"}
                             onClick={props.delete}
                             disabled={props.disabled || props.question.approved || !props.editMode}
                         >
                             <Trash />
-                        </Button>
+                        </ButtonWithTooltip>
                     </div>
                 </div>
             </Card.Body>

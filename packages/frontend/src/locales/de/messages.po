@@ -14,19 +14,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:59
-msgid "quiz-card-button-tooltip-edit"
-msgstr "Neil: icon button tooltip-Edit"
+#: src/components/quizzes-panel/QuizCard.tsx:58
+msgid "quiz-card.button-tooltip.edit"
+msgstr "Neil: icon button tooltip:Edit"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:67
-msgid "quiz-card-button-tooltip-share"
-msgstr "Neil: icon button tooltip-Share"
+#: src/components/quizzes-panel/QuizCard.tsx:66
+msgid "quiz-card.button-tooltip.share"
+msgstr "Neil: icon button tooltip:share"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:78
-msgid "quiz-card-button-tooltip-delete"
-msgstr "Neil: icon button tooltip-delete"
+#: src/components/quizzes-panel/QuizCard.tsx:75
+msgid "quiz-card.button-tooltip.delete"
+msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -51,9 +51,29 @@ msgid "new-quiz-group"
 msgstr "Gruppe"
 
 #. js-lingui-explicit-id
-#: src/components/cards/QuestionCard.tsx:56
+#: src/components/cards/QuestionCard.tsx:57
 msgid "authored-by"
 msgstr "von {author}"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:60
+msgid "question-card.button-tooltip.edit"
+msgstr "Neil: icon button tooltip:Edit"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:73
+msgid "question-card.button-tooltip.change-group"
+msgstr "Neil: icon button tooltip:chagne-group"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-tooltip.approve"
+msgstr "Neil: icon button tooltip:arrpove"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:90
+msgid "question-card.button-tooltip.delete"
+msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:30
@@ -229,7 +249,7 @@ msgstr "QR-Code anzeigen"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:206
 msgid "quiz-questions-tab-add-group-button"
-msgstr "Gruppe hinzufügen"
+msgstr "quiz-questions-tab-add-group-button"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:254
@@ -468,6 +488,26 @@ msgstr "Benutzerverwaltung"
 #: src/UserAdminPanel.tsx:38
 msgid "user-admin-panel-search-text"
 msgstr "Suchtext"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:58
+#~ msgid "quiz-card-button-tooltip-edit"
+#~ msgstr "Neil: icon button tooltip-Edit"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:66
+#~ msgid "quiz-card-button-tooltip-share"
+#~ msgstr "Neil: icon button tooltip-Share"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:75
+#~ msgid "quiz-card-button-tooltip-delete"
+#~ msgstr "Neil: icon button tooltip-delete"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuestionsTab.tsx:206
+#~ msgid "quiz-questioins-tab-add-group-button"
+#~ msgstr "Gruppe hinzufügen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:142

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
-import { useNavigate } from "react-router-dom";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import remarkMath from "remark-math";
@@ -24,7 +23,6 @@ export const CommentCard: React.FC<{
     onJumpToQuestion: () => void;
 }> = ({ comment, onUpvote, onAccept, onDelete, teachers, userId, questionText, onJumpToQuestion }) => {
     const [text, setText] = useState("");
-    const nav = useNavigate();
     useEffect(() => {
         const f = async () => {
             const result = await unified()

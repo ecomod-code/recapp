@@ -14,18 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:58
-msgid "quiz-card.button-tooltip.edit"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:66
-msgid "quiz-card.button-tooltip.share"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:75
-msgid "quiz-card.button-tooltip.delete"
+#: src/components/cards/CommentCard.tsx:51
+msgid "comment-card.button-tooltip.upvote"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -49,6 +39,16 @@ msgstr "Description"
 #: src/actors/CurrentQuizActor.ts:359
 msgid "new-quiz-group"
 msgstr "Group"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:82
+msgid "comment-card.button-tooltip.accept"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:91
+msgid "comment-card.button-tooltip.delete"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:57
@@ -393,6 +393,21 @@ msgstr "share"
 #: src/components/quizzes-panel/QuizCard.tsx:37
 msgid "quiz-card-last-change"
 msgstr "Last change"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:58
+msgid "quiz-card.button-tooltip.edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:66
+msgid "quiz-card.button-tooltip.share"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:75
+msgid "quiz-card.button-tooltip.delete"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizzesPanel.tsx:78

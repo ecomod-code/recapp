@@ -14,19 +14,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:58
-msgid "quiz-card.button-tooltip.edit"
-msgstr "Neil: icon button tooltip:Edit"
-
-#. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:66
-msgid "quiz-card.button-tooltip.share"
-msgstr "Neil: icon button tooltip:share"
-
-#. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:75
-msgid "quiz-card.button-tooltip.delete"
-msgstr "Neil: icon button tooltip:delete"
+#: src/components/cards/CommentCard.tsx:51
+msgid "comment-card.button-tooltip.upvote"
+msgstr "Neil: icon button tooltip:upvote"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -49,6 +39,16 @@ msgstr "Beschreibung"
 #: src/actors/CurrentQuizActor.ts:359
 msgid "new-quiz-group"
 msgstr "Gruppe"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:82
+msgid "comment-card.button-tooltip.accept"
+msgstr "Neil: icon button tooltip:accept"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:91
+msgid "comment-card.button-tooltip.delete"
+msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:57
@@ -393,6 +393,21 @@ msgstr "teilen"
 #: src/components/quizzes-panel/QuizCard.tsx:37
 msgid "quiz-card-last-change"
 msgstr "Letzte Änderung"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:58
+msgid "quiz-card.button-tooltip.edit"
+msgstr "Neil: icon button tooltip:Edit"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:66
+msgid "quiz-card.button-tooltip.share"
+msgstr "Neil: icon button tooltip:share"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:75
+msgid "quiz-card.button-tooltip.delete"
+msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizzesPanel.tsx:78

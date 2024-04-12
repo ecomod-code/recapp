@@ -8,7 +8,10 @@ interface Props extends ButtonProps {
 export const ButtonWithTooltip = ({ title, ...buttonProps }: Props) => {
     return (
         <TooltipWrapper title={title}>
-            <Button {...buttonProps} />
+            {/* the span-tag is here to make the tooltip visible event when the button is disabled !! */}
+            <span className="d-inline-block">
+                <Button {...buttonProps} />
+            </span>
         </TooltipWrapper>
     );
 };

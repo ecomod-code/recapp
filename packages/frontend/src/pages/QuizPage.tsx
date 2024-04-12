@@ -1,8 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { User, toId, Comment, Id } from "@recapp/models";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { User, toId, Comment, Id, QuestionGroup } from "@recapp/models";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 
@@ -53,8 +53,8 @@ export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
 	const { state } = useLocation();
-	const quizId: Id = state.quizId;
-	const activate = state.activate;
+	const quizId: Id = state?.quizId;
+	const activate = state?.activate;
 	const system = useActorSystem();
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
@@ -105,6 +105,27 @@ export const QuizPage: React.FC = () => {
 			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
 		});
 	};
+
+	const jumpToQuestion = (questionId: Id) => {
+		const groups: QuestionGroup[] = mbQuiz.flatMap(q => maybe(q.quiz?.groups)).orElse([]);
+		const groupName = groups.find(g => g.questions.includes(questionId))?.name;
+		if (groupName) {
+			nav({ pathname: "/Dashboard/Question" }, { state: { quizId: questionId, group: groupName } });
+		}
+	};
+
+	if (!quizId) {
+		return (
+			<div className="flex-1 justify-content-center align-items-center">
+				<h1>
+					<Trans id="quiz-not-found-error-message" />
+				</h1>
+				<Link to={{ pathname: "/Dashboard" }}>
+					<Trans id="back-to-dashboard-link" />
+				</Link>
+			</div>
+		);
+	}
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -206,6 +227,21 @@ export const QuizPage: React.FC = () => {
 													onUpvote={() => upvoteComment(cmt.uid)}
 													onAccept={() => finishComment(cmt.uid)}
 													onDelete={() => deleteComment(cmt.uid)}
+													onJumpToQuestion={() => jumpToQuestion(cmt.relatedQuestion!)}
+													questionText={
+														!!cmt.relatedQuestion
+															? mbQuiz
+																	.flatMap(q =>
+																		maybe(
+																			q.questions.find(
+																				q => q.uid === cmt.relatedQuestion
+																			)?.text
+																		)
+																	)
+																	.orElse("")
+																	.substring(0, 20)
+															: undefined
+													}
 												/>
 											</div>
 										))

@@ -1,52 +1,24 @@
-import MDEditor, { commands } from "@uiw/react-md-editor";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import "katex/dist/katex.css";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
-import { i18n } from "@lingui/core";
 import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, Question, questionSchema, Id, QuestionType } from "@recapp/models";
-import {
-	Badge,
-	Offcanvas,
-	Button,
-	Card,
-	Container,
-	Row,
-	Accordion,
-	AccordionItem,
-	AccordionBody,
-	Breadcrumb,
-	Tab,
-	Tabs,
-	Form,
-	Alert,
-	InputGroup,
-} from "react-bootstrap";
-import {
-	ArrowDown,
-	ArrowUp,
-	ChatFill,
-	Check,
-	DashLg,
-	NodeMinus,
-	Pencil,
-	PersonRaisedHand,
-} from "react-bootstrap-icons";
+import { Quiz, User, toId, Comment, Question, Id, QuestionType } from "@recapp/models";
+import { Button, Card, Container, Row, Breadcrumb, Form, InputGroup } from "react-bootstrap";
+import { Check, DashLg, Pencil, PersonRaisedHand } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { CommentCard } from "../components/cards/CommentCard";
-import { matchRoutes, useLocation, useNavigate, useNavigation, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
-import { add, isEmpty, keys } from "rambda";
+import { keys } from "rambda";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
-import { DateTime } from "luxon";
-import { toTimestamp } from "itu-utils";
+import { toTimestamp, debug } from "itu-utils";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -532,10 +504,11 @@ export const QuestionEdit: React.FC = () => {
 									<CommentCard
 										userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
 										teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-										comment={cmt}
+										comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
 										onUpvote={() => upvoteComment(cmt.uid)}
 										onAccept={() => finishComment(cmt.uid)}
 										onDelete={() => deleteComment(cmt.uid)}
+										onJumpToQuestion={() => {}}
 									/>
 								</div>
 							))

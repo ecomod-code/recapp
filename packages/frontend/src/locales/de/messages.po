@@ -558,3 +558,11 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #~ msgid "remove-edit-mode-of-question-text"
 #~ msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"
+
+#. js-lingui-explicit-id
+msgid "quiz-not-found-error-message"
+msgstr "Das Quiz konnte nicht geöffnet werden. Das tut uns leid."
+
+#. js-lingui-explicit-id
+msgid "back-to-dashboard-link"
+msgstr "Zurück zum Dashboard"

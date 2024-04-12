@@ -6,19 +6,24 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { Comment, Id } from "@recapp/models";
-import { Button, Card } from "react-bootstrap";
+import { Button, Card, Tooltip } from "react-bootstrap";
 import { fromTimestamp } from "itu-utils";
-import { Check, HandThumbsUp, Trash } from "react-bootstrap-icons";
+import { Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
+import { TooltipWrapper } from "../TooltipWrapper";
+import { useNavigate } from "react-router-dom";
 
 export const CommentCard: React.FC<{
 	comment: Comment;
 	userId: Id;
 	teachers: string[];
+	questionText?: string;
 	onUpvote: () => void;
 	onAccept: () => void;
 	onDelete: () => void;
-}> = ({ comment, onUpvote, onAccept, onDelete, teachers, userId }) => {
+	onJumpToQuestion: () => void;
+}> = ({ comment, onUpvote, onAccept, onDelete, teachers, userId, questionText, onJumpToQuestion }) => {
 	const [text, setText] = useState("");
+	const nav = useNavigate();
 	useEffect(() => {
 		const f = async () => {
 			const result = await unified()
@@ -56,6 +61,18 @@ export const CommentCard: React.FC<{
 				<div className="d-flex flex-row align-items-center">
 					<div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
 					<div>
+						{comment.relatedQuestion && questionText && (
+							<TooltipWrapper title={questionText ?? ""}>
+								<Button
+									variant="secondary"
+									className="m-1"
+									onClick={onJumpToQuestion}
+									disabled={!teachers.includes(userId)}
+								>
+									<Question color="white" />
+								</Button>
+							</TooltipWrapper>
+						)}
 						<Button
 							variant={comment.answered ? "secondary" : "success"}
 							className="m-1"

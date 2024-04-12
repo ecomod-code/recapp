@@ -209,6 +209,21 @@ export const QuestionsTab: React.FC<{
                                                 position: "absolute",
                                                 zIndex: 10,
                                                 top: 0,
+                                                right: 8,
+
+                                                padding: 2,
+                                                pointerEvents: "none",
+                                            }}
+                                        >
+                                            {i18n._("quiz-card-number-of-questions", {
+                                                count: questionGroup.questions?.length ?? 0,
+                                            })}
+                                        </div>
+                                        <div
+                                            style={{
+                                                position: "absolute",
+                                                zIndex: 10,
+                                                top: 0,
                                                 left: 0,
                                                 bottom: 0,
                                                 width: BUTTON_CONTAINER_WIDTH,
@@ -240,7 +255,7 @@ export const QuestionsTab: React.FC<{
                                             </Button>
                                         </div>
 
-                                        <Accordion.Header as={"div"}>
+                                        <Accordion.Header as="div">
                                             <div
                                                 className="d-flex w-100 align-items-center"
                                                 style={{
@@ -250,27 +265,34 @@ export const QuestionsTab: React.FC<{
                                                 }}
                                             >
                                                 <div className="flex-grow-1">
-                                                    <strong>{questionGroup.name} </strong>
+                                                    <span>
+                                                        <strong>{questionGroup.name} </strong>
+
+                                                        <Button
+                                                            as="span"
+                                                            style={{ position: "relative", bottom: 2 }}
+                                                            variant="link"
+                                                            className="m-0 p-0"
+                                                            onClick={e => {
+                                                                e.stopPropagation();
+                                                                return (
+                                                                    !disableForStudentOrMode &&
+                                                                    setCurrentGroup({
+                                                                        showNameModal: true,
+                                                                        name: questionGroup.name,
+                                                                    })
+                                                                );
+                                                            }}
+                                                        >
+                                                            <span
+                                                                style={disableForStudentOrMode ? { color: "grey" } : {}}
+                                                            >
+                                                                <Pencil />
+                                                                edit
+                                                            </span>
+                                                        </Button>
+                                                    </span>
                                                 </div>
-                                                <div>
-                                                    {i18n._("quiz-card-number-of-questions", {
-                                                        count: questionGroup.questions?.length ?? 0,
-                                                    })}
-                                                    &nbsp;&nbsp;
-                                                </div>
-                                                <Button
-                                                    as="div"
-                                                    className={"me-4 " + (disableForStudentOrMode ? "disabled" : "")}
-                                                    onClick={() =>
-                                                        !disableForStudentOrMode &&
-                                                        setCurrentGroup({
-                                                            showNameModal: true,
-                                                            name: questionGroup.name,
-                                                        })
-                                                    }
-                                                >
-                                                    <Pencil />
-                                                </Button>
                                                 <div style={{ width: 32 }}></div>
                                             </div>
                                         </Accordion.Header>

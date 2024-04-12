@@ -7,3 +7,4 @@ sandbox.nbb
 .env.production
 .env.development
 docker/mongo/
+**/yarn.lock

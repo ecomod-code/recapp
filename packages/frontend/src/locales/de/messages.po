@@ -235,7 +235,7 @@ msgstr "bearbeiten"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:337
 msgid "quiz-questions-tab-empty-group-message"
-msgstr "quiz-questions-tab-empty-group-message"
+msgstr "Neil: there is no questios added to the group yet"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:54

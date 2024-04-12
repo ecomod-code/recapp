@@ -14,8 +14,33 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:51
-msgid "comment-card.button-tooltip.upvote"
+#: src/pages/QuestionEdit.tsx:375
+msgid "question-edit.button-tooltip.check"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:383
+msgid "question-edit.button-tooltip.edit-title-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:391
+msgid "question-edit.button-tooltip.edit-comment-text"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:427
+msgid "question-edit.button-tooltip.edit-hint-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:460
+msgid "question-edit.button-tooltip.edit-answer"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:466
+msgid "question-edit.button-tooltip.delete-answer"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -41,12 +66,17 @@ msgid "new-quiz-group"
 msgstr "Group"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:82
+#: src/components/cards/CommentCard.tsx:49
+msgid "comment-card.button-tooltip.upvote"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:80
 msgid "comment-card.button-tooltip.accept"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:91
+#: src/components/cards/CommentCard.tsx:89
 msgid "comment-card.button-tooltip.delete"
 msgstr ""
 
@@ -450,32 +480,32 @@ msgid "create-quiz-button"
 msgstr "Create quiz"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:348
+#: src/pages/QuestionEdit.tsx:358
 msgid "single-choice-selection"
 msgstr "Single choice"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:353
+#: src/pages/QuestionEdit.tsx:363
 msgid "multiple-choice-selection"
 msgstr "Multiple choice"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:358
+#: src/pages/QuestionEdit.tsx:368
 msgid "text-type-selection"
 msgstr "Free text"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:426
+#: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Activate all correct answers"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:453
+#: src/pages/QuestionEdit.tsx:477
 msgid "add-answer-button"
 msgstr "Add answer"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:468
+#: src/pages/QuestionEdit.tsx:492
 msgid "save-question-button"
 msgstr "Save question"
 

@@ -14,9 +14,34 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:51
-msgid "comment-card.button-tooltip.upvote"
-msgstr "Neil: icon button tooltip:upvote"
+#: src/pages/QuestionEdit.tsx:375
+msgid "question-edit.button-tooltip.check"
+msgstr "Neil: icon button tooltip:check"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:383
+msgid "question-edit.button-tooltip.edit-title-text"
+msgstr "Neil: icon button tooltip:edit-title-text"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:391
+msgid "question-edit.button-tooltip.edit-comment-text"
+msgstr "Neil: icon button tooltip:edit-comment-text"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:427
+msgid "question-edit.button-tooltip.edit-hint-title"
+msgstr "Neil: icon button tooltip:edit-hint-title"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:460
+msgid "question-edit.button-tooltip.edit-answer"
+msgstr "Neil: icon button tooltip:edit-answer"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:466
+msgid "question-edit.button-tooltip.delete-answer"
+msgstr "Neil: icon button tooltip:delete-answer"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -41,12 +66,17 @@ msgid "new-quiz-group"
 msgstr "Gruppe"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:82
+#: src/components/cards/CommentCard.tsx:49
+msgid "comment-card.button-tooltip.upvote"
+msgstr "Neil: icon button tooltip:upvote"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:80
 msgid "comment-card.button-tooltip.accept"
 msgstr "Neil: icon button tooltip:accept"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:91
+#: src/components/cards/CommentCard.tsx:89
 msgid "comment-card.button-tooltip.delete"
 msgstr "Neil: icon button tooltip:delete"
 
@@ -450,32 +480,32 @@ msgid "create-quiz-button"
 msgstr "Quiz anlegen"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:348
+#: src/pages/QuestionEdit.tsx:358
 msgid "single-choice-selection"
 msgstr "Einzelauswahl"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:353
+#: src/pages/QuestionEdit.tsx:363
 msgid "multiple-choice-selection"
 msgstr "Mehrfachauswahl"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:358
+#: src/pages/QuestionEdit.tsx:368
 msgid "text-type-selection"
 msgstr "Freitext"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:426
+#: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:453
+#: src/pages/QuestionEdit.tsx:477
 msgid "add-answer-button"
 msgstr "Antwort hinzufügen"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:468
+#: src/pages/QuestionEdit.tsx:492
 msgid "save-question-button"
 msgstr "Frage speichern"
 

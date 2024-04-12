@@ -1,4 +1,9 @@
 import { Fragment, useEffect, useState } from "react";
+import { i18n } from "@lingui/core";
+import { useLocation, useNavigate } from "react-router-dom";
+import { maybe, nothing } from "tsmonads";
+import { Trans } from "@lingui/react";
+import { keys } from "rambda";
 import "katex/dist/katex.css";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
@@ -8,16 +13,20 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, toId, Comment, Question, Id, QuestionType } from "@recapp/models";
-import { Button, Card, Container, Row, Breadcrumb, Form, InputGroup } from "react-bootstrap";
+
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
+import Breadcrumb from "react-bootstrap/Breadcrumb";
+import Form from "react-bootstrap/Form";
+import InputGroup from "react-bootstrap/InputGroup";
 import { Check, DashLg, Pencil, PersonRaisedHand } from "react-bootstrap-icons";
-import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
+import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
-import { useLocation, useNavigate } from "react-router-dom";
-import { maybe, nothing } from "tsmonads";
-import { Trans } from "@lingui/react";
-import { keys } from "rambda";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
+import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 
 const sortComments = (a: Comment, b: Comment) => {
@@ -362,24 +371,30 @@ export const QuestionEdit: React.FC = () => {
                                         </Form.Select>
                                     </div>
                                     <div className="m-1">
-                                        <Button variant="light" disabled>
+                                        <ButtonWithTooltip
+                                            title={i18n._("question-edit.button-tooltip.check")}
+                                            variant="secondary"
+                                            disabled
+                                        >
                                             <Check />
-                                        </Button>
+                                        </ButtonWithTooltip>
                                         &nbsp;
-                                        <Button
+                                        <ButtonWithTooltip
+                                            title={i18n._("question-edit.button-tooltip.edit-title-text")}
                                             variant="primary"
                                             onClick={() => handleMDShow("QUESTION", "edit-title-text")}
                                         >
                                             <Pencil />
-                                        </Button>
+                                        </ButtonWithTooltip>
                                         &nbsp;
-                                        <Button
+                                        <ButtonWithTooltip
+                                            title={i18n._("question-edit.button-tooltip.edit-comment-text")}
                                             variant="warning"
                                             disabled={!question.uid}
                                             onClick={() => handleMDShow("COMMENT", "edit-comment-text")}
                                         >
                                             <PersonRaisedHand />
-                                        </Button>
+                                        </ButtonWithTooltip>
                                     </div>
                                 </Card.Header>
                                 <Card.Body>
@@ -408,7 +423,8 @@ export const QuestionEdit: React.FC = () => {
                                             }}
                                         />
                                         <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
-                                        <Button
+                                        <ButtonWithTooltip
+                                            title={i18n._("question-edit.button-tooltip.edit-hint-title")}
                                             disabled={!hint}
                                             onClick={() =>
                                                 setShowTextModal({
@@ -419,7 +435,7 @@ export const QuestionEdit: React.FC = () => {
                                             }
                                         >
                                             <Pencil />
-                                        </Button>
+                                        </ButtonWithTooltip>
                                     </InputGroup>
                                 </Card.Body>
                                 {question.type !== "TEXT" && (
@@ -440,12 +456,19 @@ export const QuestionEdit: React.FC = () => {
                                                         <InputGroup.Text className="flex-grow-1">
                                                             {answer.text}
                                                         </InputGroup.Text>
-                                                        <Button>
-                                                            <Pencil onClick={() => editAnswer(i)} />
-                                                        </Button>
-                                                        <Button variant="danger" onClick={() => deleteAnswer(i)}>
+                                                        <ButtonWithTooltip
+                                                            title={i18n._("question-edit.button-tooltip.edit-answer")}
+                                                            onClick={() => editAnswer(i)}
+                                                        >
+                                                            <Pencil />
+                                                        </ButtonWithTooltip>
+                                                        <ButtonWithTooltip
+                                                            title={i18n._("question-edit.button-tooltip.delete-answer")}
+                                                            variant="danger"
+                                                            onClick={() => deleteAnswer(i)}
+                                                        >
                                                             <DashLg />
-                                                        </Button>
+                                                        </ButtonWithTooltip>
                                                     </InputGroup>
                                                 );
                                             })}

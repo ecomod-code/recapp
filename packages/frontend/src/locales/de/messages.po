@@ -14,9 +14,19 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:422
-msgid "button-label-share"
-msgstr "teilen"
+#: src/components/quizzes-panel/QuizCard.tsx:59
+msgid "quiz-card-button-tooltip-edit"
+msgstr "Neil: icon button tooltip-Edit"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:67
+msgid "quiz-card-button-tooltip-share"
+msgstr "Neil: icon button tooltip-Share"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:78
+msgid "quiz-card-button-tooltip-delete"
+msgstr "Neil: icon button tooltip-delete"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -41,7 +51,7 @@ msgid "new-quiz-group"
 msgstr "Gruppe"
 
 #. js-lingui-explicit-id
-#: src/components/cards/QuestionCard.tsx:52
+#: src/components/cards/QuestionCard.tsx:56
 msgid "authored-by"
 msgstr "von {author}"
 
@@ -199,41 +209,41 @@ msgid "close"
 msgstr "Schließen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:190
-#: src/components/quiz-tabs/QuestionsTab.tsx:228
-#: src/components/quizzes-panel/QuizCard.tsx:48
+#: src/components/quiz-tabs/QuestionsTab.tsx:191
+#: src/components/quiz-tabs/QuestionsTab.tsx:230
+#: src/components/quizzes-panel/QuizCard.tsx:46
 msgid "quiz-card-number-of-questions"
 msgstr "{count} Fragen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:191
-#: src/components/quizzes-panel/QuizCard.tsx:47
+#: src/components/quiz-tabs/QuestionsTab.tsx:192
+#: src/components/quizzes-panel/QuizCard.tsx:45
 msgid "quiz-card-number-of-participants"
 msgstr "{count} Teilnehmende "
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:196
+#: src/components/quiz-tabs/QuestionsTab.tsx:197
 msgid "quiz-show-qr-code-button"
 msgstr "QR-Code anzeigen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:205
+#: src/components/quiz-tabs/QuestionsTab.tsx:206
 msgid "quiz-questions-tab-add-group-button"
 msgstr "Gruppe hinzufügen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:253
+#: src/components/quiz-tabs/QuestionsTab.tsx:254
 msgid "quiz-questions-tab-new-question-button"
 msgstr "Neue Frage"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:318
+#: src/components/quiz-tabs/QuestionsTab.tsx:319
 #: src/components/quiz-tabs/QuizDataTab.tsx:410
 msgid "button-label-edit"
 msgstr "bearbeiten"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:337
+#: src/components/quiz-tabs/QuestionsTab.tsx:338
 msgid "quiz-questions-tab-empty-group-message"
 msgstr "Neil: there is no questios added to the group yet"
 
@@ -355,7 +365,12 @@ msgid "archive-quiz-button"
 msgstr "Quiz archivieren"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizCard.tsx:39
+#: src/components/quiz-tabs/QuizDataTab.tsx:422
+msgid "button-label-share"
+msgstr "teilen"
+
+#. js-lingui-explicit-id
+#: src/components/quizzes-panel/QuizCard.tsx:37
 msgid "quiz-card-last-change"
 msgstr "Letzte Änderung"
 
@@ -400,37 +415,47 @@ msgid "create-quiz-button"
 msgstr "Quiz anlegen"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:376
+#: src/pages/QuestionEdit.tsx:348
 msgid "single-choice-selection"
 msgstr "Einzelauswahl"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:381
+#: src/pages/QuestionEdit.tsx:353
 msgid "multiple-choice-selection"
 msgstr "Mehrfachauswahl"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:386
+#: src/pages/QuestionEdit.tsx:358
 msgid "text-type-selection"
 msgstr "Freitext"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:454
+#: src/pages/QuestionEdit.tsx:426
 msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:481
+#: src/pages/QuestionEdit.tsx:453
 msgid "add-answer-button"
 msgstr "Antwort hinzufügen"
 
 #. js-lingui-explicit-id
-#: src/pages/QuestionEdit.tsx:496
+#: src/pages/QuestionEdit.tsx:468
 msgid "save-question-button"
 msgstr "Frage speichern"
 
 #. js-lingui-explicit-id
-#: src/pages/QuizPage.tsx:187
+#: src/pages/QuizPage.tsx:121
+msgid "quiz-not-found-error-message"
+msgstr "Das Quiz konnte nicht geöffnet werden. Das tut uns leid."
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:124
+msgid "back-to-dashboard-link"
+msgstr "Zurück zum Dashboard"
+
+#. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:208
 msgid "comment-row-new-comment-button"
 msgstr "Neuer Kommentar"
 
@@ -558,11 +583,3 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #~ msgid "remove-edit-mode-of-question-text"
 #~ msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"
-
-#. js-lingui-explicit-id
-msgid "quiz-not-found-error-message"
-msgstr "Das Quiz konnte nicht geöffnet werden. Das tut uns leid."
-
-#. js-lingui-explicit-id
-msgid "back-to-dashboard-link"
-msgstr "Zurück zum Dashboard"

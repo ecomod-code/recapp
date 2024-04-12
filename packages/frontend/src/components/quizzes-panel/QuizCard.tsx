@@ -1,14 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Quiz, QuestionGroup } from "@recapp/models";
-import Badge from "react-bootstrap/Badge";
-import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
-import { Pencil, Share, Trash } from "react-bootstrap-icons";
-import { fromTimestamp } from "itu-utils";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
-import { TooltipWrapper } from "../TooltipWrapper";
+import { fromTimestamp } from "itu-utils";
+import { Quiz, QuestionGroup } from "@recapp/models";
+import Badge from "react-bootstrap/Badge";
+import Card from "react-bootstrap/Card";
+import { Pencil, Share, Trash } from "react-bootstrap-icons";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 
 const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
     groups.reduce((count, group) => count + (group?.questions?.length ?? 0), 0);
@@ -55,26 +54,31 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
 
                 <Card.Footer>
                     <div className="d-flex flex-row justify-content-end">
-                        <TooltipWrapper title="edit">
-                            <Button
-                                variant="primary"
-                                onClick={() => nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } })}
-                            >
-                                <Pencil />
-                            </Button>
-                        </TooltipWrapper>
+                        <ButtonWithTooltip
+                            title={i18n._("quiz-card-button-tooltip-edit")}
+                            variant="primary"
+                            onClick={() => nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } })}
+                        >
+                            <Pencil />
+                        </ButtonWithTooltip>
 
-                        <TooltipWrapper title="share">
-                            <Button className="ms-2" variant="secondary" onClick={onShare}>
-                                <Share />
-                            </Button>
-                        </TooltipWrapper>
+                        <ButtonWithTooltip
+                            title={i18n._("quiz-card-button-tooltip-share")}
+                            className="ms-2"
+                            variant="secondary"
+                            onClick={onShare}
+                        >
+                            <Share />
+                        </ButtonWithTooltip>
 
-                        <TooltipWrapper title="delete">
-                            <Button className="ms-2" variant="danger" onClick={onDelete}>
-                                <Trash />
-                            </Button>
-                        </TooltipWrapper>
+                        <ButtonWithTooltip
+                            title={i18n._("quiz-card-button-tooltip-delete")}
+                            variant="danger"
+                            className="ms-2"
+                            onClick={onDelete}
+                        >
+                            <Trash />
+                        </ButtonWithTooltip>
                     </div>
                 </Card.Footer>
             </Card>

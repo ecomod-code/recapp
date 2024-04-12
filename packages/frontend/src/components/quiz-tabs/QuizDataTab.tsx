@@ -407,7 +407,7 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 						disabled={props.editButton.isDisabled}
 					>
 						<Pencil />
-						<span className="ms-1">edit</span>
+						<span className="ms-1">{i18n._("button-label-edit")}</span>
 					</Button>
 				) : null}
 
@@ -419,7 +419,7 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 						disabled={props.shareButton.isDisabled}
 					>
 						<Share />
-						<span className="ms-1">share</span>
+						<span className="ms-1">{i18n._("button-label-share")}</span>
 					</Button>
 				) : null}
 			</div>

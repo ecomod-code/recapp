@@ -1,18 +1,22 @@
-import { Id, Question, QuestionGroup, Quiz, User, toId } from "@recapp/models";
-import { Accordion, Button, Row } from "react-bootstrap";
-import { ArrowDown, ArrowUp, Pencil } from "react-bootstrap-icons";
-import { useNavigate } from "react-router-dom";
-import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { useStatefulActor } from "ts-actors-react";
-import { YesNoModal } from "../modals/YesNoModal";
-import { ShareModal } from "../modals/ShareModal";
-import { useState } from "react";
-import { Maybe } from "tsmonads";
-import { ChangeGroupModal } from "../modals/ChangeGroupModal";
-import { CreateGroupModal } from "../modals/CreateGroupModal";
-import { QuestionCard } from "../cards/QuestionCard";
+import { CSSProperties, PropsWithChildren, useState } from "react";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
+import { Id, Question, QuestionGroup, Quiz, User, toId } from "@recapp/models";
+import { useNavigate } from "react-router-dom";
+import { useStatefulActor } from "ts-actors-react";
+import { Maybe } from "tsmonads";
+
+import Accordion from "react-bootstrap/Accordion";
+import Button, { ButtonProps } from "react-bootstrap/Button";
+import Row from "react-bootstrap/Row";
+import { ArrowDown, ArrowUp, Pencil, Plus } from "react-bootstrap-icons";
+import { QuestionCard } from "../cards/QuestionCard";
+
+import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
+import { YesNoModal } from "../modals/YesNoModal";
+import { ShareModal } from "../modals/ShareModal";
+import { ChangeGroupModal } from "../modals/ChangeGroupModal";
+import { CreateGroupModal } from "../modals/CreateGroupModal";
 
 const BUTTON_CONTAINER_WIDTH = 40;
 
@@ -184,13 +188,22 @@ export const QuestionsTab: React.FC<{
             <div className="d-flex flex-column h-100 w-100">
                 <div className="d-flex flex-row mb-4">
                     <div>
-                        {i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })} Fragen,{" "}
+                        {i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
                         {i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
                     </div>
                     <div className="flex-grow-1">&nbsp;</div>
                     <div>
-                        <Button onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
+                        <Button variant="outline-primary" onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
                             <Trans id="quiz-show-qr-code-button" />
+                        </Button>
+
+                        <Button
+                            className="m-2"
+                            style={{ width: "12rem" }}
+                            onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+                            disabled={disableForStudentOrMode}
+                        >
+                            <Trans id="quiz-questions-tab-add-group-button" />
                         </Button>
                     </div>
                 </div>
@@ -208,16 +221,39 @@ export const QuestionsTab: React.FC<{
                                             style={{
                                                 position: "absolute",
                                                 zIndex: 10,
-                                                top: 0,
-                                                right: 8,
-
-                                                padding: 2,
+                                                right: 0,
+                                                bottom: 1,
                                                 pointerEvents: "none",
                                             }}
                                         >
-                                            {i18n._("quiz-card-number-of-questions", {
-                                                count: questionGroup.questions?.length ?? 0,
-                                            })}
+                                            <span style={{ fontSize: 16 }}>
+                                                {i18n._("quiz-card-number-of-questions", {
+                                                    count: questionGroup.questions?.length ?? 0,
+                                                })}
+                                            </span>
+
+                                            <Button
+                                                style={{
+                                                    pointerEvents: "auto",
+                                                    borderRadius: 0,
+                                                    paddingLeft: 4,
+                                                    marginLeft: 12,
+                                                }}
+                                                variant="outline-primary"
+                                                disabled={disableForStudentOrMode}
+                                                size="sm"
+                                                onClick={() => {
+                                                    nav(
+                                                        { pathname: "/Dashboard/Question" },
+                                                        { state: { group: questionGroup.name } }
+                                                    );
+                                                }}
+                                            >
+                                                <span>
+                                                    <Plus size={24} />
+                                                    <Trans id="quiz-questions-tab-new-question-button" />
+                                                </span>
+                                            </Button>
                                         </div>
                                         <div
                                             style={{
@@ -260,7 +296,7 @@ export const QuestionsTab: React.FC<{
                                                 className="d-flex w-100 align-items-center"
                                                 style={{
                                                     margin: "-0.5rem",
-                                                    minHeight: 100,
+                                                    minHeight: 120,
                                                     paddingLeft: BUTTON_CONTAINER_WIDTH,
                                                 }}
                                             >
@@ -268,29 +304,20 @@ export const QuestionsTab: React.FC<{
                                                     <span>
                                                         <strong>{questionGroup.name} </strong>
 
-                                                        <Button
-                                                            as="span"
-                                                            style={{ position: "relative", bottom: 2 }}
+                                                        <NestedButton
                                                             variant="link"
-                                                            className="m-0 p-0"
-                                                            onClick={e => {
-                                                                e.stopPropagation();
-                                                                return (
-                                                                    !disableForStudentOrMode &&
-                                                                    setCurrentGroup({
-                                                                        showNameModal: true,
-                                                                        name: questionGroup.name,
-                                                                    })
-                                                                );
-                                                            }}
+                                                            isDisabled={disableForStudentOrMode}
+                                                            containerStyles={{ paddingLeft: 4, marginLeft: 4 }}
+                                                            onClick={() =>
+                                                                setCurrentGroup({
+                                                                    showNameModal: true,
+                                                                    name: questionGroup.name,
+                                                                })
+                                                            }
                                                         >
-                                                            <span
-                                                                style={disableForStudentOrMode ? { color: "grey" } : {}}
-                                                            >
-                                                                <Pencil />
-                                                                edit
-                                                            </span>
-                                                        </Button>
+                                                            <Pencil />
+                                                            {i18n._("button-label-edit")}
+                                                        </NestedButton>
                                                     </span>
                                                 </div>
                                                 <div style={{ width: 32 }}></div>
@@ -308,7 +335,7 @@ export const QuestionsTab: React.FC<{
                                                     className="d-flex justify-content-center align-items-center m-0 bg-white "
                                                     style={{ fontSize: 18, height: 80 }}
                                                 >
-                                                    No questions added yet
+                                                    <Trans id="quiz-questions-tab-empty-group-message" />
                                                 </p>
                                             ) : null}
                                             {questionGroup.questions
@@ -351,29 +378,44 @@ export const QuestionsTab: React.FC<{
                             );
                         })}
                     </Accordion>
-                    <Button
-                        className="m-2"
-                        style={{ width: "12rem" }}
-                        onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
-                        disabled={disableForStudentOrMode}
-                    >
-                        <Trans id="quiz-questions-tab-add-group-button" />
-                    </Button>
-                    <Button
-                        className="m-2"
-                        style={{ width: "12rem" }}
-                        onClick={() => {
-                            nav({ pathname: "/Dashboard/Question" });
-                        }}
-                        disabled={
-                            (disableForStudentOrMode && !quizData.quiz.studentQuestions) ||
-                            quizData.quiz.state !== "EDITING"
-                        }
-                    >
-                        <Trans id="quiz-questions-tab-new-question-button" />
-                    </Button>
                 </div>
             </div>
         </Row>
+    );
+};
+
+const NestedButton = (
+    props: {
+        isDisabled?: boolean;
+        onClick: () => void;
+        variant?: ButtonProps["variant"];
+        containerStyles?: CSSProperties;
+    } & PropsWithChildren
+) => {
+    const isVariantLink = props.variant === "link";
+
+    return (
+        <Button
+            as="span"
+            style={{
+                ...(isVariantLink
+                    ? { position: "relative", bottom: 3 }
+                    : { borderColor: props.isDisabled ? "grey" : undefined }),
+                ...props.containerStyles,
+            }}
+            variant={props.variant}
+            className={props.isDisabled ? "disabled" : ""}
+            onClick={e => {
+                e.stopPropagation();
+
+                if (props.isDisabled) return;
+                props.onClick();
+            }}
+        >
+            <span style={props.isDisabled ? { color: "grey" } : {}}>
+                {/*  */}
+                {props.children}
+            </span>
+        </Button>
     );
 };

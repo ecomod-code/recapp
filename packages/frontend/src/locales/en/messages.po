@@ -14,8 +14,23 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/RunningQuizTab.tsx:120
-msgid "running-quiz-tab.button-tooltip.comment"
+#: src/components/modals/ShareQuizModal.tsx:60
+msgid "share-quiz-modal.button-tooltip.clear"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:323
+msgid "quiz-data-tab.button-tooltip.edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:336
+msgid "quiz-data-tab.button-tooltip.share"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/UserAdminPanel.tsx:39
+msgid "user-admin-panel.button-tooltip.filter"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -26,7 +41,7 @@ msgstr "Login"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:356
-#: src/components/quiz-tabs/QuizDataTab.tsx:225
+#: src/components/quiz-tabs/QuizDataTab.tsx:144
 msgid "new-quiz-title"
 msgstr "Title"
 
@@ -145,9 +160,9 @@ msgstr "Change group"
 #: src/components/modals/ChangeRoleModal.tsx:44
 #: src/components/modals/CreateGroupModal.tsx:64
 #: src/components/modals/MarkdownModal.tsx:100
+#: src/components/modals/ShareQuizModal.tsx:96
 #: src/components/modals/TextModal.tsx:50
 #: src/components/modals/YesNoModal.tsx:40
-#: src/components/quiz-tabs/QuizDataTab.tsx:91
 msgid "cancel"
 msgstr "Cancel"
 
@@ -234,6 +249,21 @@ msgid "close"
 msgstr "Close"
 
 #. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:54
+msgid "share-with-teachers-modal-title"
+msgstr "Select teachers for sharing"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:70
+msgid "share-with-teachers-persons-to-add"
+msgstr "People to be added"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:93
+msgid "share-with-confirmed-users"
+msgstr "Share with confirmed users"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:191
 #: src/components/quiz-tabs/QuestionsTab.tsx:230
 #: src/components/quizzes-panel/QuizCard.tsx:46
@@ -263,7 +293,7 @@ msgstr "New question"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:319
-#: src/components/quiz-tabs/QuizDataTab.tsx:410
+#: src/components/quiz-tabs/QuizDataTab.tsx:330
 msgid "button-label-edit"
 msgstr "edit"
 
@@ -273,126 +303,116 @@ msgid "quiz-questions-tab-empty-group-message"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:54
-msgid "share-with-teachers-modal-title"
-msgstr "Select teachers for sharing"
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:65
-msgid "share-with-teachers-persons-to-add"
-msgstr "People to be added"
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:88
-msgid "share-with-confirmed-users"
-msgstr "Share with confirmed users"
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:201
+#: src/components/quiz-tabs/QuizDataTab.tsx:120
 msgid "start-quiz-mode-button"
 msgstr "Start quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:209
+#: src/components/quiz-tabs/QuizDataTab.tsx:128
 msgid "freeze-quiz-button"
 msgstr "Freeze quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:217
+#: src/components/quiz-tabs/QuizDataTab.tsx:136
 msgid "edit-quiz-button"
 msgstr "Edit quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:241
+#: src/components/quiz-tabs/QuizDataTab.tsx:160
 #: src/pages/CreateQuiz.tsx:60
 msgid "quiz-description"
 msgstr "Description"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:256
+#: src/components/quiz-tabs/QuizDataTab.tsx:175
 msgid "number-of-participants"
 msgstr "Number of participants"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:261
+#: src/components/quiz-tabs/QuizDataTab.tsx:180
 msgid "teachers"
 msgstr "Teachers"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:273
+#: src/components/quiz-tabs/QuizDataTab.tsx:192
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
 msgstr "Allow student comments in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:280
+#: src/components/quiz-tabs/QuizDataTab.tsx:199
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
 msgstr "Have students create questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:287
+#: src/components/quiz-tabs/QuizDataTab.tsx:206
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
 msgstr "Student participation options"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:290
+#: src/components/quiz-tabs/QuizDataTab.tsx:209
 #: src/pages/CreateQuiz.tsx:101
 msgid "quiz-allows-anonymous-participation"
 msgstr "Anonymous participation"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:303
+#: src/components/quiz-tabs/QuizDataTab.tsx:222
 #: src/pages/CreateQuiz.tsx:118
 msgid "quiz-allows-participation-via-nickname"
 msgstr "Participation with pseudonym"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:314
+#: src/components/quiz-tabs/QuizDataTab.tsx:233
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-participation-via-realname"
 msgstr "Participation with real name"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:325
+#: src/components/quiz-tabs/QuizDataTab.tsx:244
 #: src/pages/CreateQuiz.tsx:151
 msgid "quiz-allowed-question-types"
 msgstr "Allowed question types"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:328
+#: src/components/quiz-tabs/QuizDataTab.tsx:247
 #: src/pages/CreateQuiz.tsx:154
 msgid "quiz-allows-text-questions"
 msgstr "Allow free-text questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:339
+#: src/components/quiz-tabs/QuizDataTab.tsx:258
 #: src/pages/CreateQuiz.tsx:171
 msgid "quiz-allows-single-choice-questions"
 msgstr "Allow single-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:350
+#: src/components/quiz-tabs/QuizDataTab.tsx:269
 #: src/pages/CreateQuiz.tsx:188
 msgid "quiz-allows-multiple-choice-realname"
 msgstr "Allow multiple-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:364
+#: src/components/quiz-tabs/QuizDataTab.tsx:283
 #: src/pages/CreateQuiz.tsx:207
 msgid "quiz-enable-question-shufflling"
 msgstr "Shuffle questions in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:377
+#: src/components/quiz-tabs/QuizDataTab.tsx:296
 msgid "archive-quiz-button"
 msgstr "Archive quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:422
+#: src/components/quiz-tabs/QuizDataTab.tsx:343
 msgid "button-label-share"
 msgstr "share"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/RunningQuizTab.tsx:120
+msgid "running-quiz-tab.button-tooltip.comment"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:37
@@ -540,12 +560,12 @@ msgid "comment-row-new-comment-button"
 msgstr "New comment"
 
 #. js-lingui-explicit-id
-#: src/UserAdminPanel.tsx:30
+#: src/UserAdminPanel.tsx:35
 msgid "user-admin-panel-title"
 msgstr "User administration"
 
 #. js-lingui-explicit-id
-#: src/UserAdminPanel.tsx:38
+#: src/UserAdminPanel.tsx:45
 msgid "user-admin-panel-search-text"
 msgstr "Search text"
 

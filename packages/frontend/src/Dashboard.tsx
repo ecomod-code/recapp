@@ -13,6 +13,7 @@ import { cookie } from "./utils";
 const tabClasses = "py-3";
 
 export const Dashboard: React.FC = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [_, errorActor] = useStatefulActor("ErrorActor");
     const [state] = useStatefulActor<{ user: User }>("LocalUser");
     const nav = useNavigate();

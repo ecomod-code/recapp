@@ -32,8 +32,8 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
 }) => {
     const nav = useNavigate();
     return (
-        <div className="m-2 mb-4 p-0">
-            <div style={{ fontSize: 12, color: "grey" }}>
+        <div className="p-0 position-relative" style={{ margin: "2.5rem 0.5rem" }}>
+            <div style={{ position: "absolute", top: -18, left: 2, fontSize: 12, color: "grey" }}>
                 <Trans id="quiz-card-last-change" />
                 &nbsp;
                 {fromTimestamp(quiz.updated ?? -1).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}

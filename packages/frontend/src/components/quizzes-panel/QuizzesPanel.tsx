@@ -5,6 +5,7 @@ import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, Id, toId } from "@recapp/models";
 import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
+import { Plus } from "react-bootstrap-icons";
 import { ArchiveQuizMessage } from "../../actors/LocalUserActor";
 import { QuizCard } from "./QuizCard";
 import { ShareModal } from "../modals/ShareModal";
@@ -30,6 +31,7 @@ export const QuizzesPanel: React.FC = () => {
         const q: Array<Partial<Quiz>> = state.map(s => Array.from(s.quizzes.values())).orElse([]);
         setQuizzes(
             q.toSorted((a, b) => {
+                // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
                 return b.updated?.value! - a.updated?.value!;
             })
         );
@@ -54,6 +56,15 @@ export const QuizzesPanel: React.FC = () => {
 
     return (
         <Container fluid className="p-0">
+            <div className="d-flex justify-content-end">
+                <Button
+                    className="ps-1 d-flex justify-content-center align-items-center mb-3"
+                    onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}
+                >
+                    <Plus size={28} />
+                    <Trans id="button-new-quiz" />
+                </Button>
+            </div>
             <YesNoModal
                 show={!!deleteModal}
                 titleId="archive-quiz-title"
@@ -61,8 +72,14 @@ export const QuizzesPanel: React.FC = () => {
                 onClose={() => setDeleteModal(toId(""))}
                 onSubmit={deleteQuestion}
             />
+
             <ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
-            <Container fluid style={{ maxHeight: "70vh", overflowY: "auto" }}>
+
+            <Container
+                fluid
+                className="border-2 border-top"
+                // style={{ maxHeight: "70vh", overflowY: "auto" }}
+            >
                 {(quizzes ?? []).map(q => {
                     return (
                         <QuizCard
@@ -74,9 +91,6 @@ export const QuizzesPanel: React.FC = () => {
                     );
                 })}
             </Container>
-            <Button className="mt-3" onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}>
-                <Trans id="button-new-quiz" />
-            </Button>
         </Container>
     );
 };

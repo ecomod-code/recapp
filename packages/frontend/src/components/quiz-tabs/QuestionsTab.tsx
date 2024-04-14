@@ -215,14 +215,14 @@ export const QuestionsTab: React.FC<{
                             const isLast = index === arr.length - 1;
 
                             return (
-                                <Accordion.Item key={questionGroup.name} eventKey={questionGroup.name}>
+                                <Accordion.Item key={questionGroup.name} eventKey={questionGroup.name} className="mb-2">
                                     <div className="position-relative">
                                         <div
                                             style={{
                                                 position: "absolute",
                                                 zIndex: 10,
-                                                right: 1,
-                                                bottom: 1,
+                                                right: 0,
+                                                bottom: 0,
                                                 pointerEvents: "none",
                                             }}
                                         >
@@ -235,7 +235,7 @@ export const QuestionsTab: React.FC<{
                                             <Button
                                                 style={{
                                                     pointerEvents: "auto",
-                                                    borderRadius: 0,
+                                                    // borderRadius: 0,
                                                     paddingLeft: 4,
                                                     marginLeft: 12,
                                                 }}
@@ -290,15 +290,10 @@ export const QuestionsTab: React.FC<{
                                                 <ArrowDown />
                                             </Button>
                                         </div>
-
                                         <Accordion.Header as="div">
                                             <div
                                                 className="d-flex w-100 align-items-center"
-                                                style={{
-                                                    margin: "-0.5rem",
-                                                    minHeight: 120,
-                                                    paddingLeft: BUTTON_CONTAINER_WIDTH,
-                                                }}
+                                                style={{ minHeight: 100, paddingLeft: BUTTON_CONTAINER_WIDTH }}
                                             >
                                                 <div className="flex-grow-1">
                                                     <span>

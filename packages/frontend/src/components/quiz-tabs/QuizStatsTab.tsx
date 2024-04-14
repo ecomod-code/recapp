@@ -6,6 +6,8 @@ import { Button } from "react-bootstrap";
 import { ChoiceElementStatistics } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
+import { Trans } from "@lingui/react";
+import { i18n } from "@lingui/core";
 
 const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
@@ -125,8 +127,13 @@ export const QuizStatsTab: React.FC = () => {
 											onDownload={downloadExport}
 										/>
 										<div className="mb-4 d-flex flex-row">
-											<Button onClick={exportQuiz}>Quizstatistik exportieren</Button>&nbsp;&nbsp;
-											<Button onClick={exportQuestions}>Fragenstatistik exportieren</Button>
+											<Button onClick={exportQuiz}>
+												<Trans id="export-quiz-statistics-button" />
+											</Button>
+											&nbsp;&nbsp;
+											<Button onClick={exportQuestions}>
+												<Trans id="export-question-statistics-button" />
+											</Button>
 										</div>
 									</>
 								)}
@@ -153,7 +160,9 @@ export const QuizStatsTab: React.FC = () => {
 
 														{noDetails ? (
 															<div>
-																<em>Es liegen noch keine auswertbaren Daten vor</em>
+																<em>
+																	<Trans id="no-data-yet" />
+																</em>
 															</div>
 														) : (
 															<div>
@@ -180,7 +189,7 @@ export const QuizStatsTab: React.FC = () => {
 															}
 															disabled={noDetails}
 														>
-															Details
+															<Trans id="details" />
 														</Button>
 													</div>
 												</div>
@@ -200,21 +209,32 @@ export const QuizStatsTab: React.FC = () => {
 
 					return (
 						<div>
-							<h2>Frage: {question.text.slice(0, 80)}</h2>
+							<h2>
+								<Trans id="question-stats-prefix" /> {question.text.slice(0, 80)}
+							</h2>
 							<div>
-								{questionStats.participants} Teilnehmende von {questionStats.maximumParticipants} (
-								{((questionStats.participants / questionStats.maximumParticipants) * 100.0).toFixed(2)}{" "}
-								%) haben die Frage bearbeitet.
+								{i18n._("question-stats-info", {
+									participants: questionStats.participants,
+									maxParticipants: questionStats.maximumParticipants,
+									ratio: (
+										(questionStats.participants / questionStats.maximumParticipants) *
+										100.0
+									).toFixed(2),
+								})}
 							</div>
 							<div>
 								{question.type === "TEXT" && (
 									<div className="mb-5">
 										<div>
-											{questionStats.answers.length -
-												questionStats.answers.filter(a => a.toString().length > 0).length}{" "}
-											Antworten wurden gegeben
+											{i18n._("question-stats-answers-given", {
+												numberOfAnswers:
+													questionStats.answers.length -
+													questionStats.answers.filter(a => a.toString().length > 0).length,
+											})}
 										</div>
-										<div className="mt-2 mb-2">Es wurden folgenden Antworten gegeben</div>
+										<div className="mt-2 mb-2">
+											<Trans id="question-stats-given-answers" />
+										</div>
 										{questionStats.answers.map((a, i) => (
 											<div key={`${a}-${i}`}>{a}</div>
 										))}
@@ -224,15 +244,21 @@ export const QuizStatsTab: React.FC = () => {
 								{question.type !== "TEXT" && (
 									<div className="mb-5">
 										<div>
-											{(questionStats as ChoiceElementStatistics).passed} von{" "}
-											{(questionStats as ChoiceElementStatistics).participants} Antworten waren
-											richtig.
+											{i18n._("question-stats-correct-answers", {
+												passed: (questionStats as ChoiceElementStatistics).passed,
+												participants: (questionStats as ChoiceElementStatistics).participants,
+											})}
 										</div>
-										<div className="mt-2 mb-2">Es wurden folgenden Antworten gegeben</div>
+										<div className="mt-2 mb-2">
+											<Trans id="question-stats-given-answers" />
+										</div>
 										{question.answers.map(({ text, correct }, i) => (
 											<div key={text} className="d-flex flex-row w-100">
 												<div className="w-50">
-													<span>Antwort:&nbsp;{text}&nbsp;</span>
+													<span>
+														<Trans id="question-stats-answer-prefix" />
+														{text}&nbsp;
+													</span>
 												</div>
 												<div className="flex-grow-1">
 													<QuestionBarChart
@@ -254,7 +280,7 @@ export const QuizStatsTab: React.FC = () => {
 									)
 								}
 							>
-								Zurück zum Quiz
+								<Trans id="question-stats-back-to-quiz-button" />
 							</Button>
 							&nbsp;&nbsp;
 							{questionsByGroupIndex > 0 && (
@@ -272,7 +298,7 @@ export const QuizStatsTab: React.FC = () => {
 											)
 										}
 									>
-										Vorherige Frage
+										<Trans id="question-stats-previous-question-button" />
 									</Button>
 									&nbsp;&nbsp;
 								</>
@@ -292,7 +318,7 @@ export const QuizStatsTab: React.FC = () => {
 											)
 										}
 									>
-										Nächste Frage
+										<Trans id="question-stats-next-question-button" />
 									</Button>
 									&nbsp;&nbsp;
 								</>

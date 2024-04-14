@@ -14,13 +14,8 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:88
-msgid "header-section.button-tooltip.edit-or-add-pseudonym"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/layout/HeaderSection.tsx:103
-msgid "header-section.button-tooltip.logout"
+#: src/components/quiz-tabs/RunningQuizTab.tsx:120
+msgid "running-quiz-tab.button-tooltip.comment"
 msgstr ""
 
 #. js-lingui-explicit-id
@@ -433,6 +428,16 @@ msgstr "Quizzes"
 #: src/Dashboard.tsx:43
 msgid "dashboard-tab-label-users"
 msgstr "Users"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.button-tooltip.edit-or-add-pseudonym"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:103
+msgid "header-section.button-tooltip.logout"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:107

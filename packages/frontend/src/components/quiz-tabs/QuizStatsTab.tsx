@@ -3,7 +3,6 @@ import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Button } from "react-bootstrap";
-import { BarChart } from "react-bootstrap-icons";
 import { ChoiceElementStatistics } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";

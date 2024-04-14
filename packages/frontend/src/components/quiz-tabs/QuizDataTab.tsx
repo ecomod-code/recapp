@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz } from "@recapp/models";
@@ -7,98 +7,17 @@ import { toTimestamp } from "itu-utils";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
-import { Pencil, Share, Trash } from "react-bootstrap-icons";
+import { Pencil, Share } from "react-bootstrap-icons";
 import { TextModal } from "../modals/TextModal";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { SharingMessages, SharingState } from "../../actors/SharingActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { ListGroupContainer } from "../ListGroupContainer";
 import { Trans } from "@lingui/react";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
-
-const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({ quiz, show, onClose }) => {
-	const [name, setName] = useState("");
-	const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
-	useEffect(() => {
-		tryActor.forEach(actor => actor.send(actor, SharingMessages.SetQuiz(quiz)));
-	}, [quiz]);
-
-	const add = () => {
-		tryActor.forEach(actor => actor.send(actor, SharingMessages.AddEntry(name)));
-		setName("");
-	};
-
-	const share = () => {
-		tryActor.forEach(actor => actor.send(actor, SharingMessages.Share()));
-		setName("");
-		onClose();
-	};
-
-	const cancel = () => {
-		setName("");
-		onClose();
-	};
-
-	const clear = () => {
-		tryActor.forEach(actor => actor.send(actor, SharingMessages.Clear()));
-	};
-
-	return mbShare
-		.map(s => s.teachers)
-		.match(
-			teachers => {
-				return (
-					<Modal show={show}>
-						<Modal.Title className="p-1 ps-2 text-bg-primary">
-							<Trans id="share-with-teachers-modal-title" />
-						</Modal.Title>
-						<Modal.Body>
-							<div className="mb-2 mt-2" style={{ minHeight: 48 }}>
-								<div style={{ position: "absolute", right: 8 }}>
-									<Button className="me-2" variant="warning" onClick={clear}>
-										<Trash />
-									</Button>
-								</div>
-								{teachers.length === 0 && (
-									<span style={{ color: "lightgray" }}>
-										<Trans id="share-with-teachers-persons-to-add" />
-									</span>
-								)}
-								{teachers.map(t => {
-									return (
-										<div key={t.query} style={{ color: t.uid ? "green" : "red" }}>
-											{t.query}
-										</div>
-									);
-								})}
-							</div>
-							<Form.Control
-								value={name}
-								placeholder="ID, Email oder Pseudonym"
-								onChange={event => {
-									const name = event.target.value;
-									setName(name);
-								}}
-							/>
-							<Button variant="primary" onClick={add} className="mt-4"></Button>
-						</Modal.Body>
-						<Modal.Footer>
-							<Button variant="primary" onClick={share}>
-								<Trans id="share-with-confirmed-users" />
-							</Button>
-							<Button variant="warning" onClick={cancel}>
-								<Trans id="cancel" />
-							</Button>
-						</Modal.Footer>
-					</Modal>
-				);
-			},
-			() => null
-		);
-};
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
+import { ShareQuizModal } from "../modals/ShareQuizModal";
 
 export const QuizDataTab: React.FC = () => {
 	const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
@@ -256,6 +175,7 @@ export const QuizDataTab: React.FC = () => {
 								</>
 							)}
 						</div>
+
 						<ContainerWithHeaderBar
 							label={i18n._("new-quiz-title")}
 							editButton={{
@@ -271,6 +191,7 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="text" value={quiz.title} disabled />
 						</ContainerWithHeaderBar>
+
 						<ContainerWithHeaderBar
 							label={i18n._("quiz-description")}
 							editButton={{
@@ -286,9 +207,11 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="textarea" as="textarea" rows={5} value={quiz.description} disabled />
 						</ContainerWithHeaderBar>
+
 						<ContainerWithHeaderBar label={i18n._("number-of-participants")}>
 							<Form.Control type="text" value={quiz.students?.length ?? 0} disabled />
 						</ContainerWithHeaderBar>
+
 						<ContainerWithHeaderBar
 							label={i18n._("teachers")}
 							shareButton={{
@@ -298,6 +221,7 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="text" value={tNames} disabled />
 						</ContainerWithHeaderBar>
+
 						<ListGroupContainer>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -314,6 +238,7 @@ export const QuizDataTab: React.FC = () => {
 								disabled={disabledByMode}
 							/>
 						</ListGroupContainer>
+
 						<ListGroupContainer header={i18n._("quiz-student-participation")}>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -351,6 +276,7 @@ export const QuizDataTab: React.FC = () => {
 								}}
 							/>
 						</ListGroupContainer>
+
 						<ListGroupContainer header={i18n._("quiz-allowed-question-types")}>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -386,6 +312,7 @@ export const QuizDataTab: React.FC = () => {
 								}}
 							/>
 						</ListGroupContainer>
+
 						<ListGroupContainer>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -395,6 +322,7 @@ export const QuizDataTab: React.FC = () => {
 								onChange={event => update({ shuffleQuestions: event.target.checked })}
 							/>
 						</ListGroupContainer>
+
 						<Button
 							variant="warning"
 							className="mt-3"
@@ -402,15 +330,6 @@ export const QuizDataTab: React.FC = () => {
 							disabled={quiz.state === "STARTED"}
 						>
 							<Trans id="archive-quiz-button" />
-						</Button>
-						&nbsp;
-						<Button
-							variant="secondary"
-							className="mt-3"
-							onClick={startExport}
-							disabled={quiz.state === "STARTED"}
-						>
-							<Trans id="export-quiz-button" />
 						</Button>
 					</Form>
 				);
@@ -436,7 +355,8 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 		return (
 			<div>
 				{props.editButton ? (
-					<Button
+					<ButtonWithTooltip
+						title={i18n._("quiz-data-tab.button-tooltip.edit")}
 						variant="link"
 						className="p-0"
 						onClick={props.editButton.onClick}
@@ -444,11 +364,12 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 					>
 						<Pencil />
 						<span className="ms-1">{i18n._("button-label-edit")}</span>
-					</Button>
+					</ButtonWithTooltip>
 				) : null}
 
 				{props.shareButton ? (
-					<Button
+					<ButtonWithTooltip
+						title={i18n._("quiz-data-tab.button-tooltip.share")}
 						variant="link"
 						className="p-0 ms-2"
 						onClick={props.shareButton.onClick}
@@ -456,7 +377,7 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 					>
 						<Share />
 						<span className="ms-1">{i18n._("button-label-share")}</span>
-					</Button>
+					</ButtonWithTooltip>
 				) : null}
 			</div>
 		);

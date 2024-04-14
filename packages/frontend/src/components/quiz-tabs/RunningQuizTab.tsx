@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { i18n } from "@lingui/core";
+import MDEditor, { commands } from "@uiw/react-md-editor";
+import { last } from "rambda";
 import "katex/dist/katex.css";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
@@ -6,13 +9,16 @@ import remarkMath from "remark-math";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
-import { Button, Card, Row, Form } from "react-bootstrap";
+
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import Row from "react-bootstrap/Row";
+import Form from "react-bootstrap/Form";
 import { PersonRaisedHand } from "react-bootstrap-icons";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { MessageModal } from "../modals/MessageModal";
 import { Id } from "@recapp/models";
-import MDEditor, { commands } from "@uiw/react-md-editor";
-import { last } from "rambda";
+import { MessageModal } from "../modals/MessageModal";
 
 export const RunningQuizTab: React.FC<{
     quizState: CurrentQuizState;
@@ -107,11 +113,15 @@ export const RunningQuizTab: React.FC<{
                         <div className="align-self-center">
                             <strong>Frage {(run?.counter ?? 0) + 1}</strong>
                         </div>
+
                         <div className="flex-grow-1"></div>
                         <div className="m-1">
-                            <Button variant="secondary">
+                            <ButtonWithTooltip
+                                title={i18n._("running-quiz-tab.button-tooltip.comment")}
+                                variant="secondary"
+                            >
                                 <PersonRaisedHand />
-                            </Button>
+                            </ButtonWithTooltip>
                         </div>
                     </Card.Header>
                     <Card.Body>
@@ -156,6 +166,7 @@ export const RunningQuizTab: React.FC<{
                                         value={textAnswer}
                                         onChange={val => val && setTextAnswer(val)}
                                         height="100%"
+                                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         components={{ preview: (_source, _state, _dispath) => <></> }}
                                         preview="edit"
                                     />

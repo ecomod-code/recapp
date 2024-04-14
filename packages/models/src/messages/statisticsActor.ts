@@ -28,6 +28,8 @@ export const StatisticsActorMessages = unionize(
 		Clear: {}, // Delete statistics for quiz
 		SubscribeToCollection: {}, // Subscribe to all changes, sends back all updates to requester. Returns only the requested properties.
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes
+		ExportQuizStats: {},
+		ExportQuestionStats: {},
 	},
 	{ tag: "StatisticsActorMessages", value: "value" }
 );

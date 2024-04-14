@@ -1,10 +1,12 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Button } from "react-bootstrap";
 import { BarChart } from "react-bootstrap-icons";
 import { ChoiceElementStatistics } from "@recapp/models";
+import axios from "axios";
+import { QuizExportModal } from "../modals/QuizExportModal";
 
 const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
@@ -64,6 +66,38 @@ const QuizBarChart = (props: { data: number[]; maxValue: number }) => {
 
 export const QuizStatsTab: React.FC = () => {
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
+	const [showExportModal, setShowExportModal] = useState(false);
+
+	const exportQuiz = () => {
+		setShowExportModal(true);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuizStats()));
+	};
+
+	const exportQuestions = () => {
+		setShowExportModal(true);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuestionStats()));
+	};
+
+	const cancelExport = () => {
+		setShowExportModal(false);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportDone()));
+	};
+
+	const downloadExport = (filename: string) => {
+		setShowExportModal(false);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportDone()));
+		axios
+			.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {
+				responseType: "blob",
+			})
+			.then(response => {
+				const url = window.URL.createObjectURL(response.data);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = filename;
+				a.click();
+			});
+	};
 
 	return mbQuiz
 		.flatMap(q =>
@@ -73,63 +107,89 @@ export const QuizStatsTab: React.FC = () => {
 						questions: q.questions,
 						quizStats: q.quizStats,
 						questionStats: q.questionStats,
+						exportFile: q.exportFile,
 					})
 				: nothing()
 		)
 		.match(
-			({ groups, questions, quizStats, questionStats }) => {
+			({ groups, questions, quizStats, questionStats, exportFile }) => {
 				if (quizStats && groups) {
 					return groups.map((group, i) => {
 						return (
-							<Fragment key={i}>
-								<h2>{group.name}</h2>
-								{group.questions.map(qId => {
-									const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
-									const question = questions.find(q => q.uid === qId)!;
-									const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
+							<>
+								{i == 0 && (
+									<>
+										<QuizExportModal
+											show={showExportModal}
+											filename={exportFile}
+											onClose={cancelExport}
+											onDownload={downloadExport}
+										/>
+										<div className="mb-4 d-flex flex-row">
+											<Button onClick={exportQuiz}>Quizstatistik exportieren</Button>&nbsp;&nbsp;
+											<Button onClick={exportQuestions}>Fragenstatistik exportieren</Button>
+										</div>
+									</>
+								)}
+								<Fragment key={i}>
+									<h2>{group.name}</h2>
+									{group.questions.map(qId => {
+										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
+										const question = questions.find(q => q.uid === qId)!;
+										const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
 
-									if (!question) return null;
+										if (!question) return null;
 
-									return (
-										<div
-											key={question.uid}
-											className="m-1 p-2"
-											style={{ backgroundColor: "lightgrey" }}
-										>
-											<div className="d-flex flex-row w-100">
-												<div>
-													<div>{question.text?.slice(0, 80) ?? "---"}</div>
+										const noDetails = quizStats.maximumParticipants === 0;
 
+										return (
+											<div
+												key={question.uid}
+												className="m-1 p-2"
+												style={{ backgroundColor: "lightgrey" }}
+											>
+												<div className="d-flex flex-row w-100">
 													<div>
-														<QuizBarChart
-															data={[correct]}
-															maxValue={quizStats.maximumParticipants}
-														/>
+														<div>{question.text?.slice(0, 80) ?? "---"}</div>
+
+														{noDetails ? (
+															<div>
+																<em>Es liegen noch keine auswertbaren Daten vor</em>
+															</div>
+														) : (
+															<div>
+																<QuizBarChart
+																	data={[correct]}
+																	maxValue={quizStats.maximumParticipants}
+																/>
+															</div>
+														)}
 													</div>
-												</div>
-												<div className="flex-grow-1"></div>
-												<div className="align-self-center">
-													<Button
-														variant="primary"
-														onClick={() =>
-															tryActor.forEach(actor =>
-																actor.send(
-																	actor,
-																	CurrentQuizMessages.ActivateQuestionStats(
-																		question.uid
+													<div className="flex-grow-1"></div>
+													<div className="align-self-center">
+														<Button
+															variant="primary"
+															onClick={() =>
+																tryActor.forEach(actor =>
+																	actor.send(
+																		actor,
+																		CurrentQuizMessages.ActivateQuestionStats(
+																			question.uid
+																		)
 																	)
 																)
-															)
-														}
-													>
-														Details
-													</Button>
+															}
+															disabled={noDetails}
+														>
+															Details
+														</Button>
+													</div>
 												</div>
 											</div>
-										</div>
-									);
-								})}
-							</Fragment>
+										);
+									})}
+								</Fragment>
+							</>
 						);
 					});
 				}

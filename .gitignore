@@ -8,3 +8,5 @@ sandbox.nbb
 .env.development
 docker/mongo/
 **/yarn.lock
+**/downloads/*.csv
+**/downloads/*.json

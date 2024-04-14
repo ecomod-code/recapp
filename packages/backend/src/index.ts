@@ -19,6 +19,8 @@ import { logger } from "./logger";
 import { authenticationMiddleware } from "./middlewares/authMiddleware";
 import { QuizActor } from "./actors/QuizActor";
 import { ErrorActor } from "./actors/ErrorActor";
+import { createReadStream, existsSync } from "fs";
+import * as path from "path";
 
 const config = {
 	port: parseInt(process.env.SERVER_PORT ?? "3123"),
@@ -36,7 +38,27 @@ router
 	.get("/auth/login", authLogin)
 	.get("/auth/callback", authProviderCallback)
 	.get("/auth/logout", authLogout)
-	.get("/auth/refresh", authRefresh);
+	.get("/auth/refresh", authRefresh)
+	.get("/ping", ctx => {
+		ctx.status = 200;
+		ctx.body = "PONG";
+	})
+	.get("/download/:name", ctx => {
+		try {
+			const fn = ctx.params?.name?.toString();
+			if (!fn || !existsSync(path.join("./downloads/", fn))) {
+				ctx.throw(404);
+				return;
+			}
+			const stream = createReadStream(path.join("./downloads/", fn));
+			ctx.body = stream;
+			ctx.set("Content-disposition", "attachment; filename=" + fn);
+			ctx.set("Content-type", "application/txt");
+			ctx.status = 200;
+		} catch {
+			ctx.throw(404);
+		}
+	});
 
 const start = async () => {
 	try {

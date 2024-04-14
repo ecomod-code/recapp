@@ -29,7 +29,7 @@ import {
 	TextAnswer,
 	ChoiceAnswer,
 } from "@recapp/models";
-import { Unit, toTimestamp, unit } from "itu-utils";
+import { Unit, seconds, toTimestamp, unit } from "itu-utils";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { i18n } from "@lingui/core";
 import { actorUris } from "../actorUris";
@@ -59,6 +59,10 @@ export const CurrentQuizMessages = unionize(
 		ActivateQuestionStats: ofType<Id>(),
 		ActivateGroupStats: ofType<string>(),
 		ActivateQuizStats: {},
+		Export: {},
+		ExportQuizStats: {},
+		ExportQuestionStats: {},
+		ExportDone: {},
 	},
 	{ value: "value" }
 );
@@ -86,6 +90,7 @@ export type CurrentQuizState = {
 	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
+	exportFile?: string;
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean, CurrentQuizState> {
@@ -103,6 +108,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 			groupStats: undefined,
 			quizStats: undefined,
 			run: undefined,
+			exportFile: undefined,
 		};
 	}
 
@@ -606,6 +612,57 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								draft.quizStats = undefined;
 							});
 							this.getQuestionStats(id);
+							return unit();
+						},
+						Export: async () => {
+							const filename: string | Error = await this.ask(
+								actorUris.QuizActor,
+								QuizActorMessages.Export(this.quiz.orElse(toId(""))),
+								seconds(10).valueOf()
+							);
+							if (typeof filename === "string") {
+								this.updateState(draft => {
+									draft.exportFile = filename;
+								});
+							} else {
+								console.error(filename);
+							}
+							return unit();
+						},
+						ExportQuizStats: async () => {
+							const filename: string | Error = await this.ask(
+								`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								StatisticsActorMessages.ExportQuizStats(),
+								seconds(10).valueOf()
+							);
+							if (typeof filename === "string") {
+								this.updateState(draft => {
+									draft.exportFile = filename;
+								});
+							} else {
+								console.error(filename);
+							}
+							return unit();
+						},
+						ExportQuestionStats: async () => {
+							const filename: string | Error = await this.ask(
+								`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								StatisticsActorMessages.ExportQuestionStats(),
+								seconds(10).valueOf()
+							);
+							if (typeof filename === "string") {
+								this.updateState(draft => {
+									draft.exportFile = filename;
+								});
+							} else {
+								console.error(filename);
+							}
+							return unit();
+						},
+						ExportDone: async () => {
+							this.updateState(draft => {
+								draft.exportFile = undefined;
+							});
 							return unit();
 						},
 					})

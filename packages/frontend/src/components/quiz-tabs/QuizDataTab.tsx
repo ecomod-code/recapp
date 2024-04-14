@@ -16,6 +16,8 @@ import { SharingMessages, SharingState } from "../../actors/SharingActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { ListGroupContainer } from "../ListGroupContainer";
 import { Trans } from "@lingui/react";
+import axios from "axios";
+import { QuizExportModal } from "../modals/QuizExportModal";
 
 const ShareQuizModal: React.FC<{ quiz: Quiz; show: boolean; onClose: () => void }> = ({ quiz, show, onClose }) => {
 	const [name, setName] = useState("");
@@ -108,6 +110,7 @@ export const QuizDataTab: React.FC = () => {
 		newMode: "EDITING" | "STARTED" | "STOPPED";
 	}>({ titleId: "", textId: "", newMode: "EDITING" });
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
+	const [showExportModal, setShowExportModal] = useState(false);
 
 	const update = (q: Partial<Quiz>) => tryActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update(q)));
 
@@ -116,6 +119,32 @@ export const QuizDataTab: React.FC = () => {
 	};
 
 	const tNames = mbQuiz.map(s => s.teacherNames.join(", ")).orElse("");
+
+	const startExport = () => {
+		setShowExportModal(true);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.Export()));
+	};
+
+	const cancelExport = () => {
+		setShowExportModal(false);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportDone()));
+	};
+
+	const downloadExport = (filename: string) => {
+		setShowExportModal(false);
+		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportDone()));
+		axios
+			.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {
+				responseType: "blob",
+			})
+			.then(response => {
+				const url = window.URL.createObjectURL(response.data);
+				const a = document.createElement("a");
+				a.href = url;
+				a.download = filename;
+				a.click();
+			});
+	};
 
 	const startQuizMode = () => {
 		if (mbQuiz.flatMap(q => maybe(q.quiz?.state === "STOPPED")).orElse(false)) {
@@ -165,8 +194,15 @@ export const QuizDataTab: React.FC = () => {
 					setArchiveModal(false);
 				};
 				const disabledByMode = quiz.state !== "EDITING";
+				const fn = mbQuiz.flatMap(q => maybe(q.exportFile)).orUndefined();
 				return (
 					<Form>
+						<QuizExportModal
+							show={showExportModal}
+							filename={fn}
+							onClose={cancelExport}
+							onDownload={downloadExport}
+						/>
 						<ShareQuizModal show={shareModal} onClose={closeShare} quiz={quiz} />
 						<YesNoModal
 							show={archiveModal}
@@ -220,7 +256,6 @@ export const QuizDataTab: React.FC = () => {
 								</>
 							)}
 						</div>
-
 						<ContainerWithHeaderBar
 							label={i18n._("new-quiz-title")}
 							editButton={{
@@ -236,7 +271,6 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="text" value={quiz.title} disabled />
 						</ContainerWithHeaderBar>
-
 						<ContainerWithHeaderBar
 							label={i18n._("quiz-description")}
 							editButton={{
@@ -252,11 +286,9 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="textarea" as="textarea" rows={5} value={quiz.description} disabled />
 						</ContainerWithHeaderBar>
-
 						<ContainerWithHeaderBar label={i18n._("number-of-participants")}>
 							<Form.Control type="text" value={quiz.students?.length ?? 0} disabled />
 						</ContainerWithHeaderBar>
-
 						<ContainerWithHeaderBar
 							label={i18n._("teachers")}
 							shareButton={{
@@ -266,7 +298,6 @@ export const QuizDataTab: React.FC = () => {
 						>
 							<Form.Control type="text" value={tNames} disabled />
 						</ContainerWithHeaderBar>
-
 						<ListGroupContainer>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -283,7 +314,6 @@ export const QuizDataTab: React.FC = () => {
 								disabled={disabledByMode}
 							/>
 						</ListGroupContainer>
-
 						<ListGroupContainer header={i18n._("quiz-student-participation")}>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -321,7 +351,6 @@ export const QuizDataTab: React.FC = () => {
 								}}
 							/>
 						</ListGroupContainer>
-
 						<ListGroupContainer header={i18n._("quiz-allowed-question-types")}>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -357,7 +386,6 @@ export const QuizDataTab: React.FC = () => {
 								}}
 							/>
 						</ListGroupContainer>
-
 						<ListGroupContainer>
 							<Form.Switch
 								className="list-group-item ps-5"
@@ -367,7 +395,6 @@ export const QuizDataTab: React.FC = () => {
 								onChange={event => update({ shuffleQuestions: event.target.checked })}
 							/>
 						</ListGroupContainer>
-
 						<Button
 							variant="warning"
 							className="mt-3"
@@ -375,6 +402,15 @@ export const QuizDataTab: React.FC = () => {
 							disabled={quiz.state === "STARTED"}
 						>
 							<Trans id="archive-quiz-button" />
+						</Button>
+						&nbsp;
+						<Button
+							variant="secondary"
+							className="mt-3"
+							onClick={startExport}
+							disabled={quiz.state === "STARTED"}
+						>
+							<Trans id="export-quiz-button" />
 						</Button>
 					</Form>
 				);

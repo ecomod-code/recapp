@@ -22,6 +22,8 @@ import { createActorUri } from "../utils";
 import { keys } from "rambda";
 import { QuizRunActor } from "./QuizRunActor";
 import { StatisticsActor } from "./StatisticsActor";
+import { writeFile } from "fs/promises";
+import * as path from "path";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -300,13 +302,59 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							userRole: clientUserRole,
 						});
 					});
-					return unit(); // TODO: Muss die Zuweisungen der Quizze berücksichtigen!
+					return unit();
 				},
 				UnsubscribeFromCollection: async () => {
 					this.state = create(this.state, draft => {
 						draft.collectionSubscribers.delete(from.name as ActorUri);
 					});
 					return unit();
+				},
+				Export: async uid => {
+					const db = await this.connector.db();
+					const mbQuiz = maybe(await db.collection<Quiz>(this.collectionName).findOne({ uid }));
+					return mbQuiz.match<Promise<Error | string>>(
+						async quiz => {
+							console.log("EXPORTING", quiz);
+							const exportObject: any = { ...quiz };
+							exportObject.state = "EDITING";
+							delete exportObject.lastExport;
+							delete exportObject.teachers;
+							delete exportObject.students;
+							delete exportObject.comments;
+							delete exportObject.uid;
+							delete exportObject.uniqueLink;
+							delete exportObject.uniqueLink;
+							const questionIds = quiz.groups
+								.map(group => group.questions)
+								.flat()
+								.filter(id => id !== toId(""));
+							exportObject.questions = await Promise.all(
+								questionIds.map(async id => {
+									const question = await db.collection<any>("questions").findOne({ uid: id });
+									if (question) {
+										delete question?.authorId;
+										delete question?.authorName;
+									}
+									return question;
+								})
+							);
+
+							const exportTime = toTimestamp();
+							const filename = `quiz_${quiz.uid}_${exportTime.value.toString()}.json`;
+
+							await writeFile(
+								path.join("./downloads", filename),
+								JSON.stringify(exportObject, undefined, 2)
+							);
+
+							this.send(this.ref, QuizActorMessages.Update({ uid, lastExport: exportTime }));
+							return filename;
+						},
+						async () => {
+							return new Error("Unknown quiz");
+						}
+					);
 				},
 				default: async () => {
 					this.logger.error(`Unknown message from ${from.name} in QuizActor: ${JSON.stringify(message)}`);

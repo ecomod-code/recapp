@@ -16,6 +16,7 @@ export const QuizActorMessages = unionize(
 		SubscribeToCollection: ofType<string[]>(), // Subscribe to all changes, sends back all updates to requester. Returns only the requested properties.
 		UnsubscribeFrom: ofType<Id>(), // Unsubscribe from a specific quiz's changes, including comments and questions
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes
+		Export: ofType<Id>(), // Export a quiz to a json file, returns the download uri
 	},
 	{ tag: "QuizActorMessage", value: "value" }
 );

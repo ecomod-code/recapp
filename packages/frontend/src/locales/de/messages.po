@@ -678,3 +678,23 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #~ msgid "remove-edit-mode-of-question-text"
 #~ msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"
+
+#. js-lingui-explicit-id
+msgid "export-quiz-button"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-title"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-pending"
+msgstr "Export wird vorbereitet."
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-ready"
+msgstr "Export abgeschlossen. Sie können die Datei jetzt herunterladen."
+
+#. js-lingui-explicit-id
+msgid "download"
+msgstr "Herunterladen"

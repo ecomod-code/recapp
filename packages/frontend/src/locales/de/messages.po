@@ -898,3 +898,7 @@ msgstr "Importieren"
 #. js-lingui-explicit-id
 msgid "button-import-quiz"
 msgstr "Quiz importieren"
+
+#. js-lingui-explicit-id
+msgid "dashboard-show-archived-quizzes-switch"
+msgstr "Archivierte Quizze anzeigen"

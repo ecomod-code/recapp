@@ -46,10 +46,14 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
                         {i18n._("quiz-card-number-of-questions", { count: getNumberOfQuestions(quiz.groups ?? []) })}
                         &nbsp;
                     </div>
-
-                    <Badge as="div" className="mt-2" bg={getBG(quiz.state ?? "ACTIVE")}>
-                        {quiz.state}
-                    </Badge>
+					<div className="d-flex flex-row">
+						<Badge as="div" className="mt-2" bg={getBG(quiz.state ?? "ACTIVE")}>
+							{quiz.state}
+						</Badge>
+						{!!quiz.archived && <Badge as="div" className="mt-2 ms-2" bg="secondary">
+							ARCHIVED
+						</Badge>}
+					</div>
                 </Card.Body>
 
                 <Card.Footer>

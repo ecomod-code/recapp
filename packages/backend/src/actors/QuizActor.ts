@@ -253,8 +253,8 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						(q: Quiz) =>
 							clientUserRole === "ADMIN" ||
 							q.teachers.includes(clientUserId) ||
-							q.students.includes(clientUserId) ||
-							!q.archived
+							q.students.includes(clientUserId) /*||
+							!q.archived*/
 					);
 
 					quizzes.forEach(q => {

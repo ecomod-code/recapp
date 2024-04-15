@@ -23,14 +23,19 @@ export class UploadQuizMessage {
 	constructor(public readonly filename: string) {}
 }
 
+export class ToggleShowArchived {
+	public readonly tag = "ToggleShowArchived" as const;
+	constructor(public readonly value: boolean) {}
+}
+
 export class LocalUserActor extends StatefulActor<
-	UserUpdateMessage | QuizUpdateMessage | ArchiveQuizMessage | UploadQuizMessage | string,
+	UserUpdateMessage | QuizUpdateMessage | ArchiveQuizMessage | UploadQuizMessage | string | ToggleShowArchived,
 	Unit | string,
-	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number }
+	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number, showArchived: boolean }
 > {
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { user: undefined, quizzes: new Map(), updateCounter: 0 };
+		this.state = { user: undefined, quizzes: new Map(), updateCounter: 0, showArchived: false };
 	}
 
 	public async afterStart(): Promise<void> {
@@ -60,7 +65,7 @@ export class LocalUserActor extends StatefulActor<
 
 	async receive(
 		_from: ActorRef,
-		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage | UploadQuizMessage
+		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage | UploadQuizMessage | ToggleShowArchived
 	): Promise<Unit | string> {
 		if (typeof message === "string") {
 			if (message === "uid") return this.state.user?.uid ?? "";
@@ -72,15 +77,11 @@ export class LocalUserActor extends StatefulActor<
 		} else if (message.tag == "QuizUpdateMessage") {
 			this.updateState(draft => {
 				if (message.quiz.uid) {
-					if (message.quiz.archived) {
-						draft.quizzes.delete(message.quiz.uid);
-					} else {
 						const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));
 						const isStudent = message.quiz.students?.includes(this.state.user?.uid ?? toId(""));
 						if (this.state.user?.role === "ADMIN" || isTeacher || isStudent) {
 							draft.quizzes.set(message.quiz.uid, message.quiz);
 						}
-					}
 					draft.updateCounter++;
 				}
 			});
@@ -88,6 +89,11 @@ export class LocalUserActor extends StatefulActor<
 			this.send(actorUris["QuizActor"], QuizActorMessages.Update({ uid: message.id, archived: toTimestamp() }));
 		} else if (message.tag == "UploadQuizMessage") {
 			this.send(actorUris["QuizActor"], QuizActorMessages.Import({ filename: message.filename }));
+		} else if (message.tag == "ToggleShowArchived") {
+			this.updateState(draft => {
+				draft.showArchived = message.value;
+				draft.updateCounter++;
+			});
 		}
 		return unit();
 	}

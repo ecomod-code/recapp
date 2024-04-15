@@ -104,6 +104,10 @@ msgstr "Lehrperson"
 msgid "role-name-student"
 msgstr "Student"
 
+#: src/components/cards/UserCard.tsx:101
+msgid "user-card.button-tooltip.edit"
+msgstr "Bearbeiten"
+
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:128
 msgid "user-last-login: {date}"
@@ -269,6 +273,11 @@ msgstr "Löschen"
 #: src/components/modals/ShareQuizModal.tsx:70
 msgid "share-with-teachers-persons-to-add"
 msgstr "Hinzuzufügende Personen"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:92
+msgid "share-quiz-modal.button-label.add"
+msgstr "Hinzufügen"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93

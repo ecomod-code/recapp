@@ -115,9 +115,11 @@ export const CommentCardContent: React.FC<
                 </div>
             </Card.Title>
 
+            {!text ? <Card.Body style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden" }} /> : null}
+
             {text ? (
                 <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={() => showInModalHandler(true)}>
-                    <div dangerouslySetInnerHTML={{ __html: text }} />
+                    <div key={new Date().getTime()} dangerouslySetInnerHTML={{ __html: text }} />
                 </SeeMoreContainer>
             ) : null}
 

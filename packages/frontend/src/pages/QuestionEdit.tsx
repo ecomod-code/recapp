@@ -89,7 +89,7 @@ export const QuestionEdit: React.FC = () => {
 						actor,
 						CurrentQuizMessages.UpdateQuestion({
 							question: { uid: questionId, editMode: true },
-							group: formerGroup,
+							group: "", // formerGroup,
 						})
 					)
 				);
@@ -188,7 +188,7 @@ export const QuestionEdit: React.FC = () => {
 					actor.name,
 					CurrentQuizMessages.UpdateQuestion({
 						question: { ...quizQuestion, uid: toId(questionId) },
-						group: selectedGroup,
+						group: selectedGroup !== formerGroup ? selectedGroup : "",
 					})
 				);
 			} else {
@@ -291,7 +291,7 @@ export const QuestionEdit: React.FC = () => {
 									actor.name,
 									CurrentQuizMessages.UpdateQuestion({
 										question: { uid: toId(questionId), editMode: false },
-										group: selectedGroup,
+										group: selectedGroup !== formerGroup ? selectedGroup : "",
 									})
 								)
 							);
@@ -307,7 +307,7 @@ export const QuestionEdit: React.FC = () => {
 									actor.name,
 									CurrentQuizMessages.UpdateQuestion({
 										question: { uid: toId(questionId), editMode: false },
-										group: selectedGroup,
+										group: selectedGroup !== formerGroup ? selectedGroup : "",
 									})
 								)
 							);

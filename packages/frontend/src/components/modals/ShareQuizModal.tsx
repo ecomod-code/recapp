@@ -86,7 +86,9 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                     setName(name);
                                 }}
                             />
-                            <Button variant="primary" onClick={add} className="mt-4"></Button>
+                            <Button variant="primary" onClick={add} className="mt-4">
+                                <Trans id="share-quiz-modal.button-label.add" />
+                            </Button>
                         </Modal.Body>
                         <Modal.Footer>
                             <Button variant="primary" onClick={share}>

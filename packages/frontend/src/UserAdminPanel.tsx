@@ -37,7 +37,7 @@ export const UserAdminPanel: React.FC = () => {
             <Row>
                 <InputGroup className="mb-3 m-1">
                     <TooltipWrapper title={i18n._("user-admin-panel.button-tooltip.filter")}>
-                        <InputGroup.Text style={{ cursor: "pointer" }}>
+                        <InputGroup.Text>
                             <Funnel />
                         </InputGroup.Text>
                     </TooltipWrapper>

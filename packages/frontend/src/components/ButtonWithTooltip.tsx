@@ -11,9 +11,9 @@ export const ButtonWithTooltip = ({ title, titlePlacement, ...buttonProps }: Pro
     return (
         <TooltipWrapper title={title} placement={titlePlacement}>
             {/* the span-tag is here to make the tooltip visible event when the button is disabled !! */}
-            <span className="d-inline-block">
-                <Button {...buttonProps} />
-            </span>
+            {/* <span className="d-inline-block"> */}
+            <Button {...buttonProps} />
+            {/* </span> */}
         </TooltipWrapper>
     );
 };

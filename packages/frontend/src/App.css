@@ -13,6 +13,30 @@
     border-bottom: 2px solid lightgrey;
 }
 
+/* ############### Begin cutoff-text ############### */
+.cutoff-text {
+    --max-lines: 4;
+    --line-height: 1.4;
+    /* height: calc(var(--max-lines) * 1em * var(--line-height)); */
+    max-height: calc(var(--max-lines) * 1em * var(--line-height));
+    line-height: var(--line-height);
+    overflow: hidden;
+    position: relative;
+}
+.cutoff-text::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    height: calc(1em * var(--line-height));
+    width: 100%;
+    pointer-events: none;
+    background: linear-gradient(to bottom, transparent, white);
+}
+.cutoff-text p {
+    margin-bottom: 0;
+}
+/* ############### End cutoff-text ############### */
+
 .accordion-item:first-of-type > div > .accordion-header .accordion-button {
     border-top-left-radius: var(--bs-accordion-inner-border-radius);
     border-top-right-radius: var(--bs-accordion-inner-border-radius);

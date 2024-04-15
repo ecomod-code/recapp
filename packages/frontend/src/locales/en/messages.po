@@ -14,61 +14,52 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ShareQuizModal.tsx:60
-msgid "share-quiz-modal.button-tooltip.clear"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:323
-msgid "quiz-data-tab.button-tooltip.edit"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:336
-msgid "quiz-data-tab.button-tooltip.share"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/UserAdminPanel.tsx:39
-msgid "user-admin-panel.button-tooltip.filter"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/Activate.tsx:36
 #: src/Login.tsx:31
 msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:356
-#: src/components/quiz-tabs/QuizDataTab.tsx:144
+#: src/actors/CurrentQuizActor.ts:362
+#: src/components/quiz-tabs/QuizDataTab.tsx:179
 msgid "new-quiz-title"
 msgstr "Title"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:357
+#: src/actors/CurrentQuizActor.ts:363
 msgid "new-quiz-description"
 msgstr "Description"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:359
+#: src/actors/CurrentQuizActor.ts:365
 msgid "new-quiz-group"
 msgstr "Group"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:49
+#: src/components/cards/CommentCard.tsx:92
 msgid "comment-card.button-tooltip.upvote"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:80
+#: src/components/cards/CommentCard.tsx:108
+#: src/components/modals/ShareModal.tsx:36
+msgid "close"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:89
+#: src/components/cards/CommentCard.tsx:144
 msgid "comment-card.button-tooltip.delete"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:186
+msgid "see-more-container.button-label"
+msgstr "See more"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:57
@@ -96,25 +87,25 @@ msgid "question-card.button-tooltip.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:30
+#: src/components/cards/UserCard.tsx:32
 #: src/components/modals/ChangeRoleModal.tsx:34
 msgid "role-name-admin"
 msgstr "Admin"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:34
+#: src/components/cards/UserCard.tsx:36
 #: src/components/modals/ChangeRoleModal.tsx:29
 msgid "role-name-teacher"
 msgstr "Teacher"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:38
+#: src/components/cards/UserCard.tsx:40
 #: src/components/modals/ChangeRoleModal.tsx:25
 msgid "role-name-student"
 msgstr "Student"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:126
+#: src/components/cards/UserCard.tsx:128
 msgid "user-last-login: {date}"
 msgstr "Last login: {date}"
 
@@ -160,6 +151,7 @@ msgstr "Change group"
 #: src/components/modals/ChangeRoleModal.tsx:44
 #: src/components/modals/CreateGroupModal.tsx:64
 #: src/components/modals/MarkdownModal.tsx:100
+#: src/components/modals/QuizExportModal.tsx:48
 #: src/components/modals/ShareQuizModal.tsx:96
 #: src/components/modals/TextModal.tsx:50
 #: src/components/modals/YesNoModal.tsx:40
@@ -239,19 +231,39 @@ msgid "button-login-again"
 msgstr "Log in again"
 
 #. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:16
+msgid "quiz-export-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:26
+msgid "quiz-export-modal-text-pending"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:29
+msgid "quiz-export-modal-text-ready"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:40
+msgid "download"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
 msgid "share-qr-code-header"
 msgstr "Students can now register for the quiz via code or link"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ShareModal.tsx:36
-msgid "close"
-msgstr "Close"
-
-#. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:54
 msgid "share-with-teachers-modal-title"
 msgstr "Select teachers for sharing"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:60
+msgid "share-quiz-modal.button-tooltip.clear"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:70
@@ -292,122 +304,203 @@ msgid "quiz-questions-tab-new-question-button"
 msgstr "New question"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:319
-#: src/components/quiz-tabs/QuizDataTab.tsx:330
+#: src/components/quiz-tabs/QuestionsTab.tsx:315
+#: src/components/quiz-tabs/QuizDataTab.tsx:366
 msgid "button-label-edit"
 msgstr "edit"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:338
+#: src/components/quiz-tabs/QuestionsTab.tsx:334
 msgid "quiz-questions-tab-empty-group-message"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:120
+#: src/components/quiz-tabs/QuizDataTab.tsx:156
 msgid "start-quiz-mode-button"
 msgstr "Start quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:128
+#: src/components/quiz-tabs/QuizDataTab.tsx:164
 msgid "freeze-quiz-button"
 msgstr "Freeze quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:136
+#: src/components/quiz-tabs/QuizDataTab.tsx:172
 msgid "edit-quiz-button"
 msgstr "Edit quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:160
+#: src/components/quiz-tabs/QuizDataTab.tsx:194
 #: src/pages/CreateQuiz.tsx:60
 msgid "quiz-description"
 msgstr "Description"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:175
+#: src/components/quiz-tabs/QuizDataTab.tsx:208
 msgid "number-of-participants"
 msgstr "Number of participants"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:180
+#: src/components/quiz-tabs/QuizDataTab.tsx:212
 msgid "teachers"
 msgstr "Teachers"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:192
+#: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
 msgstr "Allow student comments in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:199
+#: src/components/quiz-tabs/QuizDataTab.tsx:230
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
 msgstr "Have students create questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:206
+#: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
 msgstr "Student participation options"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:209
+#: src/components/quiz-tabs/QuizDataTab.tsx:239
 #: src/pages/CreateQuiz.tsx:101
 msgid "quiz-allows-anonymous-participation"
 msgstr "Anonymous participation"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:222
+#: src/components/quiz-tabs/QuizDataTab.tsx:252
 #: src/pages/CreateQuiz.tsx:118
 msgid "quiz-allows-participation-via-nickname"
 msgstr "Participation with pseudonym"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:233
+#: src/components/quiz-tabs/QuizDataTab.tsx:263
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-participation-via-realname"
 msgstr "Participation with real name"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:244
+#: src/components/quiz-tabs/QuizDataTab.tsx:273
 #: src/pages/CreateQuiz.tsx:151
 msgid "quiz-allowed-question-types"
 msgstr "Allowed question types"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:247
+#: src/components/quiz-tabs/QuizDataTab.tsx:276
 #: src/pages/CreateQuiz.tsx:154
 msgid "quiz-allows-text-questions"
 msgstr "Allow free-text questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:258
+#: src/components/quiz-tabs/QuizDataTab.tsx:287
 #: src/pages/CreateQuiz.tsx:171
 msgid "quiz-allows-single-choice-questions"
 msgstr "Allow single-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:269
+#: src/components/quiz-tabs/QuizDataTab.tsx:298
 #: src/pages/CreateQuiz.tsx:188
 msgid "quiz-allows-multiple-choice-realname"
 msgstr "Allow multiple-choice questions"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:283
+#: src/components/quiz-tabs/QuizDataTab.tsx:311
 #: src/pages/CreateQuiz.tsx:207
 msgid "quiz-enable-question-shufflling"
 msgstr "Shuffle questions in quiz mode"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:296
+#: src/components/quiz-tabs/QuizDataTab.tsx:323
 msgid "archive-quiz-button"
 msgstr "Archive quiz"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:343
+#: src/components/quiz-tabs/QuizDataTab.tsx:332
+msgid "export-quiz-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:359
+msgid "quiz-data-tab.button-tooltip.edit"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:372
+msgid "quiz-data-tab.button-tooltip.share"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:379
 msgid "button-label-share"
 msgstr "share"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:131
+msgid "export-quiz-statistics-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:135
+msgid "export-question-statistics-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:164
+msgid "no-data-yet"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:192
+msgid "details"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:213
+msgid "question-stats-prefix"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:216
+msgid "question-stats-info"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:229
+msgid "question-stats-answers-given"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:236
+#: src/components/quiz-tabs/QuizStatsTab.tsx:253
+msgid "question-stats-given-answers"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:247
+msgid "question-stats-correct-answers"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:259
+msgid "question-stats-answer-prefix"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:283
+msgid "question-stats-back-to-quiz-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:301
+msgid "question-stats-previous-question-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:321
+msgid "question-stats-next-question-button"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120
@@ -435,17 +528,17 @@ msgid "quiz-card.button-tooltip.delete"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizzesPanel.tsx:78
+#: src/components/quizzes-panel/QuizzesPanel.tsx:65
 msgid "button-new-quiz"
 msgstr "New quiz"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:39
+#: src/Dashboard.tsx:40
 msgid "dashboard-tab-label-quizzes"
 msgstr "Quizzes"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:43
+#: src/Dashboard.tsx:44
 msgid "dashboard-tab-label-users"
 msgstr "Users"
 
@@ -563,6 +656,11 @@ msgstr "New comment"
 #: src/UserAdminPanel.tsx:35
 msgid "user-admin-panel-title"
 msgstr "User administration"
+
+#. js-lingui-explicit-id
+#: src/UserAdminPanel.tsx:39
+msgid "user-admin-panel.button-tooltip.filter"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:45

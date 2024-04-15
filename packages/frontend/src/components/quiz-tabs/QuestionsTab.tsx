@@ -301,6 +301,7 @@ export const QuestionsTab: React.FC<{
 
                                                         <NestedButton
                                                             variant="link"
+                                                            size="sm"
                                                             isDisabled={disableForStudentOrMode}
                                                             containerStyles={{ paddingLeft: 4, marginLeft: 4 }}
                                                             onClick={() =>
@@ -388,6 +389,7 @@ const NestedButton = (
         onClick: () => void;
         variant?: ButtonProps["variant"];
         containerStyles?: CSSProperties;
+        size?: ButtonProps["size"];
     } & PropsWithChildren
 ) => {
     const isVariantLink = props.variant === "link";
@@ -401,6 +403,7 @@ const NestedButton = (
                     : { borderColor: props.isDisabled ? "grey" : undefined }),
                 ...props.containerStyles,
             }}
+            size={props.size}
             variant={props.variant}
             className={props.isDisabled ? "disabled" : ""}
             onClick={e => {

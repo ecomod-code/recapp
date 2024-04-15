@@ -263,7 +263,7 @@ msgstr "Lehrpersonen zum Teilen auswählen"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:60
 msgid "share-quiz-modal.button-tooltip.clear"
-msgstr "Neil: icon button tooltip:clear"
+msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:70
@@ -595,7 +595,7 @@ msgstr "Freitext"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:375
 msgid "question-edit.button-tooltip.check"
-msgstr "Neil: icon button tooltip:check"
+msgstr "Freigeben"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:383
@@ -610,7 +610,7 @@ msgstr "Kommentar bearbeiten"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:427
 msgid "question-edit.button-tooltip.edit-hint-title"
-msgstr "Neil: icon button tooltip:edit-hint-title"
+msgstr "Titel bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:443
@@ -660,7 +660,7 @@ msgstr "Benutzerverwaltung"
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:39
 msgid "user-admin-panel.button-tooltip.filter"
-msgstr "Neil: icon button tooltip:filter"
+msgstr "Filter"
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:45
@@ -670,17 +670,17 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:58
 #~ msgid "quiz-card-button-tooltip-edit"
-#~ msgstr "Neil: icon button tooltip-Edit"
+#~ msgstr "Bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 #~ msgid "quiz-card-button-tooltip-share"
-#~ msgstr "Neil: icon button tooltip-Share"
+#~ msgstr "Teilen"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:75
 #~ msgid "quiz-card-button-tooltip-delete"
-#~ msgstr "Neil: icon button tooltip-delete"
+#~ msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:206

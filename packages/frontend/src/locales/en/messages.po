@@ -104,6 +104,10 @@ msgstr "Teacher"
 msgid "role-name-student"
 msgstr "Student"
 
+#: src/components/cards/UserCard.tsx:101
+msgid "user-card.button-tooltip.edit"
+msgstr "Edit"
+
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:128
 msgid "user-last-login: {date}"
@@ -269,6 +273,11 @@ msgstr "Clear"
 #: src/components/modals/ShareQuizModal.tsx:70
 msgid "share-with-teachers-persons-to-add"
 msgstr "People to be added"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:92
+msgid "share-quiz-modal.button-label.add"
+msgstr "Add"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93
@@ -683,6 +692,11 @@ msgstr "Search text"
 #~ msgstr "Delete"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuestionsTab.tsx:206
+#~ msgid "quiz-questioins-tab-add-group-button"
+#~ msgstr "Add group"
+
+#. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:142
 #~ msgid "quiz-tab-label-data"
 #~ msgstr "Quiz data"
@@ -788,3 +802,99 @@ msgstr "Search text"
 #. js-lingui-explicit-id
 #~ msgid "edit-title-text"
 #~ msgstr "Edit text"
+
+#. js-lingui-explicit-id
+#~ msgid "remove-edit-mode-of-question-title"
+#~ msgstr "Reactivate edit mode?"
+
+#. js-lingui-explicit-id
+#~ msgid "remove-edit-mode-of-question-text"
+#~ msgstr "The question has been locked by another editing process. Would you like to reactivate the editing process?"
+
+#. js-lingui-explicit-id
+msgid "export-quiz-button"
+msgstr "Export data"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-title"
+msgstr "Export data"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-pending"
+msgstr "Export is being prepared."
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-ready"
+msgstr "Export completed. You can now download the file."
+
+#. js-lingui-explicit-id
+msgid "download"
+msgstr "Downlaod"
+
+#. js-lingui-explicit-id
+msgid "export-quiz-statistics-button"
+msgstr "Export quiz statistics"
+
+#. js-lingui-explicit-id
+msgid "export-question-statistics-button"
+msgstr "Export question statistics"
+
+#. js-lingui-explicit-id
+msgid "no-data-yet"
+msgstr "No analyzable data is available yet"
+
+#. js-lingui-explicit-id
+msgid "details"
+msgstr "Details"
+
+#. js-lingui-explicit-id
+msgid "question-stats-prefix"
+msgstr "Question: "
+
+#. js-lingui-explicit-id
+msgid "question-stats-info"
+msgstr "{participants} participants from {maxParticipants} ({ratio}) %) have answered the question"
+
+#. js-lingui-explicit-id
+msgid "question-stats-answers-given"
+msgstr "{numberOfAnswers} answers were given"
+
+#. js-lingui-explicit-id
+msgid "question-stats-given-answers"
+msgstr "The following answers were given"
+
+#. js-lingui-explicit-id
+msgid "question-stats-correct-answers"
+msgstr "{passed} from {participants} answers were correct."
+
+#. js-lingui-explicit-id
+msgid "question-stats-answer-prefix"
+msgstr "Answer: "
+
+#. js-lingui-explicit-id
+msgid "question-stats-back-to-quiz-button"
+msgstr "Back to Quiz"
+
+#. js-lingui-explicit-id
+msgid "question-stats-previous-question-button"
+msgstr "Previous question"
+
+#. js-lingui-explicit-id
+msgid "question-stats-next-question-button"
+msgstr "Next question"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-title"
+msgstr "Import a quiz"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-message"
+msgstr "Select a quiz file to import"
+
+#. js-lingui-explicit-id
+msgid "import"
+msgstr "Import"
+
+#. js-lingui-explicit-id
+msgid "button-import-quiz"
+msgstr "Import quiz"

@@ -38,7 +38,7 @@ msgstr "Group"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:92
 msgid "comment-card.button-tooltip.upvote"
-msgstr ""
+msgstr "Upvote"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:108
@@ -49,7 +49,7 @@ msgstr "Close"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
-msgstr ""
+msgstr "Accept"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:144
@@ -69,22 +69,22 @@ msgstr "by {author}"
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:60
 msgid "question-card.button-tooltip.edit"
-msgstr ""
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:73
 msgid "question-card.button-tooltip.change-group"
-msgstr ""
+msgstr "Change group"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-tooltip.approve"
-msgstr ""
+msgstr "Approve"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:90
 msgid "question-card.button-tooltip.delete"
-msgstr ""
+msgstr "Delete"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:32
@@ -263,7 +263,7 @@ msgstr "Select teachers for sharing"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:60
 msgid "share-quiz-modal.button-tooltip.clear"
-msgstr ""
+msgstr "Clear"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:70
@@ -312,7 +312,7 @@ msgstr "edit"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:334
 msgid "quiz-questions-tab-empty-group-message"
-msgstr ""
+msgstr "No questions have been added to the group"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:156
@@ -424,17 +424,17 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359
 msgid "quiz-data-tab.button-tooltip.edit"
-msgstr ""
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:372
 msgid "quiz-data-tab.button-tooltip.share"
-msgstr ""
+msgstr "Share"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:379
 msgid "button-label-share"
-msgstr "share"
+msgstr "Share"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:131
@@ -505,7 +505,7 @@ msgstr ""
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120
 msgid "running-quiz-tab.button-tooltip.comment"
-msgstr ""
+msgstr "Comment"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:37
@@ -515,17 +515,17 @@ msgstr "Last change"
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:58
 msgid "quiz-card.button-tooltip.edit"
-msgstr ""
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 msgid "quiz-card.button-tooltip.share"
-msgstr ""
+msgstr "Share"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:75
 msgid "quiz-card.button-tooltip.delete"
-msgstr ""
+msgstr "Delete"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizzesPanel.tsx:65
@@ -545,12 +545,12 @@ msgstr "Users"
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.button-tooltip.edit-or-add-pseudonym"
-msgstr ""
+msgstr "Edit or add pseudonym"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:103
 msgid "header-section.button-tooltip.logout"
-msgstr ""
+msgstr "Logout"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:107
@@ -595,22 +595,22 @@ msgstr "Free text"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:375
 msgid "question-edit.button-tooltip.check"
-msgstr ""
+msgstr "Select"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:383
 msgid "question-edit.button-tooltip.edit-title-text"
-msgstr ""
+msgstr "Edit title"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:391
 msgid "question-edit.button-tooltip.edit-comment-text"
-msgstr ""
+msgstr "Edit comment"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:427
 msgid "question-edit.button-tooltip.edit-hint-title"
-msgstr ""
+msgstr "Edit title"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:443
@@ -620,12 +620,12 @@ msgstr "Activate all correct answers"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460
 msgid "question-edit.button-tooltip.edit-answer"
-msgstr ""
+msgstr "Edit answer"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:466
 msgid "question-edit.button-tooltip.delete-answer"
-msgstr ""
+msgstr "Delete answer"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
@@ -660,7 +660,7 @@ msgstr "User administration"
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:39
 msgid "user-admin-panel.button-tooltip.filter"
-msgstr ""
+msgstr "Filter"
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:45
@@ -670,17 +670,17 @@ msgstr "Search text"
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:58
 #~ msgid "quiz-card-button-tooltip-edit"
-#~ msgstr ""
+#~ msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 #~ msgid "quiz-card-button-tooltip-share"
-#~ msgstr ""
+#~ msgstr "Share"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:75
 #~ msgid "quiz-card-button-tooltip-delete"
-#~ msgstr ""
+#~ msgstr "Delete"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:142

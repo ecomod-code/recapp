@@ -312,7 +312,7 @@ msgstr "bearbeiten"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:334
 msgid "quiz-questions-tab-empty-group-message"
-msgstr "Neil: there is no questios added to the group yet"
+msgstr "Noch keine Fragen hinzugefügt worden"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:156
@@ -424,17 +424,17 @@ msgstr "Daten exportieren"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359
 msgid "quiz-data-tab.button-tooltip.edit"
-msgstr "Neil: icon button tooltip:edit"
+msgstr "Bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:372
 msgid "quiz-data-tab.button-tooltip.share"
-msgstr "Neil: icon button tooltip:share"
+msgstr "Teilen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:379
 msgid "button-label-share"
-msgstr "teilen"
+msgstr "Teilen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:131
@@ -505,7 +505,7 @@ msgstr "Nächste Frage"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120
 msgid "running-quiz-tab.button-tooltip.comment"
-msgstr "Neil: icon button tooltip:comment"
+msgstr "Kommentar"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:37
@@ -515,17 +515,17 @@ msgstr "Letzte Änderung"
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:58
 msgid "quiz-card.button-tooltip.edit"
-msgstr "Neil: icon button tooltip:Edit"
+msgstr "Bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 msgid "quiz-card.button-tooltip.share"
-msgstr "Neil: icon button tooltip:share"
+msgstr "Teilen"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:75
 msgid "quiz-card.button-tooltip.delete"
-msgstr "Neil: icon button tooltip:delete"
+msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizzesPanel.tsx:65
@@ -545,12 +545,12 @@ msgstr "Benutzer"
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.button-tooltip.edit-or-add-pseudonym"
-msgstr "Neil: icon button tooltip:edit-or-add-pseudonym"
+msgstr "Pseudonym bearbeiten oder hinzufügen"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:103
 msgid "header-section.button-tooltip.logout"
-msgstr "Neil: icon button tooltip:logout"
+msgstr "Abmelden"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:107
@@ -600,12 +600,12 @@ msgstr "Neil: icon button tooltip:check"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:383
 msgid "question-edit.button-tooltip.edit-title-text"
-msgstr "Neil: icon button tooltip:edit-title-text"
+msgstr "Titel bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:391
 msgid "question-edit.button-tooltip.edit-comment-text"
-msgstr "Neil: icon button tooltip:edit-comment-text"
+msgstr "Kommentar bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:427
@@ -620,12 +620,12 @@ msgstr "Aktiviere alle richtigen Antworten"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460
 msgid "question-edit.button-tooltip.edit-answer"
-msgstr "Neil: icon button tooltip:edit-answer"
+msgstr "Antwort bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:466
 msgid "question-edit.button-tooltip.delete-answer"
-msgstr "Neil: icon button tooltip:delete-answer"
+msgstr "Antwort löschen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477

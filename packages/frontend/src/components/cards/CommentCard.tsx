@@ -77,7 +77,11 @@ export const CommentCardContent: React.FC<
     }, [comment.text]);
 
     return (
-        <Card className="p-0 m-1 mt-2  mb-3" style={{ minWidth: "18rem" }} key={comment.uid}>
+        <Card
+            className={`${isDisplayedInModal ? "p-0 m-0" : "p-0 m-1 mt-2 mb-3"}`}
+            style={{ minWidth: "18rem" }}
+            key={comment.uid}
+        >
             <Card.Title className="p-1 ps-2 text-bg-light text-start">
                 <div className="d-flex flex-row align-items-center">
                     <div className="flex-grow-1 fs-6">

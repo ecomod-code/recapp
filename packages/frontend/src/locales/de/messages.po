@@ -801,3 +801,91 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #~ msgid "remove-edit-mode-of-question-text"
 #~ msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"
+
+#. js-lingui-explicit-id
+msgid "export-quiz-button"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-title"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-pending"
+msgstr "Export wird vorbereitet."
+
+#. js-lingui-explicit-id
+msgid "quiz-export-modal-text-ready"
+msgstr "Export abgeschlossen. Sie können die Datei jetzt herunterladen."
+
+#. js-lingui-explicit-id
+msgid "download"
+msgstr "Herunterladen"
+
+#. js-lingui-explicit-id
+msgid "export-quiz-statistics-button"
+msgstr "Quizstatistik exportieren"
+
+#. js-lingui-explicit-id
+msgid "export-question-statistics-button"
+msgstr "Fragenstatistik exportieren"
+
+#. js-lingui-explicit-id
+msgid "no-data-yet"
+msgstr "Es liegen noch keine auswertbaren Daten vor"
+
+#. js-lingui-explicit-id
+msgid "details"
+msgstr "Details"
+
+#. js-lingui-explicit-id
+msgid "question-stats-prefix"
+msgstr "Frage: "
+
+#. js-lingui-explicit-id
+msgid "question-stats-info"
+msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio}) %) haben die Frage bearbeitet"
+
+#. js-lingui-explicit-id
+msgid "question-stats-answers-given"
+msgstr "{numberOfAnswers} Antworten wurden gegeben"
+
+#. js-lingui-explicit-id
+msgid "question-stats-given-answers"
+msgstr "Es wurden folgenden Antworten gegeben"
+
+#. js-lingui-explicit-id
+msgid "question-stats-correct-answers"
+msgstr "{passed} von {participants} Antworten waren richtig."
+
+#. js-lingui-explicit-id
+msgid "question-stats-answer-prefix"
+msgstr "Antwort: "
+
+#. js-lingui-explicit-id
+msgid "question-stats-back-to-quiz-button"
+msgstr "Zurück zum Quiz"
+
+#. js-lingui-explicit-id
+msgid "question-stats-previous-question-button"
+msgstr "Vorherige Frage"
+
+#. js-lingui-explicit-id
+msgid "question-stats-next-question-button"
+msgstr "Nächste Frage"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-title"
+msgstr "Ein Quiz importieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-message"
+msgstr "Wählen Sie eine Quiz-Datei aus, um diese zu importieren"
+
+#. js-lingui-explicit-id
+msgid "import"
+msgstr "Importieren"
+
+#. js-lingui-explicit-id
+msgid "button-import-quiz"
+msgstr "Quiz importieren"

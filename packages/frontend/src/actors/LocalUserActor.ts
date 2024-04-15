@@ -18,8 +18,13 @@ export class ArchiveQuizMessage {
 	constructor(public readonly id: Id) {}
 }
 
+export class UploadQuizMessage {
+	public readonly tag = "UploadQuizMessage" as const;
+	constructor(public readonly filename: string) {}
+}
+
 export class LocalUserActor extends StatefulActor<
-	UserUpdateMessage | QuizUpdateMessage | ArchiveQuizMessage | string,
+	UserUpdateMessage | QuizUpdateMessage | ArchiveQuizMessage | UploadQuizMessage | string,
 	Unit | string,
 	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number }
 > {
@@ -55,7 +60,7 @@ export class LocalUserActor extends StatefulActor<
 
 	async receive(
 		_from: ActorRef,
-		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage
+		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage | UploadQuizMessage
 	): Promise<Unit | string> {
 		if (typeof message === "string") {
 			if (message === "uid") return this.state.user?.uid ?? "";
@@ -81,6 +86,8 @@ export class LocalUserActor extends StatefulActor<
 			});
 		} else if (message.tag == "ArchiveQuizMessage") {
 			this.send(actorUris["QuizActor"], QuizActorMessages.Update({ uid: message.id, archived: toTimestamp() }));
+		} else if (message.tag == "UploadQuizMessage") {
+			this.send(actorUris["QuizActor"], QuizActorMessages.Import({ filename: message.filename }));
 		}
 		return unit();
 	}

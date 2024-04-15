@@ -12,6 +12,9 @@ import koa from "koa"; // koa@2
 import cors from "@koa/cors";
 import session from "koa-session";
 import koaBody from "koa-bodyparser";
+import multer from "@koa/multer";
+import type { File } from "@koa/multer";
+import type { IncomingMessage } from "http";
 import koaLogger from "koa-logger-winston";
 import { authLogin, authLogout, authProviderCallback, authRefresh } from "./middlewares/authRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
@@ -33,6 +36,20 @@ Container.set("config", config);
 
 const router = new koaRouter();
 const app = new koa();
+
+const upload = multer({
+	dest: "./downloads",
+	fileFilter: (_req: IncomingMessage, file: File, callback: (error: Error | null, acceptFile: boolean) => void) => {
+		if (![".json"].includes(path.extname(file.originalname).toLocaleLowerCase())) {
+			console.warn(`File ${file.originalname} cannot be uploaded. Wrong file format`);
+			callback(new Error(`File ${file.originalname} cannot be uploaded. Wrong file format`), false);
+		}
+		callback(null, true);
+	},
+	limits: {
+		fileSize: 1_048_576, // 1 MB
+	},
+});
 
 router
 	.get("/auth/login", authLogin)
@@ -58,6 +75,11 @@ router
 		} catch {
 			ctx.throw(404);
 		}
+	})
+	.post("/upload", upload.single("file"), async ctx => {
+		const file = ctx.request.file;
+		ctx.body = file.filename;
+		ctx.status = 200;
 	});
 
 const start = async () => {

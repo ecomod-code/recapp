@@ -54,7 +54,7 @@ msgstr "Accept"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:144
 msgid "comment-card.button-tooltip.delete"
-msgstr ""
+msgstr "Delete"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:186
@@ -233,22 +233,22 @@ msgstr "Log in again"
 #. js-lingui-explicit-id
 #: src/components/modals/QuizExportModal.tsx:16
 msgid "quiz-export-modal-title"
-msgstr ""
+msgstr "Export data"
 
 #. js-lingui-explicit-id
 #: src/components/modals/QuizExportModal.tsx:26
 msgid "quiz-export-modal-text-pending"
-msgstr ""
+msgstr "Export is being prepared"
 
 #. js-lingui-explicit-id
 #: src/components/modals/QuizExportModal.tsx:29
 msgid "quiz-export-modal-text-ready"
-msgstr ""
+msgstr "Export completed. You can now download the file."
 
 #. js-lingui-explicit-id
 #: src/components/modals/QuizExportModal.tsx:40
 msgid "download"
-msgstr ""
+msgstr "Download"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
@@ -419,7 +419,7 @@ msgstr "Archive quiz"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:332
 msgid "export-quiz-button"
-msgstr ""
+msgstr "Export data"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359
@@ -439,68 +439,68 @@ msgstr "Share"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:131
 msgid "export-quiz-statistics-button"
-msgstr ""
+msgstr "Export quiz statistics"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:135
 msgid "export-question-statistics-button"
-msgstr ""
+msgstr "Export question statistics"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:164
 msgid "no-data-yet"
-msgstr ""
+msgstr "No analyzable data is available yet"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:192
 msgid "details"
-msgstr ""
+msgstr "Details"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:213
 msgid "question-stats-prefix"
-msgstr ""
+msgstr "Question: "
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:216
 msgid "question-stats-info"
-msgstr ""
+msgstr "{participants} participants from {maxParticipants} ({ratio}) %) have answered the question"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:229
 msgid "question-stats-answers-given"
-msgstr ""
+msgstr "{numberOfAnswers} answers were given"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:236
 #: src/components/quiz-tabs/QuizStatsTab.tsx:253
 msgid "question-stats-given-answers"
-msgstr ""
+msgstr "The following answers were given"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:247
 msgid "question-stats-correct-answers"
-msgstr ""
+msgstr "{passed} from {participants} answers were correct."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:259
 msgid "question-stats-answer-prefix"
-msgstr ""
+msgstr "Answer: "
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:283
 msgid "question-stats-back-to-quiz-button"
-msgstr ""
+msgstr "Back to quiz"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:301
 msgid "question-stats-previous-question-button"
-msgstr ""
+msgstr "Previous question"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:321
 msgid "question-stats-next-question-button"
-msgstr ""
+msgstr "Next question"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120
@@ -640,12 +640,12 @@ msgstr "Save question"
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:121
 msgid "quiz-not-found-error-message"
-msgstr ""
+msgstr "Sorry, the quiz could not be opened"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:124
 msgid "back-to-dashboard-link"
-msgstr ""
+msgstr "Back to dashboard"
 
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:208

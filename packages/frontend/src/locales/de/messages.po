@@ -305,7 +305,7 @@ msgstr "QR-Code anzeigen"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:206
 msgid "quiz-questions-tab-add-group-button"
-msgstr "quiz-questions-tab-add-group-button"
+msgstr "Gruppe hinzufügen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:254

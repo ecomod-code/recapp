@@ -38,7 +38,7 @@ msgstr "Gruppe"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:92
 msgid "comment-card.button-tooltip.upvote"
-msgstr "Neil: icon button tooltip:upvote"
+msgstr "Upvote"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:108
@@ -49,12 +49,12 @@ msgstr "Schließen"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
-msgstr "Neil: icon button tooltip:accept"
+msgstr "Annehmen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:144
 msgid "comment-card.button-tooltip.delete"
-msgstr "Neil: icon button tooltip:delete"
+msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:186
@@ -69,22 +69,22 @@ msgstr "von {author}"
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:60
 msgid "question-card.button-tooltip.edit"
-msgstr "Neil: icon button tooltip:Edit"
+msgstr "Bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:73
 msgid "question-card.button-tooltip.change-group"
-msgstr "Neil: icon button tooltip:chagne-group"
+msgstr "Gruppe ändern"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-tooltip.approve"
-msgstr "Neil: icon button tooltip:arrpove"
+msgstr "Freigeben"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:90
 msgid "question-card.button-tooltip.delete"
-msgstr "Neil: icon button tooltip:delete"
+msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:32

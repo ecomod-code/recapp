@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { i18n } from "@lingui/core";
+import { Trans } from "@lingui/react";
 import rehypeKatex from "rehype-katex";
 import rehypeStringify from "rehype-stringify";
 import remarkMath from "remark-math";
@@ -7,12 +8,16 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import Card from "react-bootstrap/Card";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import { Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { fromTimestamp } from "itu-utils";
 import { Comment, Id } from "@recapp/models";
 
-export const CommentCard: React.FC<{
+const CARD_BODY_HEIGHT = 140;
+
+interface Props {
     comment: Comment;
     userId: Id;
     teachers: string[];
@@ -21,7 +26,36 @@ export const CommentCard: React.FC<{
     onAccept: () => void;
     onDelete: () => void;
     onJumpToQuestion: () => void;
-}> = ({ comment, onUpvote, onAccept, onDelete, teachers, userId, questionText, onJumpToQuestion }) => {
+}
+
+export const CommentCard: React.FC<Props> = props => {
+    const [showInModal, setShowInModal] = useState(false);
+
+    return (
+        <>
+            {showInModal ? (
+                <Modal show={showInModal} size="lg">
+                    <CommentCardContent {...props} isDisplayedInModal />
+                </Modal>
+            ) : null}
+
+            <CommentCardContent {...props} onSeeMoreClick={() => setShowInModal(true)} />
+        </>
+    );
+};
+
+export const CommentCardContent: React.FC<Props & { isDisplayedInModal?: boolean; onSeeMoreClick?: () => void }> = ({
+    comment,
+    onUpvote,
+    onAccept,
+    onDelete,
+    teachers,
+    userId,
+    questionText,
+    onJumpToQuestion,
+    onSeeMoreClick,
+    isDisplayedInModal,
+}) => {
     const [text, setText] = useState("");
     useEffect(() => {
         const f = async () => {
@@ -38,14 +72,18 @@ export const CommentCard: React.FC<{
     }, [comment.text]);
 
     return (
-        <Card className="p-0 m-1" style={{ width: "18rem", minHeight: 250 }} key={comment.uid}>
+        <Card className="p-0 m-1 mt-2  mb-3" style={{ minWidth: "18rem" }} key={comment.uid}>
             <Card.Title className="p-1 ps-2 text-bg-light text-start">
                 <div className="d-flex flex-row align-items-center">
                     <div className="flex-grow-1 fs-6">
-                        {fromTimestamp(comment.updated).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}
+                        {fromTimestamp(comment.updated).toLocaleString({
+                            dateStyle: "medium",
+                            timeStyle: "medium",
+                        })}
                     </div>
                     <div>
                         <ButtonWithTooltip
+                            titlePlacement={isDisplayedInModal ? "left" : undefined}
                             title={i18n._("comment-card.button-tooltip.upvote")}
                             variant="primary"
                             onClick={onUpvote}
@@ -57,11 +95,13 @@ export const CommentCard: React.FC<{
                     </div>
                 </div>
             </Card.Title>
-            <Card.Body>
-                <Card.Text as="div" className="text-start">
+
+            {text ? (
+                <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={onSeeMoreClick}>
                     <div dangerouslySetInnerHTML={{ __html: text }} />
-                </Card.Text>
-            </Card.Body>
+                </SeeMoreContainer>
+            ) : null}
+
             <Card.Footer className="p-1 w-100 text-start">
                 <div className="d-flex flex-row align-items-center">
                     <div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
@@ -98,5 +138,39 @@ export const CommentCard: React.FC<{
                 </div>
             </Card.Footer>
         </Card>
+    );
+};
+
+const SeeMoreContainer = (props: { isDisplayedInModal?: boolean; onClick?: () => void } & PropsWithChildren) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [isSeeMoreVisible, setIsSeeMoreVisible] = useState(false);
+
+    useEffect(() => {
+        if (containerRef.current && !props.isDisplayedInModal) {
+            const contentHeight = containerRef.current.scrollHeight;
+            const hasScroll = contentHeight > CARD_BODY_HEIGHT;
+            if (hasScroll) {
+                setIsSeeMoreVisible(true);
+            }
+        }
+    }, []);
+
+    return (
+        <Card.Body ref={containerRef} style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden", position: "relative" }}>
+            <Card.Text as="div" className={`text-start ${isSeeMoreVisible ? "cutoff-text" : ""}`}>
+                {props.children}
+            </Card.Text>
+
+            {isSeeMoreVisible ? (
+                <Button
+                    variant="link"
+                    className="p-0"
+                    style={{ lineHeight: 1.4, position: "absolute", bottom: 6, left: 16 }}
+                    onClick={props.onClick}
+                >
+                    <Trans id="see-more-container.button-label" />
+                </Button>
+            ) : null}
+        </Card.Body>
     );
 };

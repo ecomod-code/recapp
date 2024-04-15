@@ -14,24 +14,9 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ShareQuizModal.tsx:60
-msgid "share-quiz-modal.button-tooltip.clear"
-msgstr "Neil: icon button tooltip:clear"
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:323
-msgid "quiz-data-tab.button-tooltip.edit"
-msgstr "Neil: icon button tooltip:edit"
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:336
-msgid "quiz-data-tab.button-tooltip.share"
-msgstr "Neil: icon button tooltip:share"
-
-#. js-lingui-explicit-id
-#: src/UserAdminPanel.tsx:39
-msgid "user-admin-panel.button-tooltip.filter"
-msgstr "Neil: icon button tooltip:filter"
+#: src/components/cards/CommentCard.tsx:132
+msgid "see-more-container.button-label"
+msgstr "Mehr anzeigen"
 
 #. js-lingui-explicit-id
 #: src/Activate.tsx:36
@@ -40,33 +25,33 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:356
-#: src/components/quiz-tabs/QuizDataTab.tsx:144
+#: src/actors/CurrentQuizActor.ts:362
+#: src/components/quiz-tabs/QuizDataTab.tsx:179
 msgid "new-quiz-title"
 msgstr "Titel"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:357
+#: src/actors/CurrentQuizActor.ts:363
 msgid "new-quiz-description"
 msgstr "Beschreibung"
 
 #. js-lingui-explicit-id
-#: src/actors/CurrentQuizActor.ts:359
+#: src/actors/CurrentQuizActor.ts:365
 msgid "new-quiz-group"
 msgstr "Gruppe"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:49
+#: src/components/cards/CommentCard.tsx:53
 msgid "comment-card.button-tooltip.upvote"
 msgstr "Neil: icon button tooltip:upvote"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:80
+#: src/components/cards/CommentCard.tsx:86
 msgid "comment-card.button-tooltip.accept"
 msgstr "Neil: icon button tooltip:accept"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:89
+#: src/components/cards/CommentCard.tsx:95
 msgid "comment-card.button-tooltip.delete"
 msgstr "Neil: icon button tooltip:delete"
 
@@ -96,25 +81,25 @@ msgid "question-card.button-tooltip.delete"
 msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:30
+#: src/components/cards/UserCard.tsx:32
 #: src/components/modals/ChangeRoleModal.tsx:34
 msgid "role-name-admin"
 msgstr "Admin"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:34
+#: src/components/cards/UserCard.tsx:36
 #: src/components/modals/ChangeRoleModal.tsx:29
 msgid "role-name-teacher"
 msgstr "Lehrperson"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:38
+#: src/components/cards/UserCard.tsx:40
 #: src/components/modals/ChangeRoleModal.tsx:25
 msgid "role-name-student"
 msgstr "Student"
 
 #. js-lingui-explicit-id
-#: src/components/cards/UserCard.tsx:126
+#: src/components/cards/UserCard.tsx:128
 msgid "user-last-login: {date}"
 msgstr "Letze Anmeldung: {date}"
 
@@ -160,6 +145,7 @@ msgstr "Gruppe ändern"
 #: src/components/modals/ChangeRoleModal.tsx:44
 #: src/components/modals/CreateGroupModal.tsx:64
 #: src/components/modals/MarkdownModal.tsx:100
+#: src/components/modals/QuizExportModal.tsx:48
 #: src/components/modals/ShareQuizModal.tsx:96
 #: src/components/modals/TextModal.tsx:50
 #: src/components/modals/YesNoModal.tsx:40
@@ -239,6 +225,26 @@ msgid "button-login-again"
 msgstr "Erneut anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:16
+msgid "quiz-export-modal-title"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:26
+msgid "quiz-export-modal-text-pending"
+msgstr "Export wird vorbereitet."
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:29
+msgid "quiz-export-modal-text-ready"
+msgstr "Export abgeschlossen. Sie können die Datei jetzt herunterladen."
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:40
+msgid "download"
+msgstr "Herunterladen"
+
+#. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
 msgid "share-qr-code-header"
 msgstr "Studierende können sich jetzt über Code oder Link in das Quiz einschreiben"
@@ -252,6 +258,11 @@ msgstr "Schließen"
 #: src/components/modals/ShareQuizModal.tsx:54
 msgid "share-with-teachers-modal-title"
 msgstr "Lehrpersonen zum Teilen auswählen"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:60
+msgid "share-quiz-modal.button-tooltip.clear"
+msgstr "Neil: icon button tooltip:clear"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:70
@@ -292,122 +303,203 @@ msgid "quiz-questions-tab-new-question-button"
 msgstr "Neue Frage"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:319
-#: src/components/quiz-tabs/QuizDataTab.tsx:330
+#: src/components/quiz-tabs/QuestionsTab.tsx:314
+#: src/components/quiz-tabs/QuizDataTab.tsx:366
 msgid "button-label-edit"
 msgstr "bearbeiten"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:338
+#: src/components/quiz-tabs/QuestionsTab.tsx:333
 msgid "quiz-questions-tab-empty-group-message"
 msgstr "Neil: there is no questios added to the group yet"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:120
+#: src/components/quiz-tabs/QuizDataTab.tsx:156
 msgid "start-quiz-mode-button"
 msgstr "Quizmodus starten"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:128
+#: src/components/quiz-tabs/QuizDataTab.tsx:164
 msgid "freeze-quiz-button"
 msgstr "Quiz einfrieren"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:136
+#: src/components/quiz-tabs/QuizDataTab.tsx:172
 msgid "edit-quiz-button"
 msgstr "Editiermodus aktivieren"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:160
+#: src/components/quiz-tabs/QuizDataTab.tsx:194
 #: src/pages/CreateQuiz.tsx:60
 msgid "quiz-description"
 msgstr "Beschreibung"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:175
+#: src/components/quiz-tabs/QuizDataTab.tsx:208
 msgid "number-of-participants"
 msgstr "Anzahl Teilnehmende"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:180
+#: src/components/quiz-tabs/QuizDataTab.tsx:212
 msgid "teachers"
 msgstr "Lehrpersonen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:192
+#: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
 msgstr "Studentische Kommentare im Quizmodus erlauben"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:199
+#: src/components/quiz-tabs/QuizDataTab.tsx:230
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
 msgstr "Fragen durch Studierende erstellen lassen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:206
+#: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
 msgstr "Studentische Teilnahmemöglichkeiten"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:209
+#: src/components/quiz-tabs/QuizDataTab.tsx:239
 #: src/pages/CreateQuiz.tsx:101
 msgid "quiz-allows-anonymous-participation"
 msgstr "Anonyme Teilnahme"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:222
+#: src/components/quiz-tabs/QuizDataTab.tsx:252
 #: src/pages/CreateQuiz.tsx:118
 msgid "quiz-allows-participation-via-nickname"
 msgstr "Teilnahme mit Pseudonym"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:233
+#: src/components/quiz-tabs/QuizDataTab.tsx:263
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-participation-via-realname"
 msgstr "Teilnahme mit echtem Namen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:244
+#: src/components/quiz-tabs/QuizDataTab.tsx:273
 #: src/pages/CreateQuiz.tsx:151
 msgid "quiz-allowed-question-types"
 msgstr "Erlaubte Fragentypen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:247
+#: src/components/quiz-tabs/QuizDataTab.tsx:276
 #: src/pages/CreateQuiz.tsx:154
 msgid "quiz-allows-text-questions"
 msgstr "Freitextfragen erlauben"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:258
+#: src/components/quiz-tabs/QuizDataTab.tsx:287
 #: src/pages/CreateQuiz.tsx:171
 msgid "quiz-allows-single-choice-questions"
 msgstr "Single-Choice Fragen erlauben"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:269
+#: src/components/quiz-tabs/QuizDataTab.tsx:298
 #: src/pages/CreateQuiz.tsx:188
 msgid "quiz-allows-multiple-choice-realname"
 msgstr "Multiple-Choice Fragen erlauben"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:283
+#: src/components/quiz-tabs/QuizDataTab.tsx:311
 #: src/pages/CreateQuiz.tsx:207
 msgid "quiz-enable-question-shufflling"
 msgstr "Fragen im Quizmodus mischen"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:296
+#: src/components/quiz-tabs/QuizDataTab.tsx:323
 msgid "archive-quiz-button"
 msgstr "Quiz archivieren"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:343
+#: src/components/quiz-tabs/QuizDataTab.tsx:332
+msgid "export-quiz-button"
+msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:359
+msgid "quiz-data-tab.button-tooltip.edit"
+msgstr "Neil: icon button tooltip:edit"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:372
+msgid "quiz-data-tab.button-tooltip.share"
+msgstr "Neil: icon button tooltip:share"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:379
 msgid "button-label-share"
 msgstr "teilen"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:131
+msgid "export-quiz-statistics-button"
+msgstr "Quizstatistik exportieren"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:135
+msgid "export-question-statistics-button"
+msgstr "Fragenstatistik exportieren"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:164
+msgid "no-data-yet"
+msgstr "Es liegen noch keine auswertbaren Daten vor"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:192
+msgid "details"
+msgstr "Details"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:213
+msgid "question-stats-prefix"
+msgstr "Frage: "
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:216
+msgid "question-stats-info"
+msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio}) %) haben die Frage bearbeitet"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:229
+msgid "question-stats-answers-given"
+msgstr "{numberOfAnswers} Antworten wurden gegeben"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:236
+#: src/components/quiz-tabs/QuizStatsTab.tsx:253
+msgid "question-stats-given-answers"
+msgstr "Es wurden folgenden Antworten gegeben"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:247
+msgid "question-stats-correct-answers"
+msgstr "{passed} von {participants} Antworten waren richtig."
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:259
+msgid "question-stats-answer-prefix"
+msgstr "Antwort: "
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:283
+msgid "question-stats-back-to-quiz-button"
+msgstr "Zurück zum Quiz"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:301
+msgid "question-stats-previous-question-button"
+msgstr "Vorherige Frage"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:321
+msgid "question-stats-next-question-button"
+msgstr "Nächste Frage"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120
@@ -435,17 +527,17 @@ msgid "quiz-card.button-tooltip.delete"
 msgstr "Neil: icon button tooltip:delete"
 
 #. js-lingui-explicit-id
-#: src/components/quizzes-panel/QuizzesPanel.tsx:78
+#: src/components/quizzes-panel/QuizzesPanel.tsx:65
 msgid "button-new-quiz"
 msgstr "Neues Quiz"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:39
+#: src/Dashboard.tsx:40
 msgid "dashboard-tab-label-quizzes"
 msgstr "Quizze"
 
 #. js-lingui-explicit-id
-#: src/Dashboard.tsx:43
+#: src/Dashboard.tsx:44
 msgid "dashboard-tab-label-users"
 msgstr "Benutzer"
 
@@ -563,6 +655,11 @@ msgstr "Neuer Kommentar"
 #: src/UserAdminPanel.tsx:35
 msgid "user-admin-panel-title"
 msgstr "Benutzerverwaltung"
+
+#. js-lingui-explicit-id
+#: src/UserAdminPanel.tsx:39
+msgid "user-admin-panel.button-tooltip.filter"
+msgstr "Neil: icon button tooltip:filter"
 
 #. js-lingui-explicit-id
 #: src/UserAdminPanel.tsx:45
@@ -703,75 +800,3 @@ msgstr "Suchtext"
 #. js-lingui-explicit-id
 #~ msgid "remove-edit-mode-of-question-text"
 #~ msgstr "Die Frage befindet ist durch einen anderen Editiervorgang gesperrt worden. Möchten Sie den Editiervorgang wieder aktivieren?"
-
-#. js-lingui-explicit-id
-msgid "export-quiz-button"
-msgstr "Daten exportieren"
-
-#. js-lingui-explicit-id
-msgid "quiz-export-modal-title"
-msgstr "Daten exportieren"
-
-#. js-lingui-explicit-id
-msgid "quiz-export-modal-text-pending"
-msgstr "Export wird vorbereitet."
-
-#. js-lingui-explicit-id
-msgid "quiz-export-modal-text-ready"
-msgstr "Export abgeschlossen. Sie können die Datei jetzt herunterladen."
-
-#. js-lingui-explicit-id
-msgid "download"
-msgstr "Herunterladen"
-
-#. js-lingui-explicit-id
-msgid "export-quiz-statistics-button"
-msgstr "Quizstatistik exportieren"
-
-#. js-lingui-explicit-id
-msgid "export-question-statistics-button"
-msgstr "Fragenstatistik exportieren"
-
-#. js-lingui-explicit-id
-msgid "no-data-yet"
-msgstr "Es liegen noch keine auswertbaren Daten vor"
-
-#. js-lingui-explicit-id
-msgid "details"
-msgstr "Details"
-
-#. js-lingui-explicit-id
-msgid "question-stats-prefix"
-msgstr "Frage: "
-
-#. js-lingui-explicit-id
-msgid "question-stats-info"
-msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio}) %) haben die Frage bearbeitet"
-
-#. js-lingui-explicit-id
-msgid "question-stats-answers-given"
-msgstr "{numberOfAnswers} Antworten wurden gegeben"
-
-#. js-lingui-explicit-id
-msgid "question-stats-given-answers"
-msgstr "Es wurden folgenden Antworten gegeben"
-
-#. js-lingui-explicit-id
-msgid "question-stats-correct-answers"
-msgstr "{passed} von {participants} Antworten waren richtig."
-
-#. js-lingui-explicit-id
-msgid "question-stats-answer-prefix"
-msgstr "Antwort: "
-
-#. js-lingui-explicit-id
-msgid "question-stats-back-to-quiz-button"
-msgstr "Zurück zum Quiz"
-
-#. js-lingui-explicit-id
-msgid "question-stats-previous-question-button"
-msgstr "Vorherige Frage"
-
-#. js-lingui-explicit-id
-msgid "question-stats-next-question-button"
-msgstr "Nächste Frage"

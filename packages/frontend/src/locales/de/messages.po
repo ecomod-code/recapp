@@ -775,3 +775,19 @@ msgstr "Vorherige Frage"
 #. js-lingui-explicit-id
 msgid "question-stats-next-question-button"
 msgstr "Nächste Frage"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-title"
+msgstr "Ein Quiz importieren"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-modal-message"
+msgstr "Wählen Sie eine Quiz-Datei aus, um diese zu importieren"
+
+#. js-lingui-explicit-id
+msgid "import"
+msgstr "Importieren"
+
+#. js-lingui-explicit-id
+msgid "button-import-quiz"
+msgstr "Quiz importieren"

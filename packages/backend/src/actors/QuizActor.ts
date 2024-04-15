@@ -1,6 +1,8 @@
 import {
 	ActorUri,
 	Id,
+	Question,
+	QuestionGroup,
 	Quiz,
 	QuizActorMessage,
 	QuizActorMessages,
@@ -22,8 +24,9 @@ import { createActorUri } from "../utils";
 import { keys } from "rambda";
 import { QuizRunActor } from "./QuizRunActor";
 import { StatisticsActor } from "./StatisticsActor";
-import { writeFile } from "fs/promises";
+import { writeFile, readFile } from "fs/promises";
 import * as path from "path";
+import { AccessRole } from "./StoringActor";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -157,30 +160,31 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		}
 	};
 
+	private async create(quiz: Partial<Quiz>, clientUserRole: AccessRole, clientUserId: Id): Promise<Id> {
+		if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
+			// Students can also create quizzes. This will automatically upgrade them to a teacher role
+			this.send(createActorUri("UserStore"), UserStoreMessages.Update({ uid: clientUserId, role: "TEACHER" }));
+		}
+		const uid = toId(v4());
+		(quiz as Quiz).uid = uid;
+		(quiz as Quiz).uniqueLink = `/activate?quiz=${uid}`;
+		(quiz as Quiz).created = toTimestamp();
+		(quiz as Quiz).updated = toTimestamp();
+		(quiz as Quiz).state = "EDITING";
+		const quizToCreate = quizSchema.parse(quiz);
+		await this.afterEntityWasCached(uid);
+		await this.storeEntity(quizToCreate);
+		this.sendUpdateToSubscribers(quizToCreate);
+		return uid;
+	}
+
 	public async receive(from: ActorRef, message: QuizActorMessage): Promise<ResultType> {
 		console.log("QUIZACTOR", from.name, message);
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
-					if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
-						// Students can also create quizzes. This will automatically upgrade them to a teacher role
-						this.send(
-							createActorUri("UserStore"),
-							UserStoreMessages.Update({ uid: clientUserId, role: "TEACHER" })
-						);
-					}
-					const uid = toId(v4());
-					(quiz as Quiz).uid = uid;
-					(quiz as Quiz).uniqueLink = `/activate?quiz=${uid}`;
-					(quiz as Quiz).created = toTimestamp();
-					(quiz as Quiz).updated = toTimestamp();
-					(quiz as Quiz).state = "EDITING";
-					const quizToCreate = quizSchema.parse(quiz);
-					await this.afterEntityWasCached(uid);
-					await this.storeEntity(quizToCreate);
-					this.sendUpdateToSubscribers(quizToCreate);
-					return uid;
+					return this.create(quiz, clientUserRole, clientUserId);
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);
@@ -310,6 +314,60 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					});
 					return unit();
 				},
+				Import: async ({ filename }) => {
+					console.log(filename);
+					const jsonBuffer = await readFile(path.join("./downloads", filename));
+					const importedObject = JSON.parse(jsonBuffer.toString());
+					const quiz: Omit<Quiz, "uniqueLink" | "uid"> = {
+						allowedQuestionTypesSettings: importedObject.allowedQuestionTypesSettings,
+						description: importedObject.description,
+						groups: [],
+						shuffleQuestions: importedObject.shuffleQuestions,
+						state: importedObject.state,
+						studentComments: importedObject.studentComments,
+						studentParticipationSettings: importedObject.studentParticipationSettings,
+						studentQuestions: importedObject.studentQuestions,
+						title: importedObject.title,
+						comments: [],
+						teachers: [clientUserId],
+						students: [],
+						created: toTimestamp(),
+						updated: toTimestamp(),
+					};
+					const uid = await this.create(quiz, clientUserRole, clientUserId);
+					const rawQuestions: Question[] = importedObject.questions;
+					const questionOldIdToNewId = new Map<Id, Id>();
+					const db = await this.connector.db();
+					await Promise.all(
+						rawQuestions.map(async (q: Question) => {
+							const newId = toId(v4());
+							questionOldIdToNewId.set(q.uid, newId);
+							q.uid = newId;
+							q.quiz = uid;
+							q.authorId = clientUserId;
+							q.authorName = "IMPORTED";
+							q.created = toTimestamp();
+							q.updated = toTimestamp();
+							await db.collection("questions").insertOne(q);
+						})
+					);
+					const groups: QuestionGroup[] = importedObject.groups;
+					groups.forEach(g => {
+						const newGroup: QuestionGroup = {
+							name: g.name,
+							questions: [],
+						};
+						g.questions.forEach(q => {
+							const id = questionOldIdToNewId.get(q);
+							if (id) {
+								newGroup.questions.push(id);
+							}
+						});
+						quiz.groups.push(newGroup);
+					});
+					this.send(this.ref, QuizActorMessages.Update({ uid, groups: quiz.groups }));
+					return uid;
+				},
 				Export: async uid => {
 					const db = await this.connector.db();
 					const mbQuiz = maybe(await db.collection<Quiz>(this.collectionName).findOne({ uid }));
@@ -324,7 +382,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							delete exportObject.comments;
 							delete exportObject.uid;
 							delete exportObject.uniqueLink;
-							delete exportObject.uniqueLink;
+							delete exportObject._id;
 							const questionIds = quiz.groups
 								.map(group => group.questions)
 								.flat()
@@ -333,8 +391,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 								questionIds.map(async id => {
 									const question = await db.collection<any>("questions").findOne({ uid: id });
 									if (question) {
-										delete question?.authorId;
-										delete question?.authorName;
+										delete question.authorId;
+										delete question.authorName;
+										delete question._id;
 									}
 									return question;
 								})

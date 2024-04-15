@@ -8,6 +8,7 @@ import { fromTimestamp, toTimestamp } from "itu-utils";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import { CheckCircleFill, CircleFill, Pencil } from "react-bootstrap-icons";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { actorUris } from "../../actorUris";
 import { ChangeNameModal } from "../modals/ChangeNameModal";
 import { ChangeActiveModal } from "../modals/ChangeActiveModal";
@@ -94,11 +95,11 @@ export const UserCard: React.FC<{ user: User; ownUser: Maybe<User> }> = ({ user,
 
             <Card className="p-0 m-1" style={{ width: "16rem" }}>
                 <Card.Title className="p-1 ps-2 text-bg-primary text-start" style={{ background: "darkGrey" }}>
-                    <div className="d-flex flex-row">
+                    <div className="d-flex align-items-center">
                         <div className="flex-grow-1">{user.username}</div>
-                        <div className="justify-self-end pb-1 ml-1">
-                            <Pencil height="1rem" onClick={() => setModal("Name")}></Pencil>
-                        </div>
+                        <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
+                            <Pencil height="1rem" onClick={() => setModal("Name")} />
+                        </ButtonWithTooltip>
                     </div>
                 </Card.Title>
                 <Card.Body>

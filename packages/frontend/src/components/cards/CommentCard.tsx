@@ -30,21 +30,26 @@ interface Props {
 
 export const CommentCard: React.FC<Props> = props => {
     const [showInModal, setShowInModal] = useState(false);
+    const showInModalHandler = (value: boolean) => {
+        setShowInModal(value);
+    };
 
     return (
         <>
             {showInModal ? (
                 <Modal show={showInModal} size="lg">
-                    <CommentCardContent {...props} isDisplayedInModal />
+                    <CommentCardContent {...props} isDisplayedInModal showInModalHandler={showInModalHandler} />
                 </Modal>
             ) : null}
 
-            <CommentCardContent {...props} onSeeMoreClick={() => setShowInModal(true)} />
+            <CommentCardContent {...props} showInModalHandler={showInModalHandler} />
         </>
     );
 };
 
-export const CommentCardContent: React.FC<Props & { isDisplayedInModal?: boolean; onSeeMoreClick?: () => void }> = ({
+export const CommentCardContent: React.FC<
+    Props & { isDisplayedInModal?: boolean; showInModalHandler: (value: boolean) => void }
+> = ({
     comment,
     onUpvote,
     onAccept,
@@ -53,7 +58,7 @@ export const CommentCardContent: React.FC<Props & { isDisplayedInModal?: boolean
     userId,
     questionText,
     onJumpToQuestion,
-    onSeeMoreClick,
+    showInModalHandler,
     isDisplayedInModal,
 }) => {
     const [text, setText] = useState("");
@@ -93,11 +98,21 @@ export const CommentCardContent: React.FC<Props & { isDisplayedInModal?: boolean
                             <span className="ms-2">{comment.upvoters.length}</span>
                         </ButtonWithTooltip>
                     </div>
+
+                    {isDisplayedInModal ? (
+                        <Button
+                            variant="outline-secondary"
+                            className="py-2 ms-2"
+                            onClick={() => showInModalHandler(false)}
+                        >
+                            <Trans id="close" />
+                        </Button>
+                    ) : null}
                 </div>
             </Card.Title>
 
             {text ? (
-                <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={onSeeMoreClick}>
+                <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={() => showInModalHandler(true)}>
                     <div dangerouslySetInnerHTML={{ __html: text }} />
                 </SeeMoreContainer>
             ) : null}

@@ -14,102 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:132
-msgid "see-more-container.button-label"
-msgstr "See more"
-
-#. js-lingui-explicit-id
-#: src/components/modals/QuizExportModal.tsx:16
-msgid "quiz-export-modal-title"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/modals/QuizExportModal.tsx:26
-msgid "quiz-export-modal-text-pending"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/modals/QuizExportModal.tsx:29
-msgid "quiz-export-modal-text-ready"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/modals/QuizExportModal.tsx:40
-msgid "download"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizDataTab.tsx:332
-msgid "export-quiz-button"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:131
-msgid "export-quiz-statistics-button"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:135
-msgid "export-question-statistics-button"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:164
-msgid "no-data-yet"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:192
-msgid "details"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:213
-msgid "question-stats-prefix"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:216
-msgid "question-stats-info"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:229
-msgid "question-stats-answers-given"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:236
-#: src/components/quiz-tabs/QuizStatsTab.tsx:253
-msgid "question-stats-given-answers"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:247
-msgid "question-stats-correct-answers"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:259
-msgid "question-stats-answer-prefix"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:283
-msgid "question-stats-back-to-quiz-button"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:301
-msgid "question-stats-previous-question-button"
-msgstr ""
-
-#. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuizStatsTab.tsx:321
-msgid "question-stats-next-question-button"
-msgstr ""
-
-#. js-lingui-explicit-id
 #: src/Activate.tsx:36
 #: src/Login.tsx:31
 msgid "login-page.login"
@@ -132,19 +36,30 @@ msgid "new-quiz-group"
 msgstr "Group"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:53
+#: src/components/cards/CommentCard.tsx:92
 msgid "comment-card.button-tooltip.upvote"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:86
+#: src/components/cards/CommentCard.tsx:108
+#: src/components/modals/ShareModal.tsx:36
+msgid "close"
+msgstr "Close"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
 msgstr ""
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:95
+#: src/components/cards/CommentCard.tsx:144
 msgid "comment-card.button-tooltip.delete"
 msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:186
+msgid "see-more-container.button-label"
+msgstr "See more"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:57
@@ -316,14 +231,29 @@ msgid "button-login-again"
 msgstr "Log in again"
 
 #. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:16
+msgid "quiz-export-modal-title"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:26
+msgid "quiz-export-modal-text-pending"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:29
+msgid "quiz-export-modal-text-ready"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/QuizExportModal.tsx:40
+msgid "download"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
 msgid "share-qr-code-header"
 msgstr "Students can now register for the quiz via code or link"
-
-#. js-lingui-explicit-id
-#: src/components/modals/ShareModal.tsx:36
-msgid "close"
-msgstr "Close"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:54
@@ -374,13 +304,13 @@ msgid "quiz-questions-tab-new-question-button"
 msgstr "New question"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:314
+#: src/components/quiz-tabs/QuestionsTab.tsx:315
 #: src/components/quiz-tabs/QuizDataTab.tsx:366
 msgid "button-label-edit"
 msgstr "edit"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:333
+#: src/components/quiz-tabs/QuestionsTab.tsx:334
 msgid "quiz-questions-tab-empty-group-message"
 msgstr ""
 
@@ -487,6 +417,11 @@ msgid "archive-quiz-button"
 msgstr "Archive quiz"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:332
+msgid "export-quiz-button"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359
 msgid "quiz-data-tab.button-tooltip.edit"
 msgstr ""
@@ -500,6 +435,72 @@ msgstr ""
 #: src/components/quiz-tabs/QuizDataTab.tsx:379
 msgid "button-label-share"
 msgstr "share"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:131
+msgid "export-quiz-statistics-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:135
+msgid "export-question-statistics-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:164
+msgid "no-data-yet"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:192
+msgid "details"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:213
+msgid "question-stats-prefix"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:216
+msgid "question-stats-info"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:229
+msgid "question-stats-answers-given"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:236
+#: src/components/quiz-tabs/QuizStatsTab.tsx:253
+msgid "question-stats-given-answers"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:247
+msgid "question-stats-correct-answers"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:259
+msgid "question-stats-answer-prefix"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:283
+msgid "question-stats-back-to-quiz-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:301
+msgid "question-stats-previous-question-button"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:321
+msgid "question-stats-next-question-button"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:120

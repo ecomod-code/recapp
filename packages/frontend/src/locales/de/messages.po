@@ -14,11 +14,6 @@ msgstr ""
 "Plural-Forms: \n"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:132
-msgid "see-more-container.button-label"
-msgstr "Mehr anzeigen"
-
-#. js-lingui-explicit-id
 #: src/Activate.tsx:36
 #: src/Login.tsx:31
 msgid "login-page.login"
@@ -41,19 +36,30 @@ msgid "new-quiz-group"
 msgstr "Gruppe"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:53
+#: src/components/cards/CommentCard.tsx:92
 msgid "comment-card.button-tooltip.upvote"
 msgstr "Neil: icon button tooltip:upvote"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:86
+#: src/components/cards/CommentCard.tsx:108
+#: src/components/modals/ShareModal.tsx:36
+msgid "close"
+msgstr "Schließen"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
 msgstr "Neil: icon button tooltip:accept"
 
 #. js-lingui-explicit-id
-#: src/components/cards/CommentCard.tsx:95
+#: src/components/cards/CommentCard.tsx:144
 msgid "comment-card.button-tooltip.delete"
 msgstr "Neil: icon button tooltip:delete"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:186
+msgid "see-more-container.button-label"
+msgstr "Mehr anzeigen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:57
@@ -250,11 +256,6 @@ msgid "share-qr-code-header"
 msgstr "Studierende können sich jetzt über Code oder Link in das Quiz einschreiben"
 
 #. js-lingui-explicit-id
-#: src/components/modals/ShareModal.tsx:36
-msgid "close"
-msgstr "Schließen"
-
-#. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:54
 msgid "share-with-teachers-modal-title"
 msgstr "Lehrpersonen zum Teilen auswählen"
@@ -303,13 +304,13 @@ msgid "quiz-questions-tab-new-question-button"
 msgstr "Neue Frage"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:314
+#: src/components/quiz-tabs/QuestionsTab.tsx:315
 #: src/components/quiz-tabs/QuizDataTab.tsx:366
 msgid "button-label-edit"
 msgstr "bearbeiten"
 
 #. js-lingui-explicit-id
-#: src/components/quiz-tabs/QuestionsTab.tsx:333
+#: src/components/quiz-tabs/QuestionsTab.tsx:334
 msgid "quiz-questions-tab-empty-group-message"
 msgstr "Neil: there is no questios added to the group yet"
 

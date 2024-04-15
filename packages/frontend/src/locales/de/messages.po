@@ -74,17 +74,17 @@ msgstr "Bearbeiten"
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:73
 msgid "question-card.button-tooltip.change-group"
-msgstr "Neil: icon button tooltip:chagne-group"
+msgstr "Gruppe ändern"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-tooltip.approve"
-msgstr "Neil: icon button tooltip:arrpove"
+msgstr "Freigeben"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:90
 msgid "question-card.button-tooltip.delete"
-msgstr "Neil: icon button tooltip:delete"
+msgstr "Löschen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:32

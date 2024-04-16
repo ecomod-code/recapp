@@ -176,7 +176,7 @@ msgstr "Change username"
 #: src/components/modals/TextModal.tsx:41
 #: src/components/modals/YesNoModal.tsx:32
 msgid "okay"
-msgstr "O.K."
+msgstr "OK"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNicknameModal.tsx:25

@@ -12,7 +12,7 @@ import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, Question, Id, QuestionType } from "@recapp/models";
+import { Quiz, User, toId, Comment, Question, Id, QuestionType, UserParticipation } from "@recapp/models";
 
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -60,6 +60,8 @@ export const QuestionEdit: React.FC = () => {
 	const [groups, setGroups] = useState<string[]>([]);
 	const [selectedGroup, setSelectedGroup] = useState("");
 	const [allowedQuestionTypes, setAllowedQuestionTypes] = useState<string[]>([]);
+	const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<string[]>([]);
+	const [authorType, setAuthorType] = useState<UserParticipation>("ANONYMOUS");
 	const nav = useNavigate();
 	const isStudent = mbUser.map(u => u.user.role === "STUDENT").orElse(true);
 
@@ -71,11 +73,25 @@ export const QuestionEdit: React.FC = () => {
 
 		const groups = quiz?.quiz?.groups?.map(g => g.name);
 		if (groups) {
+			const aat: UserParticipation[] = keys(quiz?.quiz.studentParticipationSettings)
+				.filter(k => !!quiz?.quiz.studentParticipationSettings[k as UserParticipation])
+				.map(k => k as UserParticipation);
+
+			setAllowedAuthorTypes(aat);
+			if (!aat.includes("ANONYMOUS")) {
+				if (!aat.includes("NICKNAME")) {
+					setAuthorType("NAME");
+				} else {
+					setAuthorType("NICKNAME");
+				}
+			}
+
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
 				.map(k => k as QuestionType);
 
 			setAllowedQuestionTypes(aqt);
+
 			if (questionId) {
 				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
 				const newType: QuestionType = aqt.includes(editQuestion.type ?? question.type)
@@ -176,8 +192,22 @@ export const QuestionEdit: React.FC = () => {
 		const user = mbUser.map(u => u.user);
 		user.match(
 			userData => {
-				quizQuestion.authorId = userData.uid;
-				quizQuestion.authorName = userData.username;
+				if (isStudent) {
+					quizQuestion.authorId = userData.uid;
+					switch (authorType) {
+						case "ANONYMOUS":
+							quizQuestion.authorName = i18n._("anonymous");
+							break;
+						case "NICKNAME":
+							quizQuestion.authorName = userData.nickname ?? userData.username;
+							break;
+						case "NAME":
+							quizQuestion.authorName = userData.username;
+							break;
+					}
+				} else {
+					quizQuestion.authorName = userData.username;
+				}
 			},
 			() => {}
 		);
@@ -336,6 +366,34 @@ export const QuestionEdit: React.FC = () => {
 										<strong>{question.uid ? "Frage" : "Neue Frage"}</strong>
 									</div>
 									<div className="flex-grow-1"></div>
+									{isStudent && (
+										<div className="align-self-center d-flex flex-row align-items-center">
+											Autor:&nbsp;
+											<Form.Select
+												value={authorType}
+												onChange={event =>
+													setAuthorType(event.target.value as UserParticipation)
+												}
+											>
+												{allowedAuthorTypes.includes("NAME") && (
+													<option value="NAME">
+														{mbUser.flatMap(u => maybe(u.user?.username)).orElse("---")}
+													</option>
+												)}
+												{allowedAuthorTypes.includes("NICKNAME") &&
+													mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("") !== "" && (
+														<option value="NICKNAME">
+															{mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("---")}
+														</option>
+													)}
+												{allowedAuthorTypes.includes("ANONYMOUS") && (
+													<option value="TEXT">
+														<Trans id="anonymous" />
+													</option>
+												)}
+											</Form.Select>
+										</div>
+									)}
 									<div className="align-self-center">
 										<Form.Select
 											value={selectedGroup}

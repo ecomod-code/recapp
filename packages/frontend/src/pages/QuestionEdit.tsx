@@ -42,6 +42,7 @@ export const QuestionEdit: React.FC = () => {
 	const { state } = useLocation();
 	const questionId = state?.quizId ?? "";
 	const formerGroup = state?.group ?? "";
+	const writeAccess = state?.write === "true" ?? false;
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 		"CurrentQuiz"
 	);
@@ -103,15 +104,17 @@ export const QuestionEdit: React.FC = () => {
 
 				setQuestion({ ...question, ...editQuestion, type: newType });
 				setHint(!!editQuestion.hint);
-				tryQuizActor.forEach(actor =>
-					actor.send(
-						actor,
-						CurrentQuizMessages.UpdateQuestion({
-							question: { uid: questionId, editMode: true },
-							group: "", // formerGroup,
-						})
-					)
-				);
+				if (writeAccess) {
+					tryQuizActor.forEach(actor =>
+						actor.send(
+							actor,
+							CurrentQuizMessages.UpdateQuestion({
+								question: { uid: questionId, editMode: true },
+								group: "", // formerGroup,
+							})
+						)
+					);
+				}
 			} else {
 				const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
 
@@ -188,49 +191,51 @@ export const QuestionEdit: React.FC = () => {
 	};
 
 	const submit = async () => {
-		const quizQuestion = { ...question };
-		if (quizQuestion.type === "TEXT") {
-			quizQuestion.answers = [];
-		}
-		const user = mbUser.map(u => u.user);
-		user.match(
-			userData => {
-				if (isStudent) {
-					quizQuestion.authorId = userData.uid;
-					switch (authorType) {
-						case "ANONYMOUS":
-							quizQuestion.authorName = i18n._("anonymous");
-							break;
-						case "NICKNAME":
-							quizQuestion.authorName = userData.nickname ?? userData.username;
-							break;
-						case "NAME":
-							quizQuestion.authorName = userData.username;
-							break;
-					}
-				} else {
-					quizQuestion.authorName = userData.username;
-				}
-			},
-			() => {}
-		);
-
-		tryQuizActor.forEach(actor => {
-			if (questionId) {
-				actor.send(
-					actor.name,
-					CurrentQuizMessages.UpdateQuestion({
-						question: { ...quizQuestion, uid: toId(questionId) },
-						group: selectedGroup !== formerGroup ? selectedGroup : "",
-					})
-				);
-			} else {
-				actor.send(
-					actor.name,
-					CurrentQuizMessages.AddQuestion({ question: quizQuestion, group: selectedGroup })
-				);
+		if (writeAccess) {
+			const quizQuestion = { ...question };
+			if (quizQuestion.type === "TEXT") {
+				quizQuestion.answers = [];
 			}
-		});
+			const user = mbUser.map(u => u.user);
+			user.match(
+				userData => {
+					if (isStudent) {
+						quizQuestion.authorId = userData.uid;
+						switch (authorType) {
+							case "ANONYMOUS":
+								quizQuestion.authorName = i18n._("anonymous");
+								break;
+							case "NICKNAME":
+								quizQuestion.authorName = userData.nickname ?? userData.username;
+								break;
+							case "NAME":
+								quizQuestion.authorName = userData.username;
+								break;
+						}
+					} else {
+						quizQuestion.authorName = userData.username;
+					}
+				},
+				() => {}
+			);
+
+			tryQuizActor.forEach(actor => {
+				if (questionId) {
+					actor.send(
+						actor.name,
+						CurrentQuizMessages.UpdateQuestion({
+							question: { ...quizQuestion, uid: toId(questionId) },
+							group: selectedGroup !== formerGroup ? selectedGroup : "",
+						})
+					);
+				} else {
+					actor.send(
+						actor.name,
+						CurrentQuizMessages.AddQuestion({ question: quizQuestion, group: selectedGroup })
+					);
+				}
+			});
+		}
 		nav(
 			{ pathname: "/Dashboard/quiz" },
 			{
@@ -382,7 +387,7 @@ export const QuestionEdit: React.FC = () => {
 										<strong>{question.uid ? "Frage" : "Neue Frage"}</strong>
 									</div>
 									<div className="flex-grow-1"></div>
-									{isStudent && (
+									{isStudent && writeAccess && (
 										<div className="align-self-center d-flex flex-row align-items-center">
 											{i18n._("author")}:&nbsp;
 											<Form.Select
@@ -414,7 +419,7 @@ export const QuestionEdit: React.FC = () => {
 										<Form.Select
 											value={selectedGroup}
 											onChange={event => setSelectedGroup(event.target.value)}
-											disabled={isStudent}
+											disabled={isStudent || !writeAccess}
 										>
 											{groups.map(g => (
 												<option key={g} value={g}>
@@ -432,6 +437,7 @@ export const QuestionEdit: React.FC = () => {
 													type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
 												}))
 											}
+											disabled={!writeAccess}
 										>
 											{allowedQuestionTypes.includes("SINGLE") && (
 												<option value="SINGLE">
@@ -463,6 +469,7 @@ export const QuestionEdit: React.FC = () => {
 											title={i18n._("question-edit.button-tooltip.edit-title-text")}
 											variant="primary"
 											onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+											disabled={!writeAccess}
 										>
 											<Pencil />
 										</ButtonWithTooltip>
@@ -470,7 +477,6 @@ export const QuestionEdit: React.FC = () => {
 										<ButtonWithTooltip
 											title={i18n._("question-edit.button-tooltip.edit-comment-text")}
 											variant="warning"
-											disabled={!question.uid}
 											onClick={() => handleMDShow("COMMENT", "edit-comment-text")}
 										>
 											<PersonRaisedHand />
@@ -501,11 +507,12 @@ export const QuestionEdit: React.FC = () => {
 												}
 												setHint(active);
 											}}
+											disabled={!writeAccess}
 										/>
 										<InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
 										<ButtonWithTooltip
 											title={i18n._("question-edit.button-tooltip.edit-hint-title")}
-											disabled={!hint}
+											disabled={!hint || !writeAccess}
 											onClick={() =>
 												setShowTextModal({
 													property: "hint",
@@ -532,6 +539,7 @@ export const QuestionEdit: React.FC = () => {
 															type="switch"
 															checked={answer.correct}
 															onChange={() => toggleAnswer(i)}
+															disabled={!writeAccess}
 														/>
 														<InputGroup.Text className="flex-grow-1">
 															{answer.text}
@@ -539,6 +547,7 @@ export const QuestionEdit: React.FC = () => {
 														<ButtonWithTooltip
 															title={i18n._("question-edit.button-tooltip.edit-answer")}
 															onClick={() => editAnswer(i)}
+															disabled={!writeAccess}
 														>
 															<Pencil />
 														</ButtonWithTooltip>
@@ -546,6 +555,7 @@ export const QuestionEdit: React.FC = () => {
 															title={i18n._("question-edit.button-tooltip.delete-answer")}
 															variant="danger"
 															onClick={() => deleteAnswer(i)}
+															disabled={!writeAccess}
 														>
 															<DashLg />
 														</ButtonWithTooltip>
@@ -553,7 +563,7 @@ export const QuestionEdit: React.FC = () => {
 												);
 											})}
 										</Form>
-										<Button onClick={addAnswer}>
+										<Button onClick={addAnswer} disabled={!writeAccess}>
 											<Trans id="add-answer-button" />
 										</Button>
 									</Card.Footer>
@@ -569,7 +579,7 @@ export const QuestionEdit: React.FC = () => {
 			<Row>
 				<div className="d-flex flex-column h-100 w-100">
 					<Button className="m-3" onClick={submit}>
-						<Trans id="save-question-button" />
+						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
 					</Button>
 				</div>
 			</Row>

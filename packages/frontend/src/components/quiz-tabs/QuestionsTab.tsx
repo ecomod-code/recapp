@@ -4,7 +4,7 @@ import { i18n } from "@lingui/core";
 import { Id, Question, QuestionGroup, Quiz, User, toId } from "@recapp/models";
 import { useNavigate } from "react-router-dom";
 import { useStatefulActor } from "ts-actors-react";
-import { Maybe } from "tsmonads";
+import { Maybe, maybe } from "tsmonads";
 
 import Accordion from "react-bootstrap/Accordion";
 import Button, { ButtonProps } from "react-bootstrap/Button";
@@ -108,10 +108,23 @@ export const QuestionsTab: React.FC<{
 	};
 
 	const editQuestion = (uid: Id, group: string) => {
-		if (quizData.questions.find(q => q.uid === uid)?.editMode) {
+		const writeAccess =
+			quizData.quiz.state === "EDITING" &&
+			(teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+				mbQuiz
+					.flatMap(q => maybe(q.questions))
+					.map(
+						qs => !!qs.find(q => q.uid === uid && q.authorId === localUser.map(u => u.uid).orElse(toId("")))
+					)
+					.orElse(false));
+
+		if (quizData.questions.find(q => q.uid === uid)?.editMode && writeAccess) {
 			setRemoveEditModal(uid);
 		} else {
-			nav({ pathname: "/Dashboard/Question" }, { state: { quizId: uid, group } });
+			nav(
+				{ pathname: "/Dashboard/Question" },
+				{ state: { quizId: uid, group, write: writeAccess ? "true" : undefined } }
+			);
 		}
 	};
 
@@ -244,9 +257,15 @@ export const QuestionsTab: React.FC<{
 												disabled={disableForSettingOrMode}
 												size="sm"
 												onClick={() => {
+													const writeAccess = true;
 													nav(
 														{ pathname: "/Dashboard/Question" },
-														{ state: { group: questionGroup.name } }
+														{
+															state: {
+																group: questionGroup.name,
+																write: writeAccess ? "true" : undefined,
+															},
+														}
 													);
 												}}
 											>
@@ -341,15 +360,32 @@ export const QuestionsTab: React.FC<{
 												.map((q, i, arr) => {
 													const isFirst = i === 0;
 													const isLast = i === arr.length - 1;
-
+													const writeAccess =
+														teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+														mbQuiz
+															.flatMap(q => maybe(q.questions))
+															.map(
+																qs =>
+																	!!qs.find(
+																		qu =>
+																			qu.uid === q!.uid &&
+																			qu.authorId ===
+																				localUser
+																					.map(u => u.uid)
+																					.orElse(toId(""))
+																	)
+															)
+															.orElse(false);
 													return (
 														<QuestionCard
+															writeAccess={writeAccess}
 															key={q!.uid}
 															editMode={quizData.quiz.state === "EDITING"}
 															question={q!}
 															approve={() => approveQuestion(q!.uid, q!.approved)}
 															delete={() => setDeleteModal(q!.uid)}
 															edit={() => editQuestion(q!.uid, questionGroup.name)}
+															state={quizData.quiz.state}
 															moveUp={() =>
 																moveQuestion(questionGroup.name, q!.uid, true)
 															}

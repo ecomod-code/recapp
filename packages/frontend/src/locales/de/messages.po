@@ -922,3 +922,11 @@ msgstr "Autor"
 #. js-lingui-explicit-id
 msgid "new-comment-title"
 msgstr "Neuer Kommentar"
+
+#. js-lingui-explicit-id
+msgid "back-to-quiz-button"
+msgstr "Zurück zum Quiz"
+
+#. js-lingui-explicit-id
+msgid "question-card.button-tooltip.view"
+msgstr "Frage anzeigen"

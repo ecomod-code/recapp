@@ -110,7 +110,21 @@ export const QuizPage: React.FC = () => {
 		const groups: QuestionGroup[] = mbQuiz.flatMap(q => maybe(q.quiz?.groups)).orElse([]);
 		const groupName = groups.find(g => g.questions.includes(questionId))?.name;
 		if (groupName) {
-			nav({ pathname: "/Dashboard/Question" }, { state: { quizId: questionId, group: groupName } });
+			const writeAccess =
+				teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+				mbQuiz
+					.flatMap(q => maybe(q.questions))
+					.map(
+						qs =>
+							!!qs.find(
+								q => q.uid === questionId && q.authorId === localUser.map(u => u.uid).orElse(toId(""))
+							)
+					)
+					.orElse(false);
+			nav(
+				{ pathname: "/Dashboard/Question" },
+				{ state: { quizId: questionId, group: groupName, write: writeAccess ? "true" : undefined } }
+			);
 		}
 	};
 

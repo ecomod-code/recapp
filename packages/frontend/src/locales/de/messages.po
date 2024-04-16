@@ -914,3 +914,11 @@ msgstr "Quiz unwiderruflich löschen"
 #. js-lingui-explicit-id
 msgid "anonymous"
 msgstr "ANONYM"
+
+#. js-lingui-explicit-id
+msgid "author"
+msgstr "Autor"
+
+#. js-lingui-explicit-id
+msgid "new-comment-title"
+msgstr "Neuer Kommentar"

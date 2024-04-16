@@ -43,7 +43,7 @@ export const CurrentQuizMessages = unionize(
 		Activate: ofType<{ userId: Id; quizId: Id }>(),
 		UpvoteComment: ofType<Id>(),
 		FinishComment: ofType<Id>(),
-		AddComment: ofType<Omit<Comment, "uid" | "authorName" | "authorId">>(),
+		AddComment: ofType<Omit<Comment, "uid" | "authorId">>(),
 		AddQuestion: ofType<{
 			question: Omit<Question, "uid" | "authorName" | "authorId" | "created" | "updated">;
 			group: string;
@@ -384,7 +384,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								const uid: Id = await this.ask(
 									`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									CommentActorMessages.Create({
-										authorName: u.username,
 										authorId: u.uid,
 										...comment,
 									})
@@ -416,10 +415,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 										console.debug("Auto-approving question");
 										question.approved = true; // Teacher questions are automatically approved
 									}
+									console.log("CURRENTQUIZ", "Creating question for user", u.uid);
 									const uid: Id = await this.ask(
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuestionActorMessages.Create({
-											authorName: u.username,
 											authorId: u.uid,
 											...question,
 										})

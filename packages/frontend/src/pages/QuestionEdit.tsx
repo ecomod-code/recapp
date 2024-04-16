@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
-import { maybe, nothing } from "tsmonads";
+import { Maybe, maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
@@ -28,6 +28,8 @@ import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
+import { CommentEditorModal } from "../components/modals/CommentEditorModal";
+import { LocalUserActor } from "../actors/LocalUserActor";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -60,10 +62,11 @@ export const QuestionEdit: React.FC = () => {
 	const [groups, setGroups] = useState<string[]>([]);
 	const [selectedGroup, setSelectedGroup] = useState("");
 	const [allowedQuestionTypes, setAllowedQuestionTypes] = useState<string[]>([]);
-	const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<string[]>([]);
+	const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<UserParticipation[]>([]);
 	const [authorType, setAuthorType] = useState<UserParticipation>("ANONYMOUS");
 	const nav = useNavigate();
-	const isStudent = mbUser.map(u => u.user.role === "STUDENT").orElse(true);
+	const students = mbQuiz.flatMap(q => maybe(q.quiz)).map(q => q.students);
+	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 
 	useEffect(() => {
 		if (mbQuiz.isEmpty()) {
@@ -250,9 +253,13 @@ export const QuestionEdit: React.FC = () => {
 		});
 	};
 
-	const addComment = (value: string) => {
-		const c: Omit<Comment, "authorId" | "authorName" | "uid"> = {
+	const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
+	const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
+
+	const addComment = (value: string, name?: string) => {
+		const c: Omit<Comment, "authorId" | "uid"> = {
 			text: value,
+			authorName: name ?? userName,
 			created: toTimestamp(),
 			updated: toTimestamp(),
 			upvoters: [],
@@ -298,14 +305,23 @@ export const QuestionEdit: React.FC = () => {
 			<MarkdownModal
 				titleId={showMDModal.titleId}
 				editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
-				show={!!showMDModal.titleId}
+				show={!!showMDModal.titleId && showMDModal.type === "QUESTION"}
 				onClose={handleClose}
 				onSubmit={text => {
-					if (showMDModal.type === "QUESTION") {
-						setQuestion(state => ({ ...state, text }));
-					} else {
-						addComment(text);
-					}
+					setQuestion(state => ({ ...state, text }));
+					handleClose();
+				}}
+			/>
+			<CommentEditorModal
+				titleId={showMDModal.titleId}
+				editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
+				show={!!showMDModal.titleId && showMDModal.type !== "QUESTION"}
+				onClose={handleClose}
+				isStudent={isStudent}
+				userNames={[userName, userNickname ?? ""]}
+				participationOptions={allowedAuthorTypes}
+				onSubmit={(text, name) => {
+					addComment(text, name);
 					handleClose();
 				}}
 			/>
@@ -368,7 +384,7 @@ export const QuestionEdit: React.FC = () => {
 									<div className="flex-grow-1"></div>
 									{isStudent && (
 										<div className="align-self-center d-flex flex-row align-items-center">
-											Autor:&nbsp;
+											{i18n._("author")}:&nbsp;
 											<Form.Select
 												value={authorType}
 												onChange={event =>
@@ -387,7 +403,7 @@ export const QuestionEdit: React.FC = () => {
 														</option>
 													)}
 												{allowedAuthorTypes.includes("ANONYMOUS") && (
-													<option value="TEXT">
+													<option value="ANONYMOUS">
 														<Trans id="anonymous" />
 													</option>
 												)}

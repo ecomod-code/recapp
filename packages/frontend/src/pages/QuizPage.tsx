@@ -18,6 +18,7 @@ import { QuizDataTab } from "../components/quiz-tabs/QuizDataTab";
 import { QuestionsTab } from "../components/quiz-tabs/QuestionsTab";
 import { RunningQuizTab } from "../components/quiz-tabs/RunningQuizTab";
 import { QuizStatsTab } from "../components/quiz-tabs/QuizStatsTab";
+import { QuizButtons } from "../components/quiz-tabs/QuizButtons";
 
 import { actorUris } from "../actorUris";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
@@ -208,6 +209,10 @@ export const QuizPage: React.FC = () => {
 								</Breadcrumb.Item>
 							</Breadcrumb>
 						</Row>
+
+						<div className="my-4">
+							<QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
+						</div>
 
 						<Row>
 							<div

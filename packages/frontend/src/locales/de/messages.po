@@ -765,7 +765,7 @@ msgstr "Suchtext"
 
 #. js-lingui-explicit-id
 #~ msgid "archive-quiz-text"
-#~ msgstr "Möchten Sie dieses Quiz archivieren? Es wird nicht mehr in der Übersicht angezeigt, ist über existierende Links und QR-Codes aber noch erreichbar."
+#~ msgstr "Möchten Sie dieses Quiz archivieren? Es wird nicht mehr in der Übersicht angezeigt, ist über existierende Links und QR-Codes aber noch erreichbar. Alternativ können Sie das Quiz auch unwiderrufllich löschen. Achtung, es erfolgt keine weitere Rückfrage!"
 
 #. js-lingui-explicit-id
 #~ msgid "title-set-quiz-mode-edit"
@@ -902,3 +902,11 @@ msgstr "Quiz importieren"
 #. js-lingui-explicit-id
 msgid "dashboard-show-archived-quizzes-switch"
 msgstr "Archivierte Quizze anzeigen"
+
+#. js-lingui-explicit-id
+msgid "archive-quiz-button"
+msgstr "Quiz archivieren"
+
+#. js-lingui-explicit-id
+msgid "delete-quiz-button"
+msgstr "Quiz unwiderruflich löschen"

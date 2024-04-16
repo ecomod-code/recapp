@@ -1,6 +1,7 @@
 import {
 	ActorUri,
 	Id,
+	Comment,
 	Question,
 	QuestionGroup,
 	Quiz,
@@ -200,6 +201,25 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						entity.students.push(student);
 						await this.storeEntity(entity);
 						this.sendUpdateToSubscribers(entity);
+					});
+				},
+				Delete: async id => {
+					const mbQuiz = await this.getEntity(id);
+					return mbQuiz.map(async quiz => {
+						if (clientUserRole !== "ADMIN" || quiz.teachers[0] !== clientUserId) {
+							this.logger.warn(
+								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin.`
+							);
+							return unit();
+						}
+						const db = await this.connector.db();
+						await this.deleteEntity(id);
+						await this.state.cache.delete(id);
+						await this.afterEntityRemovedFromCache(id);
+						await db.collection<Question>("questions").deleteMany({ quiz: id });
+						await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
+						this.logger.debug(`Successfully deleted quiz ${id}`);
+						return unit();
 					});
 				},
 				RemoveUser: async ({ quiz, user }) => {

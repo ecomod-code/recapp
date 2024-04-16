@@ -18,6 +18,11 @@ export class ArchiveQuizMessage {
 	constructor(public readonly id: Id) {}
 }
 
+export class DeleteQuizMessage {
+	public readonly tag = "DeleteQuizMessage" as const;
+	constructor(public readonly id: Id) {}
+}
+
 export class UploadQuizMessage {
 	public readonly tag = "UploadQuizMessage" as const;
 	constructor(public readonly filename: string) {}
@@ -28,10 +33,19 @@ export class ToggleShowArchived {
 	constructor(public readonly value: boolean) {}
 }
 
+type Messages =
+	| UserUpdateMessage
+	| QuizUpdateMessage
+	| ArchiveQuizMessage
+	| UploadQuizMessage
+	| string
+	| ToggleShowArchived
+	| DeleteQuizMessage;
+
 export class LocalUserActor extends StatefulActor<
-	UserUpdateMessage | QuizUpdateMessage | ArchiveQuizMessage | UploadQuizMessage | string | ToggleShowArchived,
+	Messages,
 	Unit | string,
-	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number, showArchived: boolean }
+	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number; showArchived: boolean }
 > {
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
@@ -63,10 +77,7 @@ export class LocalUserActor extends StatefulActor<
 		});
 	}
 
-	async receive(
-		_from: ActorRef,
-		message: UserUpdateMessage | QuizUpdateMessage | string | ArchiveQuizMessage | UploadQuizMessage | ToggleShowArchived
-	): Promise<Unit | string> {
+	async receive(_from: ActorRef, message: Messages): Promise<Unit | string> {
 		if (typeof message === "string") {
 			if (message === "uid") return this.state.user?.uid ?? "";
 		} else if (message.tag == "UserUpdateMessage") {
@@ -77,16 +88,22 @@ export class LocalUserActor extends StatefulActor<
 		} else if (message.tag == "QuizUpdateMessage") {
 			this.updateState(draft => {
 				if (message.quiz.uid) {
-						const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));
-						const isStudent = message.quiz.students?.includes(this.state.user?.uid ?? toId(""));
-						if (this.state.user?.role === "ADMIN" || isTeacher || isStudent) {
-							draft.quizzes.set(message.quiz.uid, message.quiz);
-						}
+					const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));
+					const isStudent = message.quiz.students?.includes(this.state.user?.uid ?? toId(""));
+					if (this.state.user?.role === "ADMIN" || isTeacher || isStudent) {
+						draft.quizzes.set(message.quiz.uid, message.quiz);
+					}
 					draft.updateCounter++;
 				}
 			});
 		} else if (message.tag == "ArchiveQuizMessage") {
 			this.send(actorUris["QuizActor"], QuizActorMessages.Update({ uid: message.id, archived: toTimestamp() }));
+		} else if (message.tag == "DeleteQuizMessage") {
+			this.send(actorUris["QuizActor"], QuizActorMessages.Delete(message.id));
+			this.updateState(draft => {
+				draft.quizzes.delete(message.id);
+				draft.updateCounter++;
+			});
 		} else if (message.tag == "UploadQuizMessage") {
 			this.send(actorUris["QuizActor"], QuizActorMessages.Import({ filename: message.filename }));
 		} else if (message.tag == "ToggleShowArchived") {

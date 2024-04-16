@@ -7,6 +7,7 @@ export const QuizActorMessages = unionize(
 		Create: ofType<Omit<Quiz, "uniqueLink" | "uid">>(), // Create a new quiz, returns the quiz uid (generated if not set)
 		Import: ofType<{ filename: string }>(), // Import the json with the given filename
 		Update: ofType<Partial<Quiz> & { uid: Id }>(), // Update quiz data, answers updated Quiz
+		Delete: ofType<Id>(), // Completely delete a quiz, including all comments and questions
 		GetAll: {}, // Get all quizzes accessible by the requester, will send back all quizzes in this list to the requester
 		Has: ofType<Id>(), // Check if quiz exists, answers with boolean
 		Get: ofType<Id>(), // Get quiz, answers with quiz

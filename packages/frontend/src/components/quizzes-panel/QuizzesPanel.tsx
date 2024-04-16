@@ -8,16 +8,17 @@ import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import { Download, Plus } from "react-bootstrap-icons";
-import { ArchiveQuizMessage, ToggleShowArchived } from "../../actors/LocalUserActor";
+import { ArchiveQuizMessage, DeleteQuizMessage, ToggleShowArchived } from "../../actors/LocalUserActor";
 import { QuizCard } from "./QuizCard";
 import { ShareModal } from "../modals/ShareModal";
-import { YesNoModal } from "../modals/YesNoModal";
 import { QuizImportModal } from "../modals/QuizImportModal";
+import { ArchiveQuizModal } from "../modals/ArchiveQuizModal";
 
 export const QuizzesPanel: React.FC = () => {
 	const nav = useNavigate();
 	const [shareModal, setShareModal] = useState("");
 	const [deleteModal, setDeleteModal] = useState(toId(""));
+	const [showDelete, setShowDelete] = useState(false);
 	const [importModal, setImportModal] = useState(false);
 	const [quizzes, setQuizzes] = useState<Array<Partial<Quiz>>>();
 	const updateCounterRef = useRef<number>(0);
@@ -50,7 +51,7 @@ export const QuizzesPanel: React.FC = () => {
 		);
 	}, [state]);
 
-	const deleteAllowed = (quiz: Partial<Quiz>): true | undefined => {
+	const archiveAllowed = (quiz: Partial<Quiz>): true | undefined => {
 		const isAdmin = state
 			.map(s => s.user)
 			.map(u => u?.role === "ADMIN")
@@ -62,8 +63,25 @@ export const QuizzesPanel: React.FC = () => {
 		return isAdmin || isTeacher ? true : undefined;
 	};
 
-	const deleteQuestion = () => {
+	const deleteAllowed = (quiz: Partial<Quiz>): true | undefined => {
+		const isAdmin = state
+			.map(s => s.user)
+			.map(u => u?.role === "ADMIN")
+			.orElse(false);
+		const isCreatingTeacher = state
+			.map(s => s.user)
+			.map(u => (u?.uid && u?.uid === quiz.teachers?.[0]) ?? false)
+			.orElse(false);
+		return isAdmin || isCreatingTeacher ? true : undefined;
+	};
+
+	const archiveQuiz = () => {
 		tryLocalUserActor.forEach(q => q.send(q, new ArchiveQuizMessage(deleteModal)));
+		setDeleteModal(toId(""));
+	};
+
+	const deleteQuiz = () => {
+		tryLocalUserActor.forEach(q => q.send(q, new DeleteQuizMessage(deleteModal)));
 		setDeleteModal(toId(""));
 	};
 
@@ -86,12 +104,12 @@ export const QuizzesPanel: React.FC = () => {
 					<Trans id="button-import-quiz" />
 				</Button>
 			</div>
-			<YesNoModal
+			<ArchiveQuizModal
 				show={!!deleteModal}
-				titleId="archive-quiz-title"
-				textId="archive-quiz-text"
+				showDelete={showDelete}
 				onClose={() => setDeleteModal(toId(""))}
-				onSubmit={deleteQuestion}
+				onSubmit={archiveQuiz}
+				onDelete={deleteQuiz}
 			/>
 			<QuizImportModal show={importModal} onClose={() => setImportModal(false)} />
 
@@ -118,7 +136,12 @@ export const QuizzesPanel: React.FC = () => {
 							key={q.uid}
 							quiz={q}
 							onShare={() => setShareModal(q.uniqueLink!)}
-							onDelete={deleteAllowed(q) && (() => setDeleteModal(q.uid!))}
+							onDelete={() => {
+								if (archiveAllowed(q)) {
+									setShowDelete(!!deleteAllowed(q));
+									setDeleteModal(q.uid!);
+								}
+							}}
 						/>
 					);
 				})}

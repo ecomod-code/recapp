@@ -199,19 +199,22 @@ export const QuizPage: React.FC = () => {
                         />
 
                         <Row>
-                            <Breadcrumb>
-                                <Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
-                                    Dashboard
-                                </Breadcrumb.Item>
-                                <Breadcrumb.Item>
-                                    {mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
-                                </Breadcrumb.Item>
-                            </Breadcrumb>
-                        </Row>
+                            <div className="d-flex justify-content-between">
+                                <Breadcrumb>
+                                    <Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
+                                        Dashboard
+                                    </Breadcrumb.Item>
+                                    <Breadcrumb.Item>
+                                        {mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
+                                    </Breadcrumb.Item>
+                                </Breadcrumb>
 
-                        <div className="my-4">
-                            <QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
-                        </div>
+                                <span className="">
+                                    <Trans id="quiz-page.quiz-state.label" />:{" "}
+                                    <span style={{ fontWeight: "bold" }}>{quizData.quiz.state}</span>
+                                </span>
+                            </div>
+                        </Row>
 
                         <Row>
                             <CommentsContainer onClickAddComment={() => setShowMDModal(true)}>
@@ -255,6 +258,10 @@ export const QuizPage: React.FC = () => {
                                     .orElse([<Fragment key="key-1" />])}
                             </CommentsContainer>
                         </Row>
+
+                        <div className="my-4">
+                            <QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
+                        </div>
                         <Row className="mt-5">
                             <Tabs
                                 // defaultActiveKey="questions"

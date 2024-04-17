@@ -84,41 +84,43 @@ export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: strin
                     <Trans id="quiz-show-qr-code-button" />
                 </Button>
 
-                {/* {props.quizState !== "EDITING" && ( */}
-                <Button
-                    variant="info"
-                    className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                    disabled={isDisabledEditBtn}
-                    onClick={editQuizMode}
-                >
-                    <Pencil className="mx-1" />
-                    <Trans id="edit-quiz-button" />
-                </Button>
-                {/* )} */}
-                {/* {props.quizState !== "STOPPED" && ( */}
-                <Button
-                    variant="secondary"
-                    className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                    disabled={isDisabledStopBtn}
-                    onClick={stopQuizMode}
-                >
-                    <StopFill size={24} />
-                    <Trans id="freeze-quiz-button" />
-                </Button>
-                {/* )} */}
-                {/* {props.quizState !== "STARTED" && ( */}
-                <Button
-                    variant="primary"
-                    className="col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                    disabled={isDisabledStartBtn}
-                    onClick={startQuizMode}
-                >
-                    <Play size={24} />
-                    <span className="d-flex flex-nowrap">
-                        <Trans id="start-quiz-mode-button" />
-                    </span>
-                </Button>
-                {/* )} */}
+                {props.quizState !== "EDITING" && (
+                    <Button
+                        variant="success"
+                        className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+                        disabled={isDisabledEditBtn}
+                        onClick={editQuizMode}
+                    >
+                        <Pencil className="mx-1" />
+                        <Trans id="edit-quiz-button" />
+                    </Button>
+                )}
+
+                {props.quizState !== "STOPPED" && (
+                    <Button
+                        variant="success"
+                        className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+                        disabled={isDisabledStopBtn}
+                        onClick={stopQuizMode}
+                    >
+                        <StopFill size={24} />
+                        <Trans id="freeze-quiz-button" />
+                    </Button>
+                )}
+
+                {props.quizState !== "STARTED" && (
+                    <Button
+                        variant="success"
+                        className="col-12 col-lg-auto d-flex justify-content-center align-items-center"
+                        disabled={isDisabledStartBtn}
+                        onClick={startQuizMode}
+                    >
+                        <Play size={24} />
+                        <span className="d-flex flex-nowrap">
+                            <Trans id="start-quiz-mode-button" />
+                        </span>
+                    </Button>
+                )}
             </div>
         </>
     );

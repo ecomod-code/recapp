@@ -26,6 +26,11 @@ msgid "new-quiz-title"
 msgstr "Title"
 
 #. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:121
+msgid "quiz-page.quiz-state.label"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:363
 msgid "new-quiz-description"
 msgstr "Description"

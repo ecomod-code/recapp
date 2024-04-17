@@ -21,7 +21,7 @@ import Row from "react-bootstrap/Row";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Check, DashLg, Pencil, PersonRaisedHand } from "react-bootstrap-icons";
+import { Check, DashLg, Pencil } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
@@ -484,14 +484,6 @@ export const QuestionEdit: React.FC = () => {
                                             disabled={!writeAccess}
                                         >
                                             <Pencil />
-                                        </ButtonWithTooltip>
-                                        &nbsp;
-                                        <ButtonWithTooltip
-                                            title={i18n._("question-edit.button-tooltip.edit-comment-text")}
-                                            variant="warning"
-                                            onClick={() => handleMDShow("COMMENT", "edit-comment-text")}
-                                        >
-                                            <PersonRaisedHand />
                                         </ButtonWithTooltip>
                                     </div>
                                 </Card.Header>

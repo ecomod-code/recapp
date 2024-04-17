@@ -478,7 +478,7 @@ msgstr "Frage: "
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:216
 msgid "question-stats-info"
-msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio}) %) haben die Frage bearbeitet"
+msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio} %) haben die Frage bearbeitet"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:229
@@ -858,7 +858,7 @@ msgstr "Frage: "
 
 #. js-lingui-explicit-id
 msgid "question-stats-info"
-msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio}) %) haben die Frage bearbeitet"
+msgstr "{participants} Teilnehmende von {maxParticipants} ({ratio} %) haben die Frage bearbeitet"
 
 #. js-lingui-explicit-id
 msgid "question-stats-answers-given"

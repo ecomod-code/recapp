@@ -19,6 +19,10 @@ msgstr ""
 msgid "login-page.login"
 msgstr "Anmelden"
 
+#: src/components/cards/CommentCard.tsx:22
+msgid "comments-container.toggle-button.label"
+msgstr "Neil: comment-toggle-button-label"
+
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:362
 #: src/components/quiz-tabs/QuizDataTab.tsx:179

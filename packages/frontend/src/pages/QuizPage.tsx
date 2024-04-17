@@ -24,6 +24,7 @@ import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActo
 import { toTimestamp, debug } from "itu-utils";
 import { Trans } from "@lingui/react";
 import { CommentEditorModal } from "../components/modals/CommentEditorModal";
+import { QuizStateBadge } from "../components/QuizStateBadge";
 
 const sortComments = (a: Comment, b: Comment) => {
     if (a.answered && !b.answered) return 1;
@@ -211,7 +212,7 @@ export const QuizPage: React.FC = () => {
 
                                 <span className="">
                                     <Trans id="quiz-page.quiz-state.label" />:{" "}
-                                    <span style={{ fontWeight: "bold" }}>{quizData.quiz.state}</span>
+                                    <QuizStateBadge state={quizData.quiz.state} />
                                 </span>
                             </div>
                         </Row>

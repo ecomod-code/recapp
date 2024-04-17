@@ -4,26 +4,13 @@ import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { fromTimestamp } from "itu-utils";
 import { Quiz, QuestionGroup } from "@recapp/models";
-import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import { Pencil, Share, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
+import { QuizStateBadge } from "../QuizStateBadge";
 
 const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
     groups.reduce((count, group) => count + (group?.questions?.length ?? 0), 0);
-
-const getBG = (state: "EDITING" | "STOPPED" | "STARTED" | "ACTIVE"): string => {
-    switch (state) {
-        case "EDITING":
-            return "primary";
-        case "STARTED":
-            return "success";
-        case "STOPPED":
-            return "warning";
-        default:
-            return "secondary";
-    }
-};
 
 export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDelete?: () => void }> = ({
     quiz,
@@ -46,14 +33,13 @@ export const QuizCard: React.FC<{ quiz: Partial<Quiz>; onShare: () => void; onDe
                         {i18n._("quiz-card-number-of-questions", { count: getNumberOfQuestions(quiz.groups ?? []) })}
                         &nbsp;
                     </div>
-					<div className="d-flex flex-row">
-						<Badge as="div" className="mt-2" bg={getBG(quiz.state ?? "ACTIVE")}>
-							{quiz.state}
-						</Badge>
-						{!!quiz.archived && <Badge as="div" className="mt-2 ms-2" bg="secondary">
-							ARCHIVED
-						</Badge>}
-					</div>
+                    <div className="d-flex flex-row">
+                        <QuizStateBadge state={quiz.state} />
+
+                        {!!quiz.archived && ( //
+                            <QuizStateBadge state="ARCHIVED" />
+                        )}
+                    </div>
                 </Card.Body>
 
                 <Card.Footer>

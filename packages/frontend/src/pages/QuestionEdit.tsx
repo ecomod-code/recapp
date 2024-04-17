@@ -383,7 +383,7 @@ export const QuestionEdit: React.FC = () => {
                     <Button variant="secondary" onClick={onCancelClick}>
                         <Trans id="cancel" />
                     </Button>
-                    <Button onClick={submit}>
+                    <Button disabled={!question.text.trim()} onClick={submit}>
                         {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
                     </Button>
                 </div>

@@ -29,7 +29,6 @@ import { TextModal } from "../components/modals/TextModal";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal } from "../components/modals/CommentEditorModal";
-import { LocalUserActor } from "../actors/LocalUserActor";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -337,15 +336,17 @@ export const QuestionEdit: React.FC = () => {
 				<Breadcrumb>
 					<Breadcrumb.Item
 						onClick={() => {
-							tryQuizActor.forEach(actor =>
-								actor.send(
-									actor.name,
-									CurrentQuizMessages.UpdateQuestion({
-										question: { uid: toId(questionId), editMode: false },
-										group: selectedGroup !== formerGroup ? selectedGroup : "",
-									})
-								)
-							);
+							if (writeAccess) {
+								tryQuizActor.forEach(actor =>
+									actor.send(
+										actor.name,
+										CurrentQuizMessages.UpdateQuestion({
+											question: { uid: toId(questionId), editMode: false },
+											group: selectedGroup !== formerGroup ? selectedGroup : "",
+										})
+									)
+								);
+							}
 							nav({ pathname: "/Dashboard" });
 						}}
 					>
@@ -353,15 +354,17 @@ export const QuestionEdit: React.FC = () => {
 					</Breadcrumb.Item>
 					<Breadcrumb.Item
 						onClick={() => {
-							tryQuizActor.forEach(actor =>
-								actor.send(
-									actor.name,
-									CurrentQuizMessages.UpdateQuestion({
-										question: { uid: toId(questionId), editMode: false },
-										group: selectedGroup !== formerGroup ? selectedGroup : "",
-									})
-								)
-							);
+							if (writeAccess) {
+								tryQuizActor.forEach(actor =>
+									actor.send(
+										actor.name,
+										CurrentQuizMessages.UpdateQuestion({
+											question: { uid: toId(questionId), editMode: false },
+											group: selectedGroup !== formerGroup ? selectedGroup : "",
+										})
+									)
+								);
+							}
 							nav(
 								{ pathname: "/Dashboard/quiz" },
 								{

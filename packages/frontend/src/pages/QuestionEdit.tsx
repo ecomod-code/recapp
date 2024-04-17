@@ -303,6 +303,10 @@ export const QuestionEdit: React.FC = () => {
 
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
+	const showCommentArea =
+		!mbQuiz.flatMap(q => maybe(q.quiz.hideComments)).orElse(false) ||
+		(!isStudent && mbQuiz.flatMap(q => maybe(q.quiz.state)).orElse("EDITING") === "EDITING");
+
 	return (
 		<Container fluid>
 			<TextModal
@@ -581,7 +585,10 @@ export const QuestionEdit: React.FC = () => {
 			</Row>
 
 			<div className="mx-3">
-				<CommentsContainer onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}>
+				<CommentsContainer
+					onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+					showCommentArea={showCommentArea}
+				>
 					{mbQuiz
 						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
 						.map(

@@ -83,6 +83,7 @@ export const quizSchema = zod
 		lastExport: timestampSchema.optional(), // Date of last export
 		teachers: zod.array(uidSchema), // Teachers who can access and change the quiz
 		students: zod.array(uidSchema), // Students participating in this quiz
+		hideComments: zod.boolean().optional().default(false), // Hide the comments from all student participants. For teachers, they will stay visible, but only in edit mode.
 	})
 	.merge(idEntitySchema);
 

@@ -935,3 +935,7 @@ msgstr "Zurück zum Quiz"
 #. js-lingui-explicit-id
 msgid "question-card.button-tooltip.view"
 msgstr "Frage anzeigen"
+
+#. js-lingui-explicit-id
+msgid "quiz-hide-comments-switch"
+msgstr "Kommentarleiste verbergen"

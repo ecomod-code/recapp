@@ -14,7 +14,6 @@ import { QuestionCard } from "../cards/QuestionCard";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
-// import { ShareModal } from "../modals/ShareModal";
 import { ChangeGroupModal } from "../modals/ChangeGroupModal";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 
@@ -26,7 +25,6 @@ export const QuestionsTab: React.FC<{
     disableForStudent: boolean;
 }> = ({ quizData, disableForStudent, localUser }) => {
     const nav = useNavigate();
-    // const [shareModal, setShareModal] = useState("");
     const [deleteModal, setDeleteModal] = useState(toId(""));
     const [removeEditModal, setRemoveEditModal] = useState(toId(""));
     const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
@@ -159,7 +157,6 @@ export const QuestionsTab: React.FC<{
 
     return (
         <Row>
-            {/* <ShareModal quizLink={shareModal} onClose={() => setShareModal("")} /> */}
             <YesNoModal
                 show={!!removeEditModal}
                 titleId="remove-edit-mode-of-question-title"
@@ -200,26 +197,19 @@ export const QuestionsTab: React.FC<{
                 defaultValue={currentGroup.name}
             />
             <div className="d-flex flex-column h-100 w-100">
-                <div className="d-flex flex-row mb-4">
+                <div className="d-flex gap-2 align-items-center justify-content-between mb-4 flex-wrap">
                     <div>
                         {i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
                         {i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
                     </div>
-                    <div className="flex-grow-1">&nbsp;</div>
-                    <div>
-                        {/* <Button variant="outline-primary" onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
-							<Trans id="quiz-show-qr-code-button" />
-						</Button> */}
 
-                        <Button
-                            className="m-2"
-                            style={{ width: "12rem" }}
-                            onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
-                            disabled={disableForStudentOrMode}
-                        >
-                            <Trans id="quiz-questions-tab-add-group-button" />
-                        </Button>
-                    </div>
+                    <Button
+                        className="col-12 col-lg-auto"
+                        onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+                        disabled={disableForStudentOrMode}
+                    >
+                        <Trans id="quiz-questions-tab-add-group-button" />
+                    </Button>
                 </div>
 
                 <div className="flex-grow-1">

@@ -23,11 +23,7 @@ export const QuizDataTab: React.FC = () => {
     const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
     const [shareModal, setShareModal] = useState(false);
     const [archiveModal, setArchiveModal] = useState(false);
-    const [quizModeChange, setQuizModeChange] = useState<{
-        titleId: string;
-        textId: string;
-        newMode: "EDITING" | "STARTED" | "STOPPED";
-    }>({ titleId: "", textId: "", newMode: "EDITING" });
+
     const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
     const [showExportModal, setShowExportModal] = useState(false);
 
@@ -65,43 +61,6 @@ export const QuizDataTab: React.FC = () => {
             });
     };
 
-    const startQuizMode = () => {
-        if (mbQuiz.flatMap(q => maybe(q.quiz?.state === "STOPPED")).orElse(false)) {
-            setQuizModeChange({
-                titleId: "title-set-quiz-mode-started",
-                textId: "info-set-quiz-mode-started",
-                newMode: "STARTED",
-            });
-        } else {
-            setQuizModeChange({
-                titleId: "title-set-quiz-mode-started",
-                textId: "warning-set-quiz-mode-started",
-                newMode: "STARTED",
-            });
-        }
-    };
-
-    const stopQuizMode = () => {
-        setQuizModeChange({
-            titleId: "title-set-quiz-mode-stopped",
-            textId: "info-set-quiz-mode-stopped",
-            newMode: "STOPPED",
-        });
-    };
-
-    const editQuizMode = () => {
-        setQuizModeChange({
-            titleId: "title-set-quiz-mode-edit",
-            textId: "info-set-quiz-mode-edit",
-            newMode: "EDITING",
-        });
-    };
-
-    const changeQuizMode = () => {
-        tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ChangeState(quizModeChange.newMode)));
-        setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" });
-    };
-
     return mbQuiz
         .flatMap(q => (q.quiz.uid ? maybe(q.quiz) : nothing()))
         .match(
@@ -130,13 +89,6 @@ export const QuizDataTab: React.FC = () => {
                             titleId="archive-quiz-title"
                             textId="archive-quiz-title"
                         />
-                        <YesNoModal
-                            show={!!quizModeChange.textId}
-                            onClose={() => setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" })}
-                            onSubmit={changeQuizMode}
-                            titleId={quizModeChange.titleId}
-                            textId={quizModeChange.textId}
-                        />
                         <TextModal
                             show={textEdit.show}
                             onClose={() => setTextEdit({ element: "", value: "", show: false, title: "" })}
@@ -149,32 +101,6 @@ export const QuizDataTab: React.FC = () => {
                             titleId={textEdit.title}
                             editorValue={textEdit.value}
                         />
-                        <div className="d-flex flex-direction-row">
-                            {quiz.state !== "STARTED" && (
-                                <>
-                                    <Button variant="success" onClick={startQuizMode}>
-                                        <Trans id="start-quiz-mode-button" />
-                                    </Button>
-                                    &nbsp;
-                                </>
-                            )}
-                            {quiz.state !== "STOPPED" && (
-                                <>
-                                    <Button variant="success" onClick={stopQuizMode}>
-                                        <Trans id="freeze-quiz-button" />
-                                    </Button>
-                                    &nbsp;
-                                </>
-                            )}
-                            {quiz.state !== "EDITING" && (
-                                <>
-                                    <Button variant="success" onClick={editQuizMode}>
-                                        <Trans id="edit-quiz-button" />
-                                    </Button>
-                                    &nbsp;
-                                </>
-                            )}
-                        </div>
                         <ContainerWithHeaderBar
                             label={i18n._("new-quiz-title")}
                             editButton={{

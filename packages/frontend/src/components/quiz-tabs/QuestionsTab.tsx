@@ -14,7 +14,7 @@ import { QuestionCard } from "../cards/QuestionCard";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
-import { ShareModal } from "../modals/ShareModal";
+// import { ShareModal } from "../modals/ShareModal";
 import { ChangeGroupModal } from "../modals/ChangeGroupModal";
 import { CreateGroupModal } from "../modals/CreateGroupModal";
 
@@ -26,7 +26,7 @@ export const QuestionsTab: React.FC<{
 	disableForStudent: boolean;
 }> = ({ quizData, disableForStudent, localUser }) => {
 	const nav = useNavigate();
-	const [shareModal, setShareModal] = useState("");
+	// const [shareModal, setShareModal] = useState("");
 	const [deleteModal, setDeleteModal] = useState(toId(""));
 	const [removeEditModal, setRemoveEditModal] = useState(toId(""));
 	const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
@@ -159,7 +159,7 @@ export const QuestionsTab: React.FC<{
 
 	return (
 		<Row>
-			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
+			{/* <ShareModal quizLink={shareModal} onClose={() => setShareModal("")} /> */}
 			<YesNoModal
 				show={!!removeEditModal}
 				titleId="remove-edit-mode-of-question-title"
@@ -207,9 +207,9 @@ export const QuestionsTab: React.FC<{
 					</div>
 					<div className="flex-grow-1">&nbsp;</div>
 					<div>
-						<Button variant="outline-primary" onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
+						{/* <Button variant="outline-primary" onClick={() => setShareModal(quizData.quiz.uniqueLink)}>
 							<Trans id="quiz-show-qr-code-button" />
-						</Button>
+						</Button> */}
 
 						<Button
 							className="m-2"

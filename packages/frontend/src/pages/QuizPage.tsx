@@ -260,9 +260,12 @@ export const QuizPage: React.FC = () => {
                             </CommentsContainer>
                         </Row>
 
-                        <div className="my-4">
-                            <QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
-                        </div>
+                        {!disableForStudent && (
+                            <div className="my-4">
+                                <QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
+                            </div>
+                        )}
+
                         <Row className="mt-5">
                             <Tabs
                                 // defaultActiveKey="questions"

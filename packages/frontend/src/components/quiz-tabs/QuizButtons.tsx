@@ -11,7 +11,6 @@ import { YesNoModal } from "../modals/YesNoModal";
 import { ShareModal } from "../modals/ShareModal";
 
 export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: string }) => {
-    // props.quizState
     const [shareModal, setShareModal] = useState("");
     const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 
@@ -58,10 +57,6 @@ export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: strin
         setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" });
     };
 
-    const isDisabledStartBtn = props.quizState === "STARTED";
-    const isDisabledStopBtn = props.quizState === "STOPPED";
-    const isDisabledEditBtn = props.quizState === "EDITING";
-
     return (
         <>
             <ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
@@ -88,7 +83,6 @@ export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: strin
                     <Button
                         variant="success"
                         className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                        disabled={isDisabledEditBtn}
                         onClick={editQuizMode}
                     >
                         <Pencil className="mx-1" />
@@ -100,7 +94,6 @@ export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: strin
                     <Button
                         variant="success"
                         className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                        disabled={isDisabledStopBtn}
                         onClick={stopQuizMode}
                     >
                         <StopFill size={24} />
@@ -112,7 +105,6 @@ export const QuizButtons = (props: { quizState: Quiz["state"]; uniqueLink: strin
                     <Button
                         variant="success"
                         className="col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                        disabled={isDisabledStartBtn}
                         onClick={startQuizMode}
                     >
                         <Play size={24} />

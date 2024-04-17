@@ -21,11 +21,12 @@ import Row from "react-bootstrap/Row";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Check, DashLg, Pencil, PersonRaisedHand } from "react-bootstrap-icons";
+import { Check, DashLg, Pencil } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
+import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal } from "../components/modals/CommentEditorModal";
@@ -189,6 +190,25 @@ export const QuestionEdit: React.FC = () => {
 		});
 	};
 
+	const resetQuestionEditModeFlag = () => {
+		if (writeAccess) {
+			tryQuizActor.forEach(actor =>
+				actor.send(
+					actor.name,
+					CurrentQuizMessages.UpdateQuestion({
+						question: { uid: toId(questionId), editMode: false },
+						group: selectedGroup !== formerGroup ? selectedGroup : "",
+					})
+				)
+			);
+		}
+	};
+
+	const onCancelClick = () => {
+		resetQuestionEditModeFlag();
+		nav(-1);
+	};
+
 	const submit = async () => {
 		if (writeAccess) {
 			const quizQuestion = { ...question };
@@ -336,17 +356,7 @@ export const QuestionEdit: React.FC = () => {
 				<Breadcrumb>
 					<Breadcrumb.Item
 						onClick={() => {
-							if (writeAccess) {
-								tryQuizActor.forEach(actor =>
-									actor.send(
-										actor.name,
-										CurrentQuizMessages.UpdateQuestion({
-											question: { uid: toId(questionId), editMode: false },
-											group: selectedGroup !== formerGroup ? selectedGroup : "",
-										})
-									)
-								);
-							}
+							resetQuestionEditModeFlag();
 							nav({ pathname: "/Dashboard" });
 						}}
 					>
@@ -354,24 +364,10 @@ export const QuestionEdit: React.FC = () => {
 					</Breadcrumb.Item>
 					<Breadcrumb.Item
 						onClick={() => {
-							if (writeAccess) {
-								tryQuizActor.forEach(actor =>
-									actor.send(
-										actor.name,
-										CurrentQuizMessages.UpdateQuestion({
-											question: { uid: toId(questionId), editMode: false },
-											group: selectedGroup !== formerGroup ? selectedGroup : "",
-										})
-									)
-								);
-							}
+							resetQuestionEditModeFlag();
 							nav(
 								{ pathname: "/Dashboard/quiz" },
-								{
-									state: {
-										quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
-									},
-								}
+								{ state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
 							);
 						}}
 					>
@@ -380,6 +376,18 @@ export const QuestionEdit: React.FC = () => {
 					<Breadcrumb.Item>{question.uid ? "Frage" : "Neue Frage"}</Breadcrumb.Item>
 				</Breadcrumb>
 			</div>
+
+			<Row className="mb-4">
+				<div className="mt-3 d-flex gap-2 justify-content-end">
+					<Button variant="secondary" onClick={onCancelClick}>
+						<Trans id="cancel" />
+					</Button>
+					<Button disabled={!question.text.trim()} onClick={submit}>
+						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
+					</Button>
+				</div>
+			</Row>
+
 			<Row>
 				<div className="d-flex flex-column h-100 w-100">
 					<div className="flex-grow-1">
@@ -476,14 +484,6 @@ export const QuestionEdit: React.FC = () => {
 										>
 											<Pencil />
 										</ButtonWithTooltip>
-										&nbsp;
-										<ButtonWithTooltip
-											title={i18n._("question-edit.button-tooltip.edit-comment-text")}
-											variant="warning"
-											onClick={() => handleMDShow("COMMENT", "edit-comment-text")}
-										>
-											<PersonRaisedHand />
-										</ButtonWithTooltip>
 									</div>
 								</Card.Header>
 								<Card.Body>
@@ -579,23 +579,9 @@ export const QuestionEdit: React.FC = () => {
 					<div className="flew-grow-1">&nbsp;</div>
 				</Row>
 			</Row>
-			<Row>
-				<div className="d-flex flex-column h-100 w-100">
-					<Button className="m-3" onClick={submit}>
-						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-					</Button>
-				</div>
-			</Row>
-			<Row>
-				<div
-					className="d-flex flex-row"
-					style={{
-						maxHeight: "19rem",
-						overflowY: "hidden",
-						overflowX: "auto",
-						backgroundColor: "#f5f5f5",
-					}}
-				>
+
+			<div className="mx-3">
+				<CommentsContainer onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}>
 					{mbQuiz
 						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
 						.map(
@@ -631,8 +617,8 @@ export const QuestionEdit: React.FC = () => {
 							))
 						)
 						.orElse([<Fragment key={"key-1"} />])}
-				</div>
-			</Row>
+				</CommentsContainer>
+			</div>
 		</Container>
 	);
 };

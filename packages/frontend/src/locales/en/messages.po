@@ -26,6 +26,11 @@ msgid "new-quiz-title"
 msgstr "Title"
 
 #. js-lingui-explicit-id
+#: src/pages/QuizPage.tsx:121
+msgid "quiz-page.quiz-state.label"
+msgstr "Quiz state"
+
+#. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:363
 msgid "new-quiz-description"
 msgstr "Description"
@@ -176,7 +181,7 @@ msgstr "Change username"
 #: src/components/modals/TextModal.tsx:41
 #: src/components/modals/YesNoModal.tsx:32
 msgid "okay"
-msgstr "O.K."
+msgstr "OK"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeNicknameModal.tsx:25
@@ -609,7 +614,7 @@ msgstr "Select"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:383
 msgid "question-edit.button-tooltip.edit-title-text"
-msgstr "Edit title"
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:391

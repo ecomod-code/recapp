@@ -258,8 +258,10 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							}
 							c.updated = toTimestamp();
 							const { created, ...updateDelta } = quiz;
-							console.log("DELTA", JSON.stringify(updateDelta, undefined, 4));
 							const quizToUpdate = quizSchema.parse({ ...c, ...updateDelta });
+							if (quiz.state && quiz.state !== "STOPPED") {
+								delete quizToUpdate.archived;
+							}
 							await this.storeEntity(quizToUpdate);
 							this.sendUpdateToSubscribers(quizToUpdate);
 							return quizToUpdate;
@@ -347,6 +349,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						studentComments: importedObject.studentComments,
 						studentParticipationSettings: importedObject.studentParticipationSettings,
 						studentQuestions: importedObject.studentQuestions,
+						hideComments: importedObject.hideComments ?? false,
 						title: importedObject.title,
 						comments: [],
 						teachers: [clientUserId],

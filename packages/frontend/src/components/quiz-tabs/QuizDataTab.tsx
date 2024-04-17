@@ -67,7 +67,10 @@ export const QuizDataTab: React.FC = () => {
 			quiz => {
 				const archive = () => {
 					tryActor.forEach(actor => {
-						actor.send(actor, CurrentQuizMessages.Update({ uid: quiz.uid, archived: toTimestamp() }));
+						actor.send(
+							actor,
+							CurrentQuizMessages.Update({ uid: quiz.uid, state: "STOPPED", archived: toTimestamp() })
+						);
 					});
 					setArchiveModal(false);
 				};

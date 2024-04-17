@@ -97,7 +97,10 @@ export class LocalUserActor extends StatefulActor<
 				}
 			});
 		} else if (message.tag == "ArchiveQuizMessage") {
-			this.send(actorUris["QuizActor"], QuizActorMessages.Update({ uid: message.id, archived: toTimestamp() }));
+			this.send(
+				actorUris["QuizActor"],
+				QuizActorMessages.Update({ uid: message.id, state: "STOPPED", archived: toTimestamp() })
+			);
 		} else if (message.tag == "DeleteQuizMessage") {
 			this.send(actorUris["QuizActor"], QuizActorMessages.Delete(message.id));
 			this.updateState(draft => {

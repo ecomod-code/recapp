@@ -324,7 +324,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								if (["ACTIVE", "EDITING", "STOPPED"].includes(this.state.quiz.state)) {
 									this.send(
 										actorUris.QuizActor,
-										QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "STARTED" })
+										QuizActorMessages.Update({
+											uid: this.state.quiz.uid,
+											state: "STARTED",
+										})
 									);
 								}
 							} else if (newState === "STOPPED") {
@@ -342,7 +345,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 									);
 									this.send(
 										actorUris.QuizActor,
-										QuizActorMessages.Update({ uid: this.state.quiz.uid, state: "EDITING" })
+										QuizActorMessages.Update({
+											uid: this.state.quiz.uid,
+											state: "EDITING",
+										})
 									);
 									this.send(
 										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
@@ -373,6 +379,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								created: toTimestamp(),
 								updated: toTimestamp(),
 								comments: [],
+								hideComments: false,
 							};
 							const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
 							this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));

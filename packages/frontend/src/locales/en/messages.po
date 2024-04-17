@@ -28,7 +28,7 @@ msgstr "Title"
 #. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:121
 msgid "quiz-page.quiz-state.label"
-msgstr ""
+msgstr "Quiz state"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:363
@@ -614,7 +614,7 @@ msgstr "Select"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:383
 msgid "question-edit.button-tooltip.edit-title-text"
-msgstr "Edit title"
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:391

@@ -1,7 +1,11 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren } from "react";
 import Button from "react-bootstrap/Button";
 import { Plus } from "react-bootstrap-icons";
 import { Trans } from "@lingui/react";
+import { useStatefulActor } from "ts-actors-react";
+import { maybe, nothing } from "tsmonads";
+import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
+import { keys } from "rambda";
 
 type Props = {
     showCommentArea: boolean;
@@ -9,20 +13,34 @@ type Props = {
 } & PropsWithChildren;
 
 export const CommentsContainer = (props: Props) => {
-    const [open, setOpen] = useState(false);
+    const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 
     if (!props.showCommentArea) {
         return null;
     }
 
+    const isCommentSectionVisible = mbQuiz
+        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+        .match(
+            x => x.isCommentSectionVisible,
+            () => null
+        );
+
+    const setIsCommentSectionVisible = (value: boolean) => {
+        tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
+    };
+
     return (
         <>
-            <div className="d-flex">
-                <Button className="flex-fill" onClick={() => setOpen(prev => !prev)}>
+            <div className="d-flex flex-column">
+                <Button
+                    className="flex-fillx align-self-end"
+                    onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                >
                     <Trans id="comments-container.toggle-button.label" />
                 </Button>
             </div>
-            {open ? (
+            {isCommentSectionVisible ? (
                 <div
                     className="d-flex align-items-center border"
                     style={{

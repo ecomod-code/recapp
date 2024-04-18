@@ -53,6 +53,7 @@ export const CurrentQuizMessages = unionize(
 		GetTeacherNames: {},
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
+		setIsCommentSectionVisible: ofType<boolean>(),
 		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED">(),
 		StartQuiz: {}, // Start quiz for a participating student
 		LogAnswer: ofType<{ questionId: Id; answer: string | boolean[] }>(), // Sets the answer for the current quiz question, returns whether the answer was correct
@@ -87,6 +88,7 @@ export type CurrentQuizState = {
 	questions: Question[];
 	questionStats: TextElementStatistics | ChoiceElementStatistics | undefined;
 	groupStats: GroupStatistics | undefined;
+	isCommentSectionVisible: boolean
 	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
@@ -106,6 +108,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 			teacherNames: [],
 			questionStats: undefined,
 			groupStats: undefined,
+			isCommentSectionVisible: true, 
 			quizStats: undefined,
 			run: undefined,
 			exportFile: undefined,
@@ -475,6 +478,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 							return unit();
 						},
+						setIsCommentSectionVisible: async (visible) => {
+							this.updateState(draft => {
+								draft.isCommentSectionVisible = visible;
+							});
+							return unit();
+						}, 
+							
 						// MARK Comments
 						FinishComment: async uid => {
 							this.send(

@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Maybe, maybe, nothing } from "tsmonads";
+import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
@@ -381,49 +381,48 @@ export const QuestionEdit: React.FC = () => {
                 </Breadcrumb>
             </div>
 
-            <div className="mx-3">
-                <CommentsContainer
-                    onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
-                    showCommentArea={showCommentArea}
-                >
-                    {mbQuiz
-                        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
-                        .map(
-                            q =>
-                                (q.comments ?? [])
-                                    .map(c => {
-                                        const result = comments.find(
-                                            cmt => cmt.uid === c && cmt.relatedQuestion === questionId
-                                        );
-                                        console.log(
-                                            comments.map(c => c.relatedQuestion).join(";"),
-                                            questionId,
-                                            question.uid,
-                                            result
-                                        );
-                                        return result;
-                                    })
-                                    .filter(Boolean) as Comment[]
-                        )
-                        .map(c =>
-                            c.sort(sortComments).map(cmt => (
-                                <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-                                    <CommentCard
-                                        userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-                                        teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-                                        comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
-                                        onUpvote={() => upvoteComment(cmt.uid)}
-                                        onAccept={() => finishComment(cmt.uid)}
-                                        onDelete={() => deleteComment(cmt.uid)}
-                                        onJumpToQuestion={() => {}}
-                                    />
-                                </div>
-                            ))
-                        )
-                        .orElse([<Fragment key={"key-1"} />])}
-                </CommentsContainer>
-            </div>
-            <div className="mb-4 mx-3">
+            <CommentsContainer
+                onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+                showCommentArea={showCommentArea}
+            >
+                {mbQuiz
+                    .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+                    .map(
+                        q =>
+                            (q.comments ?? [])
+                                .map(c => {
+                                    const result = comments.find(
+                                        cmt => cmt.uid === c && cmt.relatedQuestion === questionId
+                                    );
+                                    console.log(
+                                        comments.map(c => c.relatedQuestion).join(";"),
+                                        questionId,
+                                        question.uid,
+                                        result
+                                    );
+                                    return result;
+                                })
+                                .filter(Boolean) as Comment[]
+                    )
+                    .map(c =>
+                        c.sort(sortComments).map(cmt => (
+                            <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                <CommentCard
+                                    userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+                                    teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+                                    comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
+                                    onUpvote={() => upvoteComment(cmt.uid)}
+                                    onAccept={() => finishComment(cmt.uid)}
+                                    onDelete={() => deleteComment(cmt.uid)}
+                                    onJumpToQuestion={() => {}}
+                                />
+                            </div>
+                        ))
+                    )
+                    .orElse([<Fragment key={"key-1"} />])}
+            </CommentsContainer>
+
+            <div className="mb-4">
                 <div className="mt-3 d-flex gap-2 justify-content-end">
                     <Button variant="secondary" onClick={onCancelClick}>
                         <Trans id="cancel" />
@@ -434,196 +433,185 @@ export const QuestionEdit: React.FC = () => {
                 </div>
             </div>
 
-            <Row>
-                <div className="d-flex flex-column h-100 w-100">
-                    <div className="flex-grow-1">
-                        <Container>
-                            <Card className="p-0">
-                                <Card.Header className="text-start d-flex flex-row">
-                                    <div className="align-self-center">
-                                        <strong>{question.uid ? "Frage" : "Neue Frage"}</strong>
-                                    </div>
-                                    <div className="flex-grow-1"></div>
-                                    {isStudent && writeAccess && (
-                                        <div className="align-self-center d-flex flex-row align-items-center">
-                                            {i18n._("author")}:&nbsp;
-                                            <Form.Select
-                                                value={authorType}
-                                                onChange={event =>
-                                                    setAuthorType(event.target.value as UserParticipation)
-                                                }
-                                            >
-                                                {allowedAuthorTypes.includes("NAME") && (
-                                                    <option value="NAME">
-                                                        {mbUser.flatMap(u => maybe(u.user?.username)).orElse("---")}
-                                                    </option>
-                                                )}
-                                                {allowedAuthorTypes.includes("NICKNAME") &&
-                                                    mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("") !== "" && (
-                                                        <option value="NICKNAME">
-                                                            {mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("---")}
-                                                        </option>
-                                                    )}
-                                                {allowedAuthorTypes.includes("ANONYMOUS") && (
-                                                    <option value="ANONYMOUS">
-                                                        <Trans id="anonymous" />
-                                                    </option>
-                                                )}
-                                            </Form.Select>
-                                        </div>
+            <div className="d-flex flex-column h-100 w-100">
+                <div className="flex-grow-1">
+                    <Card className="p-0">
+                        <Card.Header className="text-start d-flex flex-row">
+                            <div className="align-self-center">
+                                <strong>{question.uid ? "Frage" : "Neue Frage"}</strong>
+                            </div>
+                            <div className="flex-grow-1"></div>
+                            {isStudent && writeAccess && (
+                                <div className="align-self-center d-flex flex-row align-items-center">
+                                    {i18n._("author")}:&nbsp;
+                                    <Form.Select
+                                        value={authorType}
+                                        onChange={event => setAuthorType(event.target.value as UserParticipation)}
+                                    >
+                                        {allowedAuthorTypes.includes("NAME") && (
+                                            <option value="NAME">
+                                                {mbUser.flatMap(u => maybe(u.user?.username)).orElse("---")}
+                                            </option>
+                                        )}
+                                        {allowedAuthorTypes.includes("NICKNAME") &&
+                                            mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("") !== "" && (
+                                                <option value="NICKNAME">
+                                                    {mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("---")}
+                                                </option>
+                                            )}
+                                        {allowedAuthorTypes.includes("ANONYMOUS") && (
+                                            <option value="ANONYMOUS">
+                                                <Trans id="anonymous" />
+                                            </option>
+                                        )}
+                                    </Form.Select>
+                                </div>
+                            )}
+                            <div className="align-self-center">
+                                <Form.Select
+                                    value={selectedGroup}
+                                    onChange={event => setSelectedGroup(event.target.value)}
+                                    disabled={isStudent || !writeAccess}
+                                >
+                                    {groups.map(g => (
+                                        <option key={g} value={g}>
+                                            {g}
+                                        </option>
+                                    ))}
+                                </Form.Select>
+                            </div>
+                            <div className="align-self-center">
+                                <Form.Select
+                                    value={question.type}
+                                    onChange={event =>
+                                        setQuestion(state => ({
+                                            ...state,
+                                            type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
+                                        }))
+                                    }
+                                    disabled={!writeAccess}
+                                >
+                                    {allowedQuestionTypes.includes("SINGLE") && (
+                                        <option value="SINGLE">
+                                            <Trans id="single-choice-selection" />
+                                        </option>
                                     )}
-                                    <div className="align-self-center">
-                                        <Form.Select
-                                            value={selectedGroup}
-                                            onChange={event => setSelectedGroup(event.target.value)}
-                                            disabled={isStudent || !writeAccess}
-                                        >
-                                            {groups.map(g => (
-                                                <option key={g} value={g}>
-                                                    {g}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                    </div>
-                                    <div className="align-self-center">
-                                        <Form.Select
-                                            value={question.type}
-                                            onChange={event =>
-                                                setQuestion(state => ({
-                                                    ...state,
-                                                    type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
-                                                }))
-                                            }
-                                            disabled={!writeAccess}
-                                        >
-                                            {allowedQuestionTypes.includes("SINGLE") && (
-                                                <option value="SINGLE">
-                                                    <Trans id="single-choice-selection" />
-                                                </option>
-                                            )}
-                                            {allowedQuestionTypes.includes("MULTIPLE") && (
-                                                <option value="MULTIPLE">
-                                                    <Trans id="multiple-choice-selection" />
-                                                </option>
-                                            )}
-                                            {allowedQuestionTypes.includes("TEXT") && (
-                                                <option value="TEXT">
-                                                    <Trans id="text-type-selection" />
-                                                </option>
-                                            )}
-                                        </Form.Select>
-                                    </div>
-                                    <div className="m-1">
-                                        <ButtonWithTooltip
-                                            title={i18n._("question-edit.button-tooltip.check")}
-                                            variant="secondary"
-                                            disabled
-                                        >
-                                            <Check />
-                                        </ButtonWithTooltip>
-                                        &nbsp;
-                                        <ButtonWithTooltip
-                                            title={i18n._("question-edit.button-tooltip.edit-title-text")}
-                                            variant="primary"
-                                            onClick={() => handleMDShow("QUESTION", "edit-title-text")}
-                                            disabled={!writeAccess}
-                                        >
-                                            <Pencil />
-                                        </ButtonWithTooltip>
-                                    </div>
-                                </Card.Header>
-                                <Card.Body>
-                                    {question.text ? (
-                                        <div
-                                            className="p-2 text-start h-30"
-                                            dangerouslySetInnerHTML={{ __html: rendered }}
-                                        />
-                                    ) : (
-                                        <div className="p-2 text-start h-30" style={{ minHeight: 90 }} />
+                                    {allowedQuestionTypes.includes("MULTIPLE") && (
+                                        <option value="MULTIPLE">
+                                            <Trans id="multiple-choice-selection" />
+                                        </option>
                                     )}
-                                    <div className="mb-2">Hinweistext:</div>
-                                    <InputGroup className="mb-2">
-                                        <Form.Check
-                                            className="align-self-center"
-                                            label=""
-                                            name="answer"
-                                            type="switch"
-                                            checked={hint}
-                                            onChange={event => {
-                                                const active = event.target.checked;
-                                                if (!active) {
-                                                    setQuestion(state => ({ ...state, hint: undefined }));
-                                                }
-                                                setHint(active);
-                                            }}
-                                            disabled={!writeAccess}
-                                        />
-                                        <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
-                                        <ButtonWithTooltip
-                                            title={i18n._("question-edit.button-tooltip.edit-hint-title")}
-                                            disabled={!hint || !writeAccess}
-                                            onClick={() =>
-                                                setShowTextModal({
-                                                    property: "hint",
-                                                    titleId: "edit-hint-title",
-                                                    editorText: question.hint ?? "",
-                                                })
-                                            }
-                                        >
-                                            <Pencil />
-                                        </ButtonWithTooltip>
-                                    </InputGroup>
-                                </Card.Body>
-                                {question.type !== "TEXT" && (
-                                    <Card.Footer>
-                                        <Trans id="activate-all-correct-answers" />
-                                        <Form className="text-start mb-2 mt-2">
-                                            {question.answers.map((answer, i) => {
-                                                return (
-                                                    <InputGroup key={i} className="mb-2">
-                                                        <Form.Check
-                                                            className="align-self-center"
-                                                            label=""
-                                                            name="answer"
-                                                            type="switch"
-                                                            checked={answer.correct}
-                                                            onChange={() => toggleAnswer(i)}
-                                                            disabled={!writeAccess}
-                                                        />
-                                                        <InputGroup.Text className="flex-grow-1">
-                                                            {answer.text}
-                                                        </InputGroup.Text>
-                                                        <ButtonWithTooltip
-                                                            title={i18n._("question-edit.button-tooltip.edit-answer")}
-                                                            onClick={() => editAnswer(i)}
-                                                            disabled={!writeAccess}
-                                                        >
-                                                            <Pencil />
-                                                        </ButtonWithTooltip>
-                                                        <ButtonWithTooltip
-                                                            title={i18n._("question-edit.button-tooltip.delete-answer")}
-                                                            variant="danger"
-                                                            onClick={() => deleteAnswer(i)}
-                                                            disabled={!writeAccess}
-                                                        >
-                                                            <DashLg />
-                                                        </ButtonWithTooltip>
-                                                    </InputGroup>
-                                                );
-                                            })}
-                                        </Form>
-                                        <Button onClick={addAnswer} disabled={!writeAccess}>
-                                            <Trans id="add-answer-button" />
-                                        </Button>
-                                    </Card.Footer>
-                                )}
-                            </Card>
-                        </Container>
-                    </div>
+                                    {allowedQuestionTypes.includes("TEXT") && (
+                                        <option value="TEXT">
+                                            <Trans id="text-type-selection" />
+                                        </option>
+                                    )}
+                                </Form.Select>
+                            </div>
+                            <div className="m-1">
+                                <ButtonWithTooltip
+                                    title={i18n._("question-edit.button-tooltip.check")}
+                                    variant="secondary"
+                                    disabled
+                                >
+                                    <Check />
+                                </ButtonWithTooltip>
+                                &nbsp;
+                                <ButtonWithTooltip
+                                    title={i18n._("question-edit.button-tooltip.edit-title-text")}
+                                    variant="primary"
+                                    onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+                                    disabled={!writeAccess}
+                                >
+                                    <Pencil />
+                                </ButtonWithTooltip>
+                            </div>
+                        </Card.Header>
+                        <Card.Body>
+                            {question.text ? (
+                                <div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
+                            ) : (
+                                <div className="p-2 text-start h-30" style={{ minHeight: 90 }} />
+                            )}
+                            <div className="mb-2">Hinweistext:</div>
+                            <InputGroup className="mb-2">
+                                <Form.Check
+                                    className="align-self-center"
+                                    label=""
+                                    name="answer"
+                                    type="switch"
+                                    checked={hint}
+                                    onChange={event => {
+                                        const active = event.target.checked;
+                                        if (!active) {
+                                            setQuestion(state => ({ ...state, hint: undefined }));
+                                        }
+                                        setHint(active);
+                                    }}
+                                    disabled={!writeAccess}
+                                />
+                                <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
+                                <ButtonWithTooltip
+                                    title={i18n._("question-edit.button-tooltip.edit-hint-title")}
+                                    disabled={!hint || !writeAccess}
+                                    onClick={() =>
+                                        setShowTextModal({
+                                            property: "hint",
+                                            titleId: "edit-hint-title",
+                                            editorText: question.hint ?? "",
+                                        })
+                                    }
+                                >
+                                    <Pencil />
+                                </ButtonWithTooltip>
+                            </InputGroup>
+                        </Card.Body>
+                        {question.type !== "TEXT" && (
+                            <Card.Footer>
+                                <Trans id="activate-all-correct-answers" />
+                                <Form className="text-start mb-2 mt-2">
+                                    {question.answers.map((answer, i) => {
+                                        return (
+                                            <InputGroup key={i} className="mb-2">
+                                                <Form.Check
+                                                    className="align-self-center"
+                                                    label=""
+                                                    name="answer"
+                                                    type="switch"
+                                                    checked={answer.correct}
+                                                    onChange={() => toggleAnswer(i)}
+                                                    disabled={!writeAccess}
+                                                />
+                                                <InputGroup.Text className="flex-grow-1">{answer.text}</InputGroup.Text>
+                                                <ButtonWithTooltip
+                                                    title={i18n._("question-edit.button-tooltip.edit-answer")}
+                                                    onClick={() => editAnswer(i)}
+                                                    disabled={!writeAccess}
+                                                >
+                                                    <Pencil />
+                                                </ButtonWithTooltip>
+                                                <ButtonWithTooltip
+                                                    title={i18n._("question-edit.button-tooltip.delete-answer")}
+                                                    variant="danger"
+                                                    onClick={() => deleteAnswer(i)}
+                                                    disabled={!writeAccess}
+                                                >
+                                                    <DashLg />
+                                                </ButtonWithTooltip>
+                                            </InputGroup>
+                                        );
+                                    })}
+                                </Form>
+                                <Button onClick={addAnswer} disabled={!writeAccess}>
+                                    <Trans id="add-answer-button" />
+                                </Button>
+                            </Card.Footer>
+                        )}
+                    </Card>
                 </div>
-                <Row>
-                    <div className="flew-grow-1">&nbsp;</div>
-                </Row>
+            </div>
+            <Row>
+                <div className="flew-grow-1">&nbsp;</div>
             </Row>
         </Container>
     );

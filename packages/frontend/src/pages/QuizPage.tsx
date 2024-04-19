@@ -129,6 +129,11 @@ export const QuizPage: React.FC = () => {
 		}
 	};
 
+	const leaveQuiz = () => {
+		tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.LeaveQuiz()));
+		nav({ pathname: "/Dashboard" });
+	};
+
 	if (!quizId) {
 		return (
 			<div className="flex-1 justify-content-center align-items-center">
@@ -267,7 +272,14 @@ export const QuizPage: React.FC = () => {
 
 						{!disableForStudent && (
 							<div className="my-4">
-								<QuizButtons quizState={quizData.quiz.state} uniqueLink={quizData.quiz.uniqueLink} />
+								<QuizButtons
+									quizState={quizData.quiz.state}
+									uniqueLink={quizData.quiz.uniqueLink}
+									leaveQuiz={leaveQuiz}
+									isQuizCreator={
+										teachers[0] === mbLocalUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))
+									}
+								/>
 							</div>
 						)}
 

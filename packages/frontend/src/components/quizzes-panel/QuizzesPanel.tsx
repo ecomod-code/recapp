@@ -13,6 +13,7 @@ import { QuizCard } from "./QuizCard";
 import { ShareModal } from "../modals/ShareModal";
 import { QuizImportModal } from "../modals/QuizImportModal";
 import { ArchiveQuizModal } from "../modals/ArchiveQuizModal";
+import { maybe } from "tsmonads";
 
 export const QuizzesPanel: React.FC = () => {
 	const nav = useNavigate();
@@ -27,6 +28,7 @@ export const QuizzesPanel: React.FC = () => {
 		quizzes: Map<Id, Partial<Quiz>>;
 		showArchived: boolean;
 		updateCounter: number;
+		teachers: Map<Id, string[]>;
 	}>("LocalUser");
 	useEffect(() => {
 		const counter = state.map(s => s.updateCounter).orElse(0);
@@ -142,6 +144,7 @@ export const QuizzesPanel: React.FC = () => {
 									setDeleteModal(q.uid!);
 								}
 							}}
+							teachers={state.flatMap(s => maybe(s.teachers.get(q.uid!))).orElse([])}
 						/>
 					);
 				})}

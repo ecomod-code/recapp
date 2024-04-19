@@ -42,14 +42,24 @@ type Messages =
 	| ToggleShowArchived
 	| DeleteQuizMessage;
 
-export class LocalUserActor extends StatefulActor<
-	Messages,
-	Unit | string,
-	{ user: User | undefined; quizzes: Map<Id, Partial<Quiz>>; updateCounter: number; showArchived: boolean }
-> {
+type State = {
+	user: User | undefined;
+	quizzes: Map<Id, Partial<Quiz>>;
+	teachers: Map<Id, string[]>;
+	updateCounter: number;
+	showArchived: boolean;
+};
+
+export class LocalUserActor extends StatefulActor<Messages, Unit | string, State> {
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
-		this.state = { user: undefined, quizzes: new Map(), updateCounter: 0, showArchived: false };
+		this.state = {
+			user: undefined,
+			quizzes: new Map(),
+			teachers: new Map(),
+			updateCounter: 0,
+			showArchived: false,
+		};
 	}
 
 	public async afterStart(): Promise<void> {
@@ -86,12 +96,19 @@ export class LocalUserActor extends StatefulActor<
 				draft.updateCounter++;
 			});
 		} else if (message.tag == "QuizUpdateMessage") {
+			const names: any[] = message.quiz.teachers
+				? await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers))
+				: [];
 			this.updateState(draft => {
 				if (message.quiz.uid) {
 					const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));
 					const isStudent = message.quiz.students?.includes(this.state.user?.uid ?? toId(""));
 					if (this.state.user?.role === "ADMIN" || isTeacher || isStudent) {
 						draft.quizzes.set(message.quiz.uid, message.quiz);
+						draft.teachers.set(
+							message.quiz.uid,
+							names.map(n => n.username)
+						);
 					}
 					draft.updateCounter++;
 				}
@@ -105,6 +122,7 @@ export class LocalUserActor extends StatefulActor<
 			this.send(actorUris["QuizActor"], QuizActorMessages.Delete(message.id));
 			this.updateState(draft => {
 				draft.quizzes.delete(message.id);
+				draft.teachers.delete(message.id);
 				draft.updateCounter++;
 			});
 		} else if (message.tag == "UploadQuizMessage") {

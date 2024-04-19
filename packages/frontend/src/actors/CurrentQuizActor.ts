@@ -64,6 +64,7 @@ export const CurrentQuizMessages = unionize(
 		ExportQuizStats: {},
 		ExportQuestionStats: {},
 		ExportDone: {},
+		LeaveQuiz: {}, // Remove yourself from the quiz, regardless whether you are a teacher or student
 	},
 	{ value: "value" }
 );
@@ -88,7 +89,7 @@ export type CurrentQuizState = {
 	questions: Question[];
 	questionStats: TextElementStatistics | ChoiceElementStatistics | undefined;
 	groupStats: GroupStatistics | undefined;
-	isCommentSectionVisible: boolean
+	isCommentSectionVisible: boolean;
 	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
@@ -108,7 +109,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 			teacherNames: [],
 			questionStats: undefined,
 			groupStats: undefined,
-			isCommentSectionVisible: true, 
+			isCommentSectionVisible: true,
 			quizStats: undefined,
 			run: undefined,
 			exportFile: undefined,
@@ -478,13 +479,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 							return unit();
 						},
-						setIsCommentSectionVisible: async (visible) => {
+						setIsCommentSectionVisible: async visible => {
 							this.updateState(draft => {
 								draft.isCommentSectionVisible = visible;
 							});
 							return unit();
-						}, 
-							
+						},
+
 						// MARK Comments
 						FinishComment: async uid => {
 							this.send(
@@ -679,6 +680,24 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							this.updateState(draft => {
 								draft.exportFile = undefined;
 							});
+							return unit();
+						},
+						LeaveQuiz: async () => {
+							const userId = this.user.map(u => u.uid).orElse(toId(""));
+							if (userId === this.state.quiz.teachers[0]) {
+								// If you created the quiz you cannot leave it
+								return unit();
+							}
+							const teachers = this.state.quiz.teachers.filter(t => t !== userId);
+							const students = this.state.quiz.students.filter(s => s !== userId);
+							this.send(
+								actorUris.QuizActor,
+								QuizActorMessages.Update({
+									uid: this.state.quiz.uid,
+									teachers,
+									students,
+								})
+							);
 							return unit();
 						},
 					})

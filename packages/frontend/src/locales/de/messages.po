@@ -943,3 +943,15 @@ msgstr "Frage anzeigen"
 #. js-lingui-explicit-id
 msgid "quiz-hide-comments-switch"
 msgstr "Kommentarleiste verbergen"
+
+#. js-lingui-explicit-id
+msgid "leave-quiz-modal-title"
+msgstr "Quiz verlassen"
+
+#. js-lingui-explicit-id
+msgid "leave-quiz-modal-text"
+msgstr "Sie sind im Begriff, das Quiz zu verlassen. Es wird Ihnen nicht mehr im Dashboard angezeigt und Sie können nicht länger am Quiz teilnehmen oder es modifizieren. Wirklich verlassen?"
+
+#. js-lingui-explicit-id
+msgid "quiz-card-teachers-label"
+msgstr "Lehrpersonen:"

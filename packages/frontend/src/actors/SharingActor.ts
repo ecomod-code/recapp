@@ -72,12 +72,7 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 				});
 			},
 			Share: quiz => {
-				const teachers: Id[] = Array.from(
-					new Set([
-						...quiz.teachers,
-						...(this.state.teachers.map(t => t.uid).filter(Boolean) as Id[]),
-					]).values()
-				);
+				const teachers: Id[] = this.state.teachers.map(t => t.uid);
 				console.warn(teachers, this.state.teachers, quiz.teachers);
 				const students = quiz.students.filter(s => !teachers.includes(s));
 				this.ask<unknown, Quiz>(

@@ -207,7 +207,9 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				Find: async ({ query, role }) => {
 					const db = await this.connector.db();
 					const users = await db.collection<User>(this.collectionName).find({}).toArray();
-					const user = users.find(u => u.nickname === query || u.uid === query || u.email === query);
+					const user = users.find(
+						u => u.nickname === query || u.uid === query || u.email === query || u.username === query
+					);
 					if (user) {
 						if (role === "STUDENT") {
 							return user;

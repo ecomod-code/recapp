@@ -3,17 +3,12 @@ import { i18n } from "@lingui/core";
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import { last } from "rambda";
 import "katex/dist/katex.css";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
+import { useRendered } from "../../hooks/useRendered";
 import { PersonRaisedHand } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
@@ -25,7 +20,6 @@ export const RunningQuizTab: React.FC<{
     logQuestion: (questionId: Id, answer: string | boolean[]) => void;
 }> = ({ quizState, logQuestion }) => {
     const [answered, setAnswered] = useState(false);
-    const [rendered, setRendered] = useState<string>("");
     const [correct, setCorrect] = useState(false);
     const [textAnswer, setTextAnswer] = useState("");
     const [answers, setAnswers] = useState<boolean[]>([]);
@@ -42,22 +36,7 @@ export const RunningQuizTab: React.FC<{
     );
 
     const questionText = questions.at(run?.counter ?? 0)?.text;
-    useEffect(() => {
-        if (!questionText) {
-            return;
-        }
-        const f = async () => {
-            const result = await unified()
-                .use(remarkParse)
-                .use(remarkMath)
-                .use(remarkRehype)
-                .use(rehypeKatex)
-                .use(rehypeStringify)
-                .process(questionText);
-            setRendered(result.toString());
-        };
-        f();
-    }, [questionText]);
+    const { rendered } = useRendered({ value: questionText ?? "" });
 
     useEffect(() => {
         setCorrect(last(quizState.run?.correct ?? []) ?? false);

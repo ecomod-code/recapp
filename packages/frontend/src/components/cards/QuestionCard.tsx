@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash, Eye } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
+import { useRendered } from "../../hooks/useRendered";
 
 const CONTAINER_MIN_HEIGHT = 160;
 const ARROW_CONTAINER_MAX_HEIGHT = CONTAINER_MIN_HEIGHT;
@@ -27,6 +28,8 @@ type Props = {
 };
 
 export const QuestionCard = (props: Props) => {
+    const { rendered } = useRendered({ value: props.question.text });
+
     return (
         <Card className="p-0 mb-2">
             <Card.Body
@@ -67,7 +70,8 @@ export const QuestionCard = (props: Props) => {
                         </Badge>
                     </div>
 
-                    <div dangerouslySetInnerHTML={{ __html: props.question.text }} />
+                    {/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
+                    <div dangerouslySetInnerHTML={{ __html: rendered }} />
 
                     <div className="d-flex justify-content-end gap-2">
                         {props.writeAccess && props.state === "EDITING" ? (

@@ -1,15 +1,11 @@
 import { PropsWithChildren, useEffect, useRef, useState } from "react";
 import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
+
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
+import { useRendered } from "../../hooks/useRendered";
 import { Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { fromTimestamp } from "itu-utils";
@@ -61,20 +57,7 @@ export const CommentCardContent: React.FC<
     showInModalHandler,
     isDisplayedInModal,
 }) => {
-    const [text, setText] = useState("");
-    useEffect(() => {
-        const f = async () => {
-            const result = await unified()
-                .use(remarkParse)
-                .use(remarkMath)
-                .use(remarkRehype)
-                .use(rehypeKatex)
-                .use(rehypeStringify)
-                .process(comment.text);
-            setText(result.toString());
-        };
-        f();
-    }, [comment.text]);
+    const { rendered } = useRendered({ value: comment.text });
 
     return (
         <Card
@@ -115,11 +98,11 @@ export const CommentCardContent: React.FC<
                 </div>
             </Card.Title>
 
-            {!text ? <Card.Body style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden" }} /> : null}
+            {!rendered ? <Card.Body style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden" }} /> : null}
 
-            {text ? (
+            {rendered ? (
                 <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={() => showInModalHandler(true)}>
-                    <div key={new Date().getTime()} dangerouslySetInnerHTML={{ __html: text }} />
+                    <div key={new Date().getTime()} dangerouslySetInnerHTML={{ __html: rendered }} />
                 </SeeMoreContainer>
             ) : null}
 

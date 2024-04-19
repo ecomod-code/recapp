@@ -2,13 +2,8 @@ import { Trans } from "@lingui/react";
 import { Button, Modal } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import "katex/dist/katex.css";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 import MDEditor, { commands } from "@uiw/react-md-editor";
+import { useRendered } from "../../hooks/useRendered";
 
 interface Props {
     show: boolean;
@@ -20,23 +15,12 @@ interface Props {
 
 export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onClose, onSubmit }) => {
     const [value, setValue] = useState<string>(editorValue);
-    const [rendered, setRendered] = useState<string>("");
+    const { rendered } = useRendered({ value });
+
     useEffect(() => {
         setValue(editorValue);
     }, [editorValue]);
-    useEffect(() => {
-        const f = async () => {
-            const result = await unified()
-                .use(remarkParse)
-                .use(remarkMath)
-                .use(remarkRehype)
-                .use(rehypeKatex)
-                .use(rehypeStringify)
-                .process(value);
-            setRendered(result.toString());
-        };
-        f();
-    }, [value]);
+
     return (
         <Modal show={show} dialogClassName="modal-80w">
             <Modal.Title className="p-1 ps-2 text-bg-primary">
@@ -67,7 +51,8 @@ export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onC
                             value={value}
                             onChange={val => setValue(val ?? "")}
                             height="100%"
-                            components={{ preview: (_source, _state, _dispath) => <></> }}
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                            components={{ preview: (_source, _state, _dispatch) => <></> }}
                             preview="edit"
                         />
                     </div>

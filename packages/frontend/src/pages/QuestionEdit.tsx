@@ -5,15 +5,10 @@ import { maybe, nothing } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz, User, toId, Comment, Question, Id, QuestionType, UserParticipation } from "@recapp/models";
 
+import { useRendered } from "../hooks/useRendered";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
@@ -129,7 +124,7 @@ export const QuestionEdit: React.FC = () => {
         }
     }, [mbQuiz.hasValue]);
 
-    const [rendered, setRendered] = useState<string>("");
+    const { rendered } = useRendered({ value: question.text });
     const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
     const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
 
@@ -142,20 +137,6 @@ export const QuestionEdit: React.FC = () => {
         setShowTextModal({ property: "", titleId: "", editorText: "" });
         setShowMDModal({ type, titleId });
     };
-
-    useEffect(() => {
-        const f = async () => {
-            const result = await unified()
-                .use(remarkParse)
-                .use(remarkMath)
-                .use(remarkRehype)
-                .use(rehypeKatex)
-                .use(rehypeStringify)
-                .process(question.text);
-            setRendered(result.toString());
-        };
-        f();
-    }, [question.text]);
 
     const addAnswer = () => {
         const answers = question.answers;

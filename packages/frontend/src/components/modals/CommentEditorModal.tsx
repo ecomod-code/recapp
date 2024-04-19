@@ -3,15 +3,11 @@ import { i18n } from "@lingui/core";
 import { Button, Modal, Form } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import "katex/dist/katex.css";
-import rehypeKatex from "rehype-katex";
-import rehypeStringify from "rehype-stringify";
-import remarkMath from "remark-math";
-import remarkParse from "remark-parse";
-import remarkRehype from "remark-rehype";
-import { unified } from "unified";
+
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import { UserParticipation } from "@recapp/models";
 import { maybe } from "tsmonads";
+import { useRendered } from "../../hooks/useRendered";
 
 interface Props {
     show: boolean;
@@ -35,24 +31,12 @@ export const CommentEditorModal: React.FC<Props> = ({
     participationOptions,
 }) => {
     const [value, setValue] = useState<string>(editorValue);
-    const [rendered, setRendered] = useState<string>("");
+    const { rendered } = useRendered({ value });
     const [name, setName] = useState<UserParticipation | undefined>(isStudent ? participationOptions[0] : undefined);
     useEffect(() => {
         setValue(editorValue);
     }, [editorValue]);
-    useEffect(() => {
-        const f = async () => {
-            const result = await unified()
-                .use(remarkParse)
-                .use(remarkMath)
-                .use(remarkRehype)
-                .use(rehypeKatex)
-                .use(rehypeStringify)
-                .process(value);
-            setRendered(result.toString());
-        };
-        f();
-    }, [value]);
+
     return (
         <Modal show={show} dialogClassName="modal-80w">
             <Modal.Title className="p-1 ps-2 text-bg-primary">
@@ -76,6 +60,7 @@ export const CommentEditorModal: React.FC<Props> = ({
                             )}
                         </Form.Select>
                     </div>
+
                     <div data-color-mode="light">
                         <MDEditor
                             commands={[
@@ -97,10 +82,12 @@ export const CommentEditorModal: React.FC<Props> = ({
                             value={value}
                             onChange={val => setValue(val ?? "")}
                             height="100%"
+                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
                             components={{ preview: (_source, _state, _dispath) => <></> }}
                             preview="edit"
                         />
                     </div>
+
                     <div
                         className="p-2 text-start h-30"
                         style={{ minHeight: 150 }}

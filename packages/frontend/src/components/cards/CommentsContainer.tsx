@@ -1,6 +1,6 @@
 import { PropsWithChildren } from "react";
 import Button from "react-bootstrap/Button";
-import { Plus } from "react-bootstrap-icons";
+import { ChevronDown, ChevronUp, Plus } from "react-bootstrap-icons";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
@@ -31,15 +31,19 @@ export const CommentsContainer = (props: Props) => {
     };
 
     return (
-        <>
-            <div className="d-flex flex-column">
-                <Button
-                    className="flex-fillx align-self-end"
-                    onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-                >
-                    <Trans id="comments-container.toggle-button.label" />
-                </Button>
-            </div>
+        <div className="d-flex flex-column">
+            <Button
+                className="align-self-end d-flex justify-content-center align-items-center col-12 col-lg-auto"
+                onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+            >
+                {isCommentSectionVisible ? (
+                    <ChevronUp className="me-2" size={20} />
+                ) : (
+                    <ChevronDown className="me-2" size={20} />
+                )}
+                <Trans id="comments-container.toggle-button.label" />
+            </Button>
+
             {isCommentSectionVisible ? (
                 <div
                     className="d-flex align-items-center border"
@@ -64,6 +68,6 @@ export const CommentsContainer = (props: Props) => {
                     {props.children}
                 </div>
             ) : null}
-        </>
+        </div>
     );
 };

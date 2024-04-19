@@ -224,51 +224,49 @@ export const QuizPage: React.FC = () => {
 							</div>
 						</Row>
 
-						<Row>
-							<CommentsContainer
-								onClickAddComment={() => setShowMDModal(true)}
-								showCommentArea={showCommentArea}
-							>
-								{mbQuiz
-									.flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
-									.map(
-										q =>
-											(q.comments ?? [])
-												.map(c => debug(comments.find(cmt => cmt.uid === c)!))
-												.filter(Boolean) as Comment[]
-									)
-									.map(c =>
-										c.sort(sortComments).map(cmt => (
-											<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-												<CommentCard
-													teachers={teachers}
-													userId={localUser.map(l => l.uid).orElse(toId(""))}
-													comment={cmt}
-													onUpvote={() => upvoteComment(cmt.uid)}
-													onAccept={() => finishComment(cmt.uid)}
-													onDelete={() => deleteComment(cmt.uid)}
-													onJumpToQuestion={() => jumpToQuestion(cmt.relatedQuestion!)}
-													questionText={
-														cmt.relatedQuestion
-															? mbQuiz
-																	.flatMap(q =>
-																		maybe(
-																			q.questions.find(
-																				q => q.uid === cmt.relatedQuestion
-																			)?.text
-																		)
+						<CommentsContainer
+							onClickAddComment={() => setShowMDModal(true)}
+							showCommentArea={showCommentArea}
+						>
+							{mbQuiz
+								.flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
+								.map(
+									q =>
+										(q.comments ?? [])
+											.map(c => debug(comments.find(cmt => cmt.uid === c)!))
+											.filter(Boolean) as Comment[]
+								)
+								.map(c =>
+									c.sort(sortComments).map(cmt => (
+										<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+											<CommentCard
+												teachers={teachers}
+												userId={localUser.map(l => l.uid).orElse(toId(""))}
+												comment={cmt}
+												onUpvote={() => upvoteComment(cmt.uid)}
+												onAccept={() => finishComment(cmt.uid)}
+												onDelete={() => deleteComment(cmt.uid)}
+												onJumpToQuestion={() => jumpToQuestion(cmt.relatedQuestion!)}
+												questionText={
+													cmt.relatedQuestion
+														? mbQuiz
+																.flatMap(q =>
+																	maybe(
+																		q.questions.find(
+																			q => q.uid === cmt.relatedQuestion
+																		)?.text
 																	)
-																	.orElse("")
-																	.substring(0, 20)
-															: undefined
-													}
-												/>
-											</div>
-										))
-									)
-									.orElse([<Fragment key="key-1" />])}
-							</CommentsContainer>
-						</Row>
+																)
+																.orElse("")
+																.substring(0, 20)
+														: undefined
+												}
+											/>
+										</div>
+									))
+								)
+								.orElse([<Fragment key="key-1" />])}
+						</CommentsContainer>
 
 						{!disableForStudent && (
 							<div className="my-4">

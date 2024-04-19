@@ -83,40 +83,42 @@ export const QuizButtons = (props: {
 				titleId={i18n._("leave-quiz-modal-title")}
 				textId={i18n._("leave-quiz-modal-text")}
 			/>
-
-			<div className="row gap-2 justify-content-end flex-column-reverse flex-lg-row">
+			<div className="d-flex gap-2 justify-content-end flex-column-reverse flex-lg-row">
 				<Button
 					variant="outline-primary"
-					className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+					className="ps-1 d-flex justify-content-center align-items-center"
 					onClick={() => setShareModal(props.uniqueLink)}
 				>
 					<QrCode className="mx-1" />
 					<Trans id="quiz-show-qr-code-button" />
 				</Button>
+
 				{props.quizState !== "EDITING" && (
 					<Button
 						variant="success"
-						className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+						className="ps-1 d-flex justify-content-center align-items-center"
 						onClick={editQuizMode}
 					>
 						<Pencil className="mx-1" />
 						<Trans id="edit-quiz-button" />
 					</Button>
 				)}
+
 				{props.quizState !== "STOPPED" && (
 					<Button
 						variant="success"
-						className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+						className="ps-1 d-flex justify-content-center align-items-center"
 						onClick={stopQuizMode}
 					>
 						<StopFill size={24} />
 						<Trans id="freeze-quiz-button" />
 					</Button>
 				)}
+
 				{props.quizState !== "STARTED" && (
 					<Button
 						variant="success"
-						className="col-12 col-lg-auto d-flex justify-content-center align-items-center"
+						className="d-flex justify-content-center align-items-center"
 						onClick={startQuizMode}
 					>
 						<Play size={24} />

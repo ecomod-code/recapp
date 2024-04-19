@@ -8,7 +8,6 @@ import {
 	UserStoreMessage,
 	UserStoreMessages,
 	UserUpdateMessage,
-	toId,
 	uidSchema,
 	userSchema,
 } from "@recapp/models";
@@ -209,15 +208,14 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const db = await this.connector.db();
 					const users = await db.collection<User>(this.collectionName).find({}).toArray();
 					const user = users.find(u => u.nickname === query || u.uid === query || u.email === query);
-					console.log(user, users);
 					if (user) {
 						if (role === "STUDENT") {
-							return user.uid;
+							return user;
 						} else if (user.role !== "STUDENT") {
-							return user.uid;
+							return user;
 						}
 					}
-					return toId("");
+					return new Error(`User not found with query <${query}>`);
 				},
 				GetNames: async ids => {
 					const db = await this.connector.db();

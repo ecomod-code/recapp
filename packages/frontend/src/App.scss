@@ -98,3 +98,16 @@
     width: 80vw !important;
     max-width: 80vw !important;
 }
+
+.text-overflow-ellipsis {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.user-admin-card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
+    row-gap: 2rem;
+    column-gap: 1rem;
+}

@@ -46,39 +46,39 @@ export const UserCard = ({ user, ownUser }: Props) => {
                 onSubmit={onSubmit}
             />
 
-            <Card className="p-0 m-1" style={{ width: "16rem" }}>
-                <Card.Title className="p-1 ps-2 text-bg-primary text-start">
-                    <div className="d-flex align-items-center">
-                        <p
-                            className="flex-grow-1 m-0"
-                            style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
-                        >
-                            {user.username}
-                        </p>
-                        <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
-                            <Pencil height="1rem" onClick={() => setIsModalVisible(true)} />
-                        </ButtonWithTooltip>
-                    </div>
+            <Card className="position-relative overflow-hidden">
+                <div style={{ position: "absolute", top: -18, left: 0, fontSize: 12, color: "grey" }}>
+                    {i18n._({
+                        id: "user-last-login: {date}",
+                        values: {
+                            date: fromTimestamp(user.lastLogin ?? toTimestamp()).toLocaleString({
+                                dateStyle: "medium",
+                                timeStyle: "medium",
+                            }),
+                        },
+                    })}
+                </div>
+                <Card.Title className="p-3 ps-2 text-bg-primary">
+                    <p className="text-overflow-ellipsis m-0">{user.username}</p>
                 </Card.Title>
-                <Card.Body>
-                    <Card.Text as="div" className="text-start">
-                        <div className="d-flex flex-row align-items-center mb-2">
-                            <div className="d-flex flex-row align-items-center flex-fill">
-                                <UserActive active={user.active} />
-                                <div>&nbsp;{user.uid}</div>
-                            </div>
-                            <RoleBadge role={user.role} />
-                        </div>
-                        <div className="fst-italic">{user.nickname ? `aka ${user.nickname}` : " "}</div>
-                    </Card.Text>
-                </Card.Body>
-                <Card.Footer className="w-100">
-                    <div className="text-start">
-                        {i18n._({
-                            id: "user-last-login: {date}",
-                            values: { date: fromTimestamp(user.lastLogin ?? toTimestamp()).toLocaleString() },
-                        })}
+
+                <Card.Body className="d-flex flex-column justify-content-between">
+                    <div className="mb-2 d-flex">
+                        <UserActive active={user.active} />
+                        <span>&nbsp;{user.uid}</span>
                     </div>
+
+                    <div className="fst-italic mb-2">{user.nickname ? `aka ${user.nickname}` : " "}</div>
+
+                    <div>
+                        <RoleBadge role={user.role} />
+                    </div>
+                </Card.Body>
+
+                <Card.Footer className="d-flex justify-content-end">
+                    <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
+                        <Pencil height="1rem" onClick={() => setIsModalVisible(true)} />
+                    </ButtonWithTooltip>
                 </Card.Footer>
             </Card>
         </>

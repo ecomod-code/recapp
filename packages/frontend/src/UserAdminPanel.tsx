@@ -48,7 +48,7 @@ export const UserAdminPanel: React.FC = () => {
                     />
                 </InputGroup>
             </Row>
-            <div className="d-flex flex-wrap">
+            <div className="pt-4 user-admin-card-list">
                 {users.orElse<User[]>([]).map((user: User) => (
                     <UserCard key={user.uid} user={user} ownUser={localUser.map(l => l.user)} />
                 ))}

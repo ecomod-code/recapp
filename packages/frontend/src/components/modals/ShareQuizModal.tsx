@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
@@ -78,24 +78,29 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
         onClose();
     };
 
+    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        add();
+    };
+
     return mbShare
         .map(s => s.teachers)
         .match(
             teachers => {
                 return (
                     <Modal show={show}>
-                        <Modal.Title className="p-1 ps-2 text-bg-primary">
+                        <Modal.Title className="p-3 ps-3 text-bg-primary rounded-top-2">
                             <Trans id="share-with-teachers-modal-title" />
                         </Modal.Title>
                         <Modal.Body>
-                            <div className="mb-2 mt-2" style={{ minHeight: 48 }}>
+                            <div className="p-2 mb-2 mt-2" style={{ minHeight: 48 }}>
                                 {teachers.length === 0 && (
                                     <span style={{ color: "lightgray" }}>
                                         <Trans id="share-with-teachers-persons-to-add" />
                                     </span>
                                 )}
 
-                                <div className="d-flex flex-wrap">
+                                <div className="d-flex flex-wrap gap-2">
                                     {teachers.map((t, i) => {
                                         const isQuizCreator = i === 0;
                                         return (
@@ -109,25 +114,38 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                     })}
                                 </div>
                             </div>
-                            <Form.Control
-                                value={name}
-                                placeholder="ID, Email oder Pseudonym"
-                                onChange={event => {
-                                    const name = event.target.value;
-                                    setName(name);
-                                }}
-                            />
-                            <Button variant="primary" onClick={add} className="mt-4">
-                                <Trans id="share-quiz-modal.button-label.add" />
-                            </Button>
+                            <Form onSubmit={onSubmit}>
+                                <Form.Group className="mt-3 d-flex flex-column flex-sm-row gap-2 border-top pt-3">
+                                    <Form.Control
+                                        className="border-secondary"
+                                        value={name}
+                                        autoFocus
+                                        placeholder="ID, Email oder Pseudonym"
+                                        onChange={event => {
+                                            const name = event.target.value;
+                                            setName(name);
+                                        }}
+                                    />
+                                    <Button
+                                        variant="warning"
+                                        type="submit"
+                                        // onClick={add}
+                                    >
+                                        <Trans id="share-quiz-modal.button-label.add" />
+                                    </Button>
+                                </Form.Group>
+                            </Form>
                         </Modal.Body>
                         <Modal.Footer>
-                            <Button variant="primary" onClick={share}>
-                                <Trans id="share-with-confirmed-users" />
-                            </Button>
-                            <Button variant="warning" onClick={cancel}>
-                                <Trans id="cancel" />
-                            </Button>
+                            <Form.Group className="flex-fill d-flex align-items-center justify-content-end flex-column-reverse flex-sm-row gap-2">
+                                <Button variant="secondary" className="align-self-stretch" onClick={cancel}>
+                                    <Trans id="cancel" />
+                                </Button>
+
+                                <Button variant="primary" className="align-self-stretch" onClick={share}>
+                                    <Trans id="share-with-confirmed-users" />
+                                </Button>
+                            </Form.Group>
                         </Modal.Footer>
                     </Modal>
                 );
@@ -146,7 +164,7 @@ const TeacherTag = ({
     onClick: () => void;
 }) => {
     return (
-        <div key={teacher.uid} className="d-flex justify-content-start align-items-center me-2 border">
+        <div key={teacher.uid} className="d-flex justify-content-start align-items-center border">
             {isButtonVisible ? (
                 <ButtonWithTooltip
                     title={i18n._("share-quiz-modal.button-tooltip.clear")}

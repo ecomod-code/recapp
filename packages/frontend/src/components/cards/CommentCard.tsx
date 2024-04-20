@@ -61,7 +61,7 @@ export const CommentCardContent: React.FC<
 
     return (
         <Card
-            className={`${isDisplayedInModal ? "p-0 m-0" : "p-0 m-1 mt-2 mb-3"}`}
+            className={`${isDisplayedInModal ? "p-0 m-0" : "p-0 m-1 mt-2 mb-3"} overflow-hidden`}
             style={{ minWidth: "18rem" }}
             key={comment.uid}
         >

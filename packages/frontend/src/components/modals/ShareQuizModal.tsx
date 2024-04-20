@@ -88,8 +88,8 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
         .match(
             teachers => {
                 return (
-                    <Modal show={show}>
-                        <Modal.Title className="p-3 ps-3 text-bg-primary rounded-top-2">
+                    <Modal show={show} contentClassName="overflow-hidden">
+                        <Modal.Title className="p-3 ps-3 text-bg-primary">
                             <Trans id="share-with-teachers-modal-title" />
                         </Modal.Title>
                         <Modal.Body>

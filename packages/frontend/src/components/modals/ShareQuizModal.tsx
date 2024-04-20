@@ -128,6 +128,7 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                     />
                                     <Button
                                         variant="warning"
+                                        disabled={!name}
                                         type="submit"
                                         // onClick={add}
                                     >

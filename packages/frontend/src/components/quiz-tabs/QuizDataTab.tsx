@@ -250,23 +250,24 @@ export const QuizDataTab: React.FC = () => {
                                 onChange={event => update({ shuffleQuestions: event.target.checked })}
                             />
                         </ListGroupContainer>
-                        <Button
-                            variant="warning"
-                            className="mt-3"
-                            onClick={() => setArchiveModal(true)}
-                            disabled={quiz.state === "STARTED"}
-                        >
-                            <Trans id="archive-quiz-button" />
-                        </Button>
-                        &nbsp;
-                        <Button
-                            variant="secondary"
-                            className="mt-3"
-                            onClick={startExport}
-                            disabled={quiz.state === "STARTED"}
-                        >
-                            <Trans id="export-quiz-button" />
-                        </Button>
+                        <div className="d-flex justify-content-end gap-2">
+                            <Button
+                                variant="secondary"
+                                className="mt-3"
+                                onClick={startExport}
+                                disabled={quiz.state === "STARTED"}
+                            >
+                                <Trans id="export-quiz-button" />
+                            </Button>
+                            <Button
+                                variant="warning"
+                                className="mt-3"
+                                onClick={() => setArchiveModal(true)}
+                                disabled={quiz.state === "STARTED"}
+                            >
+                                <Trans id="archive-quiz-button" />
+                            </Button>
+                        </div>
                     </Form>
                 );
             },

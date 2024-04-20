@@ -6,7 +6,7 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useRendered } from "../../hooks/useRendered";
-import { Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
+import { Calendar2Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { fromTimestamp } from "itu-utils";
 import { Comment, Id } from "@recapp/models";
@@ -127,7 +127,7 @@ export const CommentCardContent: React.FC<
                             onClick={onAccept}
                             disabled={!teachers.includes(userId)}
                         >
-                            <Check />
+                            <Calendar2Check size={18} />
                         </ButtonWithTooltip>
                         <ButtonWithTooltip
                             title={i18n._("comment-card.button-tooltip.delete")}

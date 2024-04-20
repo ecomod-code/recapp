@@ -8,25 +8,96 @@ import { fromTimestamp, toTimestamp } from "itu-utils";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import { CheckCircleFill, CircleFill, Pencil } from "react-bootstrap-icons";
+import { EditUserModal } from "../modals/EditUserModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { actorUris } from "../../actorUris";
-import { ChangeNameModal } from "../modals/ChangeNameModal";
-import { ChangeActiveModal } from "../modals/ChangeActiveModal";
-import { ChangeRoleModal } from "../modals/ChangeRoleModal";
+// import { ChangeNameModal } from "../modals/ChangeNameModal";
+// import { ChangeActiveModal } from "../modals/ChangeActiveModal";
+// import { ChangeRoleModal } from "../modals/ChangeRoleModal";
 
-const UserActive: React.FC<{ active: boolean; onClick: () => void }> = ({ active, onClick }) => {
+interface Props {
+    user: User;
+    ownUser: Maybe<User>;
+}
+
+export const UserCard = ({ user, ownUser }: Props) => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [, actor] = useStatefulActor<{ users: User[] }>("UserAdmin");
+
+    const close = () => {
+        setIsModalVisible(false);
+    };
+
+    const onSubmit = ({ username, role, active }: Pick<User, "username" | "role" | "active">) => {
+        actor.forEach(a =>
+            a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, username, role, active }))
+        );
+
+        setIsModalVisible(false);
+    };
+
+    return (
+        <>
+            <EditUserModal //
+                show={isModalVisible}
+                user={user}
+                onClose={close}
+                ownRole={ownUser.map(o => o.role).orElse("STUDENT")}
+                onSubmit={onSubmit}
+            />
+
+            <Card className="p-0 m-1" style={{ width: "16rem" }}>
+                <Card.Title className="p-1 ps-2 text-bg-primary text-start">
+                    <div className="d-flex align-items-center">
+                        <p
+                            className="flex-grow-1 m-0"
+                            style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}
+                        >
+                            {user.username}
+                        </p>
+                        <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
+                            <Pencil height="1rem" onClick={() => setIsModalVisible(true)} />
+                        </ButtonWithTooltip>
+                    </div>
+                </Card.Title>
+                <Card.Body>
+                    <Card.Text as="div" className="text-start">
+                        <div className="d-flex flex-row align-items-center mb-2">
+                            <div className="d-flex flex-row align-items-center flex-fill">
+                                <UserActive active={user.active} />
+                                <div>&nbsp;{user.uid}</div>
+                            </div>
+                            <RoleBadge role={user.role} />
+                        </div>
+                        <div className="fst-italic">{user.nickname ? `aka ${user.nickname}` : " "}</div>
+                    </Card.Text>
+                </Card.Body>
+                <Card.Footer className="w-100">
+                    <div className="text-start">
+                        {i18n._({
+                            id: "user-last-login: {date}",
+                            values: { date: fromTimestamp(user.lastLogin ?? toTimestamp()).toLocaleString() },
+                        })}
+                    </div>
+                </Card.Footer>
+            </Card>
+        </>
+    );
+};
+
+const UserActive = (props: { active: boolean }) => {
     return (
         <div>
-            {active ? (
-                <CheckCircleFill onClick={onClick} color="green" size="1.5rem" style={{ paddingBottom: 4 }} />
+            {props.active ? (
+                <CheckCircleFill color="green" size="1.5rem" style={{ paddingBottom: 4 }} />
             ) : (
-                <CircleFill onClick={onClick} color="grey" size="1.5rem" style={{ paddingBottom: 4 }} />
+                <CircleFill color="grey" size="1.5rem" style={{ paddingBottom: 4 }} />
             )}
         </div>
     );
 };
 
-const RoleBadge: React.FC<{ role: UserRole; onClick: () => void }> = ({ role, onClick }) => {
+const RoleBadge = (props: { role: UserRole }) => {
     const roleProps: Record<UserRole, { color: "success" | "info" | "dark"; name: string }> = {
         ADMIN: {
             color: "success",
@@ -42,97 +113,10 @@ const RoleBadge: React.FC<{ role: UserRole; onClick: () => void }> = ({ role, on
         },
     };
 
-    const { color, name } = roleProps[role];
+    const { color, name } = roleProps[props.role];
     return (
-        <Badge as="div" bg={color} onClick={onClick}>
+        <Badge as="div" bg={color}>
             {name}
         </Badge>
-    );
-};
-
-export const UserCard: React.FC<{ user: User; ownUser: Maybe<User> }> = ({ user, ownUser }) => {
-    const [modal, setModal] = useState<false | "Name" | "Active" | "Role">(false);
-    const [, actor] = useStatefulActor<{ users: User[] }>("UserAdmin");
-    const toggleActivate = () => {
-        actor.forEach(a =>
-            a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, active: !user.active }))
-        );
-        setModal(false);
-    };
-    const changeRole = (role: UserRole) => {
-        actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, role })));
-        setModal(false);
-    };
-    const changeName = (username: string) => {
-        actor.forEach(a => a.send(actorUris.UserStore, UserStoreMessages.Update({ uid: user.uid, username })));
-        setModal(false);
-    };
-    const close = () => {
-        setModal(false);
-    };
-
-    return (
-        <>
-            <ChangeNameModal
-                show={modal === "Name"}
-                defaultValue={user.username}
-                onClose={close}
-                onSubmit={changeName}
-            />
-            <ChangeActiveModal
-                show={modal === "Active"}
-                active={!!user.active}
-                onClose={close}
-                onSubmit={toggleActivate}
-            />
-            <ChangeRoleModal
-                show={modal === "Role"}
-                currentRole={user.role}
-                ownRole={ownUser.map(o => o.role).orElse("STUDENT")}
-                onClose={close}
-                onSubmit={changeRole}
-            />
-
-            <Card className="p-0 m-1" style={{ width: "16rem" }}>
-                <Card.Title className="p-1 ps-2 text-bg-primary text-start" style={{ background: "darkGrey" }}>
-                    <div className="d-flex align-items-center">
-                        <div className="flex-grow-1">{user.username}</div>
-                        <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
-                            <Pencil height="1rem" onClick={() => setModal("Name")} />
-                        </ButtonWithTooltip>
-                    </div>
-                </Card.Title>
-                <Card.Body>
-                    <Card.Text as="div" className="text-start">
-                        <div className="d-flex flex-row align-items-center mb-2">
-                            <div className="d-flex flex-row align-items-center flex-fill">
-                                <UserActive
-                                    active={user.active}
-                                    onClick={() =>
-                                        user.uid !== ownUser.map(o => o.uid).orElse(user.uid) && setModal("Active")
-                                    }
-                                />
-                                <div>&nbsp;{user.uid}</div>
-                            </div>
-                            <RoleBadge
-                                role={user.role}
-                                onClick={() =>
-                                    user.uid !== ownUser.map(o => o.uid).orElse(user.uid) && setModal("Role")
-                                }
-                            />
-                        </div>
-                        <div className="fst-italic">{user.nickname ? `aka ${user.nickname}` : " "}</div>
-                    </Card.Text>
-                </Card.Body>
-                <Card.Footer className="w-100">
-                    <div className="text-start">
-                        {i18n._({
-                            id: "user-last-login: {date}",
-                            values: { date: fromTimestamp(user.lastLogin ?? toTimestamp()).toLocaleString() },
-                        })}
-                    </div>
-                </Card.Footer>
-            </Card>
-        </>
     );
 };

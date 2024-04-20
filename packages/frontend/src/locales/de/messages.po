@@ -19,6 +19,21 @@ msgstr ""
 msgid "login-page.login"
 msgstr "Anmelden"
 
+#. js-lingui-explicit-id
+#: src/components/modals/EditUserModal.tsx:42
+msgid "edit-user-modal.input-label.user-name"
+msgstr "Benutzernamen"
+
+#. js-lingui-explicit-id
+#: src/components/modals/EditUserModal.tsx:50
+msgid "edit-user-modal.input-label.user-role"
+msgstr "Benutzerrolle"
+
+#. js-lingui-explicit-id
+#: src/components/modals/EditUserModal.tsx:73
+msgid "edit-user-modal.input-label.user-status"
+msgstr "Benutzerstatus"
+
 #: src/components/cards/CommentCard.tsx:22
 msgid "comments-container.toggle-button.label"
 msgstr "Neil: comment-toggle-button-label"

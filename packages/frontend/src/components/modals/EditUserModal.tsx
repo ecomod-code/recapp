@@ -21,9 +21,9 @@ export const EditUserModal: React.FC<Props> = ({ user, ownRole, show, onClose, o
     const [active, setActive] = useState(!!user.active);
 
     return (
-        <Modal show={show}>
-            <Modal.Title className="p-1 ps-2 text-bg-primary">
-                <Trans id="user-change-username-modal-title" />
+        <Modal show={show} contentClassName="overflow-hidden">
+            <Modal.Title className="p-3 ps-3 text-bg-primary">
+                <Trans id="edit-user-modal.modal-title" />
             </Modal.Title>
 
             <Modal.Body>
@@ -68,11 +68,12 @@ export const EditUserModal: React.FC<Props> = ({ user, ownRole, show, onClose, o
             </Modal.Body>
 
             <Modal.Footer>
-                <Button className="m-1" onClick={() => onSubmit({ username, role, active })}>
-                    <Trans id="okay" />
-                </Button>
-                <Button className="m-1" onClick={onClose}>
+                <Button variant="outline-primary" onClick={onClose}>
                     <Trans id="cancel" />
+                </Button>
+
+                <Button onClick={() => onSubmit({ username, role, active })}>
+                    <Trans id="okay" />
                 </Button>
             </Modal.Footer>
         </Modal>

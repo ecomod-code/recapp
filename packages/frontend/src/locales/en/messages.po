@@ -21,6 +21,11 @@ msgstr "Login"
 
 #. js-lingui-explicit-id
 #: src/components/modals/EditUserModal.tsx:42
+msgid "edit-user-modal.modal-title"
+msgstr "Edit user"
+
+#. js-lingui-explicit-id
+#: src/components/modals/EditUserModal.tsx:42
 msgid "edit-user-modal.input-label.user-name"
 msgstr "Username"
 

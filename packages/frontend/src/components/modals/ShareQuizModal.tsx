@@ -139,7 +139,7 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                         </Modal.Body>
                         <Modal.Footer>
                             <Form.Group className="flex-fill d-flex align-items-center justify-content-end flex-column-reverse flex-sm-row gap-2">
-                                <Button variant="secondary" className="align-self-stretch" onClick={cancel}>
+                                <Button variant="outline-primary" className="align-self-stretch" onClick={cancel}>
                                     <Trans id="cancel" />
                                 </Button>
 

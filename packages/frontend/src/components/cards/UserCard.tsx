@@ -76,8 +76,12 @@ export const UserCard = ({ user, ownUser }: Props) => {
                 </Card.Body>
 
                 <Card.Footer className="d-flex justify-content-end">
-                    <ButtonWithTooltip title={i18n._("user-card.button-tooltip.edit")} className="m-0">
-                        <Pencil height="1rem" onClick={() => setIsModalVisible(true)} />
+                    <ButtonWithTooltip
+                        title={i18n._("user-card.button-tooltip.edit")}
+                        className="m-0"
+                        onClick={() => setIsModalVisible(true)}
+                    >
+                        <Pencil height="1rem" />
                     </ButtonWithTooltip>
                 </Card.Footer>
             </Card>

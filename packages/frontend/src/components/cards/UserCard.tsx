@@ -48,7 +48,7 @@ export const UserCard = ({ user, ownUser }: Props) => {
             />
 
             <div className="position-relative">
-                <div style={{ position: "absolute", top: -18, left: 2, fontSize: 12, color: "grey" }}>
+                <div style={{ position: "absolute", top: -20, left: 2, fontSize: 14, color: "grey" }}>
                     {i18n._({
                         id: "user-last-login: {date}",
                         values: {

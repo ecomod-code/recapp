@@ -21,7 +21,7 @@ export const QuizCard: React.FC<{
 	const nav = useNavigate();
 	return (
 		<div className="p-0 position-relative" style={{ margin: "2.5rem 0.5rem" }}>
-			<div style={{ position: "absolute", top: -18, left: 2, fontSize: 12, color: "grey" }}>
+			<div style={{ position: "absolute", top: -20, left: 2, fontSize: 14, color: "grey" }}>
 				<Trans id="quiz-card-last-change" />
 				&nbsp;
 				{fromTimestamp(quiz.updated ?? -1).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}

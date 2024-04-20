@@ -1,11 +1,9 @@
 import { ActorRef, ActorSystem } from "ts-actors";
 import { StatefulActor } from "ts-actors-react";
-import { Id, Quiz, QuizActorMessages, User, UserStoreMessages, Validator, toId } from "@recapp/models";
-import { Unit, toTimestamp, unit } from "itu-utils";
+import { Id, Quiz, QuizActorMessages, UserStoreMessages, toId } from "@recapp/models";
+import { Unit, unit } from "itu-utils";
 import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
-import { clone, keys } from "rambda";
-import { Maybe, nothing, maybe } from "tsmonads";
 import { ErrorMessages } from "./ErrorActor";
 import { v4 } from "uuid";
 
@@ -22,13 +20,14 @@ export const SharingMessages = unionize(
 
 export type SharingMessage = UnionOf<typeof SharingMessages>;
 
-export type NotFoundError = { id: Id; queryNotFound: string };
+export type NotFoundError = { id: Id; queryNotFound: string; alreadyExists?: never };
+export type AlreadyExists = { id: Id; queryNotFound?: never; alreadyExists: string };
 
 export type SharedUser = { query: string; uid: Id; name: string };
 
 export type SharingState = {
 	teachers: SharedUser[];
-	errors: NotFoundError[];
+    errors: (NotFoundError | AlreadyExists)[];
 };
 
 export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingState> {
@@ -50,21 +49,29 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 				});
 			},
 			AddEntry: query => {
-				this.ask<unknown, Id>(actorUris["UserStore"], UserStoreMessages.Find({ query, role: "TEACHER" })).then(
-					(userOrError: any) => {
+				this.ask<unknown, Id>(actorUris["UserStore"], UserStoreMessages.Find({ query, role: "TEACHER" }))
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    .then((userOrError: any) => {
 						console.log("FIND RESULT", userOrError);
 						if (userOrError.uid) {
-							this.updateState(draft => {
-								draft.teachers = draft.teachers.filter(t => t.query !== query);
-								draft.teachers.push({ query, uid: userOrError.uid, name: userOrError.username });
-							});
+                            this.updateState(draft => {
+                                const isAlreadyExists = draft.teachers.some(x => x.uid === userOrError.uid);
+                                if (isAlreadyExists) {
+                                    this.updateState(draft => {
+                                        draft.errors.push({ id: toId(v4()), alreadyExists: query });
+                                    });
+                                } else {
+                                    // draft.teachers = draft.teachers.filter(t => t.query !== query);
+                                    draft.teachers = draft.teachers.filter(t => t.uid !== userOrError.uid);
+                                    draft.teachers.push({ query, uid: userOrError.uid, name: userOrError.username });
+                                }
+                            });
 						} else {
 							this.updateState(draft => {
 								draft.errors.push({ id: toId(v4()), queryNotFound: query });
 							});
 						}
-					}
-				);
+					});
 			},
 			Clear: () => {
 				this.updateState(draft => {

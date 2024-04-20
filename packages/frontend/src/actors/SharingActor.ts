@@ -57,9 +57,7 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
                             this.updateState(draft => {
                                 const isAlreadyExists = draft.teachers.some(x => x.uid === userOrError.uid);
                                 if (isAlreadyExists) {
-                                    this.updateState(draft => {
-                                        draft.errors.push({ id: toId(v4()), alreadyExists: query });
-                                    });
+									draft.errors.push({ id: toId(v4()), alreadyExists: query });
                                 } else {
                                     // draft.teachers = draft.teachers.filter(t => t.query !== query);
                                     draft.teachers = draft.teachers.filter(t => t.uid !== userOrError.uid);

@@ -43,11 +43,12 @@ export const UserCard = ({ user, ownUser }: Props) => {
                 user={user}
                 onClose={close}
                 ownRole={ownUser.map(o => o.role).orElse("STUDENT")}
+                isOwnAccount={ownUser.map(o => o.uid === user.uid).orElse(false)}
                 onSubmit={onSubmit}
             />
 
-            <Card className="position-relative overflow-hidden">
-                <div style={{ position: "absolute", top: -18, left: 0, fontSize: 12, color: "grey" }}>
+            <div className="position-relative">
+                <div style={{ position: "absolute", top: -18, left: 2, fontSize: 12, color: "grey" }}>
                     {i18n._({
                         id: "user-last-login: {date}",
                         values: {
@@ -58,33 +59,35 @@ export const UserCard = ({ user, ownUser }: Props) => {
                         },
                     })}
                 </div>
-                <Card.Title className="p-3 ps-2 text-bg-primary">
-                    <p className="text-overflow-ellipsis m-0">{user.username}</p>
-                </Card.Title>
+                <Card className="overflow-hidden">
+                    <Card.Title className="p-3 ps-2 text-bg-primary">
+                        <p className="text-overflow-ellipsis m-0">{user.username}</p>
+                    </Card.Title>
 
-                <Card.Body className="d-flex flex-column justify-content-between">
-                    <div className="mb-2 d-flex">
-                        <UserActive active={user.active} />
-                        <span>&nbsp;{user.uid}</span>
-                    </div>
+                    <Card.Body className="d-flex flex-column justify-content-between">
+                        <div className="mb-2 d-flex">
+                            <UserActive active={user.active} />
+                            <span>&nbsp;{user.uid}</span>
+                        </div>
 
-                    <div className="fst-italic mb-2">{user.nickname ? `aka ${user.nickname}` : " "}</div>
+                        <div className="fst-italic mb-2">{user.nickname ? `aka ${user.nickname}` : " "}</div>
 
-                    <div>
-                        <RoleBadge role={user.role} />
-                    </div>
-                </Card.Body>
+                        <div>
+                            <RoleBadge role={user.role} />
+                        </div>
+                    </Card.Body>
 
-                <Card.Footer className="d-flex justify-content-end">
-                    <ButtonWithTooltip
-                        title={i18n._("user-card.button-tooltip.edit")}
-                        className="m-0"
-                        onClick={() => setIsModalVisible(true)}
-                    >
-                        <Pencil height="1rem" />
-                    </ButtonWithTooltip>
-                </Card.Footer>
-            </Card>
+                    <Card.Footer className="d-flex justify-content-end">
+                        <ButtonWithTooltip
+                            title={i18n._("user-card.button-tooltip.edit")}
+                            className="m-0"
+                            onClick={() => setIsModalVisible(true)}
+                        >
+                            <Pencil height="1rem" />
+                        </ButtonWithTooltip>
+                    </Card.Footer>
+                </Card>
+            </div>
         </>
     );
 };

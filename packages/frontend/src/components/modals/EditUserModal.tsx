@@ -10,12 +10,13 @@ const LABEL_MIN_WIDTH = 140;
 interface Props {
     user: User;
     ownRole: UserRole;
+    isOwnAccount: boolean;
     show: boolean;
     onClose: () => void;
     onSubmit: ({ username, role, active }: Pick<User, "username" | "role" | "active">) => void;
 }
 
-export const EditUserModal: React.FC<Props> = ({ user, ownRole, show, onClose, onSubmit }) => {
+export const EditUserModal = ({ user, ownRole, isOwnAccount, show, onClose, onSubmit }: Props) => {
     const [username, setUserName] = useState(user.username);
     const [role, setRole] = useState(user.role);
     const [active, setActive] = useState(!!user.active);
@@ -38,7 +39,11 @@ export const EditUserModal: React.FC<Props> = ({ user, ownRole, show, onClose, o
                     <Form.Label style={{ minWidth: LABEL_MIN_WIDTH }}>
                         <Trans id="edit-user-modal.input-label.user-role" />
                     </Form.Label>
-                    <Form.Select value={role} onChange={e => setRole(e.target.value as UserRole)}>
+                    <Form.Select
+                        disabled={isOwnAccount}
+                        value={role}
+                        onChange={e => setRole(e.target.value as UserRole)}
+                    >
                         <option value="STUDENT">
                             <Trans id="role-name-student" />
                         </option>
@@ -60,6 +65,7 @@ export const EditUserModal: React.FC<Props> = ({ user, ownRole, show, onClose, o
                         <Trans id="edit-user-modal.input-label.user-status" />
                     </Form.Label>
                     <Form.Switch
+                        disabled={isOwnAccount}
                         className="list-group-item ps-5"
                         checked={active}
                         onChange={() => setActive(prev => !prev)}

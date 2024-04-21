@@ -64,13 +64,13 @@ export const UserCard = ({ user, ownUser }: Props) => {
                         <p className="text-overflow-ellipsis m-0">{user.username}</p>
                     </Card.Title>
 
-                    <Card.Body className="d-flex flex-column justify-content-between">
-                        <div className="mb-2 d-flex">
+                    <Card.Body style={{ minHeight: 120 }} className="d-flex flex-column justify-content-between">
+                        <div className="mb-1 d-flex">
                             <UserActive active={user.active} />
                             <span>&nbsp;{user.uid}</span>
                         </div>
 
-                        <div className="fst-italic mb-2">{user.nickname ? `aka ${user.nickname}` : " "}</div>
+                        <div className="fst-italic mb-1">{user.nickname ? `aka ${user.nickname}` : " "}</div>
 
                         <div>
                             <RoleBadge role={user.role} />

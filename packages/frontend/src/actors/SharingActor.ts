@@ -13,6 +13,7 @@ export const SharingMessages = unionize(
 		AddEntry: ofType<string>(),
 		DeleteEntry: ofType<Id>(),
 		Clear: {},
+		DeleteError: ofType<Id>(),
 		Share: ofType<Quiz>(),
 	},
 	{ value: "value" }
@@ -46,6 +47,11 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 			DeleteEntry: id => {
 				this.updateState(draft => {
 					draft.teachers = draft.teachers.filter(t => t.uid !== id);
+				});
+			},
+			DeleteError: id => {
+				this.updateState(draft => {
+					draft.errors = draft.errors.filter(error => error.id !== id);
 				});
 			},
 			AddEntry: query => {

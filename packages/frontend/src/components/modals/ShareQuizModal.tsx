@@ -2,11 +2,13 @@ import { FormEvent, useEffect, useRef, useState } from "react";
 import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz } from "@recapp/models";
+import { Id, Quiz } from "@recapp/models";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import Alert from "react-bootstrap/Alert";
+import CloseButton from "react-bootstrap/CloseButton";
 import { X } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { SharedUser, SharingMessages, SharingState } from "../../actors/SharingActor";
@@ -23,6 +25,8 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
     const [mbQuiz] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
     const [mbShare, tryActor] = useStatefulActor<SharingState>("QuizSharing");
     const firstRenderRef = useRef(true);
+
+    const errors: SharingState["errors"] = mbShare.map(s => s.errors).orElse([]);
 
     const tNames: string[] = mbQuiz.map(s => s.teacherNames).orElse([]);
 
@@ -68,6 +72,10 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
         tryActor.forEach(actor => actor.send(actor, SharingMessages.DeleteEntry(teacher.uid)));
     };
 
+    const onDeleteError = (errorId: Id) => {
+        tryActor.forEach(actor => actor.send(actor, SharingMessages.DeleteError(errorId)));
+    };
+
     const cancel = () => {
         setName("");
         handleClose();
@@ -93,6 +101,9 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                             <Trans id="share-with-teachers-modal-title" />
                         </Modal.Title>
                         <Modal.Body>
+                            {errors.map(error => (
+                                <ErrorAlert key={error.id} error={error} onDeleteError={onDeleteError} />
+                            ))}
                             <div className="p-2 mb-2 mt-2" style={{ minHeight: 48 }}>
                                 {teachers.length === 0 && (
                                     <span style={{ color: "lightgray" }}>
@@ -179,5 +190,41 @@ const TeacherTag = ({
 
             <span style={{ padding: "6px 10px" }}>{teacher.name}</span>
         </div>
+    );
+};
+
+const ErrorAlert = ({
+    error,
+    onDeleteError,
+}: {
+    error: SharingState["errors"][number];
+    onDeleteError: (errorId: Id) => void;
+}) => {
+    useEffect(() => {
+        setTimeout(() => {
+            onDeleteError(error.id);
+        }, 2000);
+    }, []);
+
+    const onClick = () => {
+        onDeleteError(error.id);
+    };
+
+    return (
+        <Alert className="alert-warning d-flex justify-content-between">
+            <span>
+                {error.alreadyExists ? (
+                    <span>
+                        <strong>{error.alreadyExists}</strong> already exists
+                    </span>
+                ) : null}
+                {error.queryNotFound ? (
+                    <span>
+                        Could not found: <strong>{error.queryNotFound}</strong>
+                    </span>
+                ) : null}
+            </span>
+            <CloseButton onClick={onClick} />
+        </Alert>
     );
 };

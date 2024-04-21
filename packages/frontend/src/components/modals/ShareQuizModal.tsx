@@ -211,25 +211,31 @@ const ErrorAlert = ({
     };
 
     return (
-        <Alert className="alert-warning d-flex justify-content-between">
+        <>
             {error.alreadyExists ? (
-                <span>
-                    <strong>
-                        <u>{error.alreadyExists}</u>
-                    </strong>{" "}
-                    <Trans id="share-quiz-modal.error-alert.already-exists" />
-                </span>
+                <Alert className="alert-info d-flex justify-content-between">
+                    <span>
+                        <strong>
+                            <u>{error.alreadyExists}</u>
+                        </strong>{" "}
+                        <Trans id="share-quiz-modal.error-alert.already-exists" />
+                    </span>
+
+                    <CloseButton onClick={onClick} />
+                </Alert>
             ) : null}
 
             {error.queryNotFound ? (
-                <span>
-                    <strong>
-                        <u>{error.queryNotFound}</u>
-                    </strong>{" "}
-                    <Trans id="share-quiz-modal.error-alert.do-not-exist" />
-                </span>
+                <Alert className="alert-warning d-flex justify-content-between">
+                    <span>
+                        <strong>
+                            <u>{error.queryNotFound}</u>
+                        </strong>{" "}
+                        <Trans id="share-quiz-modal.error-alert.do-not-exist" />
+                    </span>
+                    <CloseButton onClick={onClick} />
+                </Alert>
             ) : null}
-            <CloseButton onClick={onClick} />
-        </Alert>
+        </>
     );
 };

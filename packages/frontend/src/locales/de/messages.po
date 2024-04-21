@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:221
+msgid "share-quiz-modal.error-alert.already-exists"
+msgstr "Neil: the searched teacher name already exists"
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:229
+msgid "share-quiz-modal.error-alert.do-not-exist"
+msgstr "Neil: the searched teacher name don't exist"
+
+#. js-lingui-explicit-id
 #: src/components/modals/EditUserModal.tsx:42
 msgid "edit-user-modal.modal-title"
 msgstr "Benutzer bearbeiten"

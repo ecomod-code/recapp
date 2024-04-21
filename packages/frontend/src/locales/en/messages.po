@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:221
+msgid "share-quiz-modal.error-alert.already-exists"
+msgstr ""
+
+#. js-lingui-explicit-id
+#: src/components/modals/ShareQuizModal.tsx:229
+msgid "share-quiz-modal.error-alert.do-not-exist"
+msgstr ""
+
+#. js-lingui-explicit-id
 #: src/components/modals/EditUserModal.tsx:42
 msgid "edit-user-modal.modal-title"
 msgstr "Edit user"

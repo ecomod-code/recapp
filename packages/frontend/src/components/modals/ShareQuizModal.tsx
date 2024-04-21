@@ -212,18 +212,23 @@ const ErrorAlert = ({
 
     return (
         <Alert className="alert-warning d-flex justify-content-between">
-            <span>
-                {error.alreadyExists ? (
-                    <span>
-                        <strong>{error.alreadyExists}</strong> already exists
-                    </span>
-                ) : null}
-                {error.queryNotFound ? (
-                    <span>
-                        Could not found: <strong>{error.queryNotFound}</strong>
-                    </span>
-                ) : null}
-            </span>
+            {error.alreadyExists ? (
+                <span>
+                    <strong>
+                        <u>{error.alreadyExists}</u>
+                    </strong>{" "}
+                    <Trans id="share-quiz-modal.error-alert.already-exists" />
+                </span>
+            ) : null}
+
+            {error.queryNotFound ? (
+                <span>
+                    <strong>
+                        <u>{error.queryNotFound}</u>
+                    </strong>{" "}
+                    <Trans id="share-quiz-modal.error-alert.do-not-exist" />
+                </span>
+            ) : null}
             <CloseButton onClick={onClick} />
         </Alert>
     );

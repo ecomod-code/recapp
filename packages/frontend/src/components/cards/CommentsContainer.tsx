@@ -1,42 +1,30 @@
 import { PropsWithChildren } from "react";
 import Button from "react-bootstrap/Button";
+import Collapse from "react-bootstrap/Collapse";
 import { ChevronDown, ChevronUp, Plus } from "react-bootstrap-icons";
 import { Trans } from "@lingui/react";
-import { useStatefulActor } from "ts-actors-react";
-import { maybe, nothing } from "tsmonads";
-import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { keys } from "rambda";
 
 type Props = {
     showCommentArea: boolean;
     onClickAddComment: () => void;
+    onClickToggleButton: () => void;
+    isCommentSectionVisible: boolean;
 } & PropsWithChildren;
 
 export const CommentsContainer = (props: Props) => {
-    const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
-
     if (!props.showCommentArea) {
         return null;
     }
-
-    const isCommentSectionVisible = mbQuiz
-        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
-        .match(
-            x => x.isCommentSectionVisible,
-            () => null
-        );
-
-    const setIsCommentSectionVisible = (value: boolean) => {
-        tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
-    };
 
     return (
         <div className="d-flex flex-column">
             <Button
                 className="align-self-end d-flex justify-content-center align-items-center col-12 col-lg-auto"
-                onClick={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                onClick={props.onClickToggleButton}
+                aria-controls="example-collapse-text"
+                aria-expanded={props.isCommentSectionVisible}
             >
-                {isCommentSectionVisible ? (
+                {props.isCommentSectionVisible ? (
                     <ChevronUp className="me-2" size={20} />
                 ) : (
                     <ChevronDown className="me-2" size={20} />
@@ -44,30 +32,32 @@ export const CommentsContainer = (props: Props) => {
                 <Trans id="comments-container.toggle-button.label" />
             </Button>
 
-            {isCommentSectionVisible ? (
-                <div
-                    className="d-flex align-items-center border"
-                    style={{
-                        maxHeight: "19rem",
-                        // height: "19rem",
-                        overflowY: "hidden",
-                        overflowX: "auto",
-                        backgroundColor: "#f5f5f5",
-                        minHeight: "18rem",
-                    }}
-                >
-                    <div className="d-flex flex-column justify-content-center align-items-center p-4">
-                        <Button variant="secondary" onClick={props.onClickAddComment}>
-                            <Plus size={100} />
-                        </Button>
-                        <span style={{ width: 140, fontSize: "1.2rem", textAlign: "center" }}>
-                            <Trans id="comment-row-new-comment-button" />
-                        </span>
-                    </div>
+            <Collapse in={props.isCommentSectionVisible}>
+                <div id="example-collapse-text">
+                    <div
+                        className="d-flex align-items-center border"
+                        style={{
+                            maxHeight: "19rem",
+                            height: "19rem",
+                            overflowY: "hidden",
+                            overflowX: "auto",
+                            backgroundColor: "#f5f5f5",
+                            minHeight: "18rem",
+                        }}
+                    >
+                        <div className="d-flex flex-column justify-content-center align-items-center p-4">
+                            <Button variant="secondary" onClick={props.onClickAddComment}>
+                                <Plus size={100} />
+                            </Button>
+                            <span style={{ width: 140, fontSize: "1.2rem", textAlign: "center" }}>
+                                <Trans id="comment-row-new-comment-button" />
+                            </span>
+                        </div>
 
-                    {props.children}
+                        {props.children}
+                    </div>
                 </div>
-            ) : null}
+            </Collapse>
         </div>
     );
 };

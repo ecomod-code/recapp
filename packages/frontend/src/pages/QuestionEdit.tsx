@@ -6,7 +6,7 @@ import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
 import { useStatefulActor } from "ts-actors-react";
-import { Quiz, User, toId, Comment, Question, Id, QuestionType, UserParticipation } from "@recapp/models";
+import { User, toId, Comment, Question, Id, QuestionType, UserParticipation } from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
 import Button from "react-bootstrap/Button";
@@ -22,7 +22,7 @@ import { CommentCard } from "../components/cards/CommentCard";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
 import { CommentsContainer } from "../components/cards/CommentsContainer";
-import { CurrentQuizMessages } from "../actors/CurrentQuizActor";
+import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal } from "../components/modals/CommentEditorModal";
 
@@ -38,9 +38,8 @@ export const QuestionEdit: React.FC = () => {
     const questionId = state?.quizId ?? "";
     const formerGroup = state?.group ?? "";
     const writeAccess = state?.write === "true" ?? false;
-    const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
-        "CurrentQuiz"
-    );
+    // const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
+    const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
     const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
     const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id }>(
@@ -288,6 +287,17 @@ export const QuestionEdit: React.FC = () => {
         !mbQuiz.flatMap(q => maybe(q.quiz.hideComments)).orElse(false) ||
         (!isStudent && mbQuiz.flatMap(q => maybe(q.quiz.state)).orElse("EDITING") === "EDITING");
 
+    const isCommentSectionVisible = mbQuiz
+        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+        .match(
+            x => x.isCommentSectionVisible,
+            () => false
+        );
+
+    const setIsCommentSectionVisible = (value: boolean) => {
+        tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
+    };
+
     return (
         <Container fluid>
             <TextModal
@@ -363,6 +373,8 @@ export const QuestionEdit: React.FC = () => {
             </div>
 
             <CommentsContainer
+                onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                isCommentSectionVisible={isCommentSectionVisible}
                 onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
                 showCommentArea={showCommentArea}
             >
@@ -389,6 +401,7 @@ export const QuestionEdit: React.FC = () => {
                         c.sort(sortComments).map(cmt => (
                             <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
                                 <CommentCard
+                                    isCommentSectionVisible={isCommentSectionVisible}
                                     userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
                                     teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
                                     comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}

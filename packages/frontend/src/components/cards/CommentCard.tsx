@@ -25,6 +25,7 @@ interface Props {
     onAccept: () => void;
     onDelete: () => void;
     onJumpToQuestion: () => void;
+    isCommentSectionVisible: boolean;
 }
 
 export const CommentCard: React.FC<Props> = props => {
@@ -59,6 +60,7 @@ export const CommentCardContent: React.FC<
     onJumpToQuestion,
     showInModalHandler,
     isDisplayedInModal,
+    isCommentSectionVisible,
 }) => {
     const { rendered } = useRendered({ value: comment.text });
 
@@ -104,7 +106,11 @@ export const CommentCardContent: React.FC<
             {!rendered ? <Card.Body style={{ minHeight: CUTOFF_CONTAINER_HEIGHT, overflow: "hidden" }} /> : null}
 
             {rendered ? (
-                <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={() => showInModalHandler(true)}>
+                <SeeMoreContainer
+                    isCommentSectionVisible={isCommentSectionVisible}
+                    isDisplayedInModal={isDisplayedInModal}
+                    onClick={() => showInModalHandler(true)}
+                >
                     <div key={new Date().getTime()} dangerouslySetInnerHTML={{ __html: rendered }} />
                 </SeeMoreContainer>
             ) : null}
@@ -148,27 +154,34 @@ export const CommentCardContent: React.FC<
     );
 };
 
-export const SeeMoreContainer = (props: { isDisplayedInModal?: boolean; onClick?: () => void } & PropsWithChildren) => {
+export const SeeMoreContainer = (
+    props: { isDisplayedInModal?: boolean; onClick?: () => void; isCommentSectionVisible: boolean } & PropsWithChildren
+) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSeeMoreVisible, setIsSeeMoreVisible] = useState(false);
 
     useEffect(() => {
-        if (containerRef.current && !props.isDisplayedInModal) {
-            const contentHeight = containerRef.current.scrollHeight;
-            const hasScroll = contentHeight > CUTOFF_CONTAINER_HEIGHT + EM;
-            if (hasScroll) {
-                setIsSeeMoreVisible(true);
-            }
-
-            containerRef.current.style.setProperty("--cutoff-container-height", `${CUTOFF_CONTAINER_HEIGHT}px`);
-            containerRef.current.style.setProperty("--line-height", `${LINE_HEIGHT}`);
-            containerRef.current.style.setProperty("--max-lines", `${MAX_LINES}`);
+        if (!props.isCommentSectionVisible) {
+            return;
         }
-    }, []);
+
+        setTimeout(() => {
+            if (containerRef.current && !props.isDisplayedInModal) {
+                const contentHeight = containerRef.current.scrollHeight;
+                const hasScroll = contentHeight > CUTOFF_CONTAINER_HEIGHT + EM;
+                if (hasScroll) {
+                    setIsSeeMoreVisible(true);
+                }
+
+                containerRef.current.style.setProperty("--cutoff-container-height", `${CUTOFF_CONTAINER_HEIGHT}px`);
+                containerRef.current.style.setProperty("--line-height", `${LINE_HEIGHT}`);
+                containerRef.current.style.setProperty("--max-lines", `${MAX_LINES}`);
+            }
+        }, 10);
+    }, [props.isCommentSectionVisible]);
 
     return (
         <Card.Body className="position-relative">
-            {/* <Card.Text as="div"> */}
             <div
                 ref={containerRef}
                 className={`text-start mb-3 content-space-resetter ${isSeeMoreVisible ? "cutoff-text" : ""}`}
@@ -176,7 +189,6 @@ export const SeeMoreContainer = (props: { isDisplayedInModal?: boolean; onClick?
             >
                 {props.children}
             </div>
-            {/* </Card.Text> */}
 
             {isSeeMoreVisible ? (
                 <Button

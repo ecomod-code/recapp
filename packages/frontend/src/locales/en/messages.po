@@ -49,9 +49,10 @@ msgstr "User role"
 msgid "edit-user-modal.input-label.user-status"
 msgstr "User status"
 
-#: src/components/cards/CommentCard.tsx:22
+#. js-lingui-explicit-id
+#: src/components/cards/CommentsContainer.tsx:44
 msgid "comments-container.toggle-button.label"
-msgstr "Neil: comment-toggle-button-label"
+msgstr ""
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:362

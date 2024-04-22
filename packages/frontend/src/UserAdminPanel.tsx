@@ -52,6 +52,11 @@ export const UserAdminPanel: React.FC = () => {
                 {users.orElse<User[]>([]).map((user: User) => (
                     <UserCard key={user.uid} user={user} ownUser={localUser.map(l => l.user)} />
                 ))}
+
+                {/* to fill the empty space so that when a single card is displayed will not take the full width  */}
+                <div />
+                <div />
+                <div />
             </div>
         </Container>
     );

@@ -49,7 +49,8 @@ msgstr "Benutzerrolle"
 msgid "edit-user-modal.input-label.user-status"
 msgstr "Benutzerstatus"
 
-#: src/components/cards/CommentCard.tsx:22
+#. js-lingui-explicit-id
+#: src/components/cards/CommentsContainer.tsx:44
 msgid "comments-container.toggle-button.label"
 msgstr "Neil: comment-toggle-button-label"
 

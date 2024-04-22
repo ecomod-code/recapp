@@ -207,14 +207,15 @@ export const QuestionsTab: React.FC<{
 						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
 					</div>
 
-					<Button
-						className="col-12 col-lg-auto"
-						onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
-						disabled={disableForStudentOrMode}
-					>
-						<Trans id="quiz-questions-tab-add-group-button" />
-					</Button>
-				</div>
+                    <Button
+                        className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
+                        onClick={() => setCurrentGroup({ showNameModal: true, name: "" })}
+                        disabled={disableForStudentOrMode}
+                    >
+                        <Plus size={28} />
+                        <Trans id="quiz-questions-tab-add-group-button" />
+                    </Button>
+                </div>
 
                 <Row>
                     <div className="flex-grow-1">

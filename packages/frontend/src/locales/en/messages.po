@@ -22,12 +22,12 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221
 msgid "share-quiz-modal.error-alert.already-exists"
-msgstr ""
+msgstr "User already selected"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:229
 msgid "share-quiz-modal.error-alert.do-not-exist"
-msgstr ""
+msgstr "User doesn't exist"
 
 #. js-lingui-explicit-id
 #: src/components/modals/EditUserModal.tsx:42
@@ -52,7 +52,7 @@ msgstr "User status"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44
 msgid "comments-container.toggle-button.label"
-msgstr ""
+msgstr "Show/hide comments"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:362

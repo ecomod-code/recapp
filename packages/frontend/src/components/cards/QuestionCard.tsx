@@ -70,8 +70,10 @@ export const QuestionCard = (props: Props) => {
                         </Badge>
                     </div>
 
-                    {/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
-                    <div dangerouslySetInnerHTML={{ __html: rendered }} />
+                    <div className="custom-line-clamp">
+                        {/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
+                        <div dangerouslySetInnerHTML={{ __html: rendered }} />
+                    </div>
 
                     <div className="d-flex justify-content-end gap-2">
                         {props.writeAccess && props.state === "EDITING" ? (

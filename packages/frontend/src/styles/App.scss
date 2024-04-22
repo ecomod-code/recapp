@@ -21,6 +21,18 @@
     border-bottom: 2px solid lightgrey;
 }
 
+.custom-line-clamp {
+    background-color: red;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    p {
+        margin-bottom: 0;
+    }
+}
+
 /* ############### Begin cutoff-text ############### */
 .cutoff-text {
     // the variables are set from inside the react component

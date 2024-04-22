@@ -22,12 +22,12 @@ msgstr "Anmelden"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221
 msgid "share-quiz-modal.error-alert.already-exists"
-msgstr "Neil: the searched teacher name already exists"
+msgstr "Benutzer ist bereits ausgewählt"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:229
 msgid "share-quiz-modal.error-alert.do-not-exist"
-msgstr "Neil: the searched teacher name don't exist"
+msgstr "Benutzer existiert nicht"
 
 #. js-lingui-explicit-id
 #: src/components/modals/EditUserModal.tsx:42
@@ -52,7 +52,7 @@ msgstr "Benutzerstatus"
 #. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44
 msgid "comments-container.toggle-button.label"
-msgstr "Neil: comment-toggle-button-label"
+msgstr "Kommentare anzeigen/ausblenden"
 
 #. js-lingui-explicit-id
 #: src/actors/CurrentQuizActor.ts:362

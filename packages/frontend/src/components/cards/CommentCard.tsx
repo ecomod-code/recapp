@@ -11,7 +11,10 @@ import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { fromTimestamp } from "itu-utils";
 import { Comment, Id } from "@recapp/models";
 
-const CARD_BODY_HEIGHT = 140;
+const MAX_LINES = 4;
+const EM = 16;
+const LINE_HEIGHT = 1.4;
+const CUTOFF_CONTAINER_HEIGHT = MAX_LINES * EM * LINE_HEIGHT;
 
 interface Props {
     comment: Comment;
@@ -98,7 +101,7 @@ export const CommentCardContent: React.FC<
                 </div>
             </Card.Title>
 
-            {!rendered ? <Card.Body style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden" }} /> : null}
+            {!rendered ? <Card.Body style={{ minHeight: CUTOFF_CONTAINER_HEIGHT, overflow: "hidden" }} /> : null}
 
             {rendered ? (
                 <SeeMoreContainer isDisplayedInModal={isDisplayedInModal} onClick={() => showInModalHandler(true)}>
@@ -145,31 +148,46 @@ export const CommentCardContent: React.FC<
     );
 };
 
-const SeeMoreContainer = (props: { isDisplayedInModal?: boolean; onClick?: () => void } & PropsWithChildren) => {
+export const SeeMoreContainer = (props: { isDisplayedInModal?: boolean; onClick?: () => void } & PropsWithChildren) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSeeMoreVisible, setIsSeeMoreVisible] = useState(false);
 
     useEffect(() => {
         if (containerRef.current && !props.isDisplayedInModal) {
             const contentHeight = containerRef.current.scrollHeight;
-            const hasScroll = contentHeight > CARD_BODY_HEIGHT;
+            const hasScroll = contentHeight > CUTOFF_CONTAINER_HEIGHT + EM;
             if (hasScroll) {
                 setIsSeeMoreVisible(true);
             }
+
+            containerRef.current.style.setProperty("--cutoff-container-height", `${CUTOFF_CONTAINER_HEIGHT}px`);
+            containerRef.current.style.setProperty("--line-height", `${LINE_HEIGHT}`);
+            containerRef.current.style.setProperty("--max-lines", `${MAX_LINES}`);
         }
     }, []);
 
     return (
-        <Card.Body ref={containerRef} style={{ minHeight: CARD_BODY_HEIGHT, overflow: "hidden", position: "relative" }}>
-            <Card.Text as="div" className={`text-start ${isSeeMoreVisible ? "cutoff-text" : ""}`}>
+        <Card.Body className="position-relative">
+            {/* <Card.Text as="div"> */}
+            <div
+                ref={containerRef}
+                className={`text-start mb-3 content-space-resetter ${isSeeMoreVisible ? "cutoff-text" : ""}`}
+                style={{ minHeight: CUTOFF_CONTAINER_HEIGHT, lineHeight: LINE_HEIGHT }}
+            >
                 {props.children}
-            </Card.Text>
+            </div>
+            {/* </Card.Text> */}
 
             {isSeeMoreVisible ? (
                 <Button
                     variant="link"
                     className="p-0"
-                    style={{ lineHeight: 1.4, position: "absolute", bottom: 6, left: 16 }}
+                    style={{
+                        lineHeight: LINE_HEIGHT,
+                        position: "absolute",
+                        left: 16,
+                        bottom: 6,
+                    }}
                     onClick={props.onClick}
                 >
                     <Trans id="see-more-container.button-label" />

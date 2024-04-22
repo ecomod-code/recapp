@@ -7,7 +7,7 @@ import { getStoredSelectedLocal } from "./components/layout/LocaleSelect";
 import { I18nProvider } from "@lingui/react";
 import { i18n } from "@lingui/core";
 // import "bootstrap/dist/css/bootstrap.min.css";
-import "./App.scss";
+import "./styles/App.scss";
 import "katex/dist/katex.css";
 import { Root } from "./components/navigation/Root";
 import { QuizPage } from "./pages/QuizPage";

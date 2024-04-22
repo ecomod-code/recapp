@@ -23,10 +23,10 @@
 
 /* ############### Begin cutoff-text ############### */
 .cutoff-text {
-    --max-lines: 4;
-    --line-height: 1.4;
-    /* height: calc(var(--max-lines) * 1em * var(--line-height)); */
-    max-height: calc(var(--max-lines) * 1em * var(--line-height));
+    // the variables are set from inside the react component
+    // height: calc(var(--max-lines) * 1em * var(--line-height));
+    max-height: var(--cutoff-container-height);
+    // height: var(--cutoff-container-height);
     line-height: var(--line-height);
     overflow: hidden;
     position: relative;
@@ -39,6 +39,9 @@
     width: 100%;
     pointer-events: none;
     background: linear-gradient(to bottom, transparent, white);
+}
+.content-space-resetter p {
+    margin-bottom: 0;
 }
 .cutoff-text p {
     margin-bottom: 0;

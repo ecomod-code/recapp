@@ -68,7 +68,7 @@ export const HeaderSection: React.FC = () => {
                             onSubmit={changeName}
                         />
                         <Navbar className="bg-body-tertiary" sticky="top">
-                            <Container fluid>
+                            <Container>
                                 <Navbar.Brand href="#">RECAPP</Navbar.Brand>
                                 <Nav className="justify-content-end flex-grow-1 pe-3">
                                     <Dropdown align="end" style={{ minWidth: 36 }} autoClose="outside">

@@ -144,6 +144,7 @@ msgstr "Lehrperson"
 msgid "role-name-student"
 msgstr "Student"
 
+#. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:101
 msgid "user-card.button-tooltip.edit"
 msgstr "Bearbeiten"

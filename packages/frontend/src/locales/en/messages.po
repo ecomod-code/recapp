@@ -870,7 +870,7 @@ msgstr "Export completed. You can now download the file."
 
 #. js-lingui-explicit-id
 msgid "download"
-msgstr "Downlaod"
+msgstr "Download"
 
 #. js-lingui-explicit-id
 msgid "export-quiz-statistics-button"

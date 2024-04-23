@@ -427,7 +427,7 @@ export const QuestionEdit: React.FC = () => {
                         </strong>
                     </span>
 
-                    <div className="d-flex flex-column flex-lg-row gap-2 justify-content-end">
+                    <div className="d-flex flex-column-reverse flex-lg-row gap-2 justify-content-end">
                         {/* <ButtonWithTooltip
                             title={i18n._("question-edit.button-tooltip.check")}
                             variant="secondary"
@@ -449,7 +449,7 @@ export const QuestionEdit: React.FC = () => {
                     <Card.Body className="d-flex flex-column gap-3 background-grey">
                         {isStudent && writeAccess && (
                             <Form.Group>
-                                <Form.Label className="m-0">{i18n._("author")}</Form.Label>
+                                <Form.Label className="m-0">{i18n._("author")}:</Form.Label>
                                 <Form.Select
                                     value={authorType}
                                     onChange={event => setAuthorType(event.target.value as UserParticipation)}
@@ -495,7 +495,6 @@ export const QuestionEdit: React.FC = () => {
                             <Form.Label className="mb-2">
                                 <Trans id="question-edit-page.input-label.advisory-text" />:
                             </Form.Label>
-
                             <InputGroup className="mb-2">
                                 <Form.Check
                                     className="align-self-center"

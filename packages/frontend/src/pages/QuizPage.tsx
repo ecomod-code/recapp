@@ -215,7 +215,7 @@ export const QuizPage: React.FC = () => {
                         />
 
                         <Row>
-                            <div className="d-flex justify-content-between">
+                            <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
                                 <Breadcrumb>
                                     <Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
                                         Dashboard
@@ -225,7 +225,7 @@ export const QuizPage: React.FC = () => {
                                     </Breadcrumb.Item>
                                 </Breadcrumb>
 
-                                <span className="">
+                                <span className="mb-3 text-end">
                                     <Trans id="quiz-page.quiz-state.label" />:{" "}
                                     <QuizStateBadge state={quizData.quiz.state} />
                                 </span>

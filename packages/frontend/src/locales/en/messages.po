@@ -405,7 +405,7 @@ msgstr "Allow student comments in quiz mode"
 #: src/components/quiz-tabs/QuizDataTab.tsx:230
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
-msgstr "Have students create questions"
+msgstr "Allow students to set questions"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
@@ -939,3 +939,51 @@ msgstr "Import"
 #. js-lingui-explicit-id
 msgid "button-import-quiz"
 msgstr "Import quiz"
+
+#. js-lingui-explicit-id
+msgid "dashboard-show-archived-quizzes-switch"
+msgstr "Show archived quizzes"
+
+#. js-lingui-explicit-id
+msgid "archive-quiz-button"
+msgstr "Archive quiz"
+
+#. js-lingui-explicit-id
+msgid "delete-quiz-button"
+msgstr "Permanently delete quiz"
+
+#. js-lingui-explicit-id
+msgid "anonymous"
+msgstr "ANONYMOUS"
+
+#. js-lingui-explicit-id
+msgid "author"
+msgstr "Author"
+
+#. js-lingui-explicit-id
+msgid "new-comment-title"
+msgstr "New comment"
+
+#. js-lingui-explicit-id
+msgid "back-to-quiz-button"
+msgstr "Back to quiz"
+
+#. js-lingui-explicit-id
+msgid "question-card.button-tooltip.view"
+msgstr "Show question"
+
+#. js-lingui-explicit-id
+msgid "quiz-hide-comments-switch"
+msgstr "Hide comment list"
+
+#. js-lingui-explicit-id
+msgid "leave-quiz-modal-title"
+msgstr "Leave quiz"
+
+#. js-lingui-explicit-id
+msgid "leave-quiz-modal-text"
+msgstr "You are about to leave the quiz. It will no longer be displayed in your dashboard and you won't be able to modify it or participate. Really leave?"
+
+#. js-lingui-explicit-id
+msgid "quiz-card-teachers-label"
+msgstr "Teaching staff:"

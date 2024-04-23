@@ -344,7 +344,7 @@ export const QuestionsTab: React.FC<{
                                             >
                                                 {questionGroup.questions.length === 0 ? (
                                                     <p
-                                                        className="d-flex justify-content-center align-items-center m-0 bg-white me-2"
+                                                        className="p-2 m-0 me-2 d-flex justify-content-center align-items-center text-center bg-white"
                                                         style={{ fontSize: 18, height: 80 }}
                                                     >
                                                         <Trans id="quiz-questions-tab-empty-group-message" />

@@ -417,7 +417,14 @@ export const QuestionEdit: React.FC = () => {
                 </CommentsContainer>
                 <div className="pb-3 pt-4 mb-4 mt-3 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
                     <span className="">
-                        <strong>{question.uid ? "Frage Bearbeiten" : "Neue Frage"}:</strong>
+                        <strong>
+                            {question.uid ? (
+                                <Trans id="question-edit-page.title.edit-question" />
+                            ) : (
+                                <Trans id="question-edit-page.title.new-question" />
+                            )}
+                            :
+                        </strong>
                     </span>
 
                     <div className="d-flex flex-column flex-lg-row gap-2 justify-content-end">
@@ -468,7 +475,9 @@ export const QuestionEdit: React.FC = () => {
                         )}
 
                         <Form.Group>
-                            <Form.Label className="">Group name</Form.Label>
+                            <Form.Label className="">
+                                <Trans id="question-edit-page.input-label.group-name" />:
+                            </Form.Label>
                             <Form.Select
                                 value={selectedGroup}
                                 onChange={event => setSelectedGroup(event.target.value)}
@@ -483,7 +492,10 @@ export const QuestionEdit: React.FC = () => {
                         </Form.Group>
 
                         <Form.Group className="mt-3x">
-                            <Form.Label className="mb-2">Hinweistext:</Form.Label>
+                            <Form.Label className="mb-2">
+                                <Trans id="question-edit-page.input-label.advisory-text" />:
+                            </Form.Label>
+
                             <InputGroup className="mb-2">
                                 <Form.Check
                                     className="align-self-center"
@@ -521,8 +533,9 @@ export const QuestionEdit: React.FC = () => {
 
                 <Card className="mt-3 overflow-hidden">
                     <Card.Header className="p-3 d-flex justify-content-between align-items-center background-grey">
-                        {/* <strong>{question.uid ? "Frage" : "Neue Frage"}</strong> */}
-                        <strong>Question:</strong>
+                        <strong>
+                            <Trans id="question-edit-page.input-label.question" />:
+                        </strong>
                     </Card.Header>
 
                     <Card.Body
@@ -537,7 +550,7 @@ export const QuestionEdit: React.FC = () => {
                                 className="p-2 text-start h-30 d-flex justify-content-center align-items-center"
                                 style={{ minHeight: 90 }}
                             >
-                                <div>
+                                {/* <div>
                                     did not add any question yet ..
                                     <Button
                                         variant="link"
@@ -548,7 +561,7 @@ export const QuestionEdit: React.FC = () => {
                                     >
                                         add question
                                     </Button>
-                                </div>
+                                </div> */}
                             </div>
                         )}
 
@@ -564,12 +577,12 @@ export const QuestionEdit: React.FC = () => {
                                 {question.uid ? (
                                     <>
                                         <Pencil className="mx-2" />
-                                        edit
+                                        <Trans id="question-edit-page.button-label.edit" />
                                     </>
                                 ) : (
                                     <>
                                         <Plus size={20} />
-                                        add
+                                        <Trans id="question-edit-page.button-label.add" />
                                     </>
                                 )}
                             </Button>
@@ -578,7 +591,9 @@ export const QuestionEdit: React.FC = () => {
 
                     <Card.Footer className="pb-4 background-grey">
                         <Form.Group>
-                            <Form.Label className="m-0">Question type</Form.Label>
+                            <Form.Label className="m-0">
+                                <Trans id="question-edit-page.input-label.question-type" />:
+                            </Form.Label>
                             <Form.Select
                                 value={question.type}
                                 onChange={event =>

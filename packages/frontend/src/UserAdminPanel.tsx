@@ -5,8 +5,6 @@ import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { maybe } from "tsmonads";
 
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import { Funnel } from "react-bootstrap-icons";
@@ -30,12 +28,12 @@ export const UserAdminPanel: React.FC = () => {
                 .slice(0, 30)
         );
     return (
-        <Container>
+        <div>
             <h1>
                 <Trans id="user-admin-panel-title" />
             </h1>
-            <Row>
-                <InputGroup className="mb-3 m-1">
+            <div>
+                <InputGroup className="mb-3 m-1xx">
                     <TooltipWrapper title={i18n._("user-admin-panel.button-tooltip.filter")}>
                         <InputGroup.Text>
                             <Funnel />
@@ -47,7 +45,7 @@ export const UserAdminPanel: React.FC = () => {
                         onChange={event => setFilter(event.target.value.toLocaleLowerCase())}
                     />
                 </InputGroup>
-            </Row>
+            </div>
             <div className="pt-4 user-admin-card-list">
                 {users.orElse<User[]>([]).map((user: User) => (
                     <UserCard key={user.uid} user={user} ownUser={localUser.map(l => l.user)} />
@@ -58,6 +56,6 @@ export const UserAdminPanel: React.FC = () => {
                 <div />
                 <div />
             </div>
-        </Container>
+        </div>
     );
 };

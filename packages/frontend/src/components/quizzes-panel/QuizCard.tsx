@@ -20,7 +20,7 @@ export const QuizCard: React.FC<{
 }> = ({ quiz, teachers, onShare, onDelete }) => {
 	const nav = useNavigate();
 	return (
-		<div className="p-0 position-relative" style={{ margin: "2.5rem 0.5rem" }}>
+		<div className="p-0 position-relative" style={{ margin: "2.5rem 0" }}>
 			<div style={{ position: "absolute", top: -20, left: 2, fontSize: 14, color: "grey" }}>
 				<Trans id="quiz-card-last-change" />
 				&nbsp;

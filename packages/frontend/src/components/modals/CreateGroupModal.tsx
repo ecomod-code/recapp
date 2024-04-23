@@ -21,7 +21,7 @@ export const CreateGroupModal: React.FC<Props> = ({ show, defaultValue, invalidV
 	}, [defaultValue]);
 
 	return (
-		<Modal show={show}>
+		<Modal size="lg" show={show}>
 			<Modal.Title className="p-1 ps-2 text-bg-primary">
 				<Trans id="quiz-create-new-group-modal-title" />
 			</Modal.Title>
@@ -44,7 +44,16 @@ export const CreateGroupModal: React.FC<Props> = ({ show, defaultValue, invalidV
 			</Modal.Body>
 			<Modal.Footer>
 				<Button
-					className="m-1"
+					variant="outline-primary"
+					onClick={() => {
+						setName("");
+						onClose();
+					}}
+				>
+					<Trans id="cancel" />
+				</Button>
+
+				<Button
 					onClick={() => {
 						const n = name;
 						setName("");
@@ -53,15 +62,6 @@ export const CreateGroupModal: React.FC<Props> = ({ show, defaultValue, invalidV
 					disabled={error}
 				>
 					<Trans id="okay" />
-				</Button>
-				<Button
-					className="m-1"
-					onClick={() => {
-						setName("");
-						onClose();
-					}}
-				>
-					<Trans id="cancel" />
 				</Button>
 			</Modal.Footer>
 		</Modal>

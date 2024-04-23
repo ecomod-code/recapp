@@ -415,25 +415,26 @@ export const QuestionEdit: React.FC = () => {
                         )
                         .orElse([<Fragment key={"key-1"} />])}
                 </CommentsContainer>
-                <div className="pb-3 pt-4 mb-4 d-flex align-items-center justify-content-between border-2 border-bottom">
-                    <strong>{question.uid ? "Frage Bearbeiten" : "Neue Frage"}</strong>
+                <div className="pb-3 pt-4 mb-4 mt-3 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
+                    <span className="">
+                        <strong>{question.uid ? "Frage Bearbeiten" : "Neue Frage"}:</strong>
+                    </span>
 
-                    <div className="mb-4x">
-                        <div className="mt-3x d-flex gap-2 justify-content-end">
-                            {/* <ButtonWithTooltip
+                    <div className="d-flex flex-column flex-lg-row gap-2 justify-content-end">
+                        {/* <ButtonWithTooltip
                             title={i18n._("question-edit.button-tooltip.check")}
                             variant="secondary"
                             disabled
                         >
                             <Check />
                         </ButtonWithTooltip> */}
-                            <Button variant="secondary" onClick={onCancelClick}>
-                                <Trans id="cancel" />
-                            </Button>
-                            <Button disabled={!question.text.trim()} onClick={submit}>
-                                {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-                            </Button>
-                        </div>
+
+                        <Button variant="secondary" onClick={onCancelClick}>
+                            <Trans id="cancel" />
+                        </Button>
+                        <Button disabled={!question.text.trim()} onClick={submit}>
+                            {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
+                        </Button>
                     </div>
                 </div>
 

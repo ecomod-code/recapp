@@ -65,6 +65,17 @@ export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onC
             </Modal.Body>
             <Modal.Footer>
                 <Button
+                    className="m-1"
+                    variant="outline-primary"
+                    onClick={() => {
+                        setValue("");
+                        onClose();
+                    }}
+                >
+                    <Trans id="cancel" />
+                </Button>
+
+                <Button
                     disabled={!value}
                     className="m-1"
                     onClick={() => {
@@ -74,15 +85,6 @@ export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onC
                     }}
                 >
                     <Trans id="okay" />
-                </Button>
-                <Button
-                    className="m-1"
-                    onClick={() => {
-                        setValue("");
-                        onClose();
-                    }}
-                >
-                    <Trans id="cancel" />
                 </Button>
             </Modal.Footer>
         </Modal>

@@ -18,7 +18,7 @@ export const TextModal: React.FC<Props> = ({ show, titleId, editorValue, onClose
 	}, [editorValue]);
 
 	return (
-		<Modal show={show} dialogClassName="modal-80w">
+		<Modal show={show} size="lg">
 			<Modal.Title className="p-1 ps-2 text-bg-primary">
 				<div style={{ minWidth: "80vw" }}>
 					<Trans id={titleId} />
@@ -31,7 +31,15 @@ export const TextModal: React.FC<Props> = ({ show, titleId, editorValue, onClose
 			</Modal.Body>
 			<Modal.Footer>
 				<Button
-					className="m-1"
+					variant="outline-primary"
+					onClick={() => {
+						setValue("");
+						onClose();
+					}}
+				>
+					<Trans id="cancel" />
+				</Button>
+				<Button
 					onClick={() => {
 						const v = value;
 						setValue("");
@@ -39,15 +47,6 @@ export const TextModal: React.FC<Props> = ({ show, titleId, editorValue, onClose
 					}}
 				>
 					<Trans id="okay" />
-				</Button>
-				<Button
-					className="m-1"
-					onClick={() => {
-						setValue("");
-						onClose();
-					}}
-				>
-					<Trans id="cancel" />
 				</Button>
 			</Modal.Footer>
 		</Modal>

@@ -109,9 +109,14 @@
     border: 1px solid var(--bs-primary-rgb) !important; /* Change the border color */
 }
 
+$layout-breakpoint-small: 650px;
+
 .modal-80w {
-    width: 80vw !important;
-    max-width: 80vw !important;
+    @media (min-width: $layout-breakpoint-small) {
+        width: 80vw !important;
+        // max-width: 80vw !important;
+        max-width: 1450px !important;
+    }
 }
 
 .background-grey {

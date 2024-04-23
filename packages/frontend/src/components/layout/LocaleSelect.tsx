@@ -68,8 +68,8 @@ export const LocaleSelect = () => {
                     })}
                 </Form.Select>
             </div>
-            <div style={{ marginTop: 4, marginLeft: 4 }}>
-                <img src={flagSrc} height="22" alt="country flag" />
+            <div style={{ marginLeft: 4, marginBottom: 4, width: 34 }}>
+                <img src={flagSrc} alt="country flag" style={{ width: "100%", height: "100%" }} />
             </div>
         </div>
     );
@@ -79,4 +79,5 @@ const style: React.CSSProperties = {
     display: "flex",
     flexDirection: "row",
     justifyContent: "start",
+    alignItems: "center",
 };

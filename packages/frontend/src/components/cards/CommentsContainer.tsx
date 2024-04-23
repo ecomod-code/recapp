@@ -35,13 +35,12 @@ export const CommentsContainer = (props: Props) => {
             <Collapse in={props.isCommentSectionVisible}>
                 <div id="example-collapse-text">
                     <div
-                        className="d-flex align-items-center border"
+                        className="d-flex align-items-center border background-grey"
                         style={{
                             maxHeight: "19rem",
                             height: "19rem",
                             overflowY: "hidden",
                             overflowX: "auto",
-                            backgroundColor: "#f5f5f5",
                             minHeight: "18rem",
                         }}
                     >

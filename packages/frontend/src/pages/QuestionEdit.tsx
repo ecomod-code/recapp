@@ -11,12 +11,10 @@ import { User, toId, Comment, Question, Id, QuestionType, UserParticipation } fr
 import { useRendered } from "../hooks/useRendered";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { Check, DashLg, Pencil } from "react-bootstrap-icons";
+import { DashLg, Pencil, Plus } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
 import { MarkdownModal } from "../components/modals/MarkdownModal";
@@ -299,7 +297,7 @@ export const QuestionEdit: React.FC = () => {
     };
 
     return (
-        <Container fluid>
+        <>
             <TextModal
                 titleId={showTextModal.titleId}
                 show={!!showTextModal.titleId}
@@ -344,190 +342,147 @@ export const QuestionEdit: React.FC = () => {
                     handleClose();
                 }}
             />
-            <div
-                className="d-flex flew-row flex-nowrap align-items-center mb-2"
-                style={{ marginLeft: "-0.5rem", marginRight: "-0.5rem" }}
-            >
-                <Breadcrumb>
-                    <Breadcrumb.Item
-                        onClick={() => {
-                            resetQuestionEditModeFlag();
-                            nav({ pathname: "/Dashboard" });
-                        }}
-                    >
-                        Dashboard
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item
-                        onClick={() => {
-                            resetQuestionEditModeFlag();
-                            nav(
-                                { pathname: "/Dashboard/quiz" },
-                                { state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
-                            );
-                        }}
-                    >
-                        {mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
-                    </Breadcrumb.Item>
-                    <Breadcrumb.Item>{question.uid ? "Frage" : "Neue Frage"}</Breadcrumb.Item>
-                </Breadcrumb>
-            </div>
 
-            <CommentsContainer
-                onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-                isCommentSectionVisible={isCommentSectionVisible}
-                onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
-                showCommentArea={showCommentArea}
-            >
-                {mbQuiz
-                    .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
-                    .map(
-                        q =>
-                            (q.comments ?? [])
-                                .map(c => {
-                                    const result = comments.find(
-                                        cmt => cmt.uid === c && cmt.relatedQuestion === questionId
-                                    );
-                                    console.log(
-                                        comments.map(c => c.relatedQuestion).join(";"),
-                                        questionId,
-                                        question.uid,
-                                        result
-                                    );
-                                    return result;
-                                })
-                                .filter(Boolean) as Comment[]
-                    )
-                    .map(c =>
-                        c.sort(sortComments).map(cmt => (
-                            <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-                                <CommentCard
-                                    isCommentSectionVisible={isCommentSectionVisible}
-                                    userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-                                    teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-                                    comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
-                                    onUpvote={() => upvoteComment(cmt.uid)}
-                                    onAccept={() => finishComment(cmt.uid)}
-                                    onDelete={() => deleteComment(cmt.uid)}
-                                    onJumpToQuestion={() => {}}
-                                />
-                            </div>
-                        ))
-                    )
-                    .orElse([<Fragment key={"key-1"} />])}
-            </CommentsContainer>
-
-            <div className="mb-4">
-                <div className="mt-3 d-flex gap-2 justify-content-end">
-                    <Button variant="secondary" onClick={onCancelClick}>
-                        <Trans id="cancel" />
-                    </Button>
-                    <Button disabled={!question.text.trim()} onClick={submit}>
-                        {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-                    </Button>
+            <div>
+                <div
+                    className="d-flex flew-row flex-nowrap align-items-center mb-2"
+                    style={{ marginLeft: "-0.5rem", marginRight: "-0.5rem" }}
+                >
+                    <Breadcrumb>
+                        <Breadcrumb.Item
+                            onClick={() => {
+                                resetQuestionEditModeFlag();
+                                nav({ pathname: "/Dashboard" });
+                            }}
+                        >
+                            Dashboard
+                        </Breadcrumb.Item>
+                        <Breadcrumb.Item
+                            onClick={() => {
+                                resetQuestionEditModeFlag();
+                                nav(
+                                    { pathname: "/Dashboard/quiz" },
+                                    { state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
+                                );
+                            }}
+                        >
+                            {mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
+                        </Breadcrumb.Item>
+                        <Breadcrumb.Item>{question.uid ? "Frage" : "Neue Frage"}</Breadcrumb.Item>
+                    </Breadcrumb>
                 </div>
-            </div>
 
-            <div className="d-flex flex-column h-100 w-100">
-                <div className="flex-grow-1">
-                    <Card className="p-0">
-                        <Card.Header className="text-start d-flex flex-row">
-                            <div className="align-self-center">
-                                <strong>{question.uid ? "Frage" : "Neue Frage"}</strong>
-                            </div>
-                            <div className="flex-grow-1"></div>
-                            {isStudent && writeAccess && (
-                                <div className="align-self-center d-flex flex-row align-items-center">
-                                    {i18n._("author")}:&nbsp;
-                                    <Form.Select
-                                        value={authorType}
-                                        onChange={event => setAuthorType(event.target.value as UserParticipation)}
-                                    >
-                                        {allowedAuthorTypes.includes("NAME") && (
-                                            <option value="NAME">
-                                                {mbUser.flatMap(u => maybe(u.user?.username)).orElse("---")}
-                                            </option>
-                                        )}
-                                        {allowedAuthorTypes.includes("NICKNAME") &&
-                                            mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("") !== "" && (
-                                                <option value="NICKNAME">
-                                                    {mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("---")}
-                                                </option>
-                                            )}
-                                        {allowedAuthorTypes.includes("ANONYMOUS") && (
-                                            <option value="ANONYMOUS">
-                                                <Trans id="anonymous" />
-                                            </option>
-                                        )}
-                                    </Form.Select>
+                <CommentsContainer
+                    onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                    isCommentSectionVisible={isCommentSectionVisible}
+                    onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+                    showCommentArea={showCommentArea}
+                >
+                    {mbQuiz
+                        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+                        .map(
+                            q =>
+                                (q.comments ?? [])
+                                    .map(c => {
+                                        const result = comments.find(
+                                            cmt => cmt.uid === c && cmt.relatedQuestion === questionId
+                                        );
+                                        console.log(
+                                            comments.map(c => c.relatedQuestion).join(";"),
+                                            questionId,
+                                            question.uid,
+                                            result
+                                        );
+                                        return result;
+                                    })
+                                    .filter(Boolean) as Comment[]
+                        )
+                        .map(c =>
+                            c.sort(sortComments).map(cmt => (
+                                <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                    <CommentCard
+                                        isCommentSectionVisible={isCommentSectionVisible}
+                                        userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+                                        teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+                                        comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
+                                        onUpvote={() => upvoteComment(cmt.uid)}
+                                        onAccept={() => finishComment(cmt.uid)}
+                                        onDelete={() => deleteComment(cmt.uid)}
+                                        onJumpToQuestion={() => {}}
+                                    />
                                 </div>
-                            )}
-                            <div className="align-self-center">
+                            ))
+                        )
+                        .orElse([<Fragment key={"key-1"} />])}
+                </CommentsContainer>
+                <div className="pb-3 pt-4 mb-4 d-flex align-items-center justify-content-between border-2 border-bottom">
+                    <strong>{question.uid ? "Frage Bearbeiten" : "Neue Frage"}</strong>
+
+                    <div className="mb-4x">
+                        <div className="mt-3x d-flex gap-2 justify-content-end">
+                            {/* <ButtonWithTooltip
+                            title={i18n._("question-edit.button-tooltip.check")}
+                            variant="secondary"
+                            disabled
+                        >
+                            <Check />
+                        </ButtonWithTooltip> */}
+                            <Button variant="secondary" onClick={onCancelClick}>
+                                <Trans id="cancel" />
+                            </Button>
+                            <Button disabled={!question.text.trim()} onClick={submit}>
+                                {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+
+                <Card>
+                    <Card.Body className="d-flex flex-column gap-3 background-grey">
+                        {isStudent && writeAccess && (
+                            <Form.Group>
+                                <Form.Label className="m-0">{i18n._("author")}</Form.Label>
                                 <Form.Select
-                                    value={selectedGroup}
-                                    onChange={event => setSelectedGroup(event.target.value)}
-                                    disabled={isStudent || !writeAccess}
+                                    value={authorType}
+                                    onChange={event => setAuthorType(event.target.value as UserParticipation)}
                                 >
-                                    {groups.map(g => (
-                                        <option key={g} value={g}>
-                                            {g}
-                                        </option>
-                                    ))}
-                                </Form.Select>
-                            </div>
-                            <div className="align-self-center">
-                                <Form.Select
-                                    value={question.type}
-                                    onChange={event =>
-                                        setQuestion(state => ({
-                                            ...state,
-                                            type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
-                                        }))
-                                    }
-                                    disabled={!writeAccess}
-                                >
-                                    {allowedQuestionTypes.includes("SINGLE") && (
-                                        <option value="SINGLE">
-                                            <Trans id="single-choice-selection" />
+                                    {allowedAuthorTypes.includes("NAME") && (
+                                        <option value="NAME">
+                                            {mbUser.flatMap(u => maybe(u.user?.username)).orElse("---")}
                                         </option>
                                     )}
-                                    {allowedQuestionTypes.includes("MULTIPLE") && (
-                                        <option value="MULTIPLE">
-                                            <Trans id="multiple-choice-selection" />
-                                        </option>
-                                    )}
-                                    {allowedQuestionTypes.includes("TEXT") && (
-                                        <option value="TEXT">
-                                            <Trans id="text-type-selection" />
+                                    {allowedAuthorTypes.includes("NICKNAME") &&
+                                        mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("") !== "" && (
+                                            <option value="NICKNAME">
+                                                {mbUser.flatMap(u => maybe(u.user?.nickname)).orElse("---")}
+                                            </option>
+                                        )}
+                                    {allowedAuthorTypes.includes("ANONYMOUS") && (
+                                        <option value="ANONYMOUS">
+                                            <Trans id="anonymous" />
                                         </option>
                                     )}
                                 </Form.Select>
-                            </div>
-                            <div className="m-1">
-                                <ButtonWithTooltip
-                                    title={i18n._("question-edit.button-tooltip.check")}
-                                    variant="secondary"
-                                    disabled
-                                >
-                                    <Check />
-                                </ButtonWithTooltip>
-                                &nbsp;
-                                <ButtonWithTooltip
-                                    title={i18n._("question-edit.button-tooltip.edit-title-text")}
-                                    variant="primary"
-                                    onClick={() => handleMDShow("QUESTION", "edit-title-text")}
-                                    disabled={!writeAccess}
-                                >
-                                    <Pencil />
-                                </ButtonWithTooltip>
-                            </div>
-                        </Card.Header>
-                        <Card.Body>
-                            {question.text ? (
-                                <div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
-                            ) : (
-                                <div className="p-2 text-start h-30" style={{ minHeight: 90 }} />
-                            )}
-                            <div className="mb-2">Hinweistext:</div>
+                            </Form.Group>
+                        )}
+
+                        <Form.Group>
+                            <Form.Label className="">Group name</Form.Label>
+                            <Form.Select
+                                value={selectedGroup}
+                                onChange={event => setSelectedGroup(event.target.value)}
+                                disabled={isStudent || !writeAccess}
+                            >
+                                {groups.map(g => (
+                                    <option key={g} value={g}>
+                                        {g}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                        </Form.Group>
+
+                        <Form.Group className="mt-3x">
+                            <Form.Label className="mb-2">Hinweistext:</Form.Label>
                             <InputGroup className="mb-2">
                                 <Form.Check
                                     className="align-self-center"
@@ -559,14 +514,111 @@ export const QuestionEdit: React.FC = () => {
                                     <Pencil />
                                 </ButtonWithTooltip>
                             </InputGroup>
-                        </Card.Body>
+                        </Form.Group>
+                    </Card.Body>
+                </Card>
+
+                <Card className="mt-3 overflow-hidden">
+                    <Card.Header className="p-3 d-flex justify-content-between align-items-center background-grey">
+                        {/* <strong>{question.uid ? "Frage" : "Neue Frage"}</strong> */}
+                        <strong>Question:</strong>
+                    </Card.Header>
+
+                    <Card.Body
+                        // as="button"
+                        // onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+                        className="bg-white border-0 overflow-hidden"
+                    >
+                        {question.text ? (
+                            <div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
+                        ) : (
+                            <div
+                                className="p-2 text-start h-30 d-flex justify-content-center align-items-center"
+                                style={{ minHeight: 90 }}
+                            >
+                                <div>
+                                    did not add any question yet ..
+                                    <Button
+                                        variant="link"
+                                        className="p-0 m-0 mx-1"
+                                        style={{ position: "relative", bottom: 2 }}
+                                        onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+                                        disabled={!writeAccess}
+                                    >
+                                        add question
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="d-flex justify-content-end">
+                            <Button
+                                // variant="link"
+                                // className="p-0"
+                                variant="warning"
+                                className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+                                onClick={() => handleMDShow("QUESTION", "edit-title-text")}
+                                disabled={!writeAccess}
+                            >
+                                {question.uid ? (
+                                    <>
+                                        <Pencil className="mx-2" />
+                                        edit
+                                    </>
+                                ) : (
+                                    <>
+                                        <Plus size={20} />
+                                        add
+                                    </>
+                                )}
+                            </Button>
+                        </div>
+                    </Card.Body>
+
+                    <Card.Footer className="pb-4 background-grey">
+                        <Form.Group>
+                            <Form.Label className="m-0">Question type</Form.Label>
+                            <Form.Select
+                                value={question.type}
+                                onChange={event =>
+                                    setQuestion(state => ({
+                                        ...state,
+                                        type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
+                                    }))
+                                }
+                                disabled={!writeAccess}
+                            >
+                                {allowedQuestionTypes.includes("SINGLE") && (
+                                    <option value="SINGLE">
+                                        <Trans id="single-choice-selection" />
+                                    </option>
+                                )}
+                                {allowedQuestionTypes.includes("MULTIPLE") && (
+                                    <option value="MULTIPLE">
+                                        <Trans id="multiple-choice-selection" />
+                                    </option>
+                                )}
+                                {allowedQuestionTypes.includes("TEXT") && (
+                                    <option value="TEXT">
+                                        <Trans id="text-type-selection" />
+                                    </option>
+                                )}
+                            </Form.Select>
+                        </Form.Group>
+
                         {question.type !== "TEXT" && (
-                            <Card.Footer>
-                                <Trans id="activate-all-correct-answers" />
-                                <Form className="text-start mb-2 mt-2">
+                            <div className="mt-3">
+                                <div className="mt-4 pb-1 d-flex justify-content-between align-items-center">
+                                    <Trans id="activate-all-correct-answers" />
+
+                                    <Button variant="warning" onClick={addAnswer} disabled={!writeAccess}>
+                                        <Trans id="add-answer-button" />
+                                    </Button>
+                                </div>
+                                <Form className="text-start">
                                     {question.answers.map((answer, i) => {
                                         return (
-                                            <InputGroup key={i} className="mb-2">
+                                            <InputGroup key={i} className="mb-2 mt-2">
                                                 <Form.Check
                                                     className="align-self-center"
                                                     label=""
@@ -596,17 +648,11 @@ export const QuestionEdit: React.FC = () => {
                                         );
                                     })}
                                 </Form>
-                                <Button onClick={addAnswer} disabled={!writeAccess}>
-                                    <Trans id="add-answer-button" />
-                                </Button>
-                            </Card.Footer>
+                            </div>
                         )}
-                    </Card>
-                </div>
+                    </Card.Footer>
+                </Card>
             </div>
-            <Row>
-                <div className="flew-grow-1">&nbsp;</div>
-            </Row>
-        </Container>
+        </>
     );
 };

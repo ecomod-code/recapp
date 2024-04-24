@@ -296,6 +296,9 @@ export const QuestionEdit: React.FC = () => {
         tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
     };
 
+    const hasAnswer = question.answers?.some(q => !!q.text.trim());
+    const isSaveButtonDisabled = (question.type !== "TEXT" && !hasAnswer) || !question.text.trim();
+
     return (
         <>
             <TextModal
@@ -436,10 +439,10 @@ export const QuestionEdit: React.FC = () => {
                             <Check />
                         </ButtonWithTooltip> */}
 
-                        <Button variant="secondary" onClick={onCancelClick}>
+                        <Button variant="outline-primary" onClick={onCancelClick}>
                             <Trans id="cancel" />
                         </Button>
-                        <Button disabled={!question.text.trim()} onClick={submit}>
+                        <Button disabled={isSaveButtonDisabled} onClick={submit}>
                             {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
                         </Button>
                     </div>
@@ -490,43 +493,6 @@ export const QuestionEdit: React.FC = () => {
                                 ))}
                             </Form.Select>
                         </Form.Group>
-
-                        <Form.Group className="mt-3x">
-                            <Form.Label className="mb-2">
-                                <Trans id="question-edit-page.input-label.advisory-text" />:
-                            </Form.Label>
-                            <InputGroup className="mb-2">
-                                <Form.Check
-                                    className="align-self-center"
-                                    label=""
-                                    name="answer"
-                                    type="switch"
-                                    checked={hint}
-                                    onChange={event => {
-                                        const active = event.target.checked;
-                                        if (!active) {
-                                            setQuestion(state => ({ ...state, hint: undefined }));
-                                        }
-                                        setHint(active);
-                                    }}
-                                    disabled={!writeAccess}
-                                />
-                                <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
-                                <ButtonWithTooltip
-                                    title={i18n._("question-edit.button-tooltip.edit-hint-title")}
-                                    disabled={!hint || !writeAccess}
-                                    onClick={() =>
-                                        setShowTextModal({
-                                            property: "hint",
-                                            titleId: "edit-hint-title",
-                                            editorText: question.hint ?? "",
-                                        })
-                                    }
-                                >
-                                    <Pencil />
-                                </ButtonWithTooltip>
-                            </InputGroup>
-                        </Form.Group>
                     </Card.Body>
                 </Card>
 
@@ -566,8 +532,6 @@ export const QuestionEdit: React.FC = () => {
 
                         <div className="d-flex justify-content-end">
                             <Button
-                                // variant="link"
-                                // className="p-0"
                                 variant="warning"
                                 className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
                                 onClick={() => handleMDShow("QUESTION", "edit-title-text")}
@@ -589,6 +553,43 @@ export const QuestionEdit: React.FC = () => {
                     </Card.Body>
 
                     <Card.Footer className="pb-4 background-grey">
+                        <Form.Group className="mt-3x">
+                            <Form.Label className="mb-2">
+                                <Trans id="question-edit-page.input-label.advisory-text" />:
+                            </Form.Label>
+                            <InputGroup className="mb-2">
+                                <Form.Check
+                                    className="align-self-center"
+                                    label=""
+                                    name="answer"
+                                    type="switch"
+                                    checked={hint}
+                                    onChange={event => {
+                                        const active = event.target.checked;
+                                        if (!active) {
+                                            setQuestion(state => ({ ...state, hint: undefined }));
+                                        }
+                                        setHint(active);
+                                    }}
+                                    disabled={!writeAccess}
+                                />
+                                <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
+                                <ButtonWithTooltip
+                                    title={i18n._("question-edit.button-tooltip.edit-hint-title")}
+                                    disabled={!hint || !writeAccess}
+                                    onClick={() =>
+                                        setShowTextModal({
+                                            property: "hint",
+                                            titleId: "edit-hint-title",
+                                            editorText: question.hint ?? "",
+                                        })
+                                    }
+                                >
+                                    <Pencil />
+                                </ButtonWithTooltip>
+                            </InputGroup>
+                        </Form.Group>
+
                         <Form.Group>
                             <Form.Label className="m-0">
                                 <Trans id="question-edit-page.input-label.question-type" />:
@@ -623,7 +624,7 @@ export const QuestionEdit: React.FC = () => {
 
                         {question.type !== "TEXT" && (
                             <div className="mt-3">
-                                <div className="mt-4 pb-1 d-flex justify-content-between align-items-center">
+                                <div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
                                     <Trans id="activate-all-correct-answers" />
 
                                     <Button variant="warning" onClick={addAnswer} disabled={!writeAccess}>

@@ -22,42 +22,42 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:423
 msgid "question-edit-page.title.edit-question"
-msgstr ""
+msgstr "Edit question"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:425
 msgid "question-edit-page.title.new-question"
-msgstr ""
+msgstr "New question"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:479
 msgid "question-edit-page.input-label.group-name"
-msgstr ""
+msgstr "Question group"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:496
 msgid "question-edit-page.input-label.advisory-text"
-msgstr ""
+msgstr "Hint text"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:539
 msgid "question-edit-page.input-label.question"
-msgstr ""
+msgstr "Question"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:580
 msgid "question-edit-page.button-label.edit"
-msgstr ""
+msgstr "Edit"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:585
 msgid "question-edit-page.button-label.add"
-msgstr ""
+msgstr "Add"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:595
 msgid "question-edit-page.input-label.question-type"
-msgstr ""
+msgstr "Question type"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221

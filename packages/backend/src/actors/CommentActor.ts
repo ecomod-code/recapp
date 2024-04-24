@@ -110,7 +110,7 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 					const existingComment = await this.getEntity(comment.uid);
 					return existingComment
 						.map(async c => {
-							if (["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+							if (!["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
 								return new Error("Invalid write access to comment");
 							}
 							comment.updated = toTimestamp();

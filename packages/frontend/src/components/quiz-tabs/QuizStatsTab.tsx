@@ -13,7 +13,7 @@ const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
 };
 
-const QuestionBarChart = (props: { data: number; maxValue: number; color: string }) => {
+const QuestionBarChart = (props: { data: number; maxValue: number; color: string; symbol: any }) => {
 	const barWidth = 400; // Height of the chart area
 	return (
 		<svg viewBox="0 0 400 24" fill="blue" width="100%" height="20">
@@ -24,6 +24,9 @@ const QuestionBarChart = (props: { data: number; maxValue: number; color: string
 			</text>
 			<text x="190" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
 				{(props.data / props.maxValue) * 100.0} %
+			</text>
+			<text x="370" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
+				{props.symbol}
 			</text>
 		</svg>
 	);
@@ -51,18 +54,18 @@ const QuizBarChart = (props: { data: number[]; maxValue: number }) => {
 								/>
 							) : null}
 							<text x="10" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
-								{value}
+								{"\u2713"} {value}
 							</text>
 							<text x="170" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
 								{hasMaxValue ? `${((value / props.maxValue) * 100.0).toFixed(1)}%` : ""}
 							</text>
 							<text
-								x="380"
+								x={370 - (props.maxValue - value).toString().length * 10}
 								y={index * 25 + 19}
 								z="10"
 								style={{ fill: "white", fontSize: 20, textAlign: "right" }}
 							>
-								{props.maxValue - value}
+								{props.maxValue - value} {"\u2717"}
 							</text>
 						</Fragment>
 					);
@@ -123,6 +126,7 @@ export const QuizStatsTab: React.FC = () => {
 			({ groups, questions, quizStats, questionStats, exportFile }) => {
 				if (quizStats && groups) {
 					return groups.map((group, i) => {
+						/* Quiz stats */
 						return (
 							<Fragment key={i}>
 								{i == 0 && (
@@ -209,6 +213,7 @@ export const QuizStatsTab: React.FC = () => {
 					});
 				}
 				if (questionStats) {
+					/* Question stats */
 					const questionIndex = questions.findIndex(q => q.uid === questionStats.questionId)!;
 					const question = questions[questionIndex];
 					const questionsByGroup = groups.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
@@ -219,7 +224,7 @@ export const QuizStatsTab: React.FC = () => {
 							<h2>
 								<Trans id="question-stats-prefix" /> {question.text.slice(0, 80)}
 							</h2>
-							<div>
+							{/*<div>
 								{i18n._("question-stats-info", {
 									participants: questionStats.participants,
 									maxParticipants: questionStats.maximumParticipants,
@@ -228,7 +233,7 @@ export const QuizStatsTab: React.FC = () => {
 										100.0
 									).toFixed(2),
 								})}
-							</div>
+							</div>*/}
 							<div>
 								{question.type === "TEXT" && (
 									<div className="mb-5">
@@ -272,6 +277,7 @@ export const QuizStatsTab: React.FC = () => {
 														data={questionStats.answers[i] as number}
 														maxValue={questionStats.participants}
 														color={correct ? CORRECT_COLOR : WRONG_COLOR}
+														symbol={correct ? "\u2713" : "\u2717"}
 													/>
 												</div>
 											</div>

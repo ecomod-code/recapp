@@ -41,7 +41,8 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 		SharingMessages.match(message, {
 			AddExisting: list => {
 				this.updateState(draft => {
-					draft.teachers = [...draft.teachers, ...list.map(l => ({ ...l, query: "" }))];
+					// draft.teachers = [...draft.teachers, ...list.map(l => ({ ...l, query: "" }))];
+                    draft.teachers = [...list.map(l => ({ ...l, query: "" }))];
 				});
 			},
 			DeleteEntry: id => {

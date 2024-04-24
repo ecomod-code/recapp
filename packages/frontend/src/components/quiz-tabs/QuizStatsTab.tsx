@@ -219,7 +219,7 @@ export const QuizStatsTab: React.FC = () => {
 							<h2>
 								<Trans id="question-stats-prefix" /> {question.text.slice(0, 80)}
 							</h2>
-							<div>
+							{/*<div>
 								{i18n._("question-stats-info", {
 									participants: questionStats.participants,
 									maxParticipants: questionStats.maximumParticipants,
@@ -228,7 +228,7 @@ export const QuizStatsTab: React.FC = () => {
 										100.0
 									).toFixed(2),
 								})}
-							</div>
+							</div>*/}
 							<div>
 								{question.type === "TEXT" && (
 									<div className="mb-5">

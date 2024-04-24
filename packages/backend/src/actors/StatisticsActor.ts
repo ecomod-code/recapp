@@ -77,7 +77,7 @@ export class StatisticsActor extends SubscribableActor<
 			questionIds: [],
 		};
 		stats.forEach(s => {
-			quizStats.maximumParticipants = s.maximumParticipants;
+			quizStats.maximumParticipants = Math.max(quizStats.maximumParticipants, s.participants);
 			quizStats.answers.push(s.participants);
 			quizStats.questionIds.push(s.questionId);
 			if (s.tag === "ChoiceElementStatistics") {

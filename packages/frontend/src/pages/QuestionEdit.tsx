@@ -537,7 +537,7 @@ export const QuestionEdit: React.FC = () => {
                                 onClick={() => handleMDShow("QUESTION", "edit-title-text")}
                                 disabled={!writeAccess}
                             >
-                                {question.uid ? (
+                                {question.text.trim() ? (
                                     <>
                                         <Pencil className="mx-2" />
                                         <Trans id="question-edit-page.button-label.edit" />

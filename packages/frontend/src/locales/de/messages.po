@@ -22,42 +22,42 @@ msgstr "Anmelden"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:423
 msgid "question-edit-page.title.edit-question"
-msgstr "Neil: title of the page when the user clicks on 'edit-question' button"
+msgstr "Frage bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:425
 msgid "question-edit-page.title.new-question"
-msgstr "Neil: title of the page when the user clicks on 'create-new-question'"
+msgstr "Neue Frage erstellen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:479
 msgid "question-edit-page.input-label.group-name"
-msgstr "Neil: input field to select the 'group-name'"
+msgstr "Fragengruppe"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:496
 msgid "question-edit-page.input-label.advisory-text"
-msgstr "Neil: input field to add 'hinweistext'"
+msgstr "Hinweistext"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:539
 msgid "question-edit-page.input-label.question"
-msgstr "Neil: the field where the question is displayed"
+msgstr "Frage"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:580
 msgid "question-edit-page.button-label.edit"
-msgstr "Neil: button to edit the content of the question"
+msgstr "Bearbeiten"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:585
 msgid "question-edit-page.button-label.add"
-msgstr "Neil: button to add the content of the question"
+msgstr "Hinzufügen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:595
 msgid "question-edit-page.input-label.question-type"
-msgstr "Neil: input field to select the question type"
+msgstr "Fragetyp"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221

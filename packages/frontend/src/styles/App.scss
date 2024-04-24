@@ -4,6 +4,14 @@
 
 :root {
     --bs-navbar-brand-color: "white";
+    // --bs-primary-bg-subtle: #f5f3f0;
+}
+
+blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: rgb(59, 64, 69);
+    border-left: 0.25em solid #c8ccd0;
 }
 
 .card-footer {

@@ -85,6 +85,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					const db = await this.connector.db();
 					const noOfUsers = await db.collection<User>(this.collectionName).countDocuments();
+					console.log("NUMBEROFUSERS", noOfUsers);
 					if (noOfUsers === 0) {
 						// The first user will always be an admin
 						userToStore.role = "ADMIN";

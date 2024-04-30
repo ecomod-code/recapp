@@ -846,7 +846,7 @@ msgstr "Search text"
 
 #. js-lingui-explicit-id
 #~ msgid "archive-quiz-text"
-#~ msgstr "Would you like to archive this quiz? It will no longer be displayed in the overview, but can still be accessed via existing links and QR codes. Alternately, you may delete the quiz completely. Caution: No further acknowledgement will be displayed!"
+#~ msgstr "Would you like to archive this quiz? It will no longer be displayed in the overview but can still be accessed via existing links and QR codes. Alternatively, you can delete the quiz permanently. Caution, there will be no further confirmation!"
 
 #. js-lingui-explicit-id
 #~ msgid "title-set-quiz-mode-edit"

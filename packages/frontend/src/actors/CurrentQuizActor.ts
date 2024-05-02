@@ -34,6 +34,7 @@ import { Maybe, maybe, nothing } from "tsmonads";
 import { i18n } from "@lingui/core";
 import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
+import { shuffle } from "../utils";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -251,10 +252,18 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 						},
 						StartQuiz: async () => {
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
-							const questions = this.state.quiz.groups.reduce(
+							let questions = this.state.quiz.groups.reduce(
 								(q, group) => [...q, ...group.questions],
 								[] as Id[]
 							);
+
+							// Die Fragen sollten hier in Reihenfolge stehen. Falls wir das mischen müssen, passiert das jetzt.
+							if (this.state.quiz.shuffleQuestions) {
+								const randomShuffle = shuffle(Math.random);
+								questions = randomShuffle(questions);
+							}
+
+							console.log("ORDER", questions);
 
 							const run: QuizRun = await this.ask(
 								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
@@ -263,6 +272,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							this.updateState(draft => {
 								draft.run = run;
 							});
+
+							console.log("NEW ORDER", run.questions);
 							return unit();
 						},
 						LogAnswer: async ({ questionId, answer }) => {
@@ -279,6 +290,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 									answerCorrect = (cleanedAnswers as boolean[])
 										.map((a, i) => a === question.answers[i].correct)
 										.every(Boolean);
+									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
+									if (cleanedAnswers.length === 0) {
+										answerCorrect = question.answers.every(a => !a.correct);
+									}
 								}
 								const correct = [...this.state.run.correct, answerCorrect];
 

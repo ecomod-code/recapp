@@ -83,7 +83,7 @@ export class StatisticsActor extends SubscribableActor<
 			if (s.tag === "ChoiceElementStatistics") {
 				quizStats.correctAnswers.push(s.passed);
 			} else {
-				quizStats.correctAnswers.push(s.participants);
+				quizStats.correctAnswers.push(s.answers.length);
 			}
 		});
 		return quizStats;
@@ -165,7 +165,9 @@ export class StatisticsActor extends SubscribableActor<
 							stat.participants = stat.participants + 1;
 							stat.maximumParticipants = Math.max(stat.maximumParticipants, answer.maxParticipants);
 							if (answer.tag === "TextAnswer") {
-								(stat as TextElementStatistics).answers.push(answer.answer);
+								if (answer.answer) {
+									(stat as TextElementStatistics).answers.push(answer.answer);
+								}
 							} else {
 								if (answer.correct) {
 									(stat as ChoiceElementStatistics).passed =
@@ -193,7 +195,7 @@ export class StatisticsActor extends SubscribableActor<
 									groupName: answer.groupName,
 									maximumParticipants: answer.maxParticipants,
 									participants: 1,
-									answers: [answer.answer],
+									answers: answer.answer ? [answer.answer] : [],
 								};
 								return stat;
 							} else {

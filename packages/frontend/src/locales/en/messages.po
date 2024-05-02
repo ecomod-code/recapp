@@ -1027,3 +1027,19 @@ msgstr "You are about to leave the quiz. It will no longer be displayed in your 
 #. js-lingui-explicit-id
 msgid "quiz-card-teachers-label"
 msgstr "Teaching staff:"
+
+#. js-lingui-explicit-id
+msgid "answer-correct-title"
+msgstr "Correct"
+
+#. js-lingui-explicit-id
+msgid "answer-correct"
+msgstr "Your answer is correct."
+
+#. js-lingui-explicit-id
+msgid "answer-wrong-title"
+msgstr "Incorrect"
+
+#. js-lingui-explicit-id
+msgid "answer-wrong"
+msgstr "Sorry, your answer is incorrect."

@@ -1,3 +1,4 @@
+import { curry } from "rambda";
 import { ActorSystem, ActorRef } from "ts-actors";
 import { Try, Maybe, nothing, maybe } from "tsmonads";
 
@@ -26,3 +27,16 @@ export const flattenSystem = <T>(
 	if (!actor) return nothing();
 	return tSystem.toMaybe().flatMap(s => maybe([s, actor, state] as [ActorSystem, ActorRef, T]));
 };
+
+export const shuffle = curry(<T>(random: () => number, list: T[]) => {
+	let idx = -1;
+	const len = list.length;
+	let position;
+	const result: Array<T> = [];
+	while (++idx < len) {
+		position = Math.floor((idx + 1) * random());
+		result[idx] = result[position];
+		result[position] = list[idx];
+	}
+	return result;
+});

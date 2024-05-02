@@ -189,7 +189,10 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 					const existingComment = await this.getEntity(id);
 					return await existingComment
 						.map(async c => {
-							if (["TEACHER", "ADMIN"].includes(clientUserRole) && clientUserId !== c.authorId) {
+							if (
+								!["SYSTEM", "TEACHER", "ADMIN"].includes(clientUserRole) &&
+								clientUserId !== c.authorId
+							) {
 								return new Error("Invalid write access to question");
 							}
 

@@ -102,7 +102,6 @@ export const CommentCardContent: React.FC<
             <Card.Footer className="p-1 w-100 text-start">
                 <div className="d-flex align-items-between justify-content-between">
                     <ButtonWithTooltip
-                        titlePlacement={isDisplayedInModal ? "left" : undefined}
                         title={i18n._("comment-card.button-tooltip.upvote")}
                         variant="primary"
                         onClick={onUpvote}

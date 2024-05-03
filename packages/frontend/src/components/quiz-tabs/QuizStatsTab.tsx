@@ -13,6 +13,7 @@ const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const QuestionBarChart = (props: { data: number; maxValue: number; color: string; symbol: any }) => {
 	const barWidth = 400; // Height of the chart area
 	return (
@@ -166,7 +167,7 @@ export const QuizStatsTab: React.FC = () => {
 												style={{ backgroundColor: "lightgrey" }}
 											>
 												<div className="d-flex flex-row w-100">
-													<div>
+													<div className="d-flex flex-column align-items-start">
 														<div>{question.text?.slice(0, 80) ?? "---"}</div>
 
 														{noDetails ? (

@@ -8,7 +8,6 @@ import Modal from "react-bootstrap/Modal";
 import { useRendered } from "../../hooks/useRendered";
 import { Calendar2Check, HandThumbsUp, Question, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
-import { fromTimestamp } from "itu-utils";
 import { Comment, Id } from "@recapp/models";
 
 const MAX_LINES = 4;
@@ -71,24 +70,9 @@ export const CommentCardContent: React.FC<
             key={comment.uid}
         >
             <Card.Title className="p-1 ps-2 text-bg-light text-start">
-                <div className="d-flex flex-row align-items-center">
-                    <div className="flex-grow-1 fs-6">
-                        {fromTimestamp(comment.updated).toLocaleString({
-                            dateStyle: "medium",
-                            timeStyle: "medium",
-                        })}
-                    </div>
-                    <div>
-                        <ButtonWithTooltip
-                            titlePlacement={isDisplayedInModal ? "left" : undefined}
-                            title={i18n._("comment-card.button-tooltip.upvote")}
-                            variant="primary"
-                            onClick={onUpvote}
-                            className="p-2 d-flex"
-                        >
-                            <HandThumbsUp size={20} />
-                            <span className="ms-2">{comment.upvoters.length}</span>
-                        </ButtonWithTooltip>
+                <div className="py-2 d-flex flex-row align-items-center">
+                    <div className="flex-grow-1 align-content-center ps-1 text-overflow-ellipsis">
+                        {comment.authorName}
                     </div>
 
                     {isDisplayedInModal ? (
@@ -116,9 +100,18 @@ export const CommentCardContent: React.FC<
             ) : null}
 
             <Card.Footer className="p-1 w-100 text-start">
-                <div className="d-flex flex-row align-items-center">
-                    <div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
-                    <div>
+                <div className="d-flex align-items-between justify-content-between">
+                    <ButtonWithTooltip
+                        title={i18n._("comment-card.button-tooltip.upvote")}
+                        variant="primary"
+                        onClick={onUpvote}
+                        className="px-2 m-1 d-flex"
+                    >
+                        <HandThumbsUp size={20} />
+                        <span className="ms-2">{comment.upvoters.length}</span>
+                    </ButtonWithTooltip>
+
+                    <div className="d-flex">
                         {comment.relatedQuestion && questionText && (
                             <ButtonWithTooltip
                                 title={questionText ?? ""}

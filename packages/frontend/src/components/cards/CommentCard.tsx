@@ -117,8 +117,10 @@ export const CommentCardContent: React.FC<
 
             <Card.Footer className="p-1 w-100 text-start">
                 <div className="d-flex flex-row align-items-center">
-                    <div className="flex-grow-1 align-content-center ps-1">{comment.authorName}</div>
-                    <div>
+                    <div className="flex-grow-1 align-content-center ps-1 text-overflow-ellipsis">
+                        {comment.authorName}
+                    </div>
+                    <div className="d-flex">
                         {comment.relatedQuestion && questionText && (
                             <ButtonWithTooltip
                                 title={questionText ?? ""}

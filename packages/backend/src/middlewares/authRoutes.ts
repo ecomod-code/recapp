@@ -45,7 +45,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	}
 
 	const authUrl = client.authorizationUrl({
-		scope: "openid email profile",
+		scope: "openid email profile offline_access",
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);
@@ -83,6 +83,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const userStore = createActorUri("UserStore");
 			let role: UserRole = "TEACHER";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
+			console.error("-------", tokenSet.refresh_token);
 			const decodedRefresh = jwt.decode(tokenSet.refresh_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
 			try {

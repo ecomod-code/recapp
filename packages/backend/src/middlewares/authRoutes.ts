@@ -10,7 +10,8 @@ import { toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 
-const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI } = process.env;
+const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI, REQUIRES_OFFLINE_SCOPE } =
+	process.env;
 
 export const getOidc = async () => {
 	if (!Container.has("oidc")) {
@@ -45,7 +46,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	}
 
 	const authUrl = client.authorizationUrl({
-		scope: "openid email profile offline_access",
+		scope: "openid email profile" + REQUIRES_OFFLINE_SCOPE ? "offline_access" : "",
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);

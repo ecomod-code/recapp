@@ -22,7 +22,7 @@ Für einen Betrieb mit HTTPS sind zudem auf dem in der Organisation üblichen We
 
 Basierend auf der `.env-template`-Datei aus dem Hauptverzeichnis sind alle Einstellungen für die Applikation vorzunehmen. Port und Host können in aller Regel beibehalten werden. Die Frontend- und Backend- URI sind entsprechend der gewählten Domänen und Webserver-Konfiguration zu setzen.
 
-Die Autorisierung in recapp erfolgt über _OpenID Connect_. Ein entsprechender Server wird für den Betrieb voraus gesetzt. Die Variablen `OPENID_PROVIDER, OID_CLIENT_ID, OID_CLIENT_SECRET, ISSUER,REDIRECT_URI` sind entsprechend der Konfiguration des OID-Servers zu belegen.
+Die Autorisierung in recapp erfolgt über _OpenID Connect_. Ein entsprechender Server wird für den Betrieb voraus gesetzt. Die Variablen `OPENID_PROVIDER, OID_CLIENT_ID, OID_CLIENT_SECRET, ISSUER,REDIRECT_URI` sind entsprechend der Konfiguration des OID-Servers zu belegen. Einige Auth-Provider benötigen zudem einen `offline_scope`, um Refresh Tokens setzen zu dürfen. In diesem Fall ist die Umgebungsvariable `REQUIRES_OFFLINE_SCOPE=true` zu setzen.
 
 Für die lokale Kommunikation (innerhalb des Servers selbst) bedient sich recapp eines API-Keys. Dies ist ein beliebiger String, wir empfehlen hier die Generierung und Nutzung einer UUID.
 

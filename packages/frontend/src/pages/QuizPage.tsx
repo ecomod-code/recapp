@@ -86,9 +86,8 @@ export const QuizPage: React.FC = () => {
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
 	const showStatTab =
-		/*localUser.map(u => u.role).orElse("STUDENT") === "ADMIN" ||
-		teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||*/
-		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false);
+		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
+		mbQuiz.map(q => !!q.questionStats).orElse(false);
 
 	const upvoteComment = (commentId: Id) => {
 		tryQuizActor.forEach(actor => {

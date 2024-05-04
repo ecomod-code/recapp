@@ -55,7 +55,7 @@ export const CurrentQuizMessages = unionize(
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
 		setIsCommentSectionVisible: ofType<boolean>(),
-		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED">(),
+		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED" | "RESETSTATS">(),
 		StartQuiz: {}, // Start quiz for a participating student
 		LogAnswer: ofType<{ questionId: Id; answer: string | boolean[] }>(), // Sets the answer for the current quiz question, returns whether the answer was correct
 		ActivateQuestionStats: ofType<Id>(),
@@ -369,6 +369,17 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 											state: "EDITING",
 										})
 									);
+									this.send(
+										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										QuizRunActorMessages.Clear()
+									);
+									this.send(
+										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										StatisticsActorMessages.Clear()
+									);
+								}
+							} else if (newState === "RESETSTATS") {
+								if (this.state.quiz.state !== "STARTED") {
 									this.send(
 										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuizRunActorMessages.Clear()

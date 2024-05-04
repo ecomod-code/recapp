@@ -412,7 +412,7 @@ msgstr "Start quiz"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:164
 msgid "freeze-quiz-button"
-msgstr "Freeze quiz"
+msgstr "Stop quiz"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:172
@@ -862,7 +862,7 @@ msgstr "Search text"
 
 #. js-lingui-explicit-id
 #~ msgid "info-set-quiz-mode-stopped"
-#~ msgstr "Do you wish to temporarily freeze the quiz?"
+#~ msgstr "Do you wish to temporarily stop the quiz?"
 
 #. js-lingui-explicit-id
 #~ msgid "warning-set-quiz-mode-started"
@@ -1043,3 +1043,15 @@ msgstr "Incorrect"
 #. js-lingui-explicit-id
 msgid "answer-wrong"
 msgstr "Sorry, your answer is incorrect."
+
+#. js-lingui-explicit-id
+msgid "reset-stats-button"
+msgstr "Reset statistics"
+
+#. js-lingui-explicit-id
+msgid "title-reset-quiz"
+msgstr "Reset statistics"
+
+#. js-lingui-explicit-id
+msgid "info-reset-quiz"
+msgstr "Reset the statistics of all given answers?"

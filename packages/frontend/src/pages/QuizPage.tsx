@@ -85,6 +85,11 @@ export const QuizPage: React.FC = () => {
 	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
+	const showStatTab =
+		/*localUser.map(u => u.role).orElse("STUDENT") === "ADMIN" ||
+		teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||*/
+		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false);
+
 	const upvoteComment = (commentId: Id) => {
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.UpvoteComment(commentId));
@@ -323,9 +328,14 @@ export const QuizPage: React.FC = () => {
 										/>
 									)}
 								</Tab>
-								<Tab eventKey={tabRecords.statistics.value} title={i18n._(tabRecords.statistics.label)}>
-									<QuizStatsTab />
-								</Tab>
+								{showStatTab && (
+									<Tab
+										eventKey={tabRecords.statistics.value}
+										title={i18n._(tabRecords.statistics.label)}
+									>
+										<QuizStatsTab />
+									</Tab>
+								)}
 							</Tabs>
 						</Row>
 					</Container>

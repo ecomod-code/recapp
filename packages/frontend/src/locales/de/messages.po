@@ -412,7 +412,7 @@ msgstr "Quizmodus starten"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:164
 msgid "freeze-quiz-button"
-msgstr "Quiz einfrieren"
+msgstr "Quiz stoppen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:172
@@ -862,7 +862,7 @@ msgstr "Suchtext"
 
 #. js-lingui-explicit-id
 #~ msgid "info-set-quiz-mode-stopped"
-#~ msgstr "Möchten Sie das Quiz temporär einfrieren?"
+#~ msgstr "Möchten Sie das Quiz temporär stoppen?"
 
 #. js-lingui-explicit-id
 #~ msgid "warning-set-quiz-mode-started"
@@ -1043,3 +1043,15 @@ msgstr "Antwort falsch"
 #. js-lingui-explicit-id
 msgid "answer-wrong"
 msgstr "Diese Antwort ist leider falsch"
+
+#. js-lingui-explicit-id
+msgid "reset-stats-button"
+msgstr "Statistik zurücksetzen"
+
+#. js-lingui-explicit-id
+msgid "title-reset-quiz"
+msgstr "Statistik zurücksetzen"
+
+#. js-lingui-explicit-id
+msgid "info-reset-quiz"
+msgstr "Möchten Sie alle erfassten Antworten löschen?"

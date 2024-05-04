@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 // import { i18n } from "@lingui/core";
 import MDEditor, { commands } from "@uiw/react-md-editor";
-import { last } from "rambda";
+// import { last } from "rambda";
 import "katex/dist/katex.css";
 
 import Button from "react-bootstrap/Button";
@@ -13,14 +13,15 @@ import { useRendered } from "../../hooks/useRendered";
 // import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Id, toId } from "@recapp/models";
-import { MessageModal } from "../modals/MessageModal";
+// import { MessageModal } from "../modals/MessageModal";
+import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 
 export const RunningQuizTab: React.FC<{
     quizState: CurrentQuizState;
     logQuestion: (questionId: Id, answer: string | boolean[]) => void;
 }> = ({ quizState, logQuestion }) => {
     const [answered, setAnswered] = useState(false);
-    const [correct, setCorrect] = useState(false);
+    // const [correct, setCorrect] = useState(false);
     const [textAnswer, setTextAnswer] = useState("");
     const [answers, setAnswers] = useState<boolean[]>([]);
     const { run, questions: qData } = quizState;
@@ -40,27 +41,40 @@ export const RunningQuizTab: React.FC<{
     const questionText = questions.at(run?.counter ?? 0)?.text;
     const { rendered } = useRendered({ value: questionText ?? "" });
 
-    useEffect(() => {
-        setCorrect(last(quizState.run?.correct ?? []) ?? false);
-    }, [quizState.run?.correct.length]);
+    // useEffect(() => {
+    //     setCorrect(last(quizState.run?.correct ?? []) ?? false);
+    // }, [quizState.run?.correct.length]);
 
     if (!quizState.run || !quizState.questions) {
         return null;
     }
 
+    const isQuestionTypeText = currentQuestion?.type === "TEXT";
+    const isQuestionTypeSingle = currentQuestion?.type === "SINGLE";
+    // const isQuestionTypeMultiple = currentQuestion?.type === "MULTIPLE";
+
+    const submitAnswer = () => {
+        if (isQuestionTypeText) {
+            nextQuestion();
+        } else {
+            setAnswered(true);
+        }
+    };
+
     const logQuestionClicked = () => {
-        logQuestion(currentQuestion?.uid ?? toId(""), currentQuestion?.type === "TEXT" ? textAnswer : answers);
-        setAnswered(true);
+        logQuestion(currentQuestion?.uid ?? toId(""), isQuestionTypeText ? textAnswer : answers);
     };
 
     const nextQuestion = () => {
+        logQuestionClicked();
+
         setAnswered(false);
         setTextAnswer("");
         setAnswers([]);
     };
 
     const updateAnswer = (index: number, value: boolean) => {
-        const answersCopy = currentQuestion?.type === "SINGLE" ? answers.map(() => false) : [...answers];
+        const answersCopy = isQuestionTypeSingle ? answers.map(() => false) : [...answers];
         if (answersCopy.length === 0) {
             const a = new Array(currentQuestion?.answers.length).map(() => false);
             a[index] = value;
@@ -73,54 +87,58 @@ export const RunningQuizTab: React.FC<{
             setAnswers(a);
         }
     };
-    const questionType = currentQuestion?.type;
+
+    const isAnsweredCorrectly = !isQuestionTypeText ? isMultiChoiceAnsweredCorrectly(answers, currentQuestion) : true;
 
     return (
         <Row>
-            <MessageModal
+            {/* <MessageModal
                 show={answered}
                 color={correct ? "green" : "red"}
                 titleId={correct ? "answer-correct-title" : "answer-wrong-title"}
                 textId={correct ? "answer-correct" : "answer-wrong"}
                 onClose={nextQuestion}
-            />
+            /> */}
             {(run?.counter ?? 0) < questions.length && (
                 <Card className="p-0">
-                    <Card.Header className="text-start d-flex flex-row">
+                    <Card.Header
+                        className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "bg-success" : "bg-danger") : ""}`}
+                    >
                         <div className="m-1 align-self-center">
-                            <strong>Frage {(run?.counter ?? 0) + 1}</strong>
+                            {/* <strong>Frage {(run?.counter ?? 0) + 1}</strong> */}
+                            <strong>
+                                Frage {(run?.counter ?? 0) + 1} / {run?.questions.length}
+                            </strong>
                         </div>
-
-                        {/* <div className="flex-grow-1"></div> */}
-                        {/* <div className="m-1">
-							<ButtonWithTooltip
-								title={i18n._("running-quiz-tab.button-tooltip.comment")}
-								variant="secondary"
-							>
-								<PersonRaisedHand />
-							</ButtonWithTooltip>
-						</div> */}
                     </Card.Header>
                     <Card.Body>
                         <div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
                     </Card.Body>
                     <Card.Footer>
-                        {questionType !== "TEXT" && (
+                        {!isQuestionTypeText && (
                             <Form className="text-start mb-2">
                                 {currentQuestion?.answers.map((answer, index) => {
                                     return (
-                                        <Form.Check
-                                            key={answer.text}
-                                            label={answer.text}
-                                            name="answer"
-                                            type={currentQuestion.type === "SINGLE" ? "radio" : "checkbox"}
-                                            onChange={event => updateAnswer(index, event.target.checked)}
-                                        />
+                                        <Form.Group key={answer.text} className="d-flex gap-2">
+                                            <Form.Check
+                                                name="answer"
+                                                disabled={answered}
+                                                type={isQuestionTypeSingle ? "radio" : "checkbox"}
+                                                onChange={event => updateAnswer(index, event.target.checked)}
+                                            />
+                                            <Form.Label
+                                                className={
+                                                    answered ? (answer.correct ? "text-success" : "text-danger") : ""
+                                                }
+                                            >
+                                                {answer.text}
+                                            </Form.Label>
+                                        </Form.Group>
                                     );
                                 })}
                             </Form>
                         )}
-                        {questionType === "TEXT" && (
+                        {isQuestionTypeText && (
                             <div className="d-flex flex-column flex-grow-1">
                                 <div data-color-mode="light">
                                     <MDEditor
@@ -141,7 +159,7 @@ export const RunningQuizTab: React.FC<{
                                         ]}
                                         extraCommands={[]}
                                         value={textAnswer}
-                                        onChange={val => val && setTextAnswer(val)}
+                                        onChange={val => setTextAnswer(val ?? "")}
                                         height="100%"
                                         // eslint-disable-next-line @typescript-eslint/no-unused-vars
                                         components={{ preview: (_source, _state, _dispath) => <></> }}
@@ -150,7 +168,15 @@ export const RunningQuizTab: React.FC<{
                                 </div>
                             </div>
                         )}
-                        <Button onClick={logQuestionClicked}>Abschließen</Button>
+
+                        <div className="mt-2 d-flex justify-content-between">
+                            <Button disabled={answered} onClick={submitAnswer}>
+                                Abschließen
+                            </Button>
+                            <Button disabled={!answered} onClick={nextQuestion}>
+                                Next
+                            </Button>
+                        </div>
                     </Card.Footer>
                 </Card>
             )}

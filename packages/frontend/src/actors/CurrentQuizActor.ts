@@ -34,7 +34,7 @@ import { Maybe, maybe, nothing } from "tsmonads";
 import { i18n } from "@lingui/core";
 import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
-import { shuffle } from "../utils";
+import { isMultiChoiceAnsweredCorrectly, shuffle } from "../utils";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -287,9 +287,11 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 										answerCorrect = true;
 									}
 								} else {
-									answerCorrect = (cleanedAnswers as boolean[])
-										.map((a, i) => a === question.answers[i].correct)
-										.every(Boolean);
+									answerCorrect = isMultiChoiceAnsweredCorrectly(cleanedAnswers as boolean[], question);
+									// answerCorrect = (cleanedAnswers as boolean[])
+									// 	.map((a, i) => a === question.answers[i].correct)
+									// 	.every(Boolean);
+
 									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
 									if (cleanedAnswers.length === 0) {
 										answerCorrect = question.answers.every(a => !a.correct);

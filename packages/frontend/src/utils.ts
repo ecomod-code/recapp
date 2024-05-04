@@ -1,6 +1,7 @@
 import { curry } from "rambda";
 import { ActorSystem, ActorRef } from "ts-actors";
 import { Try, Maybe, nothing, maybe } from "tsmonads";
+import { Question } from "@recapp/models";
 
 export const cookie = (name: string): string => {
 	const cookies = new Map(
@@ -40,3 +41,9 @@ export const shuffle = curry(<T>(random: () => number, list: T[]) => {
 	}
 	return result;
 });
+
+export const isMultiChoiceAnsweredCorrectly = (answers: boolean[], question: Question | undefined) => {
+    const isAnsweredCorrectly = answers.map((a, i) => !!a === question?.answers[i].correct).every(Boolean);
+
+    return isAnsweredCorrectly;
+};

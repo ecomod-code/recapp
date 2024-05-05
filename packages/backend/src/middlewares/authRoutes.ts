@@ -46,7 +46,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	}
 
 	const authUrl = client.authorizationUrl({
-		scope: "openid email profile" + REQUIRES_OFFLINE_SCOPE ? "offline_access" : "",
+		scope: "openid email profile" + (REQUIRES_OFFLINE_SCOPE ? " offline_access" : ""),
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);
@@ -84,6 +84,9 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const userStore = createActorUri("UserStore");
 			let role: UserRole = "TEACHER";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
+			console.error(decoded);
+			console.error(tokenSet.claims());
+			console.error(tokenSet.scope);
 			console.error("-------", tokenSet.refresh_token);
 			const decodedRefresh = jwt.decode(tokenSet.refresh_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
@@ -98,8 +101,8 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 							lastLogin: toTimestamp(),
 							created: toTimestamp(),
 							updated: toTimestamp(),
-							username: decoded.name,
-							email: decoded.email,
+							username: decoded.name ?? "",
+							email: decoded.email ?? "",
 							active: true,
 							quizUsage: new Map(),
 						})

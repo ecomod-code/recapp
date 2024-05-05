@@ -45,6 +45,9 @@ export const QuizExportModal: React.FC<Props> = ({ show, filename, onClose, onDo
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <Button variant="outline-primary" className="m-1" onClick={handleClose}>
+                    <Trans id="cancel" />
+                </Button>
                 <Button
                     ref={submitButtonRef}
                     className="m-1"
@@ -54,9 +57,6 @@ export const QuizExportModal: React.FC<Props> = ({ show, filename, onClose, onDo
                     }}
                 >
                     <Trans id="download" />
-                </Button>
-                <Button className="m-1" onClick={handleClose}>
-                    <Trans id="cancel" />
                 </Button>
             </Modal.Footer>
         </Modal>

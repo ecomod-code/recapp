@@ -32,6 +32,9 @@ export const YesNoModal: React.FC<Props> = ({ show, titleId, textId, onClose, on
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <Button variant="outline-primary" className="m-1" onClick={handleClose}>
+                    <Trans id="cancel" />
+                </Button>
                 <Button
                     // ref={submitButtonRef}
                     // onBlur={() => submitButtonRef.current?.focus()}
@@ -40,9 +43,6 @@ export const YesNoModal: React.FC<Props> = ({ show, titleId, textId, onClose, on
                     onClick={onSubmit}
                 >
                     <Trans id="okay" />
-                </Button>
-                <Button className="m-1" onClick={handleClose}>
-                    <Trans id="cancel" />
                 </Button>
             </Modal.Footer>
         </Modal>

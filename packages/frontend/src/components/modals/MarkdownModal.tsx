@@ -32,6 +32,7 @@ export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onC
                 <div className="d-flex flex-column flex-grow-1">
                     <div data-color-mode="light">
                         <MDEditor
+                            autoFocus
                             commands={[
                                 commands.bold,
                                 commands.italic,

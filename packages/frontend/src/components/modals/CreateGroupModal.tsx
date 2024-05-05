@@ -62,7 +62,7 @@ export const CreateGroupModal: React.FC<Props> = ({ show, defaultValue, invalidV
                         <Trans id="cancel" />
                     </Button>
 
-                    <Button type="submit" disabled={error}>
+                    <Button type="submit" disabled={error || !name.trim()}>
                         <Trans id="okay" />
                     </Button>
                 </Modal.Footer>

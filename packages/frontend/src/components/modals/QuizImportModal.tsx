@@ -60,11 +60,11 @@ export const QuizImportModal: React.FC<Props> = ({ show, onClose }) => {
                 </div>
             </Modal.Body>
             <Modal.Footer>
+                <Button variant="outline-primary" className="m-1" onClick={handleClose}>
+                    <Trans id="cancel" />
+                </Button>
                 <Button className="m-1" disabled={!selectedFile} type="submit" onClick={upload}>
                     <Trans id="import" />
-                </Button>
-                <Button className="m-1" onClick={handleClose}>
-                    <Trans id="cancel" />
                 </Button>
             </Modal.Footer>
         </Modal>

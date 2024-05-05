@@ -1,6 +1,8 @@
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
-import { Button, Modal, Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 import { useEffect, useState } from "react";
 import "katex/dist/katex.css";
 
@@ -85,6 +87,7 @@ export const CommentEditorModal: React.FC<Props> = ({
 
                     <div data-color-mode="light">
                         <MDEditor
+                            autoFocus
                             commands={[
                                 commands.bold,
                                 commands.italic,
@@ -119,6 +122,17 @@ export const CommentEditorModal: React.FC<Props> = ({
             </Modal.Body>
             <Modal.Footer>
                 <Button
+                    variant="outline-primary"
+                    className="m-1"
+                    onClick={() => {
+                        setValue("");
+                        onClose();
+                        setIsRelatedToQuestion(true);
+                    }}
+                >
+                    <Trans id="cancel" />
+                </Button>
+                <Button
                     disabled={!value}
                     className="m-1"
                     onClick={() => {
@@ -144,16 +158,6 @@ export const CommentEditorModal: React.FC<Props> = ({
                     }}
                 >
                     <Trans id="okay" />
-                </Button>
-                <Button
-                    className="m-1"
-                    onClick={() => {
-                        setValue("");
-                        onClose();
-                        setIsRelatedToQuestion(true);
-                    }}
-                >
-                    <Trans id="cancel" />
                 </Button>
             </Modal.Footer>
         </Modal>

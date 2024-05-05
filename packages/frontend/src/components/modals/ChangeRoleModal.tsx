@@ -1,6 +1,8 @@
 import { FormEventHandler, useState } from "react";
 import { Trans } from "@lingui/react";
-import { Button, Modal, Form } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
+import Form from "react-bootstrap/Form";
 import { UserRole } from "@recapp/models";
 
 interface Props {

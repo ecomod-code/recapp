@@ -20,6 +20,26 @@ msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/RunningQuizTab.tsx:102
+msgid "running-quiz-tab.question-header"
+msgstr "Question"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/RunningQuizTab.tsx:167
+msgid "running-quiz-tab.button-label.submit"
+msgstr "Submit"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/RunningQuizTab.tsx:191
+msgid "running-quiz-tab.completed-quiz-card.header"
+msgstr "Quiz completed"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/RunningQuizTab.tsx:197
+msgid "running-quiz-tab.completed-quiz-card.quiz-result"
+msgstr "{questionsCountTotal} questions answered. Of these, {questionsCountCorrect} correct answer."
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:423
 msgid "question-edit-page.title.edit-question"
 msgstr "Edit question"

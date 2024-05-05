@@ -43,6 +43,10 @@ export const shuffle = curry(<T>(random: () => number, list: T[]) => {
 });
 
 export const isMultiChoiceAnsweredCorrectly = (answers: boolean[], question: Question | undefined) => {
+    if (answers.length === 0) {
+		return false;
+	}
+
     const isAnsweredCorrectly = answers.map((a, i) => !!a === question?.answers[i].correct).every(Boolean);
 
     return isAnsweredCorrectly;

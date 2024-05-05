@@ -1,4 +1,4 @@
-import { ComponentProps, Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
@@ -22,7 +22,7 @@ import { TextModal } from "../components/modals/TextModal";
 import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
-import { CommentEditorModal } from "../components/modals/CommentEditorModal";
+import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 
 const sortComments = (a: Comment, b: Comment) => {
     if (a.answered && !b.answered) return 1;
@@ -258,7 +258,7 @@ export const QuestionEdit: React.FC = () => {
     const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
     const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
 
-    const addComment: ComponentProps<typeof CommentEditorModal>["onSubmit"] = ({ text, name, isRelatedToQuestion }) => {
+    const addComment = ({ text, name, isRelatedToQuestion }: CommentEditorModalOnSubmitParams) => {
         const c: Omit<Comment, "authorId" | "uid"> = {
             text: text,
             authorName: name ?? userName,

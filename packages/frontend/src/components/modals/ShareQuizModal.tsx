@@ -96,7 +96,7 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
         .match(
             teachers => {
                 return (
-                    <Modal show={show} contentClassName="overflow-hidden">
+                    <Modal show={show} contentClassName="overflow-hidden" onEscapeKeyDown={cancel}>
                         <Modal.Title className="p-3 ps-3 text-bg-primary">
                             <Trans id="share-with-teachers-modal-title" />
                         </Modal.Title>

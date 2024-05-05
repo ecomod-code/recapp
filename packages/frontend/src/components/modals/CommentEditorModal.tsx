@@ -11,6 +11,8 @@ import { useRendered } from "../../hooks/useRendered";
 
 const LABEL_MIN_WIDTH = 140;
 
+export type CommentEditorModalOnSubmitParams = { text: string; name?: string; isRelatedToQuestion?: boolean };
+
 interface Props {
     show: boolean;
     titleId: string;
@@ -20,7 +22,7 @@ interface Props {
     participationOptions: UserParticipation[];
     showRelatedQuestionCheck?: boolean;
     onClose: () => void;
-    onSubmit: ({ text, name }: { text: string; name?: string; isRelatedToQuestion?: boolean }) => void;
+    onSubmit: ({ text, name }: CommentEditorModalOnSubmitParams) => void;
 }
 
 export const CommentEditorModal: React.FC<Props> = ({

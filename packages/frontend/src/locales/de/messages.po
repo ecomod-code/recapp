@@ -95,26 +95,6 @@ msgid "share-quiz-modal.error-alert.do-not-exist"
 msgstr "Benutzer existiert nicht"
 
 #. js-lingui-explicit-id
-#: src/components/modals/EditUserModal.tsx:42
-msgid "edit-user-modal.modal-title"
-msgstr "Benutzer bearbeiten"
-
-#. js-lingui-explicit-id
-#: src/components/modals/EditUserModal.tsx:42
-msgid "edit-user-modal.input-label.user-name"
-msgstr "Benutzernamen"
-
-#. js-lingui-explicit-id
-#: src/components/modals/EditUserModal.tsx:50
-msgid "edit-user-modal.input-label.user-role"
-msgstr "Benutzerrolle"
-
-#. js-lingui-explicit-id
-#: src/components/modals/EditUserModal.tsx:73
-msgid "edit-user-modal.input-label.user-status"
-msgstr "Benutzerstatus"
-
-#. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44
 msgid "comments-container.toggle-button.label"
 msgstr "Kommentare anzeigen/ausblenden"

@@ -1,4 +1,4 @@
-import { ComponentProps, Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -23,7 +23,7 @@ import { actorUris } from "../actorUris";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { Trans } from "@lingui/react";
-import { CommentEditorModal } from "../components/modals/CommentEditorModal";
+import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { QuizStateBadge } from "../components/QuizStateBadge";
 
 const sortComments = (a: Comment, b: Comment) => {
@@ -173,7 +173,7 @@ export const QuizPage: React.FC = () => {
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 
-                const addComment: ComponentProps<typeof CommentEditorModal>["onSubmit"] = ({ text, name }) => {
+                const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {
 						const c: Omit<Comment, "authorId" | "uid"> = {
 							authorName: name ?? userName,

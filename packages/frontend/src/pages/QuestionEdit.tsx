@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { ComponentProps, Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
@@ -258,16 +258,16 @@ export const QuestionEdit: React.FC = () => {
     const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
     const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
 
-    const addComment = (value: string, name?: string) => {
+    const addComment: ComponentProps<typeof CommentEditorModal>["onSubmit"] = ({ text, name, isRelatedToQuestion }) => {
         const c: Omit<Comment, "authorId" | "uid"> = {
-            text: value,
+            text: text,
             authorName: name ?? userName,
             created: toTimestamp(),
             updated: toTimestamp(),
             upvoters: [],
             answered: false,
             relatedQuiz: question.quiz,
-            relatedQuestion: question.uid,
+            relatedQuestion: isRelatedToQuestion ? question.uid : undefined,
         };
         tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
         handleClose();
@@ -337,11 +337,12 @@ export const QuestionEdit: React.FC = () => {
                 editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
                 show={!!showMDModal.titleId && showMDModal.type !== "QUESTION"}
                 onClose={handleClose}
+                showRelatedQuestionCheck
                 isStudent={isStudent}
                 userNames={[userName, userNickname ?? ""]}
                 participationOptions={allowedAuthorTypes}
-                onSubmit={(text, name) => {
-                    addComment(text, name);
+                onSubmit={({ text, name, isRelatedToQuestion }) => {
+                    addComment({ text, name, isRelatedToQuestion });
                     handleClose();
                 }}
             />

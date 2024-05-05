@@ -20,6 +20,11 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/modals/CommentEditorModal.tsx:73
+msgid "comment-editor-modal.link-to-question.checkbox-label"
+msgstr "Mit Frage verlinkt"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:102
 msgid "running-quiz-tab.question-header"
 msgstr "Frage"

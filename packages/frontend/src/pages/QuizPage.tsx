@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState } from "react";
+import { ComponentProps, Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -173,11 +173,11 @@ export const QuizPage: React.FC = () => {
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 
-				const addComment = (value: string, name?: string) => {
+                const addComment: ComponentProps<typeof CommentEditorModal>["onSubmit"] = ({ text, name }) => {
 					mbLocalUser.forEach(() => {
 						const c: Omit<Comment, "authorId" | "uid"> = {
 							authorName: name ?? userName,
-							text: value,
+							text: text,
 							created: toTimestamp(),
 							updated: toTimestamp(),
 							upvoters: [],

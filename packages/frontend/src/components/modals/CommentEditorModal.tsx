@@ -9,6 +9,8 @@ import { UserParticipation } from "@recapp/models";
 import { maybe } from "tsmonads";
 import { useRendered } from "../../hooks/useRendered";
 
+const LABEL_MIN_WIDTH = 140;
+
 interface Props {
     show: boolean;
     titleId: string;
@@ -16,8 +18,9 @@ interface Props {
     isStudent: boolean;
     userNames: string[];
     participationOptions: UserParticipation[];
+    showRelatedQuestionCheck?: boolean;
     onClose: () => void;
-    onSubmit: (text: string, as?: string) => void;
+    onSubmit: ({ text, name }: { text: string; name?: string; isRelatedToQuestion?: boolean }) => void;
 }
 
 export const CommentEditorModal: React.FC<Props> = ({
@@ -28,11 +31,14 @@ export const CommentEditorModal: React.FC<Props> = ({
     onSubmit,
     isStudent,
     userNames,
+    showRelatedQuestionCheck,
     participationOptions,
 }) => {
     const [value, setValue] = useState<string>(editorValue);
     const { rendered } = useRendered({ value });
     const [name, setName] = useState<UserParticipation | undefined>(isStudent ? participationOptions[0] : undefined);
+    const [isRelatedToQuestion, setIsRelatedToQuestion] = useState<boolean>(true);
+
     useEffect(() => {
         setValue(editorValue);
     }, [editorValue]);
@@ -46,8 +52,8 @@ export const CommentEditorModal: React.FC<Props> = ({
             </Modal.Title>
             <Modal.Body>
                 <div className="d-flex flex-column flex-grow-1">
-                    <div className="d-flex mb-2 align-items-center">
-                        <div className="pt-4">{i18n._("author")}: &nbsp;</div>
+                    <Form.Group className="d-flex mb-2 align-items-center">
+                        <Form.Label style={{ minWidth: LABEL_MIN_WIDTH }}>{i18n._("author")}</Form.Label>
                         <Form.Select value={name} onChange={event => setName(event.target.value as UserParticipation)}>
                             {participationOptions.includes("NAME") && <option value="NAME">{userNames[0]}</option>}
                             {participationOptions.includes("NICKNAME") && maybe(userNames[1]).orElse("") !== "" && (
@@ -59,7 +65,21 @@ export const CommentEditorModal: React.FC<Props> = ({
                                 </option>
                             )}
                         </Form.Select>
-                    </div>
+                    </Form.Group>
+
+                    {showRelatedQuestionCheck ? (
+                        <Form.Group className="d-flex mb-2">
+                            <Form.Label style={{ minWidth: LABEL_MIN_WIDTH }}>
+                                <Trans id="comment-editor-modal.link-to-question.checkbox-label" />
+                            </Form.Label>
+                            <Form.Check
+                                name="answer"
+                                type="checkbox"
+                                checked={isRelatedToQuestion}
+                                onChange={event => setIsRelatedToQuestion(event.target.checked)}
+                            />
+                        </Form.Group>
+                    ) : null}
 
                     <div data-color-mode="light">
                         <MDEditor
@@ -100,20 +120,23 @@ export const CommentEditorModal: React.FC<Props> = ({
                     disabled={!value}
                     className="m-1"
                     onClick={() => {
-                        const v = value;
+                        const text = value;
                         setValue("");
+
+                        const commonValues = { text, ...(showRelatedQuestionCheck ? { isRelatedToQuestion } : {}) };
+
                         switch (name) {
                             case "ANONYMOUS":
-                                onSubmit(v, i18n._("anonymous"));
+                                onSubmit({ ...commonValues, name: i18n._("anonymous") });
                                 break;
                             case "NAME":
-                                onSubmit(v, userNames[0]);
+                                onSubmit({ ...commonValues, name: userNames[0] });
                                 break;
                             case "NICKNAME":
-                                onSubmit(v, userNames[1]);
+                                onSubmit({ ...commonValues, name: userNames[1] });
                                 break;
                             default:
-                                onSubmit(v, undefined);
+                                onSubmit({ ...commonValues, name: undefined });
                                 break;
                         }
                     }}
@@ -125,6 +148,7 @@ export const CommentEditorModal: React.FC<Props> = ({
                     onClick={() => {
                         setValue("");
                         onClose();
+                        setIsRelatedToQuestion(true);
                     }}
                 >
                     <Trans id="cancel" />

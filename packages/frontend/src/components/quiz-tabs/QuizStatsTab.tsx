@@ -24,7 +24,7 @@ const QuestionBarChart = (props: { data: number; maxValue: number; color: string
 				{props.data}
 			</text>
 			<text x="190" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
-				{(props.data / props.maxValue) * 100.0} %
+				{Math.round((props.data / props.maxValue) * 1000.0) / 10.0} %
 			</text>
 			<text x="370" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
 				{props.symbol}

@@ -42,7 +42,7 @@ msgstr "Quiz completed"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:197
 msgid "running-quiz-tab.completed-quiz-card.quiz-result"
-msgstr "{questionsCountTotal} questions answered. Of these, {questionsCountCorrect} correct answer."
+msgstr "{questionsCountTotal} questions answered. Of which, {questionsCountCorrect} correct answers."
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:423

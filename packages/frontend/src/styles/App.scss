@@ -7,6 +7,22 @@
     // --bs-primary-bg-subtle: #f5f3f0;
 }
 
+.answer-bg-correct {
+	background-color: #2468A8
+}
+
+.answer-bg-wrong {
+	background-color: #DDAA33
+}
+
+.answer-correct {
+	color: #004488
+}
+
+.answer-wrong {
+	color: #DDAA33
+}
+
 blockquote {
     margin: 0;
     padding: 0 1em;

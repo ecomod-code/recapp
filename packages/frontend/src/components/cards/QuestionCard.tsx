@@ -11,120 +11,124 @@ const CONTAINER_MIN_HEIGHT = 160;
 const ARROW_CONTAINER_MAX_HEIGHT = CONTAINER_MIN_HEIGHT;
 
 type Props = {
-    question: Question;
-    moveUp: () => void;
-    moveDown: () => void;
-    approve: () => void;
-    delete: () => void;
-    edit: () => void;
-    changeGroup: () => void;
-    disabled: boolean;
-    currentUserUid: Id;
-    editMode: boolean;
-    isFirst: boolean;
-    isLast: boolean;
-    writeAccess: boolean;
-    state: string;
+	question: Question;
+	moveUp: () => void;
+	moveDown: () => void;
+	approve: () => void;
+	delete: () => void;
+	edit: () => void;
+	changeGroup: () => void;
+	disabled: boolean;
+	currentUserUid: Id;
+	editMode: boolean;
+	isFirst: boolean;
+	isLast: boolean;
+	writeAccess: boolean;
+	state: string;
 };
 
 export const QuestionCard = (props: Props) => {
-    const { rendered } = useRendered({ value: props.question.text });
+	const { rendered } = useRendered({ value: props.question.text });
 
-    return (
-        <Card className="p-0 mb-2">
-            <Card.Body
-                as="div"
-                style={{ minHeight: CONTAINER_MIN_HEIGHT }}
-                className="p-0 py-1 pe-2 m-0 d-flex flex-row align-items-center"
-            >
-                <div
-                    style={{ maxHeight: ARROW_CONTAINER_MAX_HEIGHT }}
-                    className="d-flex flex-column align-items-center justify-content-around gap-4 mx-2"
-                >
-                    <Button
-                        variant="light"
-                        style={{ border: "1px solid grey" }}
-                        size="sm"
-                        onClick={props.moveUp}
-                        disabled={props.disabled || !props.editMode || props.isFirst}
-                    >
-                        <ArrowUp />
-                    </Button>
-                    <Button
-                        variant="light"
-                        style={{ border: "1px solid grey" }}
-                        size="sm"
-                        onClick={props.moveDown}
-                        disabled={props.disabled || !props.editMode || props.isLast}
-                    >
-                        <ArrowDown />
-                    </Button>
-                </div>
-                <div className="flex-fill align-self-stretch d-flex flex-column justify-content-between">
-                    <div className="d-flex justify-content-between">
-                        <span className="text-secondary">
-                            {i18n._("authored-by", { author: props.question.authorName })}
-                        </span>
-                        <Badge as="div" className="align-self-center" bg="info">
-                            {props.question.type}
-                        </Badge>
-                    </div>
+	return (
+		<Card className="p-0 mb-2">
+			<Card.Body
+				as="div"
+				style={{ minHeight: CONTAINER_MIN_HEIGHT }}
+				className="p-0 py-1 pe-2 m-0 d-flex flex-row align-items-center"
+			>
+				<div
+					style={{ maxHeight: ARROW_CONTAINER_MAX_HEIGHT }}
+					className="d-flex flex-column align-items-center justify-content-around gap-4 mx-2"
+				>
+					<Button
+						variant="light"
+						style={{ border: "1px solid grey" }}
+						size="sm"
+						onClick={props.moveUp}
+						disabled={props.disabled || !props.editMode || props.isFirst}
+					>
+						<ArrowUp />
+					</Button>
+					<Button
+						variant="light"
+						style={{ border: "1px solid grey" }}
+						size="sm"
+						onClick={props.moveDown}
+						disabled={props.disabled || !props.editMode || props.isLast}
+					>
+						<ArrowDown />
+					</Button>
+				</div>
+				<div className="flex-fill align-self-stretch d-flex flex-column justify-content-between">
+					<div className="d-flex justify-content-between">
+						<span className="text-secondary">
+							{i18n._("authored-by", { author: props.question.authorName })}
+						</span>
+						<Badge as="div" className="align-self-center" bg="info">
+							{props.question.type}
+						</Badge>
+					</div>
 
-                    <div className="custom-line-clamp">
-                        {/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
-                        <div dangerouslySetInnerHTML={{ __html: rendered }} />
-                    </div>
+					<div className="custom-line-clamp">
+						{/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
+						<div dangerouslySetInnerHTML={{ __html: rendered }} />
+					</div>
 
-                    <div className="d-flex justify-content-end gap-2">
-                        {props.writeAccess && props.state === "EDITING" ? (
-                            <ButtonWithTooltip
-                                title={i18n._("question-card.button-tooltip.edit")}
-                                onClick={props.edit}
-                                variant={props.question.editMode ? "secondary" : "primary"}
-                                disabled={
-                                    (props.disabled &&
-                                        (props.question.authorId !== props.currentUserUid ||
-                                            props.question.approved)) ||
-                                    !props.editMode
-                                }
-                            >
-                                <Pencil />
-                            </ButtonWithTooltip>
-                        ) : (
-                            <ButtonWithTooltip
-                                title={i18n._("question-card.button-tooltip.view")}
-                                onClick={props.edit}
-                                variant={props.question.editMode ? "secondary" : "primary"}
-                            >
-                                <Eye />
-                            </ButtonWithTooltip>
-                        )}
-                        <ButtonWithTooltip
-                            title={i18n._("question-card.button-tooltip.change-group")}
-                            onClick={props.changeGroup}
-                            disabled={props.disabled || !props.editMode}
-                        >
-                            <TrainFront />
-                        </ButtonWithTooltip>
-                        <ButtonWithTooltip
-                            title={i18n._("question-card.button-tooltip.approve")}
-                            variant={props.question.approved ? "success" : "warning"}
-                            onClick={props.approve}
-                            disabled={props.disabled || !props.editMode}
-                        >
-                            <Check />
-                        </ButtonWithTooltip>
-                        <ButtonWithTooltip
-                            title={i18n._("question-card.button-tooltip.delete")}
-                            variant="danger"
-                            onClick={props.delete}
-                            disabled={props.disabled || props.question.approved || !props.editMode}
-                        >
-                            <Trash />
-                        </ButtonWithTooltip>
-                    </div>
-                </div>
-            </Card.Body>
-        </Card>
-    );
+					<div className="d-flex justify-content-end gap-2">
+						{props.writeAccess && props.state === "EDITING" ? (
+							<ButtonWithTooltip
+								title={i18n._("question-card.button-tooltip.edit")}
+								onClick={props.edit}
+								variant={props.question.editMode ? "secondary" : "primary"}
+								disabled={
+									(props.disabled &&
+										(props.question.authorId !== props.currentUserUid ||
+											props.question.approved)) ||
+									!props.editMode
+								}
+							>
+								<Pencil />
+							</ButtonWithTooltip>
+						) : (
+							<ButtonWithTooltip
+								title={i18n._("question-card.button-tooltip.view")}
+								onClick={props.edit}
+								variant={props.question.editMode ? "secondary" : "primary"}
+							>
+								<Eye />
+							</ButtonWithTooltip>
+						)}
+						<ButtonWithTooltip
+							title={i18n._("question-card.button-tooltip.change-group")}
+							onClick={props.changeGroup}
+							disabled={props.disabled || !props.editMode}
+						>
+							<TrainFront />
+						</ButtonWithTooltip>
+						<ButtonWithTooltip
+							title={
+								props.question.approved
+									? i18n._("question-card.button-tooltip.unapprove")
+									: i18n._("question-card.button-tooltip.approve")
+							}
+							variant={props.question.approved ? "success" : "warning"}
+							onClick={props.approve}
+							disabled={props.disabled || !props.editMode}
+						>
+							<Check />
+						</ButtonWithTooltip>
+						<ButtonWithTooltip
+							title={i18n._("question-card.button-tooltip.delete")}
+							variant="danger"
+							onClick={props.delete}
+							disabled={props.disabled || props.question.approved || !props.editMode}
+						>
+							<Trash />
+						</ButtonWithTooltip>
+					</div>
+				</div>
+			</Card.Body>
+		</Card>
+	);
 };

@@ -287,7 +287,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 										answerCorrect = true;
 									}
 								} else {
-									answerCorrect = isMultiChoiceAnsweredCorrectly(cleanedAnswers as boolean[], question);
+									answerCorrect = isMultiChoiceAnsweredCorrectly(
+										cleanedAnswers as boolean[],
+										question
+									);
 									// answerCorrect = (cleanedAnswers as boolean[])
 									// 	.map((a, i) => a === question.answers[i].correct)
 									// 	.every(Boolean);
@@ -440,6 +443,15 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 							return unit();
 						},
 						DeleteQuestion: async id => {
+							// Question also needs to be deleted from the groups of the quiz
+							const groups = this.state.quiz.groups.map(g => {
+								g.questions = g.questions.filter(q => q !== id);
+								return g;
+							});
+							await this.send(
+								actorUris.QuizActor,
+								QuizActorMessages.Update({ uid: this.state.quiz.uid, groups })
+							);
 							await this.ask(
 								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuestionActorMessages.Delete(id)

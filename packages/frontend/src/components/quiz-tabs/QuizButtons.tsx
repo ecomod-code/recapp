@@ -12,6 +12,7 @@ import { YesNoModal } from "../modals/YesNoModal";
 import { ShareModal } from "../modals/ShareModal";
 
 export const QuizButtons = (props: {
+	disableForStudent: boolean;
 	quizState: Quiz["state"];
 	uniqueLink: string;
 	isQuizCreator: boolean;
@@ -92,16 +93,18 @@ export const QuizButtons = (props: {
 				textId={i18n._("leave-quiz-modal-text")}
 			/>
 			<div className="d-flex gap-2 justify-content-end flex-column-reverse flex-lg-row">
-				<Button
-					variant="outline-primary"
-					className="ps-1 d-flex justify-content-center align-items-center"
-					onClick={() => setShareModal(props.uniqueLink)}
-				>
-					<QrCode className="mx-1" />
-					<Trans id="quiz-show-qr-code-button" />
-				</Button>
+				{!props.disableForStudent && (
+					<Button
+						variant="outline-primary"
+						className="ps-1 d-flex justify-content-center align-items-center"
+						onClick={() => setShareModal(props.uniqueLink)}
+					>
+						<QrCode className="mx-1" />
+						<Trans id="quiz-show-qr-code-button" />
+					</Button>
+				)}
 
-				{props.quizState !== "EDITING" && (
+				{!props.disableForStudent && props.quizState !== "EDITING" && (
 					<Button
 						variant="success"
 						className="ps-1 d-flex justify-content-center align-items-center"
@@ -112,7 +115,7 @@ export const QuizButtons = (props: {
 					</Button>
 				)}
 
-				{props.quizState !== "STOPPED" && (
+				{!props.disableForStudent && props.quizState !== "STOPPED" && (
 					<Button
 						variant="success"
 						className="ps-1 d-flex justify-content-center align-items-center"
@@ -123,7 +126,7 @@ export const QuizButtons = (props: {
 					</Button>
 				)}
 
-				{props.quizState !== "STARTED" && (
+				{!props.disableForStudent && props.quizState !== "STARTED" && (
 					<>
 						<Button
 							variant="success"

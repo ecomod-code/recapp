@@ -1060,3 +1060,15 @@ msgstr "Reset statistics"
 #. js-lingui-explicit-id
 msgid "info-reset-quiz"
 msgstr "Reset the statistics of all given answers?"
+
+#. js-lingui-explicit-id
+msgid "delete-question-title"
+msgstr "Delete question"
+
+#. js-lingui-explicit-id
+msgid "delete-question-text"
+msgstr "Delete question from quiz? This operation is irrevocable."
+
+#. js-lingui-explicit-id
+msgid "question-card.button-tooltip.unapprove"
+msgstr "Revoke approval"

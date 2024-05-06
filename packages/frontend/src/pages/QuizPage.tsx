@@ -173,7 +173,7 @@ export const QuizPage: React.FC = () => {
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 
-                const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
+				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {
 						const c: Omit<Comment, "authorId" | "uid"> = {
 							authorName: name ?? userName,
@@ -288,10 +288,11 @@ export const QuizPage: React.FC = () => {
 							</CommentsContainer>
 						</Row>
 
-						{!disableForStudent && (
+						{
 							<Row>
 								<div className="my-4">
 									<QuizButtons
+										disableForStudent={disableForStudent}
 										quizState={quizData.quiz.state}
 										uniqueLink={quizData.quiz.uniqueLink}
 										leaveQuiz={leaveQuiz}
@@ -302,7 +303,7 @@ export const QuizPage: React.FC = () => {
 									/>
 								</div>
 							</Row>
-						)}
+						}
 
 						<Row className="mt-5">
 							<Tabs

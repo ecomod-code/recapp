@@ -1060,3 +1060,15 @@ msgstr "Statistik zurücksetzen"
 #. js-lingui-explicit-id
 msgid "info-reset-quiz"
 msgstr "Möchten Sie alle erfassten Antworten löschen?"
+
+#. js-lingui-explicit-id
+msgid "delete-question-title"
+msgstr "Frage löschen"
+
+#. js-lingui-explicit-id
+msgid "delete-question-text"
+msgstr "Möchten Sie die Frage unwiderruflich löschen?"
+
+#. js-lingui-explicit-id
+msgid "question-card.button-tooltip.unapprove"
+msgstr "Freigabe zurücknehmen"

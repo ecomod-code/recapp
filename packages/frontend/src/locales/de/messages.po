@@ -1072,3 +1072,7 @@ msgstr "Möchten Sie die Frage unwiderruflich löschen?"
 #. js-lingui-explicit-id
 msgid "question-card.button-tooltip.unapprove"
 msgstr "Freigabe zurücknehmen"
+
+#. js-lingui-explicit-id
+msgid "nickname-not-set"
+msgstr "Nicht gesetzt"

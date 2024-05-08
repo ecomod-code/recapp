@@ -47,3 +47,28 @@ Das Backend muss nicht erstellt werden. Es kann jedoch nach einem Update sinnvol
 8. (Optional) Start des Backends über PM2
 
 Wir empfehlen den Einsatz von pm2 für den Betrieb des Backends. Dieses kann mittels `pm2 startpm2 start npm --name "backend" -- run dev` bzw. `pm2 startpm2 start npm --name "backend" -- run start` direkt aus dem Verzeichnis `/packages/backend` gestartet werden. Im Falle von Updates kann man den Prozess einfach mit `pm2 restart backend` neu starten. Nach der erstmaligen Ausführung bitte nicht vergessen, mit `pm2 save` die Konfiguration zu sichern damit auch nach einem Neustart des Servers der Prozess wieder neu anläuft.
+
+9. (Optional) CRON-Job für regelmässigen Restart
+
+Um gecachte Daten regelmässig zu entfernen (und damit den Speicher wieder freizugeben) empfiehlt es sich, das Backend einmal am Tag neu zu starten. Bei der GWDG haben wir dazu einen Cronjob mit dem Benutzer `cloud` eingerichtet mit der folgenden Konfiguration:
+
+`0 3 * * * pm2 restart 0`
+
+### Einpflegen von Übersetzungen und Patches im Frontend (Empfehlung mit konkretem Bezug auf die Installation auf den GWDG-Servern)
+
+1. Übersetzungen liegen komplett im Frontendprojekt unter `/src/locales/` und dort je nach Sprache (z.B deutsch) in `de/messages.po`. Die Texte können direkt bearbeitet werden, eine Nachbearbeitung mit Tools (Kompilierung u.ä.) ist nicht notwendig.
+2. Falls gewünscht (oder falls auch Code-Änderungen gemacht worden sind): Versionsnummer in der package.json des `frontend`-Projekts hochzählen.
+3. Die Dateien auf dem Server einspielen.
+   3a. (GWDG) Auf dem Server mit dem Benutzer Cloud anmelden.
+   3b. (GWDG) Repository mit `git pull` auf den aktuellsten Stand bringen (ein passender Deployment-Key für den Cloud-Benutzer ist in Github hinterlegt)
+4. Das Frontend neu kompilieren und auf dem Webserver kopieren (falls notwendig)
+   4a. (GWDG) Die Webseite wird (als post-install step) auf ein (für den Benutzer und den Webserver) zugreifbares Verzeichnis kopiert und ist damit sofort verfügbar. Bitte als Benutzer `cloud` im Verzeichnis `/packages/frontend` einmal `sudo npm run build` ausführen, dann passiert alles weitere automatisch.
+
+### Einpflegen von Patches im Backend (Empfehlung)
+
+1. Codeänderungen vornehmen. Mit `npm run build` im `backend`-Projekt kann die Korrektheit geprüft werden.
+2. Falls gewünscht (oder falls auch Code-Änderungen gemacht worden sind): Versionsnummer in der package.json des `backend`-Projekts hochzählen.
+3. Die Dateien auf dem Server einspielen.
+   3a. (GWDG) Auf dem Server mit dem Benutzer Cloud anmelden.
+   3b. (GWDG) Repository mit `git pull` auf den aktuellsten Stand bringen (ein passender Deployment-Key für den Cloud-Benutzer ist in Github hinterlegt)
+4. Backend einmal neu starten (GWDG als Benutzer `cloud` mit dem folgenden Befehl `pm2 restart backend`)

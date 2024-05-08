@@ -1072,3 +1072,7 @@ msgstr "Delete question from quiz? This operation is irrevocable."
 #. js-lingui-explicit-id
 msgid "question-card.button-tooltip.unapprove"
 msgstr "Revoke approval"
+
+#. js-lingui-explicit-id
+msgid "nickname-not-set"
+msgstr "Nicht gesetzt"

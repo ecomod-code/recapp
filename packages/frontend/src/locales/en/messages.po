@@ -1075,4 +1075,4 @@ msgstr "Revoke approval"
 
 #. js-lingui-explicit-id
 msgid "nickname-not-set"
-msgstr "Nicht gesetzt"
+msgstr "Not set"

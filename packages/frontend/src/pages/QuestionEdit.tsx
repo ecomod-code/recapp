@@ -362,6 +362,8 @@ export const QuestionEdit: React.FC = () => {
                             Dashboard
                         </Breadcrumb.Item>
                         <Breadcrumb.Item
+                            className="text-overflow-ellipsis"
+                            style={{ maxWidth: 400 }}
                             onClick={() => {
                                 resetQuestionEditModeFlag();
                                 nav(

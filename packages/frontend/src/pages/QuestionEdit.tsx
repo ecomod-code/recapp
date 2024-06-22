@@ -52,7 +52,7 @@ export const QuestionEdit: React.FC = () => {
         }
     );
     const [hint, setHint] = useState(false);
-    const [groups, setGroups] = useState<string[]>([]);
+    // const [groups, setGroups] = useState<string[]>([]);
     const [selectedGroup, setSelectedGroup] = useState("");
     const [allowedQuestionTypes, setAllowedQuestionTypes] = useState<string[]>([]);
     const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<UserParticipation[]>([]);
@@ -117,7 +117,7 @@ export const QuestionEdit: React.FC = () => {
             } else {
                 setSelectedGroup(groups[0]);
             }
-            setGroups(groups);
+            // setGroups(groups);
         }
     }, [mbQuiz.hasValue]);
 
@@ -419,7 +419,7 @@ export const QuestionEdit: React.FC = () => {
                         )
                         .orElse([<Fragment key={"key-1"} />])}
                 </CommentsContainer>
-                <div className="pb-3 pt-4 mb-4 mt-3 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
+                <div className="py-2 mb-4 mt-2 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
                     <span className="">
                         <strong>
                             {question.uid ? (
@@ -430,26 +430,9 @@ export const QuestionEdit: React.FC = () => {
                             :
                         </strong>
                     </span>
-
-                    <div className="d-flex flex-column-reverse flex-lg-row gap-2 justify-content-end">
-                        {/* <ButtonWithTooltip
-                            title={i18n._("question-edit.button-tooltip.check")}
-                            variant="secondary"
-                            disabled
-                        >
-                            <Check />
-                        </ButtonWithTooltip> */}
-
-                        <Button variant="outline-primary" onClick={onCancelClick}>
-                            <Trans id="cancel" />
-                        </Button>
-                        <Button disabled={isSaveButtonDisabled} onClick={submit}>
-                            {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-                        </Button>
-                    </div>
                 </div>
 
-                <Card>
+                <Card className="overflow-hidden">
                     <Card.Body className="d-flex flex-column gap-3 background-grey">
                         {isStudent && writeAccess && (
                             <Form.Group>
@@ -479,6 +462,38 @@ export const QuestionEdit: React.FC = () => {
                         )}
 
                         <Form.Group>
+                            <Form.Label className="my-2">
+                                <Trans id="question-edit-page.input-label.question-type" />:
+                            </Form.Label>
+                            <Form.Select
+                                value={question.type}
+                                onChange={event =>
+                                    setQuestion(state => ({
+                                        ...state,
+                                        type: event.target.value as "SINGLE" | "MULTIPLE" | "TEXT",
+                                    }))
+                                }
+                                disabled={!writeAccess}
+                            >
+                                {allowedQuestionTypes.includes("SINGLE") && (
+                                    <option value="SINGLE">
+                                        <Trans id="single-choice-selection" />
+                                    </option>
+                                )}
+                                {allowedQuestionTypes.includes("MULTIPLE") && (
+                                    <option value="MULTIPLE">
+                                        <Trans id="multiple-choice-selection" />
+                                    </option>
+                                )}
+                                {allowedQuestionTypes.includes("TEXT") && (
+                                    <option value="TEXT">
+                                        <Trans id="text-type-selection" />
+                                    </option>
+                                )}
+                            </Form.Select>
+                        </Form.Group>
+
+                        {/* <Form.Group>
                             <Form.Label className="">
                                 <Trans id="question-edit-page.input-label.group-name" />:
                             </Form.Label>
@@ -493,7 +508,7 @@ export const QuestionEdit: React.FC = () => {
                                     </option>
                                 ))}
                             </Form.Select>
-                        </Form.Group>
+                        </Form.Group> */}
                     </Card.Body>
                 </Card>
 
@@ -591,8 +606,8 @@ export const QuestionEdit: React.FC = () => {
                             </InputGroup>
                         </Form.Group>
 
-                        <Form.Group>
-                            <Form.Label className="m-0">
+                        {/* <Form.Group>
+                            <Form.Label className="my-2">
                                 <Trans id="question-edit-page.input-label.question-type" />:
                             </Form.Label>
                             <Form.Select
@@ -621,7 +636,7 @@ export const QuestionEdit: React.FC = () => {
                                     </option>
                                 )}
                             </Form.Select>
-                        </Form.Group>
+                        </Form.Group> */}
 
                         {question.type !== "TEXT" && (
                             <div className="mt-3">
@@ -669,6 +684,23 @@ export const QuestionEdit: React.FC = () => {
                         )}
                     </Card.Footer>
                 </Card>
+
+                <div className="mt-4 d-flex flex-column-reverse flex-lg-row gap-2 justify-content-end">
+                    {/* <ButtonWithTooltip
+                            title={i18n._("question-edit.button-tooltip.check")}
+                            variant="secondary"
+                            disabled
+                        >
+                            <Check />
+                        </ButtonWithTooltip> */}
+
+                    <Button variant="outline-primary" onClick={onCancelClick}>
+                        <Trans id="cancel" />
+                    </Button>
+                    <Button disabled={isSaveButtonDisabled} onClick={submit}>
+                        {writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
+                    </Button>
+                </div>
             </div>
         </>
     );

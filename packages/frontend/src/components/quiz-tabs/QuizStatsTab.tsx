@@ -168,9 +168,7 @@ export const QuizStatsTab: React.FC = () => {
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start">
-														<div className="text-overflow-ellipsis">{question.text?.slice(0, 80) ?? "---"}</div>
-
-
+														<div className="text-overflow-ellipsis">{question.text ?? "---"}</div>
 													</div>
 
 													<div className="d-flex align-items-center justify-content-between">
@@ -222,8 +220,8 @@ export const QuizStatsTab: React.FC = () => {
 
 					return (
 						<div>
-							<p className="h2">
-								<Trans id="question-stats-prefix" /> {question.text.slice(0, 80)}
+							<p className="custom-line-clamp h2">
+								<Trans id="question-stats-prefix" />{question.text}
 							</p>
 							{/*<div>
 								{i18n._("question-stats-info", {

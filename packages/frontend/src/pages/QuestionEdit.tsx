@@ -462,7 +462,7 @@ export const QuestionEdit: React.FC = () => {
                         )}
 
                         <Form.Group>
-                            <Form.Label className="my-2">
+                            <Form.Label>
                                 <Trans id="question-edit-page.input-label.question-type" />:
                             </Form.Label>
                             <Form.Select
@@ -568,7 +568,7 @@ export const QuestionEdit: React.FC = () => {
                         </div>
                     </Card.Body>
 
-                    <Card.Footer className="pb-4 background-grey">
+                    <Card.Footer className="pb-4 background-grey pt-3">
                         <Form.Group className="mt-3x">
                             <Form.Label className="mb-2">
                                 <Trans id="question-edit-page.input-label.advisory-text" />:

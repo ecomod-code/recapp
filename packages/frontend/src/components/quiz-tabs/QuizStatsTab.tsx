@@ -163,32 +163,30 @@ export const QuizStatsTab: React.FC = () => {
 										return (
 											<div
 												key={question.uid}
-												className="m-1 p-2"
+												className="m-1 p-2 pt-3"
 												style={{ backgroundColor: "lightgrey" }}
 											>
-												<div className="d-flex flex-row w-100">
-													<div className="d-flex flex-column align-items-start">
-														<div>{question.text?.slice(0, 80) ?? "---"}</div>
-
-														{noDetails ? (
-															<div>
-																<em>
-																	<Trans id="no-data-yet" />
-																</em>
-															</div>
-														) : (
-															<div>
-																<QuizBarChart
-																	data={[correct]}
-																	maxValue={quizStats.maximumParticipants}
-																/>
-															</div>
-														)}
+												<div className="d-flex flex-column justify-content-between w-100">
+													<div className="d-flex align-items-start">
+														<div className="text-overflow-ellipsis">{question.text ?? "---"}</div>
 													</div>
-													<div className="flex-grow-1"></div>
-													<div className="align-self-center">
+
+													<div className="d-flex align-items-center justify-content-between">
+                                                        <div className="lh-1">
+                                                            {noDetails ? (
+                                                                <em>
+                                                                    <Trans id="no-data-yet" />
+                                                                </em>
+                                                            ) : (
+                                                                <QuizBarChart
+                                                                    data={[correct]}
+                                                                    maxValue={quizStats.maximumParticipants}
+                                                                />
+                                                            )}
+                                                        </div>
 														<Button
-															variant="primary"
+															size="sm"
+															variant="link"
 															onClick={() =>
 																tryActor.forEach(actor =>
 																	actor.send(
@@ -222,9 +220,9 @@ export const QuizStatsTab: React.FC = () => {
 
 					return (
 						<div>
-							<h2>
-								<Trans id="question-stats-prefix" /> {question.text.slice(0, 80)}
-							</h2>
+							<p className="custom-line-clamp h2">
+								<Trans id="question-stats-prefix" />{question.text}
+							</p>
 							{/*<div>
 								{i18n._("question-stats-info", {
 									participants: questionStats.participants,

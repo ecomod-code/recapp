@@ -32,7 +32,7 @@ export const CreateQuiz: React.FC = () => {
                     <Row>
                         <Breadcrumb>
                             <Breadcrumb.Item href="/Dashboard">Dashboard</Breadcrumb.Item>
-                            <Breadcrumb.Item>{i18n._("new-quiz")}</Breadcrumb.Item>
+                            <Breadcrumb.Item active>{i18n._("new-quiz")}</Breadcrumb.Item>
                         </Breadcrumb>
                         <Container className="pb-5">
                             <Form className="list-group">

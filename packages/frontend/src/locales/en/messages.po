@@ -1076,3 +1076,19 @@ msgstr "Revoke approval"
 #. js-lingui-explicit-id
 msgid "nickname-not-set"
 msgstr "Not set"
+
+#. js-lingui-explicit-id
+msgid "address-you"
+msgstr "You"
+
+#. js-lingui-explicit-id
+msgid "question-stats-your-answer"
+msgstr "Your answer"
+
+#. js-lingui-explicit-id
+msgid "download-csv"
+msgstr "Download CSV"
+
+#. js-lingui-explicit-id
+msgid "download-pdf"
+msgstr "Download PDF"

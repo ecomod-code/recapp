@@ -1076,3 +1076,19 @@ msgstr "Freigabe zurücknehmen"
 #. js-lingui-explicit-id
 msgid "nickname-not-set"
 msgstr "Nicht gesetzt"
+
+#. js-lingui-explicit-id
+msgid "address-you"
+msgstr "Du"
+
+#. js-lingui-explicit-id
+msgid "question-stats-your-answer"
+msgstr "Deine Antwort"
+
+#. js-lingui-explicit-id
+msgid "download-csv"
+msgstr "Als CSV herunterladen"
+
+#. js-lingui-explicit-id
+msgid "download-pdf"
+msgstr "Als PDF herunterladen"

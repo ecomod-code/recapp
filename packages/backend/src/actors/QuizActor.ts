@@ -191,7 +191,8 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				GetUserRun: async ({ studentId, quizId }) => {
 					const db = await this.connector.db();
 					const mbRun = maybe(await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId }));
-					return mbRun.match(identity, () => new Error());
+					console.warn("GETUSERRUN", { studentId, quizId }, mbRun);
+					return mbRun.match(identity, () => new Error("No run for user"));
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);

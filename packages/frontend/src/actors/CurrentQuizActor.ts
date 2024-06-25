@@ -630,6 +630,24 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								);
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
+								} else {
+									console.log("Sending RUN ", {
+										studentId: this.user.map(u => u.uid).orElse(toId("")),
+										quizId: this.state.quiz.uid,
+									});
+									const run: any = await this.ask(
+										actorUris.QuizActor,
+										QuizActorMessages.GetUserRun({
+											studentId: this.user.map(u => u.uid).orElse(toId("")),
+											quizId: this.state.quiz.uid,
+										})
+									);
+									console.log("RUN", run);
+									if (run?.message !== "No run for user") {
+										this.updateState(draft => {
+											draft.run = run;
+										});
+									}
 								}
 								this.send(this.ref, CurrentQuizMessages.ActivateQuizStats());
 							} catch (e) {

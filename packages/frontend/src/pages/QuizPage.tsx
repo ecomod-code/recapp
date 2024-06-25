@@ -227,7 +227,7 @@ export const QuizPage: React.FC = () => {
 									<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
 										Dashboard
 									</Breadcrumb.Item>
-									<Breadcrumb.Item>
+									<Breadcrumb.Item active className="text-overflow-ellipsis" style={{maxWidth: 400}}>
 										{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 									</Breadcrumb.Item>
 								</Breadcrumb>

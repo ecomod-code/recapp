@@ -3,7 +3,8 @@ import { Question, Id } from "@recapp/models";
 import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
-import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash, Eye } from "react-bootstrap-icons";
+// import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash, Eye } from "react-bootstrap-icons";
+import { ArrowUp, ArrowDown, Pencil, Check, Trash, Eye } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { useRendered } from "../../hooks/useRendered";
 
@@ -17,7 +18,7 @@ type Props = {
 	approve: () => void;
 	delete: () => void;
 	edit: () => void;
-	changeGroup: () => void;
+	// changeGroup: () => void;
 	disabled: boolean;
 	currentUserUid: Id;
 	editMode: boolean;
@@ -35,7 +36,7 @@ export const QuestionCard = (props: Props) => {
 			<Card.Body
 				as="div"
 				style={{ minHeight: CONTAINER_MIN_HEIGHT }}
-				className="p-0 py-1 pe-2 m-0 d-flex flex-row align-items-center"
+				className="pt-1 pb-2 ps-0 pe-2 m-0 d-flex flex-row align-items-center"
 			>
 				<div
 					style={{ maxHeight: ARROW_CONTAINER_MAX_HEIGHT }}
@@ -99,13 +100,13 @@ export const QuestionCard = (props: Props) => {
 								<Eye />
 							</ButtonWithTooltip>
 						)}
-						<ButtonWithTooltip
+						{/* <ButtonWithTooltip
 							title={i18n._("question-card.button-tooltip.change-group")}
 							onClick={props.changeGroup}
 							disabled={props.disabled || !props.editMode}
 						>
 							<TrainFront />
-						</ButtonWithTooltip>
+						</ButtonWithTooltip> */}
 						<ButtonWithTooltip
 							title={
 								props.question.approved

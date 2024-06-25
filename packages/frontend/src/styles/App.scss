@@ -7,20 +7,27 @@
     // --bs-primary-bg-subtle: #f5f3f0;
 }
 
+p {
+    // word-wrap: break-word !important;
+    // word-break: break-word !important;
+    word-wrap: break-word;
+    word-break: break-word;
+}
+
 .answer-bg-correct {
-	background-color: #2468A8
+    background-color: #2468a8;
 }
 
 .answer-bg-wrong {
-	background-color: #DDAA33
+    background-color: #ddaa33;
 }
 
 .answer-correct {
-	color: #004488
+    color: #004488;
 }
 
 .answer-wrong {
-	color: #DDAA33
+    color: #ddaa33;
 }
 
 blockquote {

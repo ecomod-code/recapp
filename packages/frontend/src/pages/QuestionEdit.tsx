@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
+// import React, { useState } from 'react';
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
@@ -139,7 +140,7 @@ export const QuestionEdit: React.FC = () => {
         const answers = question.answers;
         answers.push({ correct: false, text: "" });
         setQuestion(state => ({ ...state, answers }));
-        editAnswer(answers.length - 1);
+        // editAnswer(answers.length - 1);
     };
 
     const deleteAnswer = (index: number) => {
@@ -160,13 +161,13 @@ export const QuestionEdit: React.FC = () => {
         setQuestion(state => ({ ...state, answers }));
     };
 
-    const editAnswer = (index: number) => {
-        setShowTextModal({
-            titleId: "edit-answer-text",
-            property: `answer-${index}`,
-            editorText: question.answers[index].text,
-        });
-    };
+    // const editAnswer = (index: number) => {
+    //     setShowTextModal({
+    //         titleId: "edit-answer-text",
+    //         property: `answer-${index}`,
+    //         editorText: question.answers[index].text,
+    //     });
+    // };
 
     const resetQuestionEditModeFlag = () => {
         if (writeAccess) {
@@ -589,8 +590,26 @@ export const QuestionEdit: React.FC = () => {
                                     }}
                                     disabled={!writeAccess}
                                 />
-                                <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text>
-                                <ButtonWithTooltip
+
+                                {/* <InputGroup.Text className="flex-grow-1">{question.hint ?? ""}</InputGroup.Text> */}
+                                <Form.Control
+                                    value={question.hint ?? ""}
+                                    disabled={!hint}
+                                    onChange={e => {
+                                        console.log({ value: e.target.value, question: question });
+                                        const text = e.target.value;
+
+                                        setQuestion(state => {
+                                            console.log({ state });
+
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                            // (state as any)[showTextModal.property] = text;
+                                            return { ...state, hint: text };
+                                        });
+                                    }}
+                                />
+
+                                {/* <ButtonWithTooltip
                                     title={i18n._("question-edit.button-tooltip.edit-hint-title")}
                                     disabled={!hint || !writeAccess}
                                     onClick={() =>
@@ -602,7 +621,7 @@ export const QuestionEdit: React.FC = () => {
                                     }
                                 >
                                     <Pencil />
-                                </ButtonWithTooltip>
+                                </ButtonWithTooltip> */}
                             </InputGroup>
                         </Form.Group>
 
@@ -660,14 +679,25 @@ export const QuestionEdit: React.FC = () => {
                                                     onChange={() => toggleAnswer(i)}
                                                     disabled={!writeAccess}
                                                 />
-                                                <InputGroup.Text className="flex-grow-1">{answer.text}</InputGroup.Text>
-                                                <ButtonWithTooltip
+                                                {/* <InputGroup.Text className="flex-grow-1">{answer.text}</InputGroup.Text> */}
+                                                <Form.Control
+                                                    disabled={!writeAccess}
+                                                    value={answer.text}
+                                                    autoFocus={!answer.text} // only focus when new answer is added
+                                                    onChange={e => {
+                                                        const text = e.target.value;
+                                                        const answers = question.answers;
+                                                        answers[i].text = text;
+                                                        setQuestion(state => ({ ...state, answers }));
+                                                    }}
+                                                />
+                                                {/* <ButtonWithTooltip
                                                     title={i18n._("question-edit.button-tooltip.edit-answer")}
                                                     onClick={() => editAnswer(i)}
                                                     disabled={!writeAccess}
                                                 >
                                                     <Pencil />
-                                                </ButtonWithTooltip>
+                                                </ButtonWithTooltip> */}
                                                 <ButtonWithTooltip
                                                     title={i18n._("question-edit.button-tooltip.delete-answer")}
                                                     variant="danger"

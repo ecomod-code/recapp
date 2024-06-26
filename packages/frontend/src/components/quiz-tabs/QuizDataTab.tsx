@@ -8,7 +8,7 @@ import { toTimestamp } from "itu-utils";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import { Pencil, PersonPlus } from "react-bootstrap-icons";
-import { TextModal } from "../modals/TextModal";
+// import { TextModal } from "../modals/TextModal";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
@@ -20,7 +20,7 @@ import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
 
 export const QuizDataTab: React.FC = () => {
-    const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
+    // const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
     const [shareModal, setShareModal] = useState(false);
     const [archiveModal, setArchiveModal] = useState(false);
 
@@ -92,7 +92,7 @@ export const QuizDataTab: React.FC = () => {
                             titleId="archive-quiz-title"
                             textId="archive-quiz-title"
                         />
-                        <TextModal
+                        {/* <TextModal
                             show={textEdit.show}
                             onClose={() => setTextEdit({ element: "", value: "", show: false, title: "" })}
                             onSubmit={name => {
@@ -103,8 +103,37 @@ export const QuizDataTab: React.FC = () => {
                             }}
                             titleId={textEdit.title}
                             editorValue={textEdit.value}
-                        />
-                        <ContainerWithHeaderBar
+                        /> */}
+
+                        <Form.Group className="mt-3">
+                            <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
+                            <Form.Control
+                                disabled={disabledByMode}
+                                type="text"
+                                value={quiz.title}
+                                onChange={e => {
+                                    const text = e.target.value;
+                                    update({ title: text });
+                                }}
+                            />
+                        </Form.Group>
+
+                        <Form.Group className="mt-3">
+                            <Form.Text>{i18n._("quiz-description")}</Form.Text>
+                            <Form.Control
+                                disabled={disabledByMode}
+                                type="textarea"
+                                as="textarea"
+                                rows={5}
+                                value={quiz.description}
+                                onChange={e => {
+                                    const text = e.target.value;
+                                    update({ description: text });
+                                }}
+                            />
+                        </Form.Group>
+
+                        {/* <ContainerWithHeaderBar
                             label={i18n._("new-quiz-title")}
                             editButton={{
                                 onClick: () =>
@@ -118,8 +147,8 @@ export const QuizDataTab: React.FC = () => {
                             }}
                         >
                             <Form.Control type="text" value={quiz.title} disabled />
-                        </ContainerWithHeaderBar>
-                        <ContainerWithHeaderBar
+                        </ContainerWithHeaderBar> */}
+                        {/* <ContainerWithHeaderBar
                             label={i18n._("quiz-description")}
                             editButton={{
                                 onClick: () =>
@@ -133,7 +162,8 @@ export const QuizDataTab: React.FC = () => {
                             }}
                         >
                             <Form.Control type="textarea" as="textarea" rows={5} value={quiz.description} disabled />
-                        </ContainerWithHeaderBar>
+                        </ContainerWithHeaderBar> */}
+
                         <ContainerWithHeaderBar label={i18n._("number-of-participants")}>
                             <Form.Control type="text" value={quiz.students?.length ?? 0} disabled />
                         </ContainerWithHeaderBar>

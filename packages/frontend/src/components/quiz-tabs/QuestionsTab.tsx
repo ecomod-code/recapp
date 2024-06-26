@@ -255,7 +255,7 @@ export const QuestionsTab: React.FC<{
 
                 <Row>
                     <div className="d-flex flex-column">
-                        {defaultQuestionGroup.questions.length === 0 ? (
+                        {defaultQuestionGroup?.questions.length === 0 ? (
                             <p
                                 className="p-2 m-0 me-2 d-flex justify-content-center align-items-center text-center bg-white"
                                 style={{ fontSize: 18, height: 80 }}
@@ -263,7 +263,7 @@ export const QuestionsTab: React.FC<{
                                 <Trans id="quiz-questions-tab-empty-group-message" />
                             </p>
                         ) : null}
-                        {defaultQuestionGroup.questions
+                        {defaultQuestionGroup?.questions
                             .map(q => questions.find(qu => qu.uid === q))
                             .filter(Boolean)
                             .map((q, i, arr) => {

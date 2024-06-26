@@ -1,13 +1,15 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { Button } from "react-bootstrap";
-import { ChoiceElementStatistics } from "@recapp/models";
+import { Badge, Button } from "react-bootstrap";
+import { ChoiceElementStatistics, Id, QuizRun, User } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
+import { range } from "rambda";
+import { LocalUserActor } from "../../actors/LocalUserActor";
 
 const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
@@ -76,16 +78,47 @@ const QuizBarChart = (props: { data: number[]; maxValue: number }) => {
 	);
 };
 
+type OwnAnswer = string | (boolean | null | undefined)[];
+
 export const QuizStatsTab: React.FC = () => {
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
+	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [showExportModal, setShowExportModal] = useState(false);
+	const [ownAnswers, setOwnAnswers] = useState<Record<Id, OwnAnswer>>({});
+	const [ownCorrectAnswers, setOwnCorrectAnswers] = useState<Record<Id, boolean>>({});
+	const run = mbQuiz.flatMap(q => maybe(q.run));
+
+	// TODO Eigene Ergebnisse für das Quiz holen
+	useEffect(() => {
+		console.warn(tryActor, mbQuiz, mbUser);
+		if (tryActor) {
+			mbUser
+				.map(u => u.user.uid)
+				.forEach(uid => {
+					const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
+					if (isStudent) {
+						run.forEach(run => {
+							range(0, run.questions.length).forEach(index => {
+								setOwnAnswers(state => ({ ...state, [run.questions[index]]: run.answers[index] }));
+								setOwnCorrectAnswers(state => ({
+									...state,
+									[run.questions[index]]: run.correct[index],
+								}));
+							});
+						});
+					}
+				});
+		}
+	}, [tryActor, run.hasValue, mbUser.hasValue]);
 
 	const exportQuiz = () => {
+		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuizStats()));
 	};
 
 	const exportQuestions = () => {
+		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuestionStats()));
 	};
@@ -150,11 +183,11 @@ export const QuizStatsTab: React.FC = () => {
 									</>
 								)}
 								<Fragment key={i}>
-									<h2>{group.name}</h2>
 									{group.questions.map(qId => {
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
 										const question = questions.find(q => q.uid === qId)!;
 										const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
+										const ownCorrect = ownCorrectAnswers[qId] ?? false;
 
 										if (!question) return null;
 
@@ -168,22 +201,30 @@ export const QuizStatsTab: React.FC = () => {
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start">
-														<div className="text-overflow-ellipsis">{question.text ?? "---"}</div>
+														<div className="text-overflow-ellipsis">
+															{question.text ?? "---"}
+														</div>
 													</div>
 
 													<div className="d-flex align-items-center justify-content-between">
-                                                        <div className="lh-1">
-                                                            {noDetails ? (
-                                                                <em>
-                                                                    <Trans id="no-data-yet" />
-                                                                </em>
-                                                            ) : (
-                                                                <QuizBarChart
-                                                                    data={[correct]}
-                                                                    maxValue={quizStats.maximumParticipants}
-                                                                />
-                                                            )}
-                                                        </div>
+														{ownCorrectAnswers[qId] && (
+															<div>
+																(<Trans id="address-you" />:{" "}
+																{ownCorrect ? "\u2713" : "\u2717"})
+															</div>
+														)}
+														<div className="lh-1">
+															{noDetails ? (
+																<em>
+																	<Trans id="no-data-yet" />
+																</em>
+															) : (
+																<QuizBarChart
+																	data={[correct]}
+																	maxValue={quizStats.maximumParticipants}
+																/>
+															)}
+														</div>
 														<Button
 															size="sm"
 															variant="link"
@@ -218,10 +259,13 @@ export const QuizStatsTab: React.FC = () => {
 					const questionsByGroup = groups.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
 					const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
 
+					const ownAnswer = ownAnswers[question.uid];
+
 					return (
 						<div>
 							<p className="custom-line-clamp h2">
-								<Trans id="question-stats-prefix" />{question.text}
+								<Trans id="question-stats-prefix" />
+								{question.text}
 							</p>
 							{/*<div>
 								{i18n._("question-stats-info", {
@@ -244,11 +288,23 @@ export const QuizStatsTab: React.FC = () => {
 											})}
 										</div>
 										<div className="mt-2 mb-2">
-											<Trans id="question-stats-given-answers" />
+											<Trans id="question-stats-given-answers" />:
 										</div>
 										{questionStats.answers.map((a, i) => (
 											<div key={`${a}-${i}`}>{a}</div>
 										))}
+										{ownAnswer && (
+											<>
+												<div className="mt-2 mb-2">
+													<em>
+														<Trans id="question-stats-your-answer" />:
+													</em>
+												</div>
+												<div>
+													<em>{ownAnswer}</em>
+												</div>
+											</>
+										)}
 									</div>
 								)}
 
@@ -264,7 +320,26 @@ export const QuizStatsTab: React.FC = () => {
 											<Trans id="question-stats-given-answers" />
 										</div>
 										{question.answers.map(({ text, correct }, i) => (
-											<div key={text} className="d-flex flex-row w-100">
+											<div key={text} className="d-flex flex-row w-100 mb-1">
+												{ownAnswer && (
+													<div
+														className="me-1"
+														style={{
+															backgroundColor: "lightgray",
+															fontWeight: "bold",
+															padding: 2,
+														}}
+													>
+														<Trans id="address-you" />:{" "}
+														{ownAnswer[i] ? (
+															"\u2611"
+														) : (
+															<span style={{ fontSize: "1rem", fontWeight: "bold" }}>
+																{"\u2610"}
+															</span>
+														)}
+													</div>
+												)}
 												<div className="w-50">
 													<span>
 														<Trans id="question-stats-answer-prefix" />

@@ -11,6 +11,7 @@ import {
 	UserStoreMessages,
 	quizSchema,
 	toId,
+	QuizRun,
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
@@ -186,6 +187,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
 					return this.create(quiz, clientUserRole, clientUserId);
+				},
+				GetUserRun: async ({ studentId, quizId }) => {
+					const db = await this.connector.db();
+					const mbRun = maybe(await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId }));
+					console.warn("GETUSERRUN", { studentId, quizId }, mbRun);
+					return mbRun.match(identity, () => new Error("No run for user"));
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);

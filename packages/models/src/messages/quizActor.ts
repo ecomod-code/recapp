@@ -19,6 +19,7 @@ export const QuizActorMessages = unionize(
 		UnsubscribeFrom: ofType<Id>(), // Unsubscribe from a specific quiz's changes, including comments and questions
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes
 		Export: ofType<Id>(), // Export a quiz to a json file, returns the download uri
+		GetUserRun: ofType<{ studentId: Id; quizId: Id }>(), // Get the current quiz run of the given user
 	},
 	{ tag: "QuizActorMessage", value: "value" }
 );

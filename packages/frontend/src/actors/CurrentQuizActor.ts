@@ -66,6 +66,7 @@ export const CurrentQuizMessages = unionize(
 		ExportQuestionStats: {},
 		ExportDone: {},
 		LeaveQuiz: {}, // Remove yourself from the quiz, regardless whether you are a teacher or student
+		GetRun: {},
 	},
 	{ value: "value" }
 );
@@ -97,7 +98,7 @@ export type CurrentQuizState = {
 	exportFile?: string;
 };
 
-export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean, CurrentQuizState> {
+export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
 
@@ -233,13 +234,22 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 		});
 	};
 
-	async receive(_from: ActorRef, message: MessageType): Promise<Unit | boolean> {
+	async receive(_from: ActorRef, message: MessageType): Promise<Unit | boolean | QuizRun> {
 		const maybeLocalMessage = await this.handleRemoteUpdates(message);
 		try {
 			// Deal with local messages
 			return maybeLocalMessage
 				.map(m =>
-					CurrentQuizMessages.match<Promise<Unit | boolean>>(m, {
+					CurrentQuizMessages.match<Promise<Unit | boolean | QuizRun>>(m, {
+						GetRun: async () => {
+							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
+							const quizId: Id = this.quiz.orElse(toId(""));
+							const run = await this.ask(
+								actorUris.QuizActor,
+								QuizActorMessages.GetUserRun({ studentId, quizId })
+							);
+							return run as QuizRun;
+						},
 						Activate: async ({ userId, quizId }) => {
 							const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
 							const students = quiz.students;
@@ -620,6 +630,24 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean,
 								);
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
+								} else {
+									console.log("Sending RUN ", {
+										studentId: this.user.map(u => u.uid).orElse(toId("")),
+										quizId: this.state.quiz.uid,
+									});
+									const run: any = await this.ask(
+										actorUris.QuizActor,
+										QuizActorMessages.GetUserRun({
+											studentId: this.user.map(u => u.uid).orElse(toId("")),
+											quizId: this.state.quiz.uid,
+										})
+									);
+									console.log("RUN", run);
+									if (run?.message !== "No run for user") {
+										this.updateState(draft => {
+											draft.run = run;
+										});
+									}
 								}
 								this.send(this.ref, CurrentQuizMessages.ActivateQuizStats());
 							} catch (e) {

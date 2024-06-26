@@ -19,6 +19,7 @@ import { v4 } from "uuid";
 import { nothing } from "tsmonads";
 import * as path from "path";
 import { writeFile } from "fs/promises";
+import wk from "wkhtmltopdf";
 
 type State = {
 	cache: Map<Id, TextElementStatistics | ChoiceElementStatistics>;
@@ -268,7 +269,7 @@ export class StatisticsActor extends SubscribableActor<
 					);
 					const lines: string[] = [];
 					lines.push(
-						"question;group;type;maxParticipants;participants;correct;answer1;answer1_count;answer2;answer2_count;answer3;answer3_count;answer4;answer4_count;answer5;answer5_count;answer6;answer6_count"
+						"question;type;maxParticipants;participants;correct;answer1;answer1_count;answer2;answer2_count;answer3;answer3_count;answer4;answer4_count;answer5;answer5_count;answer6;answer6_count"
 					);
 					await Promise.all(
 						questions.map(async (question, index) => {
@@ -276,7 +277,7 @@ export class StatisticsActor extends SubscribableActor<
 								const qstats = await this.getStatsForQuestion(question.uid);
 								if (qstats.tag === "TextElementStatistics") {
 									lines.push(
-										`${question.text.slice(0, 30)};${qstats.groupName};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
+										`${question.text.slice(0, 30)};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
 											`${qstats.answers[0] ?? ""};${!!qstats.answers[0] ? 1 : 0};` +
 											`${qstats.answers[1] ?? ""};${!!qstats.answers[1] ? 1 : 0};` +
 											`${qstats.answers[2] ?? ""};${!!qstats.answers[2] ? 1 : 0};` +
@@ -286,7 +287,7 @@ export class StatisticsActor extends SubscribableActor<
 									);
 								} else {
 									lines.push(
-										`${question.text.slice(0, 30)};${qstats.groupName};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
+										`${question.text.slice(0, 30)};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
 											`${question.answers[0]?.text ?? ""};${qstats.answers[0] ?? 0};` +
 											`${question.answers[1]?.text ?? ""};${qstats.answers[1] ?? 0};` +
 											`${question.answers[2]?.text ?? ""};${qstats.answers[2] ?? 0};` +
@@ -304,6 +305,184 @@ export class StatisticsActor extends SubscribableActor<
 
 					await writeFile(path.join("./downloads", filename), lines.join("\n"));
 
+					const cells = await Promise.all(
+						questions.filter(Boolean).map(async (question, index) => {
+							const qstats = await this.getStatsForQuestion(question.uid);
+							if (qstats.tag === "TextElementStatistics") {
+								return `<table>
+						<tr>
+						<th>
+							<strong>Question</strong>
+						</th>
+						<th>
+							<strong>Type</strong>
+						</th>
+						<th>
+							<strong>MaxParticipants</strong>
+						</th>
+						<th>
+							<strong>Participants</strong>
+						</th>
+						<th>
+							<strong>Correct</strong>
+						</th></tr><tr>
+										<td>${question.text.slice(0, 30)}</td>
+										<td>${question.type}</td>
+										<td>${stats.maximumParticipants}</td>
+										<td>${stats.answers[index]}</td>
+										<td>${stats.correctAnswers[index]}</td></tr></table>
+										<table><tr><th>
+							<strong>Answer 1</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 2</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 3</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 4</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 5</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 6</strong>
+						</th><th>
+							<strong>Count</strong>
+						</th></tr><tr>
+										<td>${qstats.answers[0] ?? ""}</td>
+										<td>${!!qstats.answers[0] ? 1 : 0}</td>
+										<td>${qstats.answers[1] ?? ""}</td>
+										<td>${!!qstats.answers[1] ? 1 : 0}</td>
+										<td>${qstats.answers[2] ?? ""}</td>
+										<td>${!!qstats.answers[2] ? 1 : 0}</td>
+										<td>${qstats.answers[3] ?? ""}</td>
+										<td>${!!qstats.answers[3] ? 1 : 0}</td>
+										<td>${qstats.answers[4] ?? ""}</td>
+										<td>${!!qstats.answers[4] ? 1 : 0}</td>
+										<td>${qstats.answers[5] ?? ""}</td>
+										<td>${!!qstats.answers[5] ? 1 : 0}</td></tr></table>`;
+							} else {
+								return `<table>
+						<tr>
+						<th>
+							<strong>Question</strong>
+						</th>
+						<th>
+							<strong>Type</strong>
+						</th>
+						<th>
+							<strong>MaxParticipants</strong>
+						</th>
+						<th>
+							<strong>Participants</strong>
+						</th>
+						<th>
+							<strong>Correct</strong>
+						</th></tr><tr><td>${question.text.slice(0, 30)}</td>
+									<td>${question.type}</td>
+									<td>${stats.maximumParticipants}</td>
+									<td>${stats.answers[index]}</td>
+									<td>${stats.correctAnswers[index]}</td></tr></table>
+										<table><tr><th>
+							<strong>Answer 1</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 2</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 3</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 4</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 5</strong>
+						</th>
+						<th>
+							<strong>Count</strong>
+						</th>
+						<th>
+							<strong>Answer 6</strong>
+						</th><th>
+							<strong>Count</strong>
+						</th></tr><tr>
+										<td>${question.answers[0]?.text ?? ""}</td>
+										<td>${qstats.answers[0] ?? 0}</td>
+										<td>${question.answers[1]?.text ?? ""}</td>
+										<td>${qstats.answers[1] ?? 0}</td>
+										<td>${question.answers[2]?.text ?? ""}</td>
+										<td>${qstats.answers[2] ?? 0}</td>
+										<td>${question.answers[3]?.text ?? ""}</td>
+										<td>${qstats.answers[3] ?? 0}</td>
+										<td>${question.answers[4]?.text ?? ""}</td>
+										<td>${qstats.answers[4] ?? 0}</td>
+										<td>${question.answers[5]?.text ?? ""}</td>
+										<td>${qstats.answers[5] ?? 0}</td></tr></table>`;
+							}
+						})
+					);
+
+					// Export the PDF
+					const html = `<!DOCTYPE html>
+					<html lang="en">
+					<head>
+						<title>Quiz statistics</title>
+						<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+						<style>
+							body { font-face: Helvetica; font-size: 11pt }
+							table { border: 1px solid black; border-collapse: collapse; width: 100% }
+							th { border: 1px solid black; padding: 6px; text-align: center }
+							td { border: 1px solid black; padding: 6px; text-align: center } 
+						</style>
+					</head>
+					<body>
+						<h1>Question statistics</h1>
+						${cells.join("<p></p>")}
+						
+					</body>
+					</html>
+					`;
+
+					const stream = wk(html, {
+						pageSize: "A4",
+						disableSmartShrinking: true,
+						orientation: "Landscape",
+						marginLeft: "8mm",
+						marginRight: "8mm",
+						dpi: 96,
+					});
+
+					await writeFile(path.join("./downloads", filename.replace("csv", "pdf")), stream);
+
 					return filename;
 				},
 				ExportQuizStats: async () => {
@@ -315,6 +494,8 @@ export class StatisticsActor extends SubscribableActor<
 							return question;
 						})
 					);
+
+					// Export the CSV
 					const lines: string[] = [];
 					lines.push("question;type;maxParticipants;participants;correct");
 					questions.forEach((question, index) => {
@@ -329,6 +510,66 @@ export class StatisticsActor extends SubscribableActor<
 					const filename = `quiz_stats_${stats.quizId}_${exportTime.value.toString()}.csv`;
 
 					await writeFile(path.join("./downloads", filename), lines.join("\n"));
+
+					// Export the PDF
+					const html = `<!DOCTYPE html>
+					<html lang="en">
+					<head>
+						<title>Quiz statistics</title>
+						<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+						<style>
+							body { font-face: Helvetica; font-size: 11pt }
+							table { border: 1px solid black; border-collapse: collapse; width: 100% }
+							th { border: 1px solid black; padding: 6px; text-align: center }
+							td { border: 1px solid black; padding: 6px; text-align: center } 
+						</style>
+					</head>
+					<body>
+						<h1>Quiz statistics</h1>
+						<table>
+						<tr>
+						<th>
+							<strong>Question</strong>
+						</th>
+						<th>
+							<strong>Type</strong>
+						</th>
+						<th>
+							<strong>MaxParticipants</strong>
+						</th>
+						<th>
+							<strong>Participants</strong>
+						</th>
+						<th>
+							<strong>Correct</strong>
+						</th>
+						</tr>
+						${questions
+							.map((question, index) => {
+								if (!question) return "";
+								return `<tr>
+							<td style="max-width: 30%; word-wrap: break-word;">${question.text.slice(0, 80)}</td>
+							<td>${question.type}</td>
+							<td>${stats.maximumParticipants}</td>
+							<td>${stats.answers[index]}</td>
+							<td>${stats.correctAnswers[index]}</td>
+							</tr>`;
+							})
+							.join("")}
+						</table>
+					</body>
+					</html>
+					`;
+
+					const stream = wk(html, {
+						pageSize: "A4",
+						disableSmartShrinking: true,
+						marginLeft: "8mm",
+						marginRight: "8mm",
+						dpi: 96,
+					});
+
+					await writeFile(path.join("./downloads", filename.replace("csv", "pdf")), stream);
 
 					return filename;
 				},

@@ -10,7 +10,7 @@ Der aktuelle Stand des Repositories soll auf dem Rechner installiert werden. Alt
 
 2. Installation der Abhängigkeiten
 
-Im Installationsverzeichnis sind alle Softwarepakete mittels `npm install` zu installieren.
+Im Installationsverzeichnis sind alle Softwarepakete mittels `npm install` zu installieren. Zudem ist auf dem Server das Paket _wkhtmltopdf_ zu installieren.
 
 3. Konfiguration des Webservers
 

@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:394
+msgid "quiz-data-tab.sync-status.currently-saving"
+msgstr "Wird gespeichert..."
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:394
+msgid "quiz-data-tab.sync-status.is-saved"
+msgstr "Gespeichert"
+
+#. js-lingui-explicit-id
 #: src/components/modals/CommentEditorModal.tsx:73
 msgid "comment-editor-modal.link-to-question.checkbox-label"
 msgstr "Mit Frage verlinkt"

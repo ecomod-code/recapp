@@ -51,3 +51,15 @@ export const isMultiChoiceAnsweredCorrectly = (answers: boolean[], question: Que
 
     return isAnsweredCorrectly;
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function debounce(callBack: (...args: any) => void, delay: number) {
+    let timeoutId: null | ReturnType<typeof setTimeout> = null;
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return function (...args: any) {
+        if (timeoutId) clearTimeout(timeoutId);
+
+        timeoutId = setTimeout(() => callBack(...args), delay);
+    };
+}

@@ -1,4 +1,4 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useCallback, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useStatefulActor } from "ts-actors-react";
 import { Quiz } from "@recapp/models";
@@ -18,16 +18,23 @@ import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
+import { debounce } from "../../utils";
 
 export const QuizDataTab: React.FC = () => {
     // const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
     const [shareModal, setShareModal] = useState(false);
     const [archiveModal, setArchiveModal] = useState(false);
+    const [titleAndDescription, setTitleAndDescription] = useState({ title: "", description: "" });
 
     const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
     const [showExportModal, setShowExportModal] = useState(false);
 
     const update = (q: Partial<Quiz>) => tryActor.forEach(a => a.send(a.name, CurrentQuizMessages.Update(q)));
+
+    const updateDebounced = useCallback(
+        debounce((q: Partial<Quiz>) => update(q), 500),
+        [tryActor]
+    );
 
     const closeShare = () => {
         setShareModal(false);
@@ -106,29 +113,47 @@ export const QuizDataTab: React.FC = () => {
                         /> */}
 
                         <Form.Group className="mt-3">
-                            <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
+                                <SyncStatus localValue={titleAndDescription.title} storedValue={quiz.title} />
+                            </div>
                             <Form.Control
                                 disabled={disabledByMode}
                                 type="text"
-                                value={quiz.title}
+                                // value={quiz.title}
+                                value={titleAndDescription.title ? titleAndDescription.title : quiz.title}
                                 onChange={e => {
                                     const text = e.target.value;
-                                    update({ title: text });
+                                    // update({ title: text });
+                                    setTitleAndDescription(prev => ({ ...prev, title: text }));
+                                    updateDebounced({ title: text });
                                 }}
                             />
                         </Form.Group>
 
                         <Form.Group className="mt-3">
-                            <Form.Text>{i18n._("quiz-description")}</Form.Text>
+                            <div className="d-flex justify-content-between align-items-center">
+                                <Form.Text>{i18n._("quiz-description")}</Form.Text>
+                                <SyncStatus
+                                    localValue={titleAndDescription.description}
+                                    storedValue={quiz.description}
+                                />
+                            </div>
+
                             <Form.Control
                                 disabled={disabledByMode}
                                 type="textarea"
                                 as="textarea"
                                 rows={5}
-                                value={quiz.description}
+                                // value={quiz.description}
+                                value={
+                                    titleAndDescription.description ? titleAndDescription.description : quiz.description
+                                }
                                 onChange={e => {
                                     const text = e.target.value;
-                                    update({ description: text });
+                                    // update({ description: text });
+                                    setTitleAndDescription(prev => ({ ...prev, description: text }));
+                                    updateDebounced({ description: text });
                                 }}
                             />
                         </Form.Group>
@@ -353,5 +378,22 @@ const ContainerWithHeaderBar = (props: ContainerWithHeaderBarProps) => {
 
             {props.children}
         </Form.Group>
+    );
+};
+
+const SyncStatus = (props: { localValue: string; storedValue: string }) => {
+    const isVisible = !!props.localValue;
+    if (!isVisible) {
+        return null;
+    }
+
+    const isSynced = props.localValue === props.storedValue;
+
+    return (
+        <Form.Text className={`fw-bold ${isSynced ? "text-success" : "text-danger"}`}>
+            {isSynced
+                ? i18n._("quiz-data-tab.sync-status.is-saved")
+                : i18n._("quiz-data-tab.sync-status.currently-saving")}
+        </Form.Text>
     );
 };

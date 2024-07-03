@@ -1,5 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 // import React, { useState } from 'react';
+
+import "katex/dist/katex.css";
+import MDEditor, { commands } from "@uiw/react-md-editor";
 import { i18n } from "@lingui/core";
 import { useLocation, useNavigate } from "react-router-dom";
 import { maybe, nothing } from "tsmonads";
@@ -15,10 +18,11 @@ import Card from "react-bootstrap/Card";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
-import { DashLg, Pencil, Plus } from "react-bootstrap-icons";
+// import { DashLg, Pencil, Plus } from "react-bootstrap-icons";
+import { DashLg } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
-import { MarkdownModal } from "../components/modals/MarkdownModal";
+// import { MarkdownModal } from "../components/modals/MarkdownModal";
 import { TextModal } from "../components/modals/TextModal";
 import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
@@ -323,7 +327,7 @@ export const QuestionEdit: React.FC = () => {
                     handleClose();
                 }}
             />
-            <MarkdownModal
+            {/* <MarkdownModal
                 titleId={showMDModal.titleId}
                 editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
                 show={!!showMDModal.titleId && showMDModal.type === "QUESTION"}
@@ -332,7 +336,7 @@ export const QuestionEdit: React.FC = () => {
                     setQuestion(state => ({ ...state, text }));
                     handleClose();
                 }}
-            />
+            /> */}
             <CommentEditorModal
                 titleId={showMDModal.titleId}
                 editorValue={showMDModal.type === "QUESTION" ? question.text : ""}
@@ -525,16 +529,55 @@ export const QuestionEdit: React.FC = () => {
                     <Card.Body
                         // as="button"
                         // onClick={() => handleMDShow("QUESTION", "edit-title-text")}
-                        className="bg-white border-0 overflow-hidden"
+                        className="bg-white border-0 overflow-hidden p-0"
                     >
-                        {question.text ? (
+                        <div className="d-flex flex-column flex-grow-1">
+                            <div data-color-mode="light">
+                                <MDEditor
+                                    autoFocus
+                                    commands={[
+                                        commands.bold,
+                                        commands.italic,
+                                        commands.strikethrough,
+                                        commands.divider,
+                                        commands.link,
+                                        commands.quote,
+                                        commands.code,
+                                        commands.divider,
+                                        commands.unorderedListCommand,
+                                        commands.orderedListCommand,
+                                        commands.checkedListCommand,
+                                        commands.divider,
+                                        commands.help,
+                                    ]}
+                                    textareaProps={{
+                                        placeholder: i18n._("question-edit-page.input-label.question"),
+                                    }}
+                                    extraCommands={[]}
+                                    value={question.text}
+                                    onChange={val => setQuestion(prev => ({ ...prev, text: val ?? "" }))}
+                                    height="100%"
+                                    style={{ padding: 6 }}
+                                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                                    components={{ preview: (_source, _state, _dispatch) => <></> }}
+                                    preview="edit"
+                                />
+                            </div>
+                            <div
+                                className="p-3 text-start h-30"
+                                style={{ minHeight: 120 }}
+                                dangerouslySetInnerHTML={{ __html: rendered }}
+                            />
+                        </div>
+
+                        {/* {question.text ? (
                             <div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
                         ) : (
                             <div
                                 className="p-2 text-start h-30 d-flex justify-content-center align-items-center"
                                 style={{ minHeight: 90 }}
-                            >
-                                {/* <div>
+                            > */}
+                        {/* <div>
                                     did not add any question yet ..
                                     <Button
                                         variant="link"
@@ -546,10 +589,10 @@ export const QuestionEdit: React.FC = () => {
                                         add question
                                     </Button>
                                 </div> */}
-                            </div>
-                        )}
+                        {/* </div>
+                        )} */}
 
-                        <div className="d-flex justify-content-end">
+                        {/* <div className="d-flex justify-content-end">
                             <Button
                                 variant="warning"
                                 className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
@@ -568,7 +611,7 @@ export const QuestionEdit: React.FC = () => {
                                     </>
                                 )}
                             </Button>
-                        </div>
+                        </div> */}
                     </Card.Body>
 
                     <Card.Footer className="pb-4 background-grey pt-3">

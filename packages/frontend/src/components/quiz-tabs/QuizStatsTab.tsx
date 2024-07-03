@@ -2,14 +2,14 @@ import { Fragment, useEffect, useState } from "react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { Badge, Button } from "react-bootstrap";
-import { ChoiceElementStatistics, Id, QuizRun, User } from "@recapp/models";
+import { Button } from "react-bootstrap";
+import { ChoiceElementStatistics, Id, User } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { range } from "rambda";
-import { LocalUserActor } from "../../actors/LocalUserActor";
+// import { LocalUserActor } from "../../actors/LocalUserActor";
 
 const QuizBar = (props: { y: number; width: number; color: string }) => {
 	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
@@ -200,33 +200,14 @@ export const QuizStatsTab: React.FC = () => {
 												style={{ backgroundColor: "lightgrey" }}
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
-													<div className="d-flex align-items-start">
+													<div className="d-flex align-items-start justify-content-between">
 														<div className="text-overflow-ellipsis">
 															{question.text ?? "---"}
 														</div>
-													</div>
 
-													<div className="d-flex align-items-center justify-content-between">
-														{ownCorrectAnswers[qId] && (
-															<div>
-																(<Trans id="address-you" />:{" "}
-																{ownCorrect ? "\u2713" : "\u2717"})
-															</div>
-														)}
-														<div className="lh-1">
-															{noDetails ? (
-																<em>
-																	<Trans id="no-data-yet" />
-																</em>
-															) : (
-																<QuizBarChart
-																	data={[correct]}
-																	maxValue={quizStats.maximumParticipants}
-																/>
-															)}
-														</div>
 														<Button
 															size="sm"
+															className="p-0 ms-1"
 															variant="link"
 															onClick={() =>
 																tryActor.forEach(actor =>
@@ -242,6 +223,30 @@ export const QuizStatsTab: React.FC = () => {
 														>
 															<Trans id="details" />
 														</Button>
+													</div>
+
+													<div className="d-flex align-items-center justify-content-between">
+														<div>
+															{ownCorrectAnswers[qId] && (
+																<>
+																	(<Trans id="address-you" />:{" "}
+																	{ownCorrect ? "\u2713" : "\u2717"})
+																</>
+															)}
+														</div>
+														<div className="lh-1 ">
+															{noDetails ? (
+																<em>
+																	<Trans id="no-data-yet" />
+																</em>
+															) : (
+																<QuizBarChart
+																	data={[correct]}
+																	maxValue={quizStats.maximumParticipants}
+																/>
+															)}
+														</div>
+														
 													</div>
 												</div>
 											</div>
@@ -323,7 +328,7 @@ export const QuizStatsTab: React.FC = () => {
 											<div key={text} className="d-flex flex-row w-100 mb-1">
 												{ownAnswer && (
 													<div
-														className="me-1"
+														className="me-1 d-flex justify-content-center align-items-center"
 														style={{
 															backgroundColor: "lightgray",
 															fontWeight: "bold",
@@ -331,13 +336,12 @@ export const QuizStatsTab: React.FC = () => {
 														}}
 													>
 														<Trans id="address-you" />:{" "}
-														{ownAnswer[i] ? (
-															"\u2611"
-														) : (
-															<span style={{ fontSize: "1rem", fontWeight: "bold" }}>
-																{"\u2610"}
-															</span>
-														)}
+														<div 
+															className="ms-1 d-flex justify-content-center align-items-center" 
+															style={{border: "1px solid gray", width: 18, height: 18}}
+														>
+															{ownAnswer[i] ? ( "\u2713") : null}
+														</div>
 													</div>
 												)}
 												<div className="w-50">

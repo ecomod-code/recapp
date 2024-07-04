@@ -42,24 +42,28 @@ export const shuffle = curry(<T>(random: () => number, list: T[]) => {
 	return result;
 });
 
-export const isMultiChoiceAnsweredCorrectly = (answers: boolean[], question: Question | undefined) => {
-    if (answers.length === 0) {
+export const isMultiChoiceAnsweredCorrectly = (answers2: boolean[], question: Question | undefined) => {
+	const answers = [...answers2];
+	if (answers.length === 0) {
 		return false;
 	}
 
-    const isAnsweredCorrectly = answers.map((a, i) => !!a === question?.answers[i].correct).every(Boolean);
+	while (answers.length < (question?.answers.length ?? 0)) {
+		answers.push(false);
+	}
 
-    return isAnsweredCorrectly;
+	const isAnsweredCorrectly = answers.map((a, i) => !!a === question?.answers[i].correct).every(Boolean);
+	return isAnsweredCorrectly;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function debounce(callBack: (...args: any) => void, delay: number) {
-    let timeoutId: null | ReturnType<typeof setTimeout> = null;
+	let timeoutId: null | ReturnType<typeof setTimeout> = null;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return function (...args: any) {
-        if (timeoutId) clearTimeout(timeoutId);
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	return function (...args: any) {
+		if (timeoutId) clearTimeout(timeoutId);
 
-        timeoutId = setTimeout(() => callBack(...args), delay);
-    };
+		timeoutId = setTimeout(() => callBack(...args), delay);
+	};
 }

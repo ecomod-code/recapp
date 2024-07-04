@@ -95,6 +95,7 @@ export type CurrentQuizState = {
 	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
+	result?: QuizRun;
 	exportFile?: string;
 };
 
@@ -172,6 +173,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			}
 			this.updateState(draft => {
 				draft.run = { ...draft.run, ...message.run } as QuizRun;
+				draft.result = { ...draft.result, ...message.run } as QuizRun;
 			});
 			return nothing();
 		} else if (message.tag === "QuizRunDeletedMessage") {
@@ -273,17 +275,15 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								questions = randomShuffle(questions);
 							}
 
-							console.log("ORDER", questions);
-
 							const run: QuizRun = await this.ask(
 								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuizRunActorMessages.GetForUser({ studentId, questions })
 							);
 							this.updateState(draft => {
 								draft.run = run;
+								draft.result = run;
 							});
 
-							console.log("NEW ORDER", run.questions);
 							return unit();
 						},
 						LogAnswer: async ({ questionId, answer }) => {
@@ -356,6 +356,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						ChangeState: async newState => {
 							if (newState === "STARTED") {
 								if (["ACTIVE", "EDITING", "STOPPED"].includes(this.state.quiz.state)) {
+									this.send(
+										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										QuizRunActorMessages.Clear()
+									);
+									this.send(
+										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										StatisticsActorMessages.Clear()
+									);
 									this.send(
 										actorUris.QuizActor,
 										QuizActorMessages.Update({
@@ -606,6 +614,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								);
 								this.updateState(draft => {
 									draft.run = undefined;
+									draft.result = undefined;
 									draft.questionStats = undefined;
 									draft.groupStats = undefined;
 									draft.quizStats = undefined;
@@ -645,7 +654,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									console.log("RUN", run);
 									if (run?.message !== "No run for user") {
 										this.updateState(draft => {
-											draft.run = run;
+											draft.result = run;
 										});
 									}
 								}

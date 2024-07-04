@@ -8,7 +8,7 @@ import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
-import { range } from "rambda";
+import { isNil, range } from "rambda";
 // import { LocalUserActor } from "../../actors/LocalUserActor";
 
 const QuizBar = (props: { y: number; width: number; color: string }) => {
@@ -86,19 +86,20 @@ export const QuizStatsTab: React.FC = () => {
 	const [showExportModal, setShowExportModal] = useState(false);
 	const [ownAnswers, setOwnAnswers] = useState<Record<Id, OwnAnswer>>({});
 	const [ownCorrectAnswers, setOwnCorrectAnswers] = useState<Record<Id, boolean>>({});
-	const run = mbQuiz.flatMap(q => maybe(q.run));
+	const run = mbQuiz.flatMap(q => maybe(q.result));
+	const counter = run.map(r => r.counter).orElse(0);
 
 	// TODO Eigene Ergebnisse für das Quiz holen
 	useEffect(() => {
-		console.warn(tryActor, mbQuiz, mbUser);
-		if (tryActor) {
+		if (tryActor.succeeded) {
 			mbUser
 				.map(u => u.user.uid)
 				.forEach(uid => {
 					const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
-					if (isStudent) {
+					console.log("STUD", isStudent, run);
+					if (isStudent && run.hasValue) {
 						run.forEach(run => {
-							range(0, run.questions.length).forEach(index => {
+							range(0, run.questions?.length ?? 0).forEach(index => {
 								setOwnAnswers(state => ({ ...state, [run.questions[index]]: run.answers[index] }));
 								setOwnCorrectAnswers(state => ({
 									...state,
@@ -109,7 +110,7 @@ export const QuizStatsTab: React.FC = () => {
 					}
 				});
 		}
-	}, [tryActor, run.hasValue, mbUser.hasValue]);
+	}, [tryActor.succeeded, counter]);
 
 	const exportQuiz = () => {
 		// TODO: Fragen ob csv oder pdf
@@ -189,6 +190,8 @@ export const QuizStatsTab: React.FC = () => {
 										const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
 										const ownCorrect = ownCorrectAnswers[qId] ?? false;
 
+										console.log("OWN", ownAnswers, ownCorrectAnswers);
+
 										if (!question) return null;
 
 										const noDetails = quizStats.maximumParticipants === 0;
@@ -227,7 +230,7 @@ export const QuizStatsTab: React.FC = () => {
 
 													<div className="d-flex align-items-center justify-content-between">
 														<div>
-															{ownCorrectAnswers[qId] && (
+															{!isNil(ownCorrectAnswers[qId]) && (
 																<>
 																	(<Trans id="address-you" />:{" "}
 																	{ownCorrect ? "\u2713" : "\u2717"})
@@ -246,7 +249,6 @@ export const QuizStatsTab: React.FC = () => {
 																/>
 															)}
 														</div>
-														
 													</div>
 												</div>
 											</div>
@@ -336,11 +338,11 @@ export const QuizStatsTab: React.FC = () => {
 														}}
 													>
 														<Trans id="address-you" />:{" "}
-														<div 
-															className="ms-1 d-flex justify-content-center align-items-center" 
-															style={{border: "1px solid gray", width: 18, height: 18}}
+														<div
+															className="ms-1 d-flex justify-content-center align-items-center"
+															style={{ border: "1px solid gray", width: 18, height: 18 }}
 														>
-															{ownAnswer[i] ? ( "\u2713") : null}
+															{ownAnswer[i] ? "\u2713" : null}
 														</div>
 													</div>
 												)}

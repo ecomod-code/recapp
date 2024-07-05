@@ -117,6 +117,7 @@ export const RunningQuizTab: React.FC<{
 												name="answer"
 												disabled={answered}
 												type={isQuestionTypeSingle ? "radio" : "checkbox"}
+												checked={!!answers[index]}
 												onChange={event => updateAnswer(index, event.target.checked)}
 											/>
 											<Form.Label

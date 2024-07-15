@@ -3,82 +3,16 @@ import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Button } from "react-bootstrap";
-import { ChoiceElementStatistics, Id, User } from "@recapp/models";
+import { Id, User } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { Trans } from "@lingui/react";
-import { i18n } from "@lingui/core";
+// import { i18n } from "@lingui/core";
 import { isNil, range } from "rambda";
-// import { LocalUserActor } from "../../actors/LocalUserActor";
+import { QuizStatsDetails } from "./QuizStatsDetails";
+import { QuizBarChart } from "./quiz-bar/QuizBarChart";
 
-const QuizBar = (props: { y: number; width: number; color: string }) => {
-	return <rect y={props.y} height={24} width={props.width} fill={props.color} />;
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const QuestionBarChart = (props: { data: number; maxValue: number; color: string; symbol: any }) => {
-	const barWidth = 400; // Height of the chart area
-	return (
-		<svg viewBox="0 0 400 24" fill="blue" width="100%" height="20">
-			<QuizBar y={0} width={barWidth} color={"lightgrey"} />
-			<QuizBar y={0} width={(props.data / props.maxValue) * barWidth} color={props.color} />
-			<text x="10" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
-				{props.data}
-			</text>
-			<text x="190" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
-				{(Math.round((props.data / props.maxValue) * 1000.0) / 10.0).toFixed(1)} %
-			</text>
-			<text x="370" y={19} z="10" style={{ fill: "white", fontSize: 20 }}>
-				{props.symbol}
-			</text>
-		</svg>
-	);
-};
-
-const CORRECT_COLOR = "#004488";
-const WRONG_COLOR = "#DDAA33";
-
-const QuizBarChart = (props: { data: number[]; maxValue: number }) => {
-	const barWidth = 400; // Height of the chart area
-	const hasMaxValue = props.maxValue > 0;
-
-	return (
-		<svg viewBox="0 0 400 24" fill="blue" width="100%" height="20">
-			<>
-				{props.data.map((value, index) => {
-					return (
-						<Fragment key={index}>
-							<QuizBar y={index * 25} width={barWidth} color={hasMaxValue ? WRONG_COLOR : "grey"} />
-							{hasMaxValue ? (
-								<QuizBar
-									y={index * 25}
-									width={(value / props.maxValue) * barWidth}
-									color={CORRECT_COLOR}
-								/>
-							) : null}
-							<text x="10" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
-								{"\u2713"} {value}
-							</text>
-							<text x="170" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
-								{hasMaxValue ? `${((value / props.maxValue) * 100.0).toFixed(1)}%` : ""}
-							</text>
-							<text
-								x={370 - (props.maxValue - value).toString().length * 10}
-								y={index * 25 + 19}
-								z="10"
-								style={{ fill: "white", fontSize: 20, textAlign: "right" }}
-							>
-								{props.maxValue - value} {"\u2717"}
-							</text>
-						</Fragment>
-					);
-				})}
-			</>
-		</svg>
-	);
-};
-
-type OwnAnswer = string | (boolean | null | undefined)[];
+export type OwnAnswer = string | (boolean | null | undefined)[];
 
 export const QuizStatsTab: React.FC = () => {
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
@@ -259,166 +193,187 @@ export const QuizStatsTab: React.FC = () => {
 						);
 					});
 				}
-				if (questionStats) {
-					/* Question stats */
-					const questionIndex = questions.findIndex(q => q.uid === questionStats.questionId)!;
-					const question = questions[questionIndex];
-					const questionsByGroup = groups.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
-					const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
+                if (questionStats) {
+                    return (
+                        <QuizStatsDetails
+                            groups={groups}
+                            questionStats={questionStats}
+                            questions={questions}
+                            ownAnswers={ownAnswers}
+                            onBackToQuizClick={() => {
+                                tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ActivateQuizStats()));
+                            }}
+                            changeQuestionHandler={index => {
+                                tryActor.forEach(actor =>
+                                    actor.send(actor, CurrentQuizMessages.ActivateQuestionStats(index))
+                                );
+                            }}
+                        />
+                    );
+                }
 
-					const ownAnswer = ownAnswers[question.uid];
+                // 				if (questionStats) {
+                // 					/* Question stats */
+                // 					const questionIndex = questions.findIndex(q => q.uid === questionStats.questionId)!;
+                // 					const question = questions[questionIndex];
+                // 					const questionsByGroup = groups.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
+                // 					const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
 
-					return (
-						<div>
-							<p className="custom-line-clamp h2">
-								<Trans id="question-stats-prefix" />
-								{question.text}
-							</p>
-							{/*<div>
-								{i18n._("question-stats-info", {
-									participants: questionStats.participants,
-									maxParticipants: questionStats.maximumParticipants,
-									ratio: (
-										(questionStats.participants / questionStats.maximumParticipants) *
-										100.0
-									).toFixed(2),
-								})}
-							</div>*/}
-							<div>
-								{question.type === "TEXT" && (
-									<div className="mb-5">
-										<div>
-											{i18n._("question-stats-answers-given", {
-												numberOfAnswers:
-													questionStats.answers.length -
-													questionStats.answers.filter(a => a.toString().length === 0).length,
-											})}
-										</div>
-										<div className="mt-2 mb-2">
-											<Trans id="question-stats-given-answers" />:
-										</div>
-										{questionStats.answers.map((a, i) => (
-											<div key={`${a}-${i}`}>{a}</div>
-										))}
-										{ownAnswer && (
-											<>
-												<div className="mt-2 mb-2">
-													<em>
-														<Trans id="question-stats-your-answer" />:
-													</em>
-												</div>
-												<div>
-													<em>{ownAnswer}</em>
-												</div>
-											</>
-										)}
-									</div>
-								)}
+                // 					const ownAnswer = ownAnswers[question.uid];
+                // const test = questionStats.answers;
+                // console.log({test});
 
-								{question.type !== "TEXT" && (
-									<div className="mb-5">
-										<div>
-											{i18n._("question-stats-correct-answers", {
-												passed: (questionStats as ChoiceElementStatistics).passed,
-												participants: (questionStats as ChoiceElementStatistics).participants,
-											})}
-										</div>
-										<div className="mt-2 mb-2">
-											<Trans id="question-stats-given-answers" />
-										</div>
-										{question.answers.map(({ text, correct }, i) => (
-											<div key={text} className="d-flex flex-row w-100 mb-1">
-												{ownAnswer && (
-													<div
-														className="me-1 d-flex justify-content-center align-items-center"
-														style={{
-															backgroundColor: "lightgray",
-															fontWeight: "bold",
-															padding: 2,
-														}}
-													>
-														<Trans id="address-you" />:{" "}
-														<div
-															className="ms-1 d-flex justify-content-center align-items-center"
-															style={{ border: "1px solid gray", width: 18, height: 18 }}
-														>
-															{ownAnswer[i] ? "\u2713" : null}
-														</div>
-													</div>
-												)}
-												<div className="w-50">
-													<span>
-														<Trans id="question-stats-answer-prefix" />
-														{text}&nbsp;
-													</span>
-												</div>
-												<div className="flex-grow-1">
-													<QuestionBarChart
-														data={questionStats.answers[i] as number}
-														maxValue={questionStats.participants}
-														color={correct ? CORRECT_COLOR : WRONG_COLOR}
-														symbol={correct ? "\u2713" : "\u2717"}
-													/>
-												</div>
-											</div>
-										))}
-									</div>
-								)}
-							</div>
-							<Button
-								variant="primary"
-								onClick={() =>
-									tryActor.forEach(actor =>
-										actor.send(actor, CurrentQuizMessages.ActivateQuizStats())
-									)
-								}
-							>
-								<Trans id="question-stats-back-to-quiz-button" />
-							</Button>
-							&nbsp;&nbsp;
-							{questionsByGroupIndex > 0 && (
-								<>
-									<Button
-										variant="primary"
-										onClick={() =>
-											tryActor.forEach(actor =>
-												actor.send(
-													actor,
-													CurrentQuizMessages.ActivateQuestionStats(
-														questionsByGroup[questionsByGroupIndex - 1]
-													)
-												)
-											)
-										}
-									>
-										<Trans id="question-stats-previous-question-button" />
-									</Button>
-									&nbsp;&nbsp;
-								</>
-							)}
-							{questionsByGroupIndex < questionsByGroup.length - 1 && (
-								<>
-									<Button
-										variant="primary"
-										onClick={() =>
-											tryActor.forEach(actor =>
-												actor.send(
-													actor,
-													CurrentQuizMessages.ActivateQuestionStats(
-														questionsByGroup[questionsByGroupIndex + 1]
-													)
-												)
-											)
-										}
-									>
-										<Trans id="question-stats-next-question-button" />
-									</Button>
-									&nbsp;&nbsp;
-								</>
-							)}
-						</div>
-					);
-				}
+                // 					return (
+                // 						<div>
+                // 							<p className="custom-line-clamp h2">
+                // 								<Trans id="question-stats-prefix" />
+                // 								{question.text}
+                // 							</p>
+                // 							{/*<div>
+                // 								{i18n._("question-stats-info", {
+                // 									participants: questionStats.participants,
+                // 									maxParticipants: questionStats.maximumParticipants,
+                // 									ratio: (
+                // 										(questionStats.participants / questionStats.maximumParticipants) *
+                // 										100.0
+                // 									).toFixed(2),
+                // 								})}
+                // 							</div>*/}
+                // 							<div>
+                // 								{question.type === "TEXT" && (
+                // 									<div className="mb-5">
+                // 										<div>
+                // 											{i18n._("question-stats-answers-given", {
+                // 												numberOfAnswers:
+                // 													questionStats.answers.length -
+                // 													questionStats.answers.filter(a => a.toString().length === 0).length,
+                // 											})}
+                // 										</div>
+                // 										<div className="mt-2 mb-2">
+                // 											<Trans id="question-stats-given-answers" />:
+                // 										</div>
+                // 										{questionStats.answers.map((a, i) => (
+                // 											<div key={`${a}-${i}`}>{a}</div>
+                // 										))}
+                // 										{ownAnswer && (
+                // 											<>
+                // 												<div className="mt-2 mb-2">
+                // 													<em>
+                // 														<Trans id="question-stats-your-answer" />:
+                // 													</em>
+                // 												</div>
+                // 												<div>
+                // 													<em>{ownAnswer}</em>
+                // 												</div>
+                // 											</>
+                // 										)}
+                // 									</div>
+                // 								)}
+
+                // 								{question.type !== "TEXT" && (
+                // 									<div className="mb-5">
+                // 										<div>
+                // 											{i18n._("question-stats-correct-answers", {
+                // 												passed: (questionStats as ChoiceElementStatistics).passed,
+                // 												participants: (questionStats as ChoiceElementStatistics).participants,
+                // 											})}
+                // 										</div>
+                // 										<div className="mt-2 mb-2">
+                // 											<Trans id="question-stats-given-answers" />
+                // 										</div>
+                // 										{question.answers.map(({ text, correct }, i) => (
+                // 											<div key={text} className="d-flex flex-row w-100 mb-1">
+                // 												{ownAnswer && (
+                // 													<div
+                // 														className="me-1 d-flex justify-content-center align-items-center"
+                // 														style={{
+                // 															backgroundColor: "lightgray",
+                // 															fontWeight: "bold",
+                // 															padding: 2,
+                // 														}}
+                // 													>
+                // 														<Trans id="address-you" />:{" "}
+                // 														<div
+                // 															className="ms-1 d-flex justify-content-center align-items-center"
+                // 															style={{ border: "1px solid gray", width: 18, height: 18 }}
+                // 														>
+                // 															{ownAnswer[i] ? "\u2713" : null}
+                // 														</div>
+                // 													</div>
+                // 												)}
+                // 												<div className="w-50">
+                // 													<span>
+                // 														<Trans id="question-stats-answer-prefix" />
+                // 														{text}&nbsp;
+                // 													</span>
+                // 												</div>
+                // 												<div className="flex-grow-1">
+                // 													<QuestionBarChart
+                // 														data={questionStats.answers[i] as number}
+                // 														maxValue={questionStats.participants}
+                // 														color={correct ? CORRECT_COLOR : WRONG_COLOR}
+                // 														symbol={correct ? "\u2713" : "\u2717"}
+                // 													/>
+                // 												</div>
+                // 											</div>
+                // 										))}
+                // 									</div>
+                // 								)}
+                // 							</div>
+                // 							<Button
+                // 								variant="primary"
+                // 								onClick={() =>
+                // 									tryActor.forEach(actor =>
+                // 										actor.send(actor, CurrentQuizMessages.ActivateQuizStats())
+                // 									)
+                // 								}
+                // 							>
+                // 								<Trans id="question-stats-back-to-quiz-button" />
+                // 							</Button>
+                // 							&nbsp;&nbsp;
+                // 							{questionsByGroupIndex > 0 && (
+                // 								<>
+                // 									<Button
+                // 										variant="primary"
+                // 										onClick={() =>
+                // 											tryActor.forEach(actor =>
+                // 												actor.send(
+                // 													actor,
+                // 													CurrentQuizMessages.ActivateQuestionStats(
+                // 														questionsByGroup[questionsByGroupIndex - 1]
+                // 													)
+                // 												)
+                // 											)
+                // 										}
+                // 									>
+                // 										<Trans id="question-stats-previous-question-button" />
+                // 									</Button>
+                // 									&nbsp;&nbsp;
+                // 								</>
+                // 							)}
+                // 							{questionsByGroupIndex < questionsByGroup.length - 1 && (
+                // 								<>
+                // 									<Button
+                // 										variant="primary"
+                // 										onClick={() =>
+                // 											tryActor.forEach(actor =>
+                // 												actor.send(
+                // 													actor,
+                // 													CurrentQuizMessages.ActivateQuestionStats(
+                // 														questionsByGroup[questionsByGroupIndex + 1]
+                // 													)
+                // 												)
+                // 											)
+                // 										}
+                // 									>
+                // 										<Trans id="question-stats-next-question-button" />
+                // 									</Button>
+                // 									&nbsp;&nbsp;
+                // 								</>
+                // 							)}
+                // 						</div>
+                // 					);
+                // 				}
 			},
 			() => null
 		);

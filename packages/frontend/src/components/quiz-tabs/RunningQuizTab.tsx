@@ -97,7 +97,7 @@ export const RunningQuizTab: React.FC<{
 					<Card.Header
 						className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
 					>
-						<div className="m-1 align-self-center">
+						<div className="m-1 align-self-center" style={{ fontSize: 14 }}>
 							<strong>
 								<Trans id="running-quiz-tab.question-header" /> {(run?.counter ?? 0) + 1} /{" "}
 								{run?.questions.length}
@@ -105,7 +105,7 @@ export const RunningQuizTab: React.FC<{
 						</div>
 					</Card.Header>
 					<Card.Body>
-						<div className="p-2 text-start h-30" dangerouslySetInnerHTML={{ __html: rendered }} />
+						<div className="p-2 text-start h-30" style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: rendered }} />
 					</Card.Body>
 					<Card.Footer>
 						{!isQuestionTypeText && (

@@ -143,7 +143,7 @@ export const QuizButtons = (props: {
 							className="d-flex justify-content-center align-items-center"
 							onClick={resetStats}
 						>
-							<Trash size={24} />
+							<Trash size={18} className="me-1" />
 							<span className="d-flex flex-nowrap">
 								<Trans id="reset-stats-button" />
 							</span>

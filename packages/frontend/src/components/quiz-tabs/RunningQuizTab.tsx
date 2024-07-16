@@ -192,7 +192,6 @@ export const RunningQuizTab: React.FC<{
 								questionsCountCorrect: run?.correct.filter(Boolean).length ?? 0,
 							})}
 						</div>
-						`
 					</Card.Body>
 					<Card.Footer>&nbsp;</Card.Footer>
 				</Card>

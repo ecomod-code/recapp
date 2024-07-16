@@ -91,15 +91,15 @@ export const QuizPage: React.FC = () => {
 		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
 		mbQuiz.map(q => !!q.questionStats).orElse(false);
 
-    // const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
+    const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
 
-    // useEffect(() => {
-    //     if (activeKey === "statistics" && !showStatTab && isQuizStateEditing) {
-    //         setActiveKey(DEFAULT_ACTIVE_KEY);
+    useEffect(() => {
+        if (activeKey === "statistics" && !showStatTab && isQuizStateEditing) {
+            setActiveKey(DEFAULT_ACTIVE_KEY);
 
-    //         tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsPresentationModeActive(false)));
-    //     }
-    // }, [showStatTab, isQuizStateEditing]);
+            tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsPresentationModeActive(false)));
+        }
+    }, [showStatTab, isQuizStateEditing]);
 		
 	const upvoteComment = (commentId: Id) => {
 		tryQuizActor.forEach(actor => {
@@ -128,7 +128,7 @@ export const QuizPage: React.FC = () => {
 		const groupName = groups.find(g => g.questions.includes(questionId))?.name;
 		if (groupName) {
 			const writeAccess =
-				mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING" &&
+				isQuizStateEditing &&
 				(teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
 					mbQuiz
 						.flatMap(q => maybe(q.questions))

@@ -173,6 +173,9 @@ export const QuizPage: React.FC = () => {
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 
+				const userRole = localUser.map(u => u.role).orElse("STUDENT");
+				const isQuizCompleted  = (quizData.run?.counter ?? 0) === quizData.questions.length;
+
 				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {
 						const c: Omit<Comment, "authorId" | "uid"> = {
@@ -328,7 +331,7 @@ export const QuizPage: React.FC = () => {
 										/>
 									)}
 								</Tab>
-								{showStatTab && (
+                                {showStatTab && (userRole === "STUDENT" ? isQuizCompleted : true) && (
 									<Tab
 										eventKey={tabRecords.statistics.value}
 										title={i18n._(tabRecords.statistics.label)}

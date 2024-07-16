@@ -71,7 +71,7 @@ export const QuizStatsDetails = ({
     }, []);
 
     return (
-        <div>
+        <div className="mt-4">
             <p className="custom-line-clamp h2">
                 <Trans id="question-stats-prefix" />
                 {question.text}

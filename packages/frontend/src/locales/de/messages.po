@@ -20,6 +20,11 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:106
+msgid "quiz-stats-tab.switch-label.presentation-mode"
+msgstr "Präsentationsmodus"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:394
 msgid "quiz-data-tab.sync-status.currently-saving"
 msgstr "Wird gespeichert..."

@@ -50,6 +50,8 @@ const tabRecords: Record<TabValue, { label: string; value: TabValue }> = {
 	},
 };
 
+const DEFAULT_ACTIVE_KEY: TabValue = "questions";
+
 export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
 	const [showMDModal, setShowMDModal] = useState(false);
@@ -59,7 +61,7 @@ export const QuizPage: React.FC = () => {
 	const system = useActorSystem();
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
-	const [activeKey, setActiveKey] = useState<TabValue>("questions");
+	const [activeKey, setActiveKey] = useState<TabValue>(DEFAULT_ACTIVE_KEY);
 
 	useEffect(() => {
 		if (!quizId) {
@@ -89,6 +91,16 @@ export const QuizPage: React.FC = () => {
 		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
 		mbQuiz.map(q => !!q.questionStats).orElse(false);
 
+    // const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
+
+    // useEffect(() => {
+    //     if (activeKey === "statistics" && !showStatTab && isQuizStateEditing) {
+    //         setActiveKey(DEFAULT_ACTIVE_KEY);
+
+    //         tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsPresentationModeActive(false)));
+    //     }
+    // }, [showStatTab, isQuizStateEditing]);
+		
 	const upvoteComment = (commentId: Id) => {
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.UpvoteComment(commentId));
@@ -224,23 +236,29 @@ export const QuizPage: React.FC = () => {
 								.map(k => k as UserParticipation)}
 						/>
 
-						<Row>
-							<div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
-								<Breadcrumb>
-									<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
-										Dashboard
-									</Breadcrumb.Item>
-									<Breadcrumb.Item active className="text-overflow-ellipsis" style={{maxWidth: 400}}>
-										{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
-									</Breadcrumb.Item>
-								</Breadcrumb>
+                        {!quizData.isPresentationModeActive ? (
+                            <Row>
+                                <div className="mb-3 d-flex flex-column flex-lg-row justify-content-between">
+                                    <Breadcrumb>
+                                        <Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
+                                            Dashboard
+                                        </Breadcrumb.Item>
+                                        <Breadcrumb.Item
+                                            active
+                                            className="text-overflow-ellipsis"
+                                            style={{ maxWidth: 400 }}
+                                        >
+                                            {mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
+                                        </Breadcrumb.Item>
+                                    </Breadcrumb>
 
-								<span className="mb-3 text-end">
-									<Trans id="quiz-page.quiz-state.label" />:{" "}
-									<QuizStateBadge state={quizData.quiz.state} />
-								</span>
-							</div>
-						</Row>
+                                    <span className="mb-3 text-end">
+                                        <Trans id="quiz-page.quiz-state.label" />:{" "}
+                                        <QuizStateBadge state={quizData.quiz.state} />
+                                    </span>
+                                </div>
+                            </Row>
+                        ) : null}
 
 						<Row>
 							<CommentsContainer
@@ -291,56 +309,65 @@ export const QuizPage: React.FC = () => {
 							</CommentsContainer>
 						</Row>
 
-						{
-							<Row>
-								<div className="my-4">
-									<QuizButtons
-										disableForStudent={disableForStudent}
-										quizState={quizData.quiz.state}
-										uniqueLink={quizData.quiz.uniqueLink}
-										leaveQuiz={leaveQuiz}
-										isQuizCreator={
-											teachers[0] ===
-											mbLocalUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))
-										}
-									/>
-								</div>
-							</Row>
-						}
+                        {!quizData.isPresentationModeActive ? (
+                            <Row>
+                                <div className="my-4">
+                                    <QuizButtons
+                                        disableForStudent={disableForStudent}
+                                        quizState={quizData.quiz.state}
+                                        uniqueLink={quizData.quiz.uniqueLink}
+                                        leaveQuiz={leaveQuiz}
+                                        isQuizCreator={
+                                            teachers[0] ===
+                                            mbLocalUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))
+                                        }
+                                    />
+                                </div>
+                            </Row>
+                        ) : null}
 
-						<Row className="mt-5">
-							<Tabs
-								// defaultActiveKey="questions"
-								className="mb-3 w-100"
-								activeKey={activeKey}
-								onSelect={k => setActiveKey(k as TabValue)}
-							>
-								{!disableForStudent && (
-									<Tab eventKey={tabRecords.quizData.value} title={i18n._(tabRecords.quizData.label)}>
-										<QuizDataTab />
-									</Tab>
-								)}
-								<Tab eventKey={tabRecords.questions.value} title={i18n._(tabRecords.questions.label)}>
-									{disableForStudent && quizData.quiz.state === "STARTED" ? (
-										<RunningQuizTab quizState={quizData} logQuestion={logQuestion} />
-									) : (
-										<QuestionsTab
-											quizData={quizData}
-											localUser={localUser}
-											disableForStudent={disableForStudent}
-										/>
-									)}
-								</Tab>
+                        <Row className="mt-5">
+                            <Tabs
+                                // defaultActiveKey="questions"
+                                className="mb-3 w-100"
+                                activeKey={activeKey}
+                                onSelect={k => setActiveKey(k as TabValue)}
+                            >
+                                {!disableForStudent && (
+                                    <Tab
+                                        eventKey={tabRecords.quizData.value}
+                                        title={i18n._(tabRecords.quizData.label)}
+                                        tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
+                                    >
+                                        <QuizDataTab />
+                                    </Tab>
+                                )}
+                                <Tab
+                                    eventKey={tabRecords.questions.value}
+                                    title={i18n._(tabRecords.questions.label)}
+                                    tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
+                                >
+                                    {disableForStudent && quizData.quiz.state === "STARTED" ? (
+                                        <RunningQuizTab quizState={quizData} logQuestion={logQuestion} />
+                                    ) : (
+                                        <QuestionsTab
+                                            quizData={quizData}
+                                            localUser={localUser}
+                                            disableForStudent={disableForStudent}
+                                        />
+                                    )}
+                                </Tab>
                                 {showStatTab && (userRole === "STUDENT" ? isQuizCompleted : true) && (
-									<Tab
-										eventKey={tabRecords.statistics.value}
-										title={i18n._(tabRecords.statistics.label)}
-									>
-										<QuizStatsTab />
-									</Tab>
-								)}
-							</Tabs>
-						</Row>
+                                    <Tab
+                                        eventKey={tabRecords.statistics.value}
+                                        title={i18n._(tabRecords.statistics.label)}
+										tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
+                                    >
+                                        <QuizStatsTab />
+                                    </Tab>
+                                )}
+                            </Tabs>
+                        </Row>
 					</Container>
 				);
 			},

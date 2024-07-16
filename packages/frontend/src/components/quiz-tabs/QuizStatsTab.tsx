@@ -2,15 +2,15 @@ import { Fragment, useEffect, useState } from "react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
-import { Button } from "react-bootstrap";
+import Button from "react-bootstrap/Button";
 import { Id, User } from "@recapp/models";
 import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { Trans } from "@lingui/react";
-// import { i18n } from "@lingui/core";
 import { isNil, range } from "rambda";
 import { QuizStatsDetails } from "./QuizStatsDetails";
 import { QuizBarChart } from "./quiz-bar/QuizBarChart";
+import { PresentationModeSwitch } from "./PresentationModeSwitch";
 
 export type OwnAnswer = string | (boolean | null | undefined)[];
 
@@ -88,35 +88,40 @@ export const QuizStatsTab: React.FC = () => {
 						quizStats: q.quizStats,
 						questionStats: q.questionStats,
 						exportFile: q.exportFile,
+                        isPresentationModeActive: q.isPresentationModeActive, 
 					})
 				: nothing()
 		)
 		.match(
-			({ groups, questions, quizStats, questionStats, exportFile }) => {
+			({ groups, questions, quizStats, questionStats, exportFile, isPresentationModeActive }) => {
 				if (quizStats && groups) {
 					return groups.map((group, i) => {
 						/* Quiz stats */
 						return (
 							<Fragment key={i}>
-								{i == 0 && (
-									<>
-										<QuizExportModal
-											show={showExportModal}
-											filename={exportFile}
-											onClose={cancelExport}
-											onDownload={downloadExport}
-										/>
-										<div className="mb-4 d-flex flex-row">
-											<Button onClick={exportQuiz}>
-												<Trans id="export-quiz-statistics-button" />
-											</Button>
-											&nbsp;&nbsp;
-											<Button onClick={exportQuestions}>
-												<Trans id="export-question-statistics-button" />
-											</Button>
-										</div>
-									</>
-								)}
+                                <div className="mb-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
+                                    <PresentationModeSwitch />
+
+                                    {i == 0 && !isPresentationModeActive && (
+                                        <>
+                                            <QuizExportModal
+                                                show={showExportModal}
+                                                filename={exportFile}
+                                                onClose={cancelExport}
+                                                onDownload={downloadExport}
+                                            />
+                                            <div className="d-flex flex-row">
+                                                <Button onClick={exportQuiz}>
+                                                    <Trans id="export-quiz-statistics-button" />
+                                                </Button>
+                                                &nbsp;&nbsp;
+                                                <Button onClick={exportQuestions}>
+                                                    <Trans id="export-question-statistics-button" />
+                                                </Button>
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
 								<Fragment key={i}>
 									{group.questions.map(qId => {
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
@@ -195,20 +200,24 @@ export const QuizStatsTab: React.FC = () => {
 				}
                 if (questionStats) {
                     return (
-                        <QuizStatsDetails
-                            groups={groups}
-                            questionStats={questionStats}
-                            questions={questions}
-                            ownAnswers={ownAnswers}
-                            onBackToQuizClick={() => {
-                                tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ActivateQuizStats()));
-                            }}
-                            changeQuestionHandler={index => {
-                                tryActor.forEach(actor =>
-                                    actor.send(actor, CurrentQuizMessages.ActivateQuestionStats(index))
-                                );
-                            }}
-                        />
+                        <>
+                            <PresentationModeSwitch />
+
+                            <QuizStatsDetails
+                                groups={groups}
+                                questionStats={questionStats}
+                                questions={questions}
+                                ownAnswers={ownAnswers}
+                                onBackToQuizClick={() => {
+                                    tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ActivateQuizStats()));
+                                }}
+                                changeQuestionHandler={index => {
+                                    tryActor.forEach(actor =>
+                                        actor.send(actor, CurrentQuizMessages.ActivateQuestionStats(index))
+                                    );
+                                }}
+                            />
+                        </>
                     );
                 }
 

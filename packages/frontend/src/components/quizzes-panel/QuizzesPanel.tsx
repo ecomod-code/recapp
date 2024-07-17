@@ -73,7 +73,6 @@ export const QuizzesPanel: React.FC = () => {
 			.map(s => s.user)
 			.map(u => (u?.uid && (quiz.createdBy ? u?.uid === quiz.createdBy : u?.uid === quiz.teachers?.[0])) ?? false)
 			.orElse(false);
-		alert(quiz.createdBy + " " + quiz.teachers?.join(","));
 		return isAdmin || isCreatingTeacher ? true : undefined;
 	};
 

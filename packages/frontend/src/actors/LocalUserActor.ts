@@ -5,6 +5,7 @@ import {
 	Quiz,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	User,
 	UserStoreMessages,
 	UserUpdateMessage,
@@ -41,6 +42,7 @@ export class ResetError {
 type Messages =
 	| UserUpdateMessage
 	| QuizUpdateMessage
+	| QuizDeletedMessage
 	| ArchiveQuizMessage
 	| UploadQuizMessage
 	| string
@@ -105,6 +107,13 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, State
 				draft.user = message.user as User;
 				draft.updateCounter++;
 			});
+		} else if (message.tag == "QuizDeletedMessage") {
+			if (message.quizId) {
+				this.updateState(draft => {
+					draft.quizzes.delete(message.quizId);
+					draft.updateCounter++;
+				});
+			}
 		} else if (message.tag == "QuizUpdateMessage") {
 			const names: any[] = message.quiz.teachers
 				? await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers))

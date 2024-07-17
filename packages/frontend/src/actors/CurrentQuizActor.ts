@@ -5,6 +5,7 @@ import {
 	Comment,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	CommentUpdateMessage,
 	Id,
 	User,
@@ -35,6 +36,7 @@ import { i18n } from "@lingui/core";
 import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
 import { isMultiChoiceAnsweredCorrectly, shuffle } from "../utils";
+import { keys } from "rambda";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -75,6 +77,7 @@ export type CurrentQuizMessage = UnionOf<typeof CurrentQuizMessages>;
 
 type MessageType =
 	| QuizUpdateMessage
+	| QuizDeletedMessage
 	| CommentUpdateMessage
 	| QuestionUpdateMessage
 	| CurrentQuizMessage
@@ -97,6 +100,7 @@ export type CurrentQuizState = {
 	run?: QuizRun;
 	result?: QuizRun;
 	exportFile?: string;
+	deleted: boolean;
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
@@ -116,6 +120,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			quizStats: undefined,
 			run: undefined,
 			exportFile: undefined,
+			deleted: false,
 		};
 	}
 
@@ -134,6 +139,16 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			if (message.quiz.state === "STARTED" && !this.state.run) {
 				this.send(this.ref, CurrentQuizMessages.StartQuiz());
 			}
+			return nothing();
+		} else if (message.tag === "QuizDeletedMessage") {
+			/* if (message.quizId !== this.quiz.orElse(toId("-"))) {
+				return nothing();
+			} */
+			this.updateState(draft => {
+				draft.quiz = {} as Quiz;
+				draft.deleted = true;
+			});
+			this.quiz = nothing();
 			return nothing();
 		} else if (message.tag === "CommentUpdateMessage") {
 			this.updateState(draft => {
@@ -613,6 +628,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									QuestionActorMessages.GetAll()
 								);
+								console.log("QD", quizData);
 								this.updateState(draft => {
 									draft.run = undefined;
 									draft.result = undefined;
@@ -620,6 +636,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									draft.groupStats = undefined;
 									draft.quizStats = undefined;
 									draft.quiz = quizData;
+									draft.deleted = !quizData || keys(quizData).length === 0;
 								});
 								this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
 								this.send(

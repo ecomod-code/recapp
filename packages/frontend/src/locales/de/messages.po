@@ -1115,3 +1115,11 @@ msgstr "Importfehler"
 msgid "quiz-import-error-message"
 msgstr "Die ausgewählte Datei konnte nicht importiert werden"
 
+#. js-lingui-explicit-id
+msgid "quiz-error-quiz-title"
+msgstr "Ein Fehler ist aufgetreten"
+
+#. js-lingui-explicit-id
+msgid "quiz-error-quiz-deleted"
+msgstr "Dieses Quiz wurde durch eine Lehrkraft oder einen Administrator gelöscht."
+

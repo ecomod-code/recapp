@@ -8,6 +8,7 @@ import {
 	QuizActorMessage,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	UserStoreMessages,
 	quizSchema,
 	toId,
@@ -163,6 +164,17 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		}
 	};
 
+	private sendDeletionToSubscribers = (deletedId: Id) => {
+		for (const [subscriber] of this.state.collectionSubscribers) {
+			const globalUpdateMessage = new QuizDeletedMessage(deletedId);
+
+			this.send(subscriber, globalUpdateMessage);
+		}
+		for (const subscriber of this.state.subscribers.get(deletedId) ?? new Set()) {
+			this.send(subscriber, new QuizDeletedMessage(deletedId));
+		}
+	};
+
 	private async create(quiz: Partial<Quiz>, clientUserRole: AccessRole, clientUserId: Id): Promise<Id> {
 		if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
 			// Students can also create quizzes. This will automatically upgrade them to a teacher role
@@ -233,6 +245,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						await db.collection<Question>("questions").deleteMany({ quiz: id });
 						await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
 						this.logger.debug(`Successfully deleted quiz ${id}`);
+						this.sendDeletionToSubscribers(id);
 						return unit();
 					});
 				},

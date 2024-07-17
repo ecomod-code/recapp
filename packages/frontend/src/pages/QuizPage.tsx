@@ -278,10 +278,12 @@ export const QuizPage: React.FC = () => {
                                         </Breadcrumb.Item>
                                     </Breadcrumb>
 
-                                    <span className="mb-3 text-end">
-                                        <Trans id="quiz-page.quiz-state.label" />:{" "}
-                                        <QuizStateBadge state={quizData.quiz.state} />
-                                    </span>
+                                    {!disableForStudent || quizData.quiz.state !== "STARTED" ? (
+                                        <span className="mb-3 text-end">
+                                            <Trans id="quiz-page.quiz-state.label" />:{" "}
+                                            <QuizStateBadge state={quizData.quiz.state} />
+                                        </span>
+                                    ) : null}
                                 </div>
                             </Row>
                         ) : null}

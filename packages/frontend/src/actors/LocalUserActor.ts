@@ -79,6 +79,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, State
 					"updated",
 					"archived",
 					"uniqueLink",
+					"createdBy",
 				])
 			);
 		}

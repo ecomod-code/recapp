@@ -433,6 +433,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								updated: toTimestamp(),
 								comments: [],
 								hideComments: false,
+								createdBy: creator,
 							};
 							const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
 							this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));

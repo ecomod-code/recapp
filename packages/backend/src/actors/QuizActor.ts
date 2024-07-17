@@ -173,6 +173,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		(quiz as Quiz).created = toTimestamp();
 		(quiz as Quiz).updated = toTimestamp();
 		(quiz as Quiz).state = "EDITING";
+		(quiz as Quiz).createdBy = clientUserId;
 		const quizToCreate = quizSchema.parse(quiz);
 		await this.afterEntityWasCached(uid);
 		await this.storeEntity(quizToCreate);
@@ -213,11 +214,16 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				Delete: async id => {
 					const mbQuiz = await this.getEntity(id);
 					return mbQuiz.map(async quiz => {
-						if (clientUserRole !== "ADMIN" || quiz.teachers[0] !== clientUserId) {
+						if (
+							clientUserRole !== "ADMIN" &&
+							(quiz.createdBy ? quiz.createdBy !== clientUserId : quiz.teachers[0] !== clientUserId)
+						) {
 							this.logger.warn(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin.`
+								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
 							);
-							return unit();
+							return new Error(
+								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+							);
 						}
 						const db = await this.connector.db();
 						await this.deleteEntity(id);

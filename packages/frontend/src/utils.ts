@@ -1,7 +1,8 @@
 import { curry } from "rambda";
 import { ActorSystem, ActorRef } from "ts-actors";
 import { Try, Maybe, nothing, maybe } from "tsmonads";
-import { Question } from "@recapp/models";
+import { Question, User } from "@recapp/models";
+import { CurrentQuizState } from "./actors/CurrentQuizActor";
 
 export const cookie = (name: string): string => {
 	const cookies = new Map(
@@ -67,3 +68,12 @@ export function debounce(callBack: (...args: any) => void, delay: number) {
 		timeoutId = setTimeout(() => callBack(...args), delay);
 	};
 }
+
+export const checkIsQuizTeacher = (quizData: CurrentQuizState | null, localUser: User | null) => {
+    if (!localUser || !quizData) return false;
+
+    const teachers: string[] = quizData.quiz.teachers;
+    const isQuizTeacher = teachers.includes(localUser.uid);
+
+    return isQuizTeacher;
+};

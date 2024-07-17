@@ -25,6 +25,7 @@ import { toTimestamp, debug } from "itu-utils";
 import { Trans } from "@lingui/react";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { QuizStateBadge } from "../components/QuizStateBadge";
+// import { useCurrentQuiz } from "../hooks/state-actor/useCurrentQuiz";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -54,6 +55,7 @@ const DEFAULT_ACTIVE_KEY: TabValue = "questions";
 
 export const QuizPage: React.FC = () => {
 	const nav = useNavigate();
+	// const {quizData, quizActorSend} = useCurrentQuiz();
 	const [showMDModal, setShowMDModal] = useState(false);
 	const { state } = useLocation();
 	const quizId: Id = state?.quizId;
@@ -68,6 +70,10 @@ export const QuizPage: React.FC = () => {
 			return;
 		}
 		if (activate) {
+            // mbLocalUser.forEach(lu => {
+            //     quizActorSend(CurrentQuizMessages.Activate({ userId: lu.user.uid, quizId }));
+            //     quizActorSend(CurrentQuizMessages.SetQuiz(toId(quizId)));
+            // });
 			tryQuizActor.forEach(q => {
 				mbLocalUser.forEach(lu => {
 					q.send(q, CurrentQuizMessages.Activate({ userId: lu.user.uid, quizId }));
@@ -75,6 +81,11 @@ export const QuizPage: React.FC = () => {
 				});
 			});
 		}
+
+		// mbLocalUser.forEach(lu => {
+		// 	quizActorSend(CurrentQuizMessages.SetUser(lu.user));
+		// 	quizActorSend(CurrentQuizMessages.SetQuiz(toId(quizId)));
+		// });
 		tryQuizActor.forEach(q => {
 			mbLocalUser.forEach(lu => {
 				q.send(q, CurrentQuizMessages.SetUser(lu.user));
@@ -87,21 +98,29 @@ export const QuizPage: React.FC = () => {
 	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
+    // const showStatTab2 =
+    //     (quizData && quizData.quizStats && (quizData.quizStats.maximumParticipants ?? 0) > 0) ||
+    //     !!quizData?.questionStats;
+
 	const showStatTab =
 		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
 		mbQuiz.map(q => !!q.questionStats).orElse(false);
 
+    // const isQuizStateEditing2 = quizData?.quiz?.state ? quizData.quiz.state === "EDITING" : "STOPPED";
     const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
 
     useEffect(() => {
         if (activeKey === "statistics" && !showStatTab && isQuizStateEditing) {
             setActiveKey(DEFAULT_ACTIVE_KEY);
 
+			// quizActorSend(CurrentQuizMessages.setIsPresentationModeActive(false));
             tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsPresentationModeActive(false)));
         }
     }, [showStatTab, isQuizStateEditing]);
 		
 	const upvoteComment = (commentId: Id) => {
+
+		// quizActorSend(CurrentQuizMessages.UpvoteComment(commentId));
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.UpvoteComment(commentId));
 		});
@@ -112,12 +131,15 @@ export const QuizPage: React.FC = () => {
 		if (!teachers.includes(user)) {
 			return;
 		}
+
+		// quizActorSend(CurrentQuizMessages.FinishComment(commentId));
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.FinishComment(commentId));
 		});
 	};
 
 	const deleteComment = (commentId: Id) => {
+		// quizActorSend(CurrentQuizMessages.DeleteComment(commentId));
 		tryQuizActor.forEach(actor => {
 			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
 		});
@@ -149,6 +171,7 @@ export const QuizPage: React.FC = () => {
 	};
 
 	const leaveQuiz = () => {
+		// quizActorSend(CurrentQuizMessages.LeaveQuiz());
 		tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.LeaveQuiz()));
 		nav({ pathname: "/Dashboard" });
 	};
@@ -181,11 +204,11 @@ export const QuizPage: React.FC = () => {
 				};
 
 				const disableForStudent = localUser.map(allowed).orElse(true);
-				const isTeacher = teachers.includes(localUser.map(u => u.uid).orElse(toId("")));
+				const isQuizTeacher = teachers.includes(localUser.map(u => u.uid).orElse(toId("")));
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 
-				const userRole = localUser.map(u => u.role).orElse("STUDENT");
+				// const userRole = localUser.map(u => u.role).orElse("STUDENT");
 				const isQuizCompleted  = (quizData.run?.counter ?? 0) === quizData.questions.length;
 
 				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
@@ -199,6 +222,7 @@ export const QuizPage: React.FC = () => {
 							answered: false,
 							relatedQuiz: quizData.quiz.uid,
 						};
+                        // quizActorSend(CurrentQuizMessages.AddComment(c));
 						tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
 					});
 					setShowMDModal(false);
@@ -206,16 +230,18 @@ export const QuizPage: React.FC = () => {
 
 				const logQuestion = (questionId: Id, answer: string | boolean[]) => {
 					console.log("SYS", system, "URI", actorUris["CurrentQuiz"]);
+					// todo: what is the correct way to use useCurrentQuiz
 					tryQuizActor.forEach(actor =>
 						actor.send(actorUris["CurrentQuiz"], CurrentQuizMessages.LogAnswer({ questionId, answer }))
 					);
 				};
 
-				const showCommentArea = !quizData.quiz.hideComments || (isTeacher && quizData.quiz.state === "EDITING");
+				const showCommentArea = !quizData.quiz.hideComments || (isQuizTeacher && quizData.quiz.state === "EDITING");
 
 				const isCommentSectionVisible = quizData.isCommentSectionVisible;
 
 				const setIsCommentSectionVisible = (value: boolean) => {
+					// quizActorSend(CurrentQuizMessages.setIsCommentSectionVisible(value));
 					tryQuizActor.forEach(actor =>
 						actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value))
 					);
@@ -229,7 +255,7 @@ export const QuizPage: React.FC = () => {
 							show={showMDModal}
 							onClose={() => setShowMDModal(false)}
 							onSubmit={addComment}
-							isStudent={!isTeacher}
+							isStudent={!isQuizTeacher}
 							userNames={[userName, userNickname ?? ""]}
 							participationOptions={keys(quizData.quiz.studentParticipationSettings)
 								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
@@ -357,7 +383,7 @@ export const QuizPage: React.FC = () => {
                                         />
                                     )}
                                 </Tab>
-                                {showStatTab && (userRole === "STUDENT" ? isQuizCompleted : true) && (
+                                {showStatTab && (isQuizTeacher ? true : isQuizCompleted) && (
                                     <Tab
                                         eventKey={tabRecords.statistics.value}
                                         title={i18n._(tabRecords.statistics.label)}

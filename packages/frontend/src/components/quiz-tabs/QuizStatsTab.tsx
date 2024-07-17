@@ -100,7 +100,10 @@ export const QuizStatsTab: React.FC = () => {
 						return (
 							<Fragment key={i}>
                                 <div className="mb-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
-                                    <PresentationModeSwitch />
+                                    {/* this div is needed to make the buttons maintain the position right when the presentation-mode-switch is not visible */}
+                                    <div>
+                                        <PresentationModeSwitch />
+                                    </div>
 
                                     {i == 0 && !isPresentationModeActive && (
                                         <>

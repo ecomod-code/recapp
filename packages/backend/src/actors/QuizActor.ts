@@ -29,6 +29,7 @@ import { StatisticsActor } from "./StatisticsActor";
 import { writeFile, readFile } from "fs/promises";
 import * as path from "path";
 import { AccessRole } from "./StoringActor";
+import { serializeError } from "serialize-error";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -353,6 +354,29 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					console.log(filename);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
 					const importedObject = JSON.parse(jsonBuffer.toString());
+					try {
+						const propertyKeys = [
+							"allowedQuestionTypesSettings",
+							"description",
+							"shuffleQuestions",
+							"state",
+							"studentComments",
+							"studentParticipationSettings",
+							"studentQuestions",
+							"hideComments",
+							"title",
+							"questions",
+						];
+						const properties = keys(importedObject);
+						if (propertyKeys.some(p => !properties.includes(p))) {
+							throw new Error("Illegal import schema");
+						}
+					} catch (e) {
+						if (e instanceof Error) {
+							console.error(e);
+							return serializeError(new Error(e.message));
+						}
+					}
 					const quiz: Omit<Quiz, "uniqueLink" | "uid"> = {
 						allowedQuestionTypesSettings: importedObject.allowedQuestionTypesSettings,
 						description: importedObject.description,

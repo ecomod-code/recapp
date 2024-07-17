@@ -1102,3 +1102,16 @@ msgstr "Download CSV"
 #. js-lingui-explicit-id
 msgid "download-pdf"
 msgstr "Download PDF"
+
+#. js-lingui-explicit-id
+msgid "download-quiz"
+msgstr "Download JSON"
+
+
+#. js-lingui-explicit-id
+msgid "quiz-import-error-title"
+msgstr "Import error"
+
+#. js-lingui-explicit-id
+msgid "quiz-import-error-message"
+msgstr "The selected file could not be imported"

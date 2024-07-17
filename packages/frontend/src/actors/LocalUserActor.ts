@@ -33,6 +33,11 @@ export class ToggleShowArchived {
 	constructor(public readonly value: boolean) {}
 }
 
+export class ResetError {
+	public readonly tag = "ResetError" as const;
+	constructor() {}
+}
+
 type Messages =
 	| UserUpdateMessage
 	| QuizUpdateMessage
@@ -40,6 +45,7 @@ type Messages =
 	| UploadQuizMessage
 	| string
 	| ToggleShowArchived
+	| ResetError
 	| DeleteQuizMessage;
 
 type State = {
@@ -48,6 +54,7 @@ type State = {
 	teachers: Map<Id, string[]>;
 	updateCounter: number;
 	showArchived: boolean;
+	error: string;
 };
 
 export class LocalUserActor extends StatefulActor<Messages, Unit | string, State> {
@@ -59,6 +66,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, State
 			teachers: new Map(),
 			updateCounter: 0,
 			showArchived: false,
+			error: "",
 		};
 	}
 
@@ -128,11 +136,27 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, State
 				draft.updateCounter++;
 			});
 		} else if (message.tag == "UploadQuizMessage") {
-			this.send(actorUris["QuizActor"], QuizActorMessages.Import({ filename: message.filename }));
+			const result: Error | Unit = await this.ask(
+				actorUris["QuizActor"],
+				QuizActorMessages.Import({ filename: message.filename })
+			);
+			if ((result as any).message) {
+				this.updateState(draft => {
+					draft.error = (result as any).message;
+				});
+			} else {
+				this.updateState(draft => {
+					draft.error = "";
+				});
+			}
 		} else if (message.tag == "ToggleShowArchived") {
 			this.updateState(draft => {
 				draft.showArchived = message.value;
 				draft.updateCounter++;
+			});
+		} else if (message.tag == "ResetError") {
+			this.updateState(draft => {
+				draft.error = "";
 			});
 		}
 		return unit();

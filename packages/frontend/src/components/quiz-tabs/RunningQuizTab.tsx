@@ -14,6 +14,7 @@ import { Id, toId } from "@recapp/models";
 import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 import { Trans } from "@lingui/react";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../colorPalette";
 
 export const RunningQuizTab: React.FC<{
 	quizState: CurrentQuizState;
@@ -95,9 +96,18 @@ export const RunningQuizTab: React.FC<{
             /> */}
 			{(run?.counter ?? 0) < questions.length && (
 				<Card className="p-0">
-					<Card.Header
-						className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
-					>
+                    <Card.Header
+                        style={{
+                            backgroundColor:
+                                !isQuestionTypeText && answered
+                                    ? isAnsweredCorrectly
+                                        ? CORRECT_COLOR
+                                        : WRONG_COLOR
+                                    : undefined,
+                        }}
+                        // className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
+                        className={"text-start d-flex flex-row"}
+                    >
 						<div className="m-1 align-self-center" style={{ fontSize: 14 }}>
 							<strong>
 								<Trans id="running-quiz-tab.question-header" /> {(run?.counter ?? 0) + 1} /{" "}
@@ -109,6 +119,13 @@ export const RunningQuizTab: React.FC<{
 						<div className="p-2 text-start h-30" style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: rendered }} />
 					</Card.Body>
 					<Card.Footer>
+						<p>bla bla</p>
+						<p>bla bla</p>
+						<p>bla bla</p>
+						<p>bla bla</p>
+						<p>bla bla</p>
+						<p>bla bla</p>
+						<p>bla bla</p>
 						{!isQuestionTypeText && (
 							<Form className="text-start mb-2">
 								{currentQuestion?.answers.map((answer, index) => {
@@ -121,12 +138,16 @@ export const RunningQuizTab: React.FC<{
 												checked={!!answers[index]}
 												onChange={event => updateAnswer(index, event.target.checked)}
 											/>
-											<Form.Label
-												className={
-													answered ? (answer.correct ? "answer-correct" : "answer-wrong") : ""
-												}
-											>
-												{answered ? (answer.correct ? CHECK_SYMBOL : X_SYMBOL) : ""}
+                                            <Form.Label
+                                                style={{
+                                                    color: answered
+                                                        ? answer.correct
+                                                            ? CORRECT_COLOR
+                                                            : WRONG_COLOR
+                                                        : undefined,
+                                                }}
+                                            >
+												{answered ? ((answer.correct ? CHECK_SYMBOL : X_SYMBOL) + " " ) : ""}
 												{answer.text}
 											</Form.Label>
 										</Form.Group>

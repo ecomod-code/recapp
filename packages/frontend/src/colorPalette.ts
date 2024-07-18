@@ -1,5 +1,4 @@
-import { CHECK_SYMBOL, X_SYMBOL } from "./layout";
-import { getStoredPaletteKey } from "./storePaletteKey";
+import { CHECK_SYMBOL, X_SYMBOL } from "./constants/layout";
 
 export type PaletteKey = "Palette 1" | "Palette 2";
 
@@ -8,7 +7,28 @@ export type PaletteItem = {
     wrong: { symbol: string; color: string; textColor?: string };
 };
 
+export const STORED_PALETTE_LOCALE_KEY = "selected-palette";
 export const DEFAULT_PALETTE: PaletteKey = "Palette 1";
+
+export const getStoredPaletteKey = (): PaletteKey => {
+    const storedLocal = localStorage.getItem(STORED_PALETTE_LOCALE_KEY);
+
+    if (!storedLocal) {
+        // if no key is stored ..
+        // 1. return the default key
+        // 2. add the default key to the localStorage
+        storePaletteKey(DEFAULT_PALETTE);
+        return DEFAULT_PALETTE;
+    }
+
+    const value = JSON.parse(storedLocal) as PaletteKey;
+
+    return value;
+};
+
+export const storePaletteKey = (selectedPalette: PaletteKey) => {
+    localStorage.setItem(STORED_PALETTE_LOCALE_KEY, JSON.stringify(selectedPalette));
+};
 
 export const colorPalette: Record<PaletteKey, PaletteItem> = {
     "Palette 1": {

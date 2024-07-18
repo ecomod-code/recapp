@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { QuizBar } from "./QuizBar";
-import { CORRECT_COLOR, WRONG_COLOR } from "../../../constants/colorPalette";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../../colorPalette";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../../constants/layout";
 
 interface Props {

@@ -2,9 +2,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Form from "react-bootstrap/Form";
 import { HEADER_SELECT_MIN_WIDTH } from "../../constants/layout";
-import { getStoredPaletteKey, storePaletteKey } from "../../constants/storePaletteKey";
-import { PaletteKey } from "../../constants/colorPalette";
-import { colorPalette } from "../../constants/colorPalette";
+import { PaletteKey, getStoredPaletteKey, storePaletteKey } from "../../colorPalette";
+import { colorPalette } from "../../colorPalette";
 
 export const PaletteSelect = () => {
     const navigation = useNavigate();

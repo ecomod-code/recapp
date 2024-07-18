@@ -8,7 +8,7 @@ import Button from "react-bootstrap/Button";
 import type { OwnAnswer } from "./QuizStatsTab";
 import type { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { QuestionBarChart } from "./quiz-bar/QuestionBarChart";
-import { CORRECT_COLOR, WRONG_COLOR } from "../../constants/colorPalette";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../colorPalette";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 type QuizStatsDetailsProps = Pick<CurrentQuizState, "questionStats" | "questions"> & {

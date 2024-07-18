@@ -1,2 +1,4 @@
-export const CORRECT_COLOR = "#004488";
-export const WRONG_COLOR = "#DDAA33";
+export const CHECK_SYMBOL = "\u2713";
+export const X_SYMBOL = "\u2717";
+
+export const HEADER_SELECT_MIN_WIDTH = 120;

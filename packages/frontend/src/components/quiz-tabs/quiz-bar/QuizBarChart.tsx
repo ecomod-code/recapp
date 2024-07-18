@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { QuizBar } from "./QuizBar";
-import { CORRECT_COLOR, WRONG_COLOR } from "../../../constants/layout";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../../constants/colorPalette";
+import { CHECK_SYMBOL, X_SYMBOL } from "../../../constants/layout";
 
 interface Props {
     data: number[];
@@ -26,7 +27,7 @@ export const QuizBarChart = (props: Props) => {
                                 />
                             ) : null}
                             <text x="10" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
-                                {"\u2713"} {value}
+                                {CHECK_SYMBOL} {value}
                             </text>
                             <text x="170" y={index * 25 + 19} z="10" style={{ fill: "white", fontSize: 20 }}>
                                 {hasMaxValue ? `${((value / props.maxValue) * 100.0).toFixed(1)}%` : ""}
@@ -37,7 +38,7 @@ export const QuizBarChart = (props: Props) => {
                                 z="10"
                                 style={{ fill: "white", fontSize: 20, textAlign: "right" }}
                             >
-                                {props.maxValue - value} {"\u2717"}
+                                {props.maxValue - value} {X_SYMBOL}
                             </text>
                         </Fragment>
                     );

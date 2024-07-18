@@ -8,7 +8,8 @@ import Button from "react-bootstrap/Button";
 import type { OwnAnswer } from "./QuizStatsTab";
 import type { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { QuestionBarChart } from "./quiz-bar/QuestionBarChart";
-import { CORRECT_COLOR, WRONG_COLOR } from "../../constants/layout";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../constants/colorPalette";
+import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 type QuizStatsDetailsProps = Pick<CurrentQuizState, "questionStats" | "questions"> & {
     groups: CurrentQuizState["quiz"]["groups"];
@@ -144,7 +145,7 @@ export const QuizStatsDetails = ({
                                             className="ms-1 d-flex justify-content-center align-items-center"
                                             style={{ border: "1px solid gray", width: 18, height: 18 }}
                                         >
-                                            {ownAnswer[i] ? "\u2713" : null}
+                                            {ownAnswer[i] ? CHECK_SYMBOL : null}
                                         </div>
                                     </div>
                                 )}
@@ -159,7 +160,7 @@ export const QuizStatsDetails = ({
                                         data={questionStats.answers[i] as number}
                                         maxValue={questionStats.participants}
                                         color={correct ? CORRECT_COLOR : WRONG_COLOR}
-                                        symbol={correct ? "\u2713" : "\u2717"}
+                                        symbol={correct ? CHECK_SYMBOL : X_SYMBOL}
                                     />
                                 </div>
                             </div>

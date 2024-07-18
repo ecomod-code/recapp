@@ -14,6 +14,7 @@ import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import { BoxArrowRight, Pencil } from "react-bootstrap-icons";
 import { LocaleSelect } from "../components/layout/LocaleSelect";
+import { PaletteSelect } from "../components/layout/PaletteSelect";
 import { InitialsBubble } from "../components/InitialsBubble";
 import { ChangeNicknameModal } from "../components/modals/ChangeNicknameModal";
 import { ErrorModal } from "../components/modals/ErrorModal";
@@ -110,6 +111,9 @@ export const HeaderSection: React.FC = () => {
                                                 </Dropdown.Item>
                                                 <Dropdown.Item>
                                                     <LocaleSelect />
+                                                </Dropdown.Item>
+                                                <Dropdown.Item>
+                                                   <PaletteSelect /> 
                                                 </Dropdown.Item>
                                                 <Dropdown.Divider></Dropdown.Divider>
                                                 <Dropdown.Item href={`${import.meta.env.VITE_BACKEND_URI}/auth/logout`}>

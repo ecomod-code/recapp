@@ -11,6 +11,7 @@ import { isNil, range } from "rambda";
 import { QuizStatsDetails } from "./QuizStatsDetails";
 import { QuizBarChart } from "./quiz-bar/QuizBarChart";
 import { PresentationModeSwitch } from "./PresentationModeSwitch";
+import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 export type OwnAnswer = string | (boolean | null | undefined)[];
 
@@ -175,7 +176,7 @@ export const QuizStatsTab: React.FC = () => {
 															{!isNil(ownCorrectAnswers[qId]) && (
 																<>
 																	(<Trans id="address-you" />:{" "}
-																	{ownCorrect ? "\u2713" : "\u2717"})
+																	{ownCorrect ? CHECK_SYMBOL : X_SYMBOL})
 																</>
 															)}
 														</div>
@@ -309,7 +310,7 @@ export const QuizStatsTab: React.FC = () => {
                 // 															className="ms-1 d-flex justify-content-center align-items-center"
                 // 															style={{ border: "1px solid gray", width: 18, height: 18 }}
                 // 														>
-                // 															{ownAnswer[i] ? "\u2713" : null}
+                // 															{ownAnswer[i] ? CHECK_SYMBOL : null}
                 // 														</div>
                 // 													</div>
                 // 												)}
@@ -324,7 +325,7 @@ export const QuizStatsTab: React.FC = () => {
                 // 														data={questionStats.answers[i] as number}
                 // 														maxValue={questionStats.participants}
                 // 														color={correct ? CORRECT_COLOR : WRONG_COLOR}
-                // 														symbol={correct ? "\u2713" : "\u2717"}
+                // 														symbol={correct ? CHECK_SYMBOL : X_SYMBOL}
                 // 													/>
                 // 												</div>
                 // 											</div>

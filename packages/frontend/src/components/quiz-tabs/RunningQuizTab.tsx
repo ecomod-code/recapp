@@ -13,6 +13,7 @@ import { Id, toId } from "@recapp/models";
 // import { MessageModal } from "../modals/MessageModal";
 import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 import { Trans } from "@lingui/react";
+import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 export const RunningQuizTab: React.FC<{
 	quizState: CurrentQuizState;
@@ -125,7 +126,7 @@ export const RunningQuizTab: React.FC<{
 													answered ? (answer.correct ? "answer-correct" : "answer-wrong") : ""
 												}
 											>
-												{answered ? (answer.correct ? "\u2713 " : "\u2717 ") : ""}
+												{answered ? (answer.correct ? CHECK_SYMBOL : X_SYMBOL) : ""}
 												{answer.text}
 											</Form.Label>
 										</Form.Group>

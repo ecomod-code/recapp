@@ -119,13 +119,6 @@ export const RunningQuizTab: React.FC<{
 						<div className="p-2 text-start h-30" style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: rendered }} />
 					</Card.Body>
 					<Card.Footer>
-						<p>bla bla</p>
-						<p>bla bla</p>
-						<p>bla bla</p>
-						<p>bla bla</p>
-						<p>bla bla</p>
-						<p>bla bla</p>
-						<p>bla bla</p>
 						{!isQuestionTypeText && (
 							<Form className="text-start mb-2">
 								{currentQuestion?.answers.map((answer, index) => {

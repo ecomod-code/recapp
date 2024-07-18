@@ -42,8 +42,8 @@ export const colorPalette: Record<PaletteKey, PaletteItem> = {
 };
 
 const {
-    right: { color: CORRECT_COLOR },
-    wrong: { color: WRONG_COLOR },
+    right: { color: CORRECT_COLOR, textColor: CORRECT_COLOR_TEXT },
+    wrong: { color: WRONG_COLOR, textColor: WRONG_COLOR_TEXT },
 } = colorPalette[getStoredPaletteKey()];
 
-export { CORRECT_COLOR, WRONG_COLOR };
+export { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT };

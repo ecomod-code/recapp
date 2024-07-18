@@ -14,7 +14,7 @@ import { Id, toId } from "@recapp/models";
 import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 import { Trans } from "@lingui/react";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
-import { CORRECT_COLOR, WRONG_COLOR } from "../../colorPalette";
+import { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT } from "../../colorPalette";
 
 export const RunningQuizTab: React.FC<{
 	quizState: CurrentQuizState;
@@ -98,12 +98,17 @@ export const RunningQuizTab: React.FC<{
 				<Card className="p-0">
                     <Card.Header
                         style={{
-                            backgroundColor:
-                                !isQuestionTypeText && answered
-                                    ? isAnsweredCorrectly
-                                        ? CORRECT_COLOR
-                                        : WRONG_COLOR
-                                    : undefined,
+                            ...(!isQuestionTypeText && answered
+                                ? isAnsweredCorrectly
+                                    ? {
+                                          backgroundColor: CORRECT_COLOR,
+                                          color: CORRECT_COLOR_TEXT,
+                                      }
+                                    : {
+                                          backgroundColor: WRONG_COLOR,
+                                          color: WRONG_COLOR_TEXT,
+                                      }
+                                : {}),
                         }}
                         // className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
                         className={"text-start d-flex flex-row"}

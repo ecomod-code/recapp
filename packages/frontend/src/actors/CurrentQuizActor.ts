@@ -69,6 +69,7 @@ export const CurrentQuizMessages = unionize(
 		ExportDone: {},
 		LeaveQuiz: {}, // Remove yourself from the quiz, regardless whether you are a teacher or student
 		GetRun: {},
+		Reset: {},
 	},
 	{ value: "value" }
 );
@@ -258,6 +259,22 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			return maybeLocalMessage
 				.map(m =>
 					CurrentQuizMessages.match<Promise<Unit | boolean | QuizRun>>(m, {
+						Reset: async () => {
+							this.updateState(draft => {
+								draft.quiz = {} as Quiz;
+								draft.comments = [];
+								draft.questions = [];
+								draft.teacherNames = [];
+								draft.questionStats = undefined;
+								draft.groupStats = undefined;
+								draft.isCommentSectionVisible = false;
+								draft.quizStats = undefined;
+								draft.run = undefined;
+								draft.exportFile = undefined;
+								draft.deleted = false;
+							});
+							return unit();
+						},
 						GetRun: async () => {
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
 							const quizId: Id = this.quiz.orElse(toId(""));
@@ -595,7 +612,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								if (uid === this.state.quiz.uid) {
 									return unit();
 								}
-								this.state = { ...this.state, comments: [], questions: [] };
+								this.state = { ...this.state, comments: [], questions: [], deleted: false };
 								this.quiz.forEach(q => {
 									this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
 								});
@@ -628,7 +645,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									QuestionActorMessages.GetAll()
 								);
-								console.log("QD", quizData);
 								this.updateState(draft => {
 									draft.run = undefined;
 									draft.result = undefined;

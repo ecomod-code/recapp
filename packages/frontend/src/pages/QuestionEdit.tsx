@@ -10,7 +10,7 @@ import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
 import { useStatefulActor } from "ts-actors-react";
-import { User, toId, Comment, Question, Id, QuestionType, UserParticipation } from "@recapp/models";
+import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz } from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
 import Button from "react-bootstrap/Button";
@@ -28,6 +28,7 @@ import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
+import { Modal } from "react-bootstrap";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -42,8 +43,28 @@ export const QuestionEdit: React.FC = () => {
 	const formerGroup = state?.group ?? "";
 	const writeAccess = state?.write === "true" ?? false;
 	// const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
-	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
+	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz", {
+		quiz: {} as Quiz,
+		comments: [],
+		questions: [],
+		teacherNames: [],
+		questionStats: undefined,
+		groupStats: undefined,
+		isCommentSectionVisible: false,
+		quizStats: undefined,
+		run: undefined,
+		exportFile: undefined,
+		deleted: false,
+	});
+
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
+
+	const [showError, setShowError] = useState<string>("");
+
+	const deleted = mbQuiz.flatMap(m => maybe(m.deleted)).orElse(false);
+	useEffect(() => {
+		if (deleted) setShowError("quiz-error-quiz-deleted");
+	}, [deleted]);
 
 	const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id }>(
 		{
@@ -63,11 +84,15 @@ export const QuestionEdit: React.FC = () => {
 	const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<UserParticipation[]>([]);
 	const [authorType, setAuthorType] = useState<UserParticipation>("ANONYMOUS");
 	const nav = useNavigate();
-	const students = mbQuiz.flatMap(q => maybe(q.quiz)).map(q => q.students);
+	const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
 	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 
 	useEffect(() => {
-		if (mbQuiz.isEmpty()) {
+		try {
+			if (mbQuiz.isEmpty()) {
+				return;
+			}
+		} catch {
 			return;
 		}
 		const quiz = mbQuiz.orUndefined();
@@ -284,7 +309,7 @@ export const QuestionEdit: React.FC = () => {
 		});
 	};
 
-	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
+	const comments: Comment[] = mbQuiz.flatMap(q => maybe(q.comments)).orElse([]);
 
 	const showCommentArea =
 		!mbQuiz.flatMap(q => maybe(q.quiz.hideComments)).orElse(false) ||
@@ -303,6 +328,25 @@ export const QuestionEdit: React.FC = () => {
 
 	const hasAnswer = question.answers?.some(q => !!q.text.trim());
 	const isSaveButtonDisabled = (question.type !== "TEXT" && !hasAnswer) || !question.text.trim();
+
+	const onErrorClose = () => {
+		setShowError("");
+		nav({ pathname: "/Dashboard" });
+	};
+
+	if (showError) {
+		return (
+			<Modal show={!!showError}>
+				<Modal.Title className="ps-2 bg-warning">{i18n._("quiz-error-quiz-title")}</Modal.Title>
+				<Modal.Body>
+					<Trans id={showError} />
+				</Modal.Body>
+				<Modal.Footer className="p-0">
+					<Button onClick={onErrorClose}>{i18n._("okay")}</Button>
+				</Modal.Footer>
+			</Modal>
+		);
+	}
 
 	return (
 		<>
@@ -415,7 +459,7 @@ export const QuestionEdit: React.FC = () => {
 										isCommentSectionVisible={isCommentSectionVisible}
 										userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
 										teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-										comment={debug(cmt, `${mbQuiz.map(q => q.questions)}`)}
+										comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
 										onUpvote={() => upvoteComment(cmt.uid)}
 										onAccept={() => finishComment(cmt.uid)}
 										onDelete={() => deleteComment(cmt.uid)}

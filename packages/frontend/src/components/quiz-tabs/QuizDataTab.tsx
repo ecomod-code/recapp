@@ -19,9 +19,8 @@ import { QuizExportModal } from "../modals/QuizExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
 import { debounce } from "../../utils";
-
-const TITLE_MAX_CHARACTERS = 150;
-const DESCRIPTION_MAX_CHARACTERS = 1000;
+import { CharacterTracker } from "../CharacterTracker";
+import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../../constants/constants";
 
 export const QuizDataTab: React.FC = () => {
     // const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
@@ -446,14 +445,6 @@ const SyncStatus = (props: { localValue: string; storedValue: string }) => {
             {isSynced
                 ? i18n._("quiz-data-tab.sync-status.is-saved")
                 : i18n._("quiz-data-tab.sync-status.currently-saving")}
-        </Form.Text>
-    );
-};
-
-const CharacterTracker = (props: { value: number; maxValue: number }) => {
-    return (
-        <Form.Text style={{ fontSize: 10, marginLeft: 6, fontWeight: "bold" }}>
-            ( {props.value} / {props.maxValue} )
         </Form.Text>
     );
 };

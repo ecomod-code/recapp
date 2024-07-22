@@ -20,6 +20,9 @@ import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
 import { debounce } from "../../utils";
 
+const TITLE_MAX_CHARACTERS = 150;
+const DESCRIPTION_MAX_CHARACTERS = 1000;
+
 export const QuizDataTab: React.FC = () => {
     // const [textEdit, setTextEdit] = useState({ element: "", value: "", show: false, title: "" });
     const [shareModal, setShareModal] = useState(false);
@@ -115,7 +118,13 @@ export const QuizDataTab: React.FC = () => {
 
                         <Form.Group className="mt-3">
                             <div className="d-flex justify-content-between align-items-center">
-                                <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
+                                <div className="mb-0">
+                                    <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
+                                    <CharacterTracker
+                                        value={titleAndDescription.title.length}
+                                        maxValue={TITLE_MAX_CHARACTERS}
+                                    />
+                                </div>
                                 {titleValidationError ? (
                                     <Form.Text
                                         className="text-danger text-overflow-ellipsis"
@@ -138,8 +147,10 @@ export const QuizDataTab: React.FC = () => {
                                         : quiz.title
                                 }
                                 onChange={e => {
-                                    const text = e.target.value;
-                                    // update({ title: text });
+                                    const value = e.target.value;
+                                    const isTextTooLong = value.length >= TITLE_MAX_CHARACTERS;
+                                    const text = isTextTooLong ? value?.slice(0, TITLE_MAX_CHARACTERS) : value;
+
                                     setTitleAndDescription(prev => ({ ...prev, title: text }));
 
                                     if (text.length > 3) {
@@ -157,7 +168,13 @@ export const QuizDataTab: React.FC = () => {
 
                         <Form.Group className="mt-3">
                             <div className="d-flex justify-content-between align-items-center">
-                                <Form.Text>{i18n._("quiz-description")}</Form.Text>
+                                <div className="mb-0">
+                                    <Form.Text>{i18n._("quiz-description")}</Form.Text>
+                                    <CharacterTracker
+                                        value={titleAndDescription.description.length}
+                                        maxValue={DESCRIPTION_MAX_CHARACTERS}
+                                    />
+                                </div>
                                 <SyncStatus
                                     localValue={titleAndDescription.description}
                                     storedValue={quiz.description}
@@ -174,7 +191,10 @@ export const QuizDataTab: React.FC = () => {
                                     titleAndDescription.description ? titleAndDescription.description : quiz.description
                                 }
                                 onChange={e => {
-                                    const text = e.target.value;
+                                    const value = e.target.value;
+                                    const isTextTooLong = value.length >= DESCRIPTION_MAX_CHARACTERS;
+                                    const text = isTextTooLong ? value?.slice(0, DESCRIPTION_MAX_CHARACTERS) : value;
+
                                     // update({ description: text });
                                     setTitleAndDescription(prev => ({ ...prev, description: text }));
                                     updateDebounced({ description: text });
@@ -418,6 +438,14 @@ const SyncStatus = (props: { localValue: string; storedValue: string }) => {
             {isSynced
                 ? i18n._("quiz-data-tab.sync-status.is-saved")
                 : i18n._("quiz-data-tab.sync-status.currently-saving")}
+        </Form.Text>
+    );
+};
+
+const CharacterTracker = (props: { value: number; maxValue: number }) => {
+    return (
+        <Form.Text style={{ fontSize: 11, marginLeft: 6 }}>
+            ( {props.value} / {props.maxValue} )
         </Form.Text>
     );
 };

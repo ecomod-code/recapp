@@ -5,6 +5,7 @@ import {
 	Quiz,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	User,
 	UserStoreMessages,
 	UserUpdateMessage,
@@ -33,13 +34,20 @@ export class ToggleShowArchived {
 	constructor(public readonly value: boolean) {}
 }
 
+export class ResetError {
+	public readonly tag = "ResetError" as const;
+	constructor() {}
+}
+
 type Messages =
 	| UserUpdateMessage
 	| QuizUpdateMessage
+	| QuizDeletedMessage
 	| ArchiveQuizMessage
 	| UploadQuizMessage
 	| string
 	| ToggleShowArchived
+	| ResetError
 	| DeleteQuizMessage;
 
 export type LocalUserState = {
@@ -48,6 +56,7 @@ export type LocalUserState = {
 	teachers: Map<Id, string[]>;
 	updateCounter: number;
 	showArchived: boolean;
+	error: string;
 };
 
 export class LocalUserActor extends StatefulActor<Messages, Unit | string, LocalUserState> {
@@ -59,6 +68,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 			teachers: new Map(),
 			updateCounter: 0,
 			showArchived: false,
+			error: "",
 		};
 	}
 
@@ -79,6 +89,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 					"updated",
 					"archived",
 					"uniqueLink",
+					"createdBy",
 				])
 			);
 		}
@@ -96,6 +107,13 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 				draft.user = message.user as User;
 				draft.updateCounter++;
 			});
+		} else if (message.tag == "QuizDeletedMessage") {
+			if (message.quizId) {
+				this.updateState(draft => {
+					draft.quizzes.delete(message.quizId);
+					draft.updateCounter++;
+				});
+			}
 		} else if (message.tag == "QuizUpdateMessage") {
 			const names: any[] = message.quiz.teachers
 				? await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers))
@@ -127,11 +145,27 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 				draft.updateCounter++;
 			});
 		} else if (message.tag == "UploadQuizMessage") {
-			this.send(actorUris["QuizActor"], QuizActorMessages.Import({ filename: message.filename }));
+			const result: Error | Unit = await this.ask(
+				actorUris["QuizActor"],
+				QuizActorMessages.Import({ filename: message.filename })
+			);
+			if ((result as any).message) {
+				this.updateState(draft => {
+					draft.error = (result as any).message;
+				});
+			} else {
+				this.updateState(draft => {
+					draft.error = "";
+				});
+			}
 		} else if (message.tag == "ToggleShowArchived") {
 			this.updateState(draft => {
 				draft.showArchived = message.value;
 				draft.updateCounter++;
+			});
+		} else if (message.tag == "ResetError") {
+			this.updateState(draft => {
+				draft.error = "";
 			});
 		}
 		return unit();

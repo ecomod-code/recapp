@@ -11,7 +11,7 @@ interface Props {
 	onDownload: (filename: string) => void;
 }
 
-export const QuizExportModal: React.FC<Props> = ({ show, filename, onClose, onDownload }) => {
+export const StatisticsExportModal: React.FC<Props> = ({ show, filename, onClose, onDownload }) => {
 	const submitButtonRef = useRef<HTMLButtonElement>(null);
 
 	const handleClose = () => {
@@ -56,7 +56,17 @@ export const QuizExportModal: React.FC<Props> = ({ show, filename, onClose, onDo
 						!!filename && onDownload(filename);
 					}}
 				>
-					<Trans id="download-quiz" />
+					<Trans id="download-csv" />
+				</Button>
+				<Button
+					ref={submitButtonRef}
+					className="m-1"
+					disabled={!filename}
+					onClick={() => {
+						!!filename && onDownload(filename.replace("csv", "pdf"));
+					}}
+				>
+					<Trans id="download-pdf" />
 				</Button>
 			</Modal.Footer>
 		</Modal>

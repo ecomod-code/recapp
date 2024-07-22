@@ -8,6 +8,7 @@ import {
 	QuizActorMessage,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	UserStoreMessages,
 	quizSchema,
 	toId,
@@ -29,6 +30,7 @@ import { StatisticsActor } from "./StatisticsActor";
 import { writeFile, readFile } from "fs/promises";
 import * as path from "path";
 import { AccessRole } from "./StoringActor";
+import { serializeError } from "serialize-error";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -162,6 +164,17 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		}
 	};
 
+	private sendDeletionToSubscribers = (deletedId: Id) => {
+		for (const [subscriber] of this.state.collectionSubscribers) {
+			const globalUpdateMessage = new QuizDeletedMessage(deletedId);
+
+			this.send(subscriber, globalUpdateMessage);
+		}
+		for (const subscriber of this.state.subscribers.get(deletedId) ?? new Set()) {
+			this.send(subscriber, new QuizDeletedMessage(deletedId));
+		}
+	};
+
 	private async create(quiz: Partial<Quiz>, clientUserRole: AccessRole, clientUserId: Id): Promise<Id> {
 		if (!["ADMIN", "TEACHER"].includes(clientUserRole)) {
 			// Students can also create quizzes. This will automatically upgrade them to a teacher role
@@ -173,6 +186,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		(quiz as Quiz).created = toTimestamp();
 		(quiz as Quiz).updated = toTimestamp();
 		(quiz as Quiz).state = "EDITING";
+		(quiz as Quiz).createdBy = clientUserId;
 		const quizToCreate = quizSchema.parse(quiz);
 		await this.afterEntityWasCached(uid);
 		await this.storeEntity(quizToCreate);
@@ -213,11 +227,16 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				Delete: async id => {
 					const mbQuiz = await this.getEntity(id);
 					return mbQuiz.map(async quiz => {
-						if (clientUserRole !== "ADMIN" || quiz.teachers[0] !== clientUserId) {
+						if (
+							clientUserRole !== "ADMIN" &&
+							(quiz.createdBy ? quiz.createdBy !== clientUserId : quiz.teachers[0] !== clientUserId)
+						) {
 							this.logger.warn(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin.`
+								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
 							);
-							return unit();
+							return new Error(
+								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+							);
 						}
 						const db = await this.connector.db();
 						await this.deleteEntity(id);
@@ -226,6 +245,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						await db.collection<Question>("questions").deleteMany({ quiz: id });
 						await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
 						this.logger.debug(`Successfully deleted quiz ${id}`);
+						this.sendDeletionToSubscribers(id);
 						return unit();
 					});
 				},
@@ -347,6 +367,29 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					console.log(filename);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
 					const importedObject = JSON.parse(jsonBuffer.toString());
+					try {
+						const propertyKeys = [
+							"allowedQuestionTypesSettings",
+							"description",
+							"shuffleQuestions",
+							"state",
+							"studentComments",
+							"studentParticipationSettings",
+							"studentQuestions",
+							"hideComments",
+							"title",
+							"questions",
+						];
+						const properties = keys(importedObject);
+						if (propertyKeys.some(p => !properties.includes(p))) {
+							throw new Error("Illegal import schema");
+						}
+					} catch (e) {
+						if (e instanceof Error) {
+							console.error(e);
+							return serializeError(new Error(e.message));
+						}
+					}
 					const quiz: Omit<Quiz, "uniqueLink" | "uid"> = {
 						allowedQuestionTypesSettings: importedObject.allowedQuestionTypesSettings,
 						description: importedObject.description,

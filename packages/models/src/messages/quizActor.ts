@@ -30,4 +30,9 @@ export class QuizUpdateMessage {
 	constructor(public readonly quiz: Partial<Quiz>) {}
 }
 
+export class QuizDeletedMessage {
+	public readonly tag = "QuizDeletedMessage" as const;
+	constructor(public readonly quizId: Id) {}
+}
+
 export type QuizActorMessage = UnionOf<typeof QuizActorMessages>;

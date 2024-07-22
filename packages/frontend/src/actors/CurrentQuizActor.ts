@@ -5,6 +5,7 @@ import {
 	Comment,
 	QuizActorMessages,
 	QuizUpdateMessage,
+	QuizDeletedMessage,
 	CommentUpdateMessage,
 	Id,
 	User,
@@ -35,6 +36,7 @@ import { i18n } from "@lingui/core";
 import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
 import { isMultiChoiceAnsweredCorrectly, shuffle } from "../utils";
+import { keys } from "rambda";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -68,6 +70,7 @@ export const CurrentQuizMessages = unionize(
 		ExportDone: {},
 		LeaveQuiz: {}, // Remove yourself from the quiz, regardless whether you are a teacher or student
 		GetRun: {},
+		Reset: {},
 	},
 	{ value: "value" }
 );
@@ -76,6 +79,7 @@ export type CurrentQuizMessage = UnionOf<typeof CurrentQuizMessages>;
 
 type MessageType =
 	| QuizUpdateMessage
+	| QuizDeletedMessage
 	| CommentUpdateMessage
 	| QuestionUpdateMessage
 	| CurrentQuizMessage
@@ -99,6 +103,7 @@ export type CurrentQuizState = {
 	run?: QuizRun;
 	result?: QuizRun;
 	exportFile?: string;
+	deleted: boolean;
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
@@ -119,6 +124,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			quizStats: undefined,
 			run: undefined,
 			exportFile: undefined,
+			deleted: false,
 		};
 	}
 
@@ -137,6 +143,16 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			if (message.quiz.state === "STARTED" && !this.state.run) {
 				this.send(this.ref, CurrentQuizMessages.StartQuiz());
 			}
+			return nothing();
+		} else if (message.tag === "QuizDeletedMessage") {
+			/* if (message.quizId !== this.quiz.orElse(toId("-"))) {
+				return nothing();
+			} */
+			this.updateState(draft => {
+				draft.quiz = {} as Quiz;
+				draft.deleted = true;
+			});
+			this.quiz = nothing();
 			return nothing();
 		} else if (message.tag === "CommentUpdateMessage") {
 			this.updateState(draft => {
@@ -246,6 +262,22 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			return maybeLocalMessage
 				.map(m =>
 					CurrentQuizMessages.match<Promise<Unit | boolean | QuizRun>>(m, {
+						Reset: async () => {
+							this.updateState(draft => {
+								draft.quiz = {} as Quiz;
+								draft.comments = [];
+								draft.questions = [];
+								draft.teacherNames = [];
+								draft.questionStats = undefined;
+								draft.groupStats = undefined;
+								draft.isCommentSectionVisible = false;
+								draft.quizStats = undefined;
+								draft.run = undefined;
+								draft.exportFile = undefined;
+								draft.deleted = false;
+							});
+							return unit();
+						},
 						GetRun: async () => {
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
 							const quizId: Id = this.quiz.orElse(toId(""));
@@ -436,6 +468,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								updated: toTimestamp(),
 								comments: [],
 								hideComments: false,
+								createdBy: creator,
 							};
 							const quizUid: Id = await this.ask(actorUris.QuizActor, QuizActorMessages.Create(quizData));
 							this.send(this.ref, CurrentQuizMessages.SetQuiz(quizUid));
@@ -589,7 +622,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								if (uid === this.state.quiz.uid) {
 									return unit();
 								}
-								this.state = { ...this.state, comments: [], questions: [] };
+								this.state = { ...this.state, comments: [], questions: [], deleted: false };
 								this.quiz.forEach(q => {
 									this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
 								});
@@ -629,6 +662,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									draft.groupStats = undefined;
 									draft.quizStats = undefined;
 									draft.quiz = quizData;
+									draft.deleted = !quizData || keys(quizData).length === 0;
 								});
 								this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
 								this.send(

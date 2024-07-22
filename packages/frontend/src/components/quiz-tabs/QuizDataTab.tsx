@@ -121,7 +121,11 @@ export const QuizDataTab: React.FC = () => {
                                 <div className="mb-0">
                                     <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
                                     <CharacterTracker
-                                        value={titleAndDescription.title.length}
+                                        value={
+                                            titleAndDescription.title || titleValidationError
+                                                ? titleAndDescription.title.length
+                                                : quiz.title.length
+                                        }
                                         maxValue={TITLE_MAX_CHARACTERS}
                                     />
                                 </div>
@@ -171,7 +175,11 @@ export const QuizDataTab: React.FC = () => {
                                 <div className="mb-0">
                                     <Form.Text>{i18n._("quiz-description")}</Form.Text>
                                     <CharacterTracker
-                                        value={titleAndDescription.description.length}
+                                        value={
+                                            titleAndDescription.description
+                                                ? titleAndDescription.description.length
+                                                : quiz.description.length
+                                        }
                                         maxValue={DESCRIPTION_MAX_CHARACTERS}
                                     />
                                 </div>
@@ -444,7 +452,7 @@ const SyncStatus = (props: { localValue: string; storedValue: string }) => {
 
 const CharacterTracker = (props: { value: number; maxValue: number }) => {
     return (
-        <Form.Text style={{ fontSize: 11, marginLeft: 6 }}>
+        <Form.Text style={{ fontSize: 10, marginLeft: 6, fontWeight: "bold" }}>
             ( {props.value} / {props.maxValue} )
         </Form.Text>
     );

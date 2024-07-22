@@ -25,6 +25,7 @@ export const QuizDataTab: React.FC = () => {
     const [shareModal, setShareModal] = useState(false);
     const [archiveModal, setArchiveModal] = useState(false);
     const [titleAndDescription, setTitleAndDescription] = useState({ title: "", description: "" });
+    const [titleValidationError, setTitleValidationError] = useState("");
 
     const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
     const [showExportModal, setShowExportModal] = useState(false);
@@ -115,20 +116,40 @@ export const QuizDataTab: React.FC = () => {
                         <Form.Group className="mt-3">
                             <div className="d-flex justify-content-between align-items-center">
                                 <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
-                                <SyncStatus localValue={titleAndDescription.title} storedValue={quiz.title} />
+                                {titleValidationError ? (
+                                    <Form.Text className="text-danger">
+                                        {i18n._("quiz-data-tab.edit-title-message.last-saved-value")}:{" "}
+                                        <b>{quiz.title}</b>
+                                    </Form.Text>
+                                ) : (
+                                    <SyncStatus localValue={titleAndDescription.title} storedValue={quiz.title} />
+                                )}
                             </div>
                             <Form.Control
                                 disabled={disabledByMode}
                                 type="text"
                                 // value={quiz.title}
-                                value={titleAndDescription.title ? titleAndDescription.title : quiz.title}
+                                value={
+                                    titleAndDescription.title || titleValidationError
+                                        ? titleAndDescription.title
+                                        : quiz.title
+                                }
                                 onChange={e => {
                                     const text = e.target.value;
                                     // update({ title: text });
                                     setTitleAndDescription(prev => ({ ...prev, title: text }));
-                                    updateDebounced({ title: text });
+
+                                    if (text.length > 3) {
+                                        updateDebounced({ title: text });
+                                        setTitleValidationError("");
+                                    } else {
+                                        const tooShortMessage = i18n._("error-quiz-title-too-short");
+                                        setTitleValidationError(tooShortMessage);
+                                    }
                                 }}
+                                isInvalid={!!titleValidationError}
                             />
+                            <Form.Control.Feedback type="invalid">{titleValidationError}</Form.Control.Feedback>
                         </Form.Group>
 
                         <Form.Group className="mt-3">

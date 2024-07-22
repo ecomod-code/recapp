@@ -30,6 +30,11 @@ msgid "quiz-data-tab.sync-status.currently-saving"
 msgstr "Wird gespeichert..."
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:121
+msgid "quiz-data-tab.edit-title-message.last-saved-value"
+msgstr "Letzter gespeicherter Wert"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:394
 msgid "quiz-data-tab.sync-status.is-saved"
 msgstr "Gespeichert"

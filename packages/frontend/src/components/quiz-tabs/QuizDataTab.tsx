@@ -117,7 +117,10 @@ export const QuizDataTab: React.FC = () => {
                             <div className="d-flex justify-content-between align-items-center">
                                 <Form.Text>{i18n._("new-quiz-title")}</Form.Text>
                                 {titleValidationError ? (
-                                    <Form.Text className="text-danger">
+                                    <Form.Text
+                                        className="text-danger text-overflow-ellipsis"
+                                        style={{ maxWidth: "60%" }}
+                                    >
                                         {i18n._("quiz-data-tab.edit-title-message.last-saved-value")}:{" "}
                                         <b>{quiz.title}</b>
                                     </Form.Text>

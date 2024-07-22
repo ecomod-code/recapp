@@ -30,28 +30,39 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
 
     const tNames: string[] = mbQuiz.map(s => s.teacherNames).orElse([]);
 
-    useEffect(() => {
-        if (!firstRenderRef.current) {
-            return;
-        }
-        if (!quiz.teachers || !tNames) {
-            return;
-        }
-        if (quiz.teachers.length !== tNames.length) {
-            return;
-        }
+    // useEffect(() => {
+    //     if (!firstRenderRef.current) return;
+    //     if (!quiz.teachers || !tNames) return;
+    //     if (quiz.teachers.length !== tNames.length) return;
 
-        const teachersRecords = quiz.teachers.map((x, i) => {
-            return {
-                uid: x,
-                name: tNames[i],
-            };
-        });
+    //     const teachersRecords = quiz.teachers.map((x, i) => {
+    //         return {
+    //             uid: x,
+    //             name: tNames[i],
+    //         };
+    //     });
+
+    //     clear();
+    //     tryActor.forEach(actor => actor.send(actor, SharingMessages.AddExisting(teachersRecords)));
+    //     firstRenderRef.current = false;
+    // }, [quiz.teachers, tNames]);
+
+    const onEnter = () => {
+        if (!firstRenderRef.current) return;
+        if (!quiz.teachers || !tNames) return;
+        if (quiz.teachers.length !== tNames.length) return;
+
+        const teachersRecords = quiz.teachers.map((x, i) => ({ uid: x, name: tNames[i] }));
 
         clear();
         tryActor.forEach(actor => actor.send(actor, SharingMessages.AddExisting(teachersRecords)));
         firstRenderRef.current = false;
-    }, [quiz.teachers, tNames]);
+    };
+
+    const onExit = () => {
+        // reset the firstRender ref when the modal is closed !!!
+        firstRenderRef.current = true;
+    };
 
     const add = () => {
         tryActor.forEach(actor => actor.send(actor, SharingMessages.AddEntry(name)));
@@ -96,7 +107,13 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
         .match(
             teachers => {
                 return (
-                    <Modal show={show} contentClassName="overflow-hidden" onEscapeKeyDown={cancel}>
+                    <Modal
+                        onEnter={onEnter}
+                        onExit={onExit}
+                        show={show}
+                        contentClassName="overflow-hidden"
+                        onEscapeKeyDown={cancel}
+                    >
                         <Modal.Title className="p-3 ps-3 text-bg-primary">
                             <Trans id="share-with-teachers-modal-title" />
                         </Modal.Title>

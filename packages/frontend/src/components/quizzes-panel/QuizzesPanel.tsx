@@ -71,7 +71,7 @@ export const QuizzesPanel: React.FC = () => {
 			.orElse(false);
 		const isCreatingTeacher = state
 			.map(s => s.user)
-			.map(u => (u?.uid && u?.uid === quiz.teachers?.[0]) ?? false)
+			.map(u => (u?.uid && (quiz.createdBy ? u?.uid === quiz.createdBy : u?.uid === quiz.teachers?.[0])) ?? false)
 			.orElse(false);
 		return isAdmin || isCreatingTeacher ? true : undefined;
 	};

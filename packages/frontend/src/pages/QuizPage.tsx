@@ -25,6 +25,7 @@ import { toTimestamp, debug } from "itu-utils";
 import { Trans } from "@lingui/react";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { QuizStateBadge } from "../components/QuizStateBadge";
+import { Button, Modal } from "react-bootstrap";
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -60,6 +61,17 @@ export const QuizPage: React.FC = () => {
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 	const [activeKey, setActiveKey] = useState<TabValue>("questions");
+	const [showError, setShowError] = useState<string>("");
+
+	const deleted = mbQuiz.map(m => m.deleted).orElse(false);
+	useEffect(() => {
+		if (deleted) setShowError("quiz-error-quiz-deleted");
+	}, [deleted]);
+
+	const onErrorClose = () => {
+		setShowError("");
+		nav({ pathname: "/Dashboard" });
+	};
 
 	useEffect(() => {
 		if (!quizId) {
@@ -154,6 +166,20 @@ export const QuizPage: React.FC = () => {
 		);
 	}
 
+	if (showError) {
+		return (
+			<Modal show={!!showError}>
+				<Modal.Title className="ps-2 bg-warning">{i18n._("quiz-error-title")}</Modal.Title>
+				<Modal.Body>
+					<Trans id={showError} />
+				</Modal.Body>
+				<Modal.Footer className="p-0">
+					<Button onClick={onErrorClose}>{i18n._("okay")}</Button>
+				</Modal.Footer>
+			</Modal>
+		);
+	}
+
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
 		.match(
@@ -227,7 +253,11 @@ export const QuizPage: React.FC = () => {
 									<Breadcrumb.Item onClick={() => nav({ pathname: "/Dashboard" })}>
 										Dashboard
 									</Breadcrumb.Item>
-									<Breadcrumb.Item active className="text-overflow-ellipsis" style={{maxWidth: 400}}>
+									<Breadcrumb.Item
+										active
+										className="text-overflow-ellipsis"
+										style={{ maxWidth: 400 }}
+									>
 										{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 									</Breadcrumb.Item>
 								</Breadcrumb>

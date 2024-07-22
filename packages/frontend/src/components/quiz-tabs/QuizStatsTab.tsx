@@ -5,7 +5,7 @@ import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizA
 import { Button } from "react-bootstrap";
 import { ChoiceElementStatistics, Id, User } from "@recapp/models";
 import axios from "axios";
-import { QuizExportModal } from "../modals/QuizExportModal";
+import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { isNil, range } from "rambda";
@@ -166,7 +166,7 @@ export const QuizStatsTab: React.FC = () => {
 							<Fragment key={i}>
 								{i == 0 && (
 									<>
-										<QuizExportModal
+										<StatisticsExportModal
 											show={showExportModal}
 											filename={exportFile}
 											onClose={cancelExport}

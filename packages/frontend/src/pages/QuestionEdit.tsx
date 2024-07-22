@@ -56,6 +56,7 @@ export const QuestionEdit: React.FC = () => {
 		exportFile: undefined,
 		deleted: false,
 	});
+	const q: any = mbQuiz.map(q => q.quiz).orUndefined();
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
@@ -115,7 +116,6 @@ export const QuestionEdit: React.FC = () => {
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
 				.map(k => k as QuestionType);
-
 			setAllowedQuestionTypes(aqt);
 
 			if (questionId) {
@@ -149,7 +149,7 @@ export const QuestionEdit: React.FC = () => {
 			}
 			// setGroups(groups);
 		}
-	}, [mbQuiz.hasValue]);
+	}, [mbQuiz.hasValue, q]);
 
 	const { rendered } = useRendered({ value: question.text });
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });

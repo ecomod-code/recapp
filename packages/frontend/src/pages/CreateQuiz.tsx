@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useContext } from "react";
+import React, { useContext } from "react";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { useNavigate } from "react-router-dom";
@@ -15,6 +15,8 @@ import { CreateQuizMessages, CreateQuizState } from "../actors/CreateQuizActor";
 import { actorUris } from "../actorUris";
 import { validationOkay } from "@recapp/models";
 import { flattenSystem } from "../utils";
+import { CharacterTracker } from "../components/CharacterTracker";
+import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../constants/constants";
 
 export const CreateQuiz: React.FC = () => {
     const nav = useNavigate();
@@ -36,14 +38,23 @@ export const CreateQuiz: React.FC = () => {
                         </Breadcrumb>
                         <Container className="pb-5">
                             <Form className="list-group">
-                                <Form.Group className="mb-2">
+                                <Form.Group className="mb-1">
+                                    <CharacterTracker value={quiz.title.length} maxValue={TITLE_MAX_CHARACTERS} />
                                     <Form.Control
                                         type="text"
                                         placeholder={i18n._("quiz-title")}
                                         value={quiz.title}
-                                        onChange={event =>
-                                            actor.send(actor, CreateQuizMessages.Update({ title: event.target.value }))
-                                        }
+                                        onChange={event => {
+                                            const value = event.target.value;
+                                            const isTextTooLong = value.length >= TITLE_MAX_CHARACTERS;
+                                            const text = isTextTooLong ? value?.slice(0, TITLE_MAX_CHARACTERS) : value;
+
+                                            return actor.send(
+                                                actor,
+                                                // CreateQuizMessages.Update({ title: event.target.value })
+                                                CreateQuizMessages.Update({ title: text })
+                                            );
+                                        }}
                                     />
                                     <Form.Text className="ms-2">
                                         {validation.title ? (
@@ -53,19 +64,33 @@ export const CreateQuiz: React.FC = () => {
                                         )}
                                     </Form.Text>
                                 </Form.Group>
-                                <Form.Control
-                                    type="textarea"
-                                    as="textarea"
-                                    rows={5}
-                                    placeholder={i18n._("quiz-description")}
-                                    value={quiz.description}
-                                    onChange={event =>
-                                        actor.send(
-                                            actor,
-                                            CreateQuizMessages.Update({ description: event.target.value })
-                                        )
-                                    }
-                                />
+
+                                <Form.Group>
+                                    <CharacterTracker
+                                        value={quiz.description.length}
+                                        maxValue={DESCRIPTION_MAX_CHARACTERS}
+                                    />
+                                    <Form.Control
+                                        type="textarea"
+                                        as="textarea"
+                                        rows={5}
+                                        placeholder={i18n._("quiz-description")}
+                                        value={quiz.description}
+                                        onChange={event => {
+                                            const value = event.target.value;
+                                            const isTextTooLong = value.length >= DESCRIPTION_MAX_CHARACTERS;
+                                            const text = isTextTooLong
+                                                ? value?.slice(0, DESCRIPTION_MAX_CHARACTERS)
+                                                : value;
+
+                                            return actor.send(
+                                                actor,
+                                                // CreateQuizMessages.Update({ description: event.target.value })
+                                                CreateQuizMessages.Update({ description: text })
+                                            );
+                                        }}
+                                    />
+                                </Form.Group>
 
                                 <ListGroupContainer>
                                     <Form.Switch

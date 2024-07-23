@@ -55,7 +55,9 @@ export const QuestionEdit: React.FC = () => {
 		run: undefined,
 		exportFile: undefined,
 		deleted: false,
+		isPresentationModeActive: false, 
 	});
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q: any = mbQuiz.map(q => q.quiz).orUndefined();
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
@@ -336,10 +338,11 @@ export const QuestionEdit: React.FC = () => {
 
 	if (showError) {
 		return (
-			<Modal show={!!showError}>
-				<Modal.Title className="ps-2 bg-warning">{i18n._("quiz-error-quiz-title")}</Modal.Title>
+			<Modal show={!!showError} contentClassName="overflow-hidden">
+				<Modal.Title className="py-2 px-3 bg-warning">{i18n._("quiz-error-quiz-title")}</Modal.Title>
 				<Modal.Body>
 					<Trans id={showError} />
+
 				</Modal.Body>
 				<Modal.Footer className="p-0">
 					<Button onClick={onErrorClose}>{i18n._("okay")}</Button>

@@ -4,6 +4,7 @@ import { useLingui } from "@lingui/react";
 import { DateTime } from "luxon";
 import { SupportedLocale, dynamicActivate, locales } from "../../i18n";
 import { Form } from "react-bootstrap";
+import { HEADER_SELECT_MIN_WIDTH } from "../../constants/layout";
 
 const STORED_SELECTED_LOCALE_KEY = "USER_LOCALE";
 
@@ -58,7 +59,7 @@ export const LocaleSelect = () => {
     return (
         <div style={style}>
             <div>
-                <Form.Select onChange={onChange} value={activeLocale}>
+                <Form.Select onChange={onChange} style={{ minWidth: HEADER_SELECT_MIN_WIDTH }} value={activeLocale}>
                     {Object.entries(locales).map(([local, label]) => {
                         return (
                             <option key={local} value={local}>
@@ -68,7 +69,8 @@ export const LocaleSelect = () => {
                     })}
                 </Form.Select>
             </div>
-            <div style={{ marginLeft: 4, marginBottom: 4, width: 34 }}>
+
+            <div className="ms-2" style={{ marginBottom: 4, width: 34 }}>
                 <img src={flagSrc} alt="country flag" style={{ width: "100%", height: "100%" }} />
             </div>
         </div>

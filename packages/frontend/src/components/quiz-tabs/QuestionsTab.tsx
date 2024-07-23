@@ -269,6 +269,8 @@ export const QuestionsTab: React.FC<{
                             .map((q, i, arr) => {
                                 const isFirst = i === 0;
                                 const isLast = i === arr.length - 1;
+                                const isStudentQuestionsAllowed = quizData.quiz.studentQuestions;
+
                                 const writeAccess =
                                     teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
                                     mbQuiz
@@ -277,6 +279,7 @@ export const QuestionsTab: React.FC<{
                                             qs =>
                                                 !!qs.find(
                                                     qu =>
+                                                        isStudentQuestionsAllowed &&
                                                         qu.uid === q!.uid &&
                                                         qu.authorId === localUser.map(u => u.uid).orElse(toId(""))
                                                 )

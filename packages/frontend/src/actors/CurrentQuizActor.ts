@@ -57,6 +57,7 @@ export const CurrentQuizMessages = unionize(
 		Update: ofType<Partial<Quiz>>(),
 		UpdateQuestion: ofType<{ question: Partial<Question> & { uid: Id }; group: string }>(),
 		setIsCommentSectionVisible: ofType<boolean>(),
+		setIsPresentationModeActive: ofType<boolean>(),
 		ChangeState: ofType<"EDITING" | "STARTED" | "STOPPED" | "RESETSTATS">(),
 		StartQuiz: {}, // Start quiz for a participating student
 		LogAnswer: ofType<{ questionId: Id; answer: string | boolean[] }>(), // Sets the answer for the current quiz question, returns whether the answer was correct
@@ -96,6 +97,7 @@ export type CurrentQuizState = {
 	questionStats: TextElementStatistics | ChoiceElementStatistics | undefined;
 	groupStats: GroupStatistics | undefined;
 	isCommentSectionVisible: boolean;
+	isPresentationModeActive: boolean;
 	quizStats: GroupStatistics | undefined;
 	teacherNames: string[];
 	run?: QuizRun;
@@ -118,6 +120,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			questionStats: undefined,
 			groupStats: undefined,
 			isCommentSectionVisible: false,
+			isPresentationModeActive: false,
 			quizStats: undefined,
 			run: undefined,
 			exportFile: undefined,
@@ -573,6 +576,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						setIsCommentSectionVisible: async visible => {
 							this.updateState(draft => {
 								draft.isCommentSectionVisible = visible;
+							});
+							return unit();
+						},
+
+						setIsPresentationModeActive: async value => {
+							this.updateState(draft => {
+								draft.isPresentationModeActive = value;
 							});
 							return unit();
 						},

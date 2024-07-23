@@ -50,7 +50,7 @@ type Messages =
 	| ResetError
 	| DeleteQuizMessage;
 
-type State = {
+export type LocalUserState = {
 	user: User | undefined;
 	quizzes: Map<Id, Partial<Quiz>>;
 	teachers: Map<Id, string[]>;
@@ -59,7 +59,7 @@ type State = {
 	error: string;
 };
 
-export class LocalUserActor extends StatefulActor<Messages, Unit | string, State> {
+export class LocalUserActor extends StatefulActor<Messages, Unit | string, LocalUserState> {
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
 		this.state = {

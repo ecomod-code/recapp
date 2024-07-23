@@ -20,9 +20,19 @@ msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizStatsTab.tsx:106
+msgid "quiz-stats-tab.switch-label.presentation-mode"
+msgstr "Presentation mode"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:394
 msgid "quiz-data-tab.sync-status.currently-saving"
 msgstr "Currently saving"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:121
+msgid "quiz-data-tab.edit-title-message.last-saved-value"
+msgstr "Last saved value"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:394

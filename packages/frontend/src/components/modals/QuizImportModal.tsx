@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
 import { useStatefulActor } from "ts-actors-react";
-import { LocalUserActor, ResetError, UploadQuizMessage } from "../../actors/LocalUserActor";
+import { ResetError, UploadQuizMessage } from "../../actors/LocalUserActor";
 
 interface Props {
 	show: boolean;

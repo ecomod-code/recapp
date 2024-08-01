@@ -299,10 +299,12 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						},
 						StartQuiz: async () => {
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
-							let questions = this.state.quiz.groups.reduce(
-								(q, group) => [...q, ...group.questions],
-								[] as Id[]
-							);
+							let questions = this.state.quiz.groups
+								.reduce((q, group) => [...q, ...group.questions], [] as Id[])
+								.filter(q => {
+									const question = this.state.questions.find(qu => qu.uid === q);
+									return question?.approved;
+								});
 
 							// Die Fragen sollten hier in Reihenfolge stehen. Falls wir das mischen müssen, passiert das jetzt.
 							if (this.state.quiz.shuffleQuestions) {

@@ -261,12 +261,14 @@ export class StatisticsActor extends SubscribableActor<
 				ExportQuestionStats: async () => {
 					const stats: GroupStatistics = await this.getQuizStats();
 					const db = await this.connector.db();
-					const questions: Question[] = await Promise.all(
-						stats.questionIds.map(async id => {
-							const question = await db.collection<any>("questions").findOne({ uid: id });
-							return question;
-						})
-					);
+					const questions: Question[] = (
+						await Promise.all(
+							stats.questionIds.map(async id => {
+								const question = await db.collection<any>("questions").findOne({ uid: id });
+								return question;
+							})
+						)
+					).filter(q => q.approved);
 					const lines: string[] = [];
 					lines.push(
 						"question;type;maxParticipants;participants;correct;answer1;answer1_count;answer2;answer2_count;answer3;answer3_count;answer4;answer4_count;answer5;answer5_count;answer6;answer6_count"
@@ -488,12 +490,14 @@ export class StatisticsActor extends SubscribableActor<
 				ExportQuizStats: async () => {
 					const stats: GroupStatistics = await this.getQuizStats();
 					const db = await this.connector.db();
-					const questions: Question[] = await Promise.all(
-						stats.questionIds.map(async id => {
-							const question = await db.collection<any>("questions").findOne({ uid: id });
-							return question;
-						})
-					);
+					const questions: Question[] = (
+						await Promise.all(
+							stats.questionIds.map(async id => {
+								const question = await db.collection<any>("questions").findOne({ uid: id });
+								return question;
+							})
+						)
+					).filter(q => q.approved);
 
 					// Export the CSV
 					const lines: string[] = [];

@@ -96,23 +96,23 @@ export const RunningQuizTab: React.FC<{
             /> */}
 			{(run?.counter ?? 0) < questions.length && (
 				<Card className="p-0">
-                    <Card.Header
-                        style={{
-                            ...(!isQuestionTypeText && answered
-                                ? isAnsweredCorrectly
-                                    ? {
-                                          backgroundColor: CORRECT_COLOR,
-                                          color: CORRECT_COLOR_TEXT,
-                                      }
-                                    : {
-                                          backgroundColor: WRONG_COLOR,
-                                          color: WRONG_COLOR_TEXT,
-                                      }
-                                : {}),
-                        }}
-                        // className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
-                        className={"text-start d-flex flex-row"}
-                    >
+					<Card.Header
+						style={{
+							...(!isQuestionTypeText && answered
+								? isAnsweredCorrectly
+									? {
+											backgroundColor: CORRECT_COLOR,
+											color: CORRECT_COLOR_TEXT,
+										}
+									: {
+											backgroundColor: WRONG_COLOR,
+											color: WRONG_COLOR_TEXT,
+										}
+								: {}),
+						}}
+						// className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
+						className={"text-start d-flex flex-row"}
+					>
 						<div className="m-1 align-self-center" style={{ fontSize: 14 }}>
 							<strong>
 								<Trans id="running-quiz-tab.question-header" /> {(run?.counter ?? 0) + 1} /{" "}
@@ -121,14 +121,21 @@ export const RunningQuizTab: React.FC<{
 						</div>
 					</Card.Header>
 					<Card.Body>
-						<div className="p-2 text-start h-30" style={{ fontSize: 20 }} dangerouslySetInnerHTML={{ __html: rendered }} />
+						<div
+							className="p-2 text-start h-30"
+							style={{ fontSize: 20 }}
+							dangerouslySetInnerHTML={{ __html: rendered }}
+						/>
 					</Card.Body>
 					<Card.Footer>
 						{!isQuestionTypeText && (
 							<Form className="text-start mb-2">
 								{currentQuestion?.answers.map((answer, index) => {
 									return (
-										<Form.Group key={answer.text} className="d-flex gap-2">
+										<Form.Group
+											key={answer.text + index + currentQuestion.uid}
+											className="d-flex gap-2"
+										>
 											<Form.Check
 												name="answer"
 												disabled={answered}
@@ -136,16 +143,16 @@ export const RunningQuizTab: React.FC<{
 												checked={!!answers[index]}
 												onChange={event => updateAnswer(index, event.target.checked)}
 											/>
-                                            <Form.Label
-                                                style={{
-                                                    color: answered
-                                                        ? answer.correct
-                                                            ? CORRECT_COLOR
-                                                            : WRONG_COLOR
-                                                        : undefined,
-                                                }}
-                                            >
-												{answered ? ((answer.correct ? CHECK_SYMBOL : X_SYMBOL) + " " ) : ""}
+											<Form.Label
+												style={{
+													color: answered
+														? answer.correct
+															? CORRECT_COLOR
+															: WRONG_COLOR
+														: undefined,
+												}}
+											>
+												{answered ? (answer.correct ? CHECK_SYMBOL : X_SYMBOL) + " " : ""}
 												{answer.text}
 											</Form.Label>
 										</Form.Group>

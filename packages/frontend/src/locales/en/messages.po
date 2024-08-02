@@ -1133,3 +1133,15 @@ msgstr "An error occured"
 #. js-lingui-explicit-id
 msgid "quiz-error-quiz-deleted"
 msgstr "This quiz was deleted by another user."
+
+#. js-lingui-explicit-id
+msgid "invalid-file-selected"
+msgstr "The selected file is invalid."
+
+#. js-lingui-explicit-id
+msgid "quiz-toggle-student-questions"
+msgstr "Student questions"
+
+#. js-lingui-explicit-id
+msgid "quiz-toggle-student-questions-tooltip"
+msgstr "Allow students to create/edit questions"

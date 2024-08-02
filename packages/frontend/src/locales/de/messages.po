@@ -1133,3 +1133,14 @@ msgstr "Ein Fehler ist aufgetreten"
 msgid "quiz-error-quiz-deleted"
 msgstr "Dieses Quiz wurde durch eine Lehrkraft oder einen Administrator gelöscht."
 
+#. js-lingui-explicit-id
+msgid "invalid-file-selected"
+msgstr "Die ausgewählte Datei ist ungültig."
+
+#. js-lingui-explicit-id
+msgid "quiz-toggle-student-questions"
+msgstr "Studierendenfragen"
+
+#. js-lingui-explicit-id
+msgid "quiz-toggle-student-questions-tooltip"
+msgstr "Studierende können Fragen stellen"

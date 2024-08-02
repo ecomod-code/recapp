@@ -10,6 +10,7 @@ import { StopFill, Pencil, Play, QrCode, BoxArrowRight, Trash } from "react-boot
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { ShareModal } from "../modals/ShareModal";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 
 export const QuizButtons = (props: {
 	disableForStudent: boolean;
@@ -17,6 +18,7 @@ export const QuizButtons = (props: {
 	uniqueLink: string;
 	isQuizCreator: boolean;
 	leaveQuiz: () => void;
+	toggleStudentQuestions: () => void;
 }) => {
 	const [shareModal, setShareModal] = useState("");
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
@@ -102,6 +104,21 @@ export const QuizButtons = (props: {
 						<QrCode className="mx-1" />
 						<Trans id="quiz-show-qr-code-button" />
 					</Button>
+				)}
+
+				{!props.disableForStudent && (
+					<ButtonWithTooltip
+						variant={
+							mbQuiz.flatMap(q => maybe(q.quiz.studentQuestions)).orElse(false)
+								? "primary"
+								: "outline-primary"
+						}
+						className="ps-2 pe-2 d-flex justify-content-center align-items-center"
+						onClick={() => props.toggleStudentQuestions()}
+						title={i18n._("quiz-toggle-student-questions-tooltip")}
+					>
+						<Trans id="quiz-toggle-student-questions" />
+					</ButtonWithTooltip>
 				)}
 
 				{!props.disableForStudent && props.quizState !== "EDITING" && (

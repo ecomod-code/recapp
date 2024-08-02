@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Trans } from "@lingui/react";
+import { i18n } from "@lingui/core";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import axios from "axios";
@@ -15,8 +16,19 @@ export const QuizImportModal: React.FC<Props> = ({ show, onClose }) => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const [selectedFile, setSelectedFile] = useState<any>(null);
 	const [data, tryActor] = useStatefulActor<{ error: string }>("LocalUser");
+	const [localError, setLocalError] = useState("");
 
 	const error = data.map(d => d.error).orElse("");
+
+	useEffect(() => {
+		console.log(((selectedFile?.name ?? "") as string).toLocaleLowerCase().endsWith(".json"));
+		if (selectedFile && !((selectedFile?.name ?? "") as string).toLocaleLowerCase().endsWith(".json")) {
+			setLocalError(i18n._("invalid-file-selected"));
+			return;
+		} else {
+			setLocalError("");
+		}
+	}, [selectedFile]);
 
 	const upload = async () => {
 		const formData = new FormData();
@@ -38,6 +50,7 @@ export const QuizImportModal: React.FC<Props> = ({ show, onClose }) => {
 	const handleClose = () => {
 		tryActor.forEach(actor => actor.send(actor, new ResetError()));
 		setSelectedFile(null);
+		setLocalError("");
 		onClose();
 	};
 
@@ -78,6 +91,11 @@ export const QuizImportModal: React.FC<Props> = ({ show, onClose }) => {
 									}}
 								/>
 							</div>
+							{localError && (
+								<div>
+									<span className="text-danger">{localError}</span>
+								</div>
+							)}
 						</div>
 					</div>
 				</Modal.Body>
@@ -85,7 +103,12 @@ export const QuizImportModal: React.FC<Props> = ({ show, onClose }) => {
 					<Button variant="outline-primary" className="m-1" onClick={handleClose}>
 						<Trans id="cancel" />
 					</Button>
-					<Button className="m-1" disabled={selectedFile === null} type="submit" onClick={upload}>
+					<Button
+						className="m-1"
+						disabled={selectedFile === null || localError !== ""}
+						type="submit"
+						onClick={upload}
+					>
 						<Trans id="import" />
 					</Button>
 				</Modal.Footer>

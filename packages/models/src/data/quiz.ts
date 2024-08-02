@@ -79,6 +79,7 @@ export const quizSchema = zod
 			zod.boolean()
 		), // Which element types are allowed in this quiz
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
+		studentsCanSeeStatistics: zod.boolean().optional(), // Whether students can see the statistics in quiz mode after answering their questions
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
 		createdBy: uidSchema.optional(),

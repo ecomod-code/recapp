@@ -254,12 +254,20 @@ export const QuizDataTab: React.FC<Props> = props => {
                         />
                         <Form.Switch
                             className="list-group-item ps-5"
+                            label={i18n._("quiz-allows-student-to-see-statistics")}
+                            checked={quiz.studentsCanSeeStatistics}
+                            disabled={disabledByMode}
+                            onChange={event => update({ studentsCanSeeStatistics: event.target.checked })}
+                        />
+                        <Form.Switch
+                            className="list-group-item ps-5"
                             label={i18n._("quiz-hide-comments-switch")}
                             checked={quiz.hideComments}
                             onChange={event => update({ hideComments: event.target.checked })}
                             disabled={disabledByMode}
                         />
                     </ListGroupContainer>
+
                     <ListGroupContainer header={i18n._("quiz-student-participation")}>
                         <Form.Switch
                             className="list-group-item ps-5"

@@ -233,9 +233,10 @@ export const QuizPage: React.FC = () => {
 				const isQuizTeacher = teachers.includes(localUser.map(u => u.uid).orElse(toId("")));
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
+				const studentsCanSeeStatistics = quizData.quiz.studentsCanSeeStatistics;
 
 				// const userRole = localUser.map(u => u.role).orElse("STUDENT");
-				const isQuizCompleted = (quizData.run?.counter ?? 0) === quizData.questions.length;
+				const isQuizCompleted = (quizData.run?.counter ?? 0) === quizData.run?.questions.length;
 
 				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {
@@ -425,7 +426,8 @@ export const QuizPage: React.FC = () => {
 										/>
 									)}
 								</Tab>
-								{showStatTab && (isQuizTeacher ? true : isQuizCompleted) && (
+								{/* {showStatTab && (isQuizTeacher ? true : isQuizCompleted ) && ( */}
+								{showStatTab && (isQuizTeacher ? true : isQuizCompleted && studentsCanSeeStatistics) && (
 									<Tab
 										eventKey={tabRecords.statistics.value}
 										title={i18n._(tabRecords.statistics.label)}

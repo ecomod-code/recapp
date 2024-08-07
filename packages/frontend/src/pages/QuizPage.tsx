@@ -400,15 +400,16 @@ export const QuizPage: React.FC = () => {
 								activeKey={activeKey}
 								onSelect={k => setActiveKey(k as TabValue)}
 							>
-								{!disableForStudent && (
-									<Tab
-										eventKey={tabRecords.quizData.value}
-										title={i18n._(tabRecords.quizData.label)}
-										tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
-									>
-										<QuizDataTab />
-									</Tab>
-								)}
+								{/* {!disableForStudent && ( */}
+								<Tab
+									eventKey={tabRecords.quizData.value}
+									title={i18n._(tabRecords.quizData.label)}
+									tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
+								>
+									{/* <QuizDataTab /> */}
+									<QuizDataTab disableForStudent={disableForStudent} />
+								</Tab>
+								{/* )} */}
 								<Tab
 									eventKey={tabRecords.questions.value}
 									title={i18n._(tabRecords.questions.label)}

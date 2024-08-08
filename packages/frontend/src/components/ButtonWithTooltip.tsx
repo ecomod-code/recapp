@@ -1,7 +1,7 @@
 import { Placement } from "react-bootstrap/esm/types";
 import { TooltipWrapper } from "./TooltipWrapper";
 import Button, { ButtonProps } from "react-bootstrap/Button";
-import { PropsWithChildren } from "react";
+// import { PropsWithChildren } from "react";
 
 interface Props extends ButtonProps {
     title: string;

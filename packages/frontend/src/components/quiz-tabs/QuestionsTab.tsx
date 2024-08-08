@@ -224,7 +224,7 @@ export const QuestionsTab: React.FC<{
                 defaultValue={currentGroup.name}
             /> */}
 			<div className="d-flex flex-column h-100 w-100">
-				<div className="d-flex gap-2 align-items-center justify-content-between mb-4 flex-wrap">
+				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
 					<div>
 						{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
 						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
@@ -240,7 +240,7 @@ export const QuestionsTab: React.FC<{
                                       )
                                     : ""
                             }
-                            className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
+                            className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
                             variant="primary"
                             disabled={disableForSettingOrMode || isCreatingQuestionDisabled}
                             onClick={() => {

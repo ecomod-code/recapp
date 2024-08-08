@@ -13,6 +13,7 @@ import { useStatefulActor } from "ts-actors-react";
 import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz } from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -28,7 +29,6 @@ import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
-import { Modal } from "react-bootstrap";
 
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
@@ -332,8 +332,24 @@ export const QuestionEdit: React.FC = () => {
 		tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
 	};
 
-	const hasAnswer = question.answers?.some(q => !!q.text.trim());
-	const isSaveButtonDisabled = (question.type !== "TEXT" && !hasAnswer) || !question.text.trim();
+	const isQuestionAdded = question.text.trim();
+	const isAnswersAdded = question.answers?.some(q => !!q.text.trim());
+	const isCorrectAnswerAssigned = question.answers.some(answer => answer.correct);
+
+	let saveButtonDisableReason = "";
+	if(!isQuestionAdded){
+		saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-question");
+	}else {
+		if(question.type !== "TEXT"){
+			if(!isAnswersAdded){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-answers");
+			}else if(!isCorrectAnswerAssigned){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer");
+			}
+		}
+	}
+
+	const isSaveButtonDisabled = !!saveButtonDisableReason;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -829,9 +845,15 @@ export const QuestionEdit: React.FC = () => {
 					<Button variant="outline-primary" onClick={onCancelClick}>
 						<Trans id="cancel" />
 					</Button>
-					<Button disabled={isSaveButtonDisabled} onClick={submit}>
+					<ButtonWithTooltip
+						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}
+						title={saveButtonDisableReason}
+						disabled={isSaveButtonDisabled} 
+						onClick={submit}
+						className="col-12"
+					>
 						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-					</Button>
+					</ButtonWithTooltip>
 				</div>
 			</div>
 		</>

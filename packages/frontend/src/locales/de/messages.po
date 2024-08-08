@@ -37,6 +37,21 @@ msgid "quiz-questions-tab-new-question-button.button-tooltip.create-question-dis
 msgstr "Neil: the 'New question' button is disabled because the user has disabled all options for 'Allowed question types' in quiz-data-tab"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:343
+msgid "question-edit-page.save-button-disabled-reason.missing-question"
+msgstr "Neil: the save button is disabled because the user didn't add the question text"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:343
+msgid "question-edit-page.save-button-disabled-reason.missing-answers"
+msgstr "Neil: the save button is disabled because the user didn't add any answers"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:343
+msgid "question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer"
+msgstr "Neil: the save button is disabled because the user didn't assign a correct answer"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:106
 msgid "quiz-stats-tab.switch-label.presentation-mode"
 msgstr "Präsentationsmodus"

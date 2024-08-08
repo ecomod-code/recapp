@@ -30,6 +30,8 @@ import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { Modal } from "react-bootstrap";
 
+const MAX_ANSWER_COUNT_ALLOWED = 20;
+
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
 	if (!a.answered && b.answered) return -1;
@@ -167,6 +169,8 @@ export const QuestionEdit: React.FC = () => {
 		setShowMDModal({ type, titleId });
 	};
 
+	console.log({answerCount: question.answers});
+	
 	const addAnswer = () => {
 		const answers = question.answers;
 		answers.push({ correct: false, text: "" });
@@ -756,9 +760,13 @@ export const QuestionEdit: React.FC = () => {
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 
-									<Button variant="warning" onClick={addAnswer} disabled={!writeAccess}>
-										<Trans id="add-answer-button" />
-									</Button>
+                                    <Button
+                                        variant="warning"
+                                        onClick={addAnswer}
+                                        disabled={!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED}
+                                    >
+                                        <Trans id="add-answer-button" />
+                                    </Button>
 								</div>
 								<Form className="text-start">
 									{question.answers.map((answer, i) => {

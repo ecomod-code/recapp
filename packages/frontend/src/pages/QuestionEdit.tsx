@@ -850,7 +850,7 @@ export const QuestionEdit: React.FC = () => {
 						title={saveButtonDisableReason}
 						disabled={isSaveButtonDisabled} 
 						onClick={submit}
-						className="col-12"
+						className="col-12 col-lg-auto"
 					>
 						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
 					</ButtonWithTooltip>

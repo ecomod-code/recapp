@@ -10,14 +10,16 @@ import { Maybe, maybe } from "tsmonads";
 
 // import Accordion from "react-bootstrap/Accordion";
 // import Button, { ButtonProps } from "react-bootstrap/Button";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 // import { ArrowDown, ArrowUp, Pencil, Plus } from "react-bootstrap-icons";
 import { Plus } from "react-bootstrap-icons";
 import { QuestionCard } from "../cards/QuestionCard";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
+import { checkIsCreatingQuestionDisabled } from "../../utils";
 // import { ChangeGroupModal } from "../modals/ChangeGroupModal";
 // import { CreateGroupModal } from "../modals/CreateGroupModal";
 
@@ -171,6 +173,8 @@ export const QuestionsTab: React.FC<{
 
 	const defaultQuestionGroup = quizData.quiz.groups[0];
 
+    const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quizData.quiz.allowedQuestionTypesSettings);
+
 	// const defaultQuestionGroup = [
 	//     quizData.quiz.groups[0],
 	//     quizData.quiz.groups[0],
@@ -226,28 +230,36 @@ export const QuestionsTab: React.FC<{
 						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
 					</div>
 
-					{quizData.quiz.state === "EDITING" ? (
-						<Button
-							className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
-							variant="primary"
-							disabled={disableForSettingOrMode}
-							onClick={() => {
-								const writeAccess = true;
-								nav(
-									{ pathname: "/Dashboard/Question" },
-									{
-										state: {
-											// group: questionGroup.name,
-											write: writeAccess ? "true" : undefined,
-										},
-									}
-								);
-							}}
-						>
-							<Plus size={28} />
-							<Trans id="quiz-questions-tab-new-question-button" />
-						</Button>
-					) : null}
+                    {quizData.quiz.state === "EDITING" ? (
+                        <ButtonWithTooltip
+                            isTooltipVisibleWhenButtonIsDisabled={isCreatingQuestionDisabled}
+                            title={
+                                isCreatingQuestionDisabled
+                                    ? i18n._(
+                                          "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
+                                      )
+                                    : ""
+                            }
+                            className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
+                            variant="primary"
+                            disabled={disableForSettingOrMode || isCreatingQuestionDisabled}
+                            onClick={() => {
+                                const writeAccess = true;
+                                nav(
+                                    { pathname: "/Dashboard/Question" },
+                                    {
+                                        state: {
+                                            // group: questionGroup.name,
+                                            write: writeAccess ? "true" : undefined,
+                                        },
+                                    }
+                                );
+                            }}
+                        >
+                            <Plus size={28} />
+                            <Trans id="quiz-questions-tab-new-question-button" />
+                        </ButtonWithTooltip>
+                    ) : null}
 
 					{/* <Button
                             className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"

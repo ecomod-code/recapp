@@ -1,7 +1,7 @@
 import { curry } from "rambda";
 import { ActorSystem, ActorRef } from "ts-actors";
 import { Try, Maybe, nothing, maybe } from "tsmonads";
-import { Question, User } from "@recapp/models";
+import { Question, Quiz, User } from "@recapp/models";
 import { CurrentQuizState } from "./actors/CurrentQuizActor";
 
 export const cookie = (name: string): string => {
@@ -76,4 +76,12 @@ export const checkIsQuizTeacher = (quizData: CurrentQuizState | null, localUser:
     const isQuizTeacher = teachers.includes(localUser.uid);
 
     return isQuizTeacher;
+};
+
+export const checkIsCreatingQuestionDisabled = (allowedQuestionTypesSettings: Quiz["allowedQuestionTypesSettings"]) => {
+    const isCreatingQuestionEnabled = Object.values(allowedQuestionTypesSettings).every(value => {
+        return !value;
+    });
+
+    return isCreatingQuestionEnabled;
 };

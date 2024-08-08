@@ -26,6 +26,17 @@ msgid "quiz-allows-student-to-see-statistics"
 msgstr "Neil: allow the students to see the quiz-statistics (the statistics tab) after the student has finished the quiz"
 
 #. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:323
+#: src/pages/CreateQuiz.tsx:135
+msgid "quiz-data-tab.alert-message.create-new-question-is-disabled"
+msgstr "Neil: the 'New question' button in the quiz-questions-tab is disabled"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuestionsTab.tsx:236
+msgid "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
+msgstr "Neil: the 'New question' button is disabled because the user has disabled all options for 'Allowed question types' in quiz-data-tab"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:106
 msgid "quiz-stats-tab.switch-label.presentation-mode"
 msgstr "Präsentationsmodus"

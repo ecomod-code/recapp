@@ -12,7 +12,7 @@ export const TooltipWrapper = ({ placement = "top", title, children }: Props) =>
     return (
         <OverlayTrigger //
             placement={placement}
-            overlay={<Tooltip>{title}</Tooltip>}
+            overlay={title ? <Tooltip>{title}</Tooltip> : <></>}
         >
             {children as any}
         </OverlayTrigger>

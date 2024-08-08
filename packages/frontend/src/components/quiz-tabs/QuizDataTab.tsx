@@ -7,7 +7,8 @@ import { toTimestamp } from "itu-utils";
 
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import { Pencil, PersonPlus } from "react-bootstrap-icons";
+import Alert from "react-bootstrap/Alert";
+import { Pencil, PersonPlus, ExclamationTriangle } from "react-bootstrap-icons";
 // import { TextModal } from "../modals/TextModal";
 
 import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
@@ -18,7 +19,7 @@ import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
-import { debounce } from "../../utils";
+import { checkIsCreatingQuestionDisabled, debounce } from "../../utils";
 import { CharacterTracker } from "../CharacterTracker";
 import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../../constants/constants";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
@@ -50,7 +51,7 @@ export const QuizDataTab: React.FC<Props> = props => {
     );
 
     if (!quizData) return null;
-    if (!quizData.quiz) return null;
+    // if (!quizData.quiz) return null;
 
     const quiz = quizData.quiz;
 
@@ -101,6 +102,8 @@ export const QuizDataTab: React.FC<Props> = props => {
     // const fn = mbQuiz.flatMap(q => maybe(q.exportFile)).orUndefined();
 
     const isTitleAndDescriptionDisabled = props.disableForStudent || disabledByMode;
+
+    const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quiz.allowedQuestionTypesSettings);
 
     return (
         <Form>
@@ -306,6 +309,18 @@ export const QuizDataTab: React.FC<Props> = props => {
                         />
                     </ListGroupContainer>
                     <ListGroupContainer header={i18n._("quiz-allowed-question-types")}>
+                        {isCreatingQuestionDisabled ? (
+                            <Alert variant="warning" className="d-flex align-items-start">
+                                <div className="d-flex">
+                                    <ExclamationTriangle size={20} />
+                                </div>
+
+                                <span className="ms-1">
+                                    {i18n._("quiz-data-tab.alert-message.create-new-question-is-disabled")}
+                                </span>
+                            </Alert>
+                        ) : null}
+
                         <Form.Switch
                             className="list-group-item ps-5"
                             label={i18n._("quiz-allows-text-questions")}

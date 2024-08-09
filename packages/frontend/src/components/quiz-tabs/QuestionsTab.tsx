@@ -39,8 +39,12 @@ export const QuestionsTab: React.FC<{
 	const userId: Id = localUser.map(u => u.uid).orElse(toId("---"));
 	const userRole: UserRole = localUser.map(u => u.role).orElse("STUDENT");
 	const disableForStudentOrMode = disableForStudent || quizData.quiz.state !== "EDITING";
+
+	const teachers: string[] = quizData.quiz.teachers ?? [];
+    const isQuizTeacher = teachers.includes(userId);
+
 	const noQuestions =
-		userRole !== "ADMIN" && !quizData.quiz.teachers.includes(userId) && !quizData.quiz.studentQuestions;
+		userRole !== "ADMIN" && !isQuizTeacher && !quizData.quiz.studentQuestions;
 	const disableForSettingOrMode = noQuestions || quizData.quiz.state !== "EDITING";
 
 	// const [currentGroup, setCurrentGroup] = useState({
@@ -118,7 +122,7 @@ export const QuestionsTab: React.FC<{
 	const editQuestion = (uid: Id, group: string) => {
 		const writeAccess =
 			quizData.quiz.state === "EDITING" &&
-			(teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+			(isQuizTeacher ||
 				mbQuiz
 					.flatMap(q => maybe(q.questions))
 					.map(
@@ -126,7 +130,7 @@ export const QuestionsTab: React.FC<{
 							!!qs.find(
 								q =>
 									q.uid === uid &&
-									q.authorId === localUser.map(u => u.uid).orElse(toId("")) &&
+									q.authorId === userId &&
 									quizData.quiz.studentQuestions
 							)
 					)
@@ -157,17 +161,15 @@ export const QuestionsTab: React.FC<{
 		setRemoveEditModal(toId(""));
 	};
 
-	const teachers: string[] = quizData.quiz.teachers ?? [];
 	const unfilteredQuestions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 	const questions = unfilteredQuestions.filter(q => {
-		const user: Id = localUser.map(l => l.uid).orElse(toId(""));
-		if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {
+		if (userRole === "ADMIN") {
 			return true;
 		}
 		if (q.approved) return true;
-		if (q.authorId === user) return true;
-		if (teachers.includes(user)) return true;
-		console.log("The following question will not be displayed", q, "for user ", user, " and teachers ", teachers);
+		if (q.authorId === userId) return true;
+		if (isQuizTeacher) return true;
+		console.log("The following question will not be displayed", q, "for user ", userId, " and teachers ", teachers);
 		return false;
 	});
 
@@ -290,7 +292,7 @@ export const QuestionsTab: React.FC<{
 								const isStudentQuestionsAllowed = quizData.quiz.studentQuestions;
 
 								const writeAccess =
-									teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+									isQuizTeacher ||
 									mbQuiz
 										.flatMap(q => maybe(q.questions))
 										.map(
@@ -299,7 +301,7 @@ export const QuestionsTab: React.FC<{
 													qu =>
 														isStudentQuestionsAllowed &&
 														qu.uid === q!.uid &&
-														qu.authorId === localUser.map(u => u.uid).orElse(toId(""))
+														qu.authorId === userId
 												)
 										)
 										.orElse(false);
@@ -315,6 +317,7 @@ export const QuestionsTab: React.FC<{
 										state={quizData.quiz.state}
 										moveUp={() => moveQuestion(defaultQuestionGroup.name, q!.uid, true)}
 										moveDown={() => moveQuestion(defaultQuestionGroup.name, q!.uid, false)}
+                                        isQuizTeacher={isQuizTeacher}
 										// changeGroup={() => {
 										//     if (quizData.quiz.groups.length < 2) {
 										//         return;
@@ -324,7 +327,7 @@ export const QuestionsTab: React.FC<{
 										//         currentGroup: questionGroup.name,
 										//     });
 										// }}
-										currentUserUid={localUser.map(u => u.uid).orElse(toId(""))}
+										currentUserUid={userId}
 										disabled={disableForStudentOrMode}
 										isFirst={isFirst}
 										isLast={isLast}

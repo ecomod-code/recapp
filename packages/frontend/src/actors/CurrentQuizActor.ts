@@ -342,6 +342,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									// 	.map((a, i) => a === question.answers[i].correct)
 									// 	.every(Boolean);
 
+									// TODO: Hendrik !!
 									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
 									if (cleanedAnswers.length === 0) {
 										answerCorrect = question.answers.every(a => !a.correct);
@@ -518,10 +519,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							question.editMode = false;
 							try {
 								await this.user.map(async u => {
-									if (this.state.quiz.teachers.includes(u.uid)) {
-										console.debug("Auto-approving question");
-										question.approved = true; // Teacher questions are automatically approved
-									}
+									// if (this.state.quiz.teachers.includes(u.uid)) {
+									// 	console.debug("Auto-approving question");
+									// 	question.approved = true; // Teacher questions are automatically approved
+									// }
+
+									// all questions are now approved by default and the teacher can 'hide' them later (hide not approve)
+									question.approved = true; // Teacher questions are automatically approved
+
 									console.log("CURRENTQUIZ", "Creating question for user", u.uid);
 									const uid: Id = await this.ask(
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,

@@ -57,6 +57,16 @@ msgid "question-edit-page.save-button-disabled-reason.empty-answers-not-allowed"
 msgstr "Neil: the save button is disabled because the there is an at least one answer with empty string"
 
 #. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-tooltip.show"
+msgstr "Neil: the button where the teacher can set a question to be visible (previously was 'question-card.button-tooltip.approve')"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-tooltip.hide"
+msgstr "Neil: the button where the teacher can set a question to be hidden (previously was 'question-card.button-tooltip.unapprove')"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:106
 msgid "quiz-stats-tab.switch-label.presentation-mode"
 msgstr "Presentation mode"

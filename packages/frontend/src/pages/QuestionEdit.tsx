@@ -334,6 +334,7 @@ export const QuestionEdit: React.FC = () => {
 
 	const isQuestionAdded = question.text.trim();
 	const isAnswersAdded = question.answers?.some(q => !!q.text.trim());
+	const isAllAnswersContainText = question.answers?.every(q => !!q.text.trim());
 	const isCorrectAnswerAssigned = question.answers.some(answer => answer.correct);
 
 	let saveButtonDisableReason = "";
@@ -345,6 +346,8 @@ export const QuestionEdit: React.FC = () => {
 				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-answers");
 			}else if(!isCorrectAnswerAssigned){
 				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer");
+			}else if(!isAllAnswersContainText){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.empty-answers-not-allowed");
 			}
 		}
 	}

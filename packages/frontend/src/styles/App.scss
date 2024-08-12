@@ -166,3 +166,15 @@ $layout-breakpoint-small: 650px;
     row-gap: 2.5rem;
     column-gap: 1rem;
 }
+
+.nested-inline-paragraph-styles {
+    p {
+        // border: 1px solid red !important;
+        display: inline;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        color: $primary
+    }
+}
+

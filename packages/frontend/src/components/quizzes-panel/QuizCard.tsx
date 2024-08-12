@@ -28,6 +28,8 @@ export const QuizCard: React.FC<{
 	const userId = localUser?.uid ?? toId("");
 	const isQuizTeacher = quiz.teachers?.includes(userId);
 
+	const isAuthorized = isAdmin || isQuizTeacher;
+
 	const navigateToQuizPage = ()=> {
 		nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } });
 	};
@@ -85,7 +87,7 @@ export const QuizCard: React.FC<{
                             </ButtonWithTooltip>
                         ) : null}
 
-                        {isAdmin || isQuizTeacher ? (
+                        {isAuthorized ? (
                             <ButtonWithTooltip
                                 title={i18n._("quiz-card.button-tooltip.share")}
                                 className="ms-2"
@@ -96,13 +98,12 @@ export const QuizCard: React.FC<{
                             </ButtonWithTooltip>
                         ) : null}
 
-                        {isAdmin || isQuizTeacher ? (
+                        {isAuthorized ? (
                             <ButtonWithTooltip
                                 title={i18n._("quiz-card.button-tooltip.delete")}
                                 variant="danger"
                                 className="ms-2"
                                 onClick={onDelete}
-                                disabled={!isAdmin && !isQuizTeacher}
                             >
                                 <Trash />
                             </ButtonWithTooltip>

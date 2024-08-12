@@ -119,10 +119,9 @@ export const QuestionsTab: React.FC<{
 		);
 	};
 
-	// const editQuestion = (uid: Id, group: string) => {
-	const navigateEditQuestionPage = (uid: Id, group: string, onlyPreview: boolean) => {
-		const writeAccess = !onlyPreview &&
-			quizData.quiz.state === "EDITING" &&
+	const editQuestion = (uid: Id, group: string) => {
+        const writeAccess =
+            quizData.quiz.state === "EDITING" &&
 			(isQuizTeacher ||
 				mbQuiz
 					.flatMap(q => maybe(q.questions))
@@ -314,8 +313,7 @@ export const QuestionsTab: React.FC<{
 										question={q!}
 										approve={() => approveQuestion(q!.uid, q!.approved)}
 										delete={() => setDeleteModal(q!.uid)}
-										edit={() => navigateEditQuestionPage(q!.uid, defaultQuestionGroup.name, false)}
-                                        preview={()=> navigateEditQuestionPage(q!.uid, defaultQuestionGroup.name, true) }
+										edit={() => editQuestion(q!.uid, defaultQuestionGroup.name)}
 										state={quizData.quiz.state}
 										moveUp={() => moveQuestion(defaultQuestionGroup.name, q!.uid, true)}
 										moveDown={() => moveQuestion(defaultQuestionGroup.name, q!.uid, false)}

@@ -19,7 +19,6 @@ type Props = {
 	approve: () => void;
 	delete: () => void;
 	edit: () => void;
-	preview: ()=> void;
 	// changeGroup: () => void;
 	disabled: boolean;
 	currentUserUid: Id;
@@ -88,7 +87,7 @@ export const QuestionCard = (props: Props) => {
                                 if (!isTargetInstanceOfHtmlElement) return;
 
                                 if (target.nodeName.toLowerCase() === "p") {
-                                    props.preview();
+                                    props.edit();
                                 }
                             }}
                             dangerouslySetInnerHTML={{ __html: rendered }}

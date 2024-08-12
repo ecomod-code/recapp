@@ -22,13 +22,14 @@ export const QuizCard: React.FC<{
 	const nav = useNavigate();
 	const { localUser } = useLocalUser();
 
-	const isAdmin = localUser?.role === "ADMIN";
-	const isQuizStarted = quiz.state === "STARTED";
-
 	const userId = localUser?.uid ?? toId("");
 	const isQuizTeacher = quiz.teachers?.includes(userId);
-
+	const isAdmin = localUser?.role === "ADMIN";
 	const isAuthorized = isAdmin || isQuizTeacher;
+
+	const isQuizStarted = quiz.state === "STARTED";
+	const isStudentQuestionAllowed = !!quiz.studentQuestions;
+	const isQuizEditable = !isQuizStarted && (isAuthorized || isStudentQuestionAllowed);
 
 	const navigateToQuizPage = ()=> {
 		nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } });
@@ -43,13 +44,24 @@ export const QuizCard: React.FC<{
 			</div>
 			<Card>
                 <Card.Title
-                    className={`text-start mx-2 mt-3 custom-line-clamp ${isQuizStarted ? "custom-nested-inline-paragraph-styles" : ""}`}
+                    // className={`text-start mx-2 mt-3 custom-line-clamp ${!isQuizEditable ? "custom-nested-inline-paragraph-styles" : ""}`}
+                    className="text-start mx-2 mt-3 custom-line-clamp"
                 >
                     <p
-                        className="m-0"
+                        className={`m-0 d-inline ${!isQuizEditable ? "text-primary" : ""}`}
+                        style={
+                            !isQuizEditable
+                                ? {
+                                      cursor: "pointer",
+                                      textDecoration: "underline",
+                                      textUnderlineOffset: "3px",
+                                      // color: $primary
+                                  }
+                                : {}
+                        }
                         onClick={() => {
-                            if (!isQuizStarted) return;
-							navigateToQuizPage();
+                            if (isQuizEditable) return;
+                            navigateToQuizPage();
                         }}
                     >
                         {quiz.title ?? ""}
@@ -77,7 +89,7 @@ export const QuizCard: React.FC<{
 
 				<Card.Footer>
 					<div className="d-flex flex-row justify-content-end">
-                        {!isQuizStarted ? (
+                        {isQuizEditable ? (
                             <ButtonWithTooltip
                                 title={i18n._("quiz-card.button-tooltip.edit")}
                                 variant="primary"

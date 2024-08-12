@@ -63,6 +63,8 @@ export const CommentCardContent: React.FC<
 }) => {
     const { rendered } = useRendered({ value: comment.text });
 
+    const isQuizTeacher = teachers.includes(userId);
+
     return (
         <Card
             className={`${isDisplayedInModal ? "p-0 m-0" : "p-0 m-1 mt-2 mb-3"} overflow-hidden`}
@@ -122,24 +124,30 @@ export const CommentCardContent: React.FC<
                                 <Question color="white" />
                             </ButtonWithTooltip>
                         )}
-                        <ButtonWithTooltip
-                            title={i18n._("comment-card.button-tooltip.accept")}
-                            variant={comment.answered ? "secondary" : "success"}
-                            className="m-1"
-                            onClick={onAccept}
-                            disabled={!teachers.includes(userId)}
-                        >
-                            <Calendar2Check size={18} />
-                        </ButtonWithTooltip>
-                        <ButtonWithTooltip
-                            title={i18n._("comment-card.button-tooltip.delete")}
-                            variant="danger"
-                            className="m-1"
-                            onClick={onDelete}
-                            disabled={comment.authorId !== userId && !teachers.includes(userId)}
-                        >
-                            <Trash />
-                        </ButtonWithTooltip>
+
+                        {isQuizTeacher ? (
+                            <ButtonWithTooltip
+                                title={i18n._("comment-card.button-tooltip.accept")}
+                                variant={comment.answered ? "secondary" : "success"}
+                                className="m-1"
+                                onClick={onAccept}
+                                disabled={!isQuizTeacher}
+                            >
+                                <Calendar2Check size={18} />
+                            </ButtonWithTooltip>
+                        ) : null}
+
+                        {comment.authorId === userId || isQuizTeacher ? (
+                            <ButtonWithTooltip
+                                title={i18n._("comment-card.button-tooltip.delete")}
+                                variant="danger"
+                                className="m-1"
+                                onClick={onDelete}
+                                disabled={comment.authorId !== userId && !isQuizTeacher}
+                            >
+                                <Trash />
+                            </ButtonWithTooltip>
+                        ) : null}
                     </div>
                 </div>
             </Card.Footer>

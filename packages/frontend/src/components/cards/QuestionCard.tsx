@@ -80,7 +80,7 @@ export const QuestionCard = (props: Props) => {
 
                     <div className="custom-line-clamp">
                         <div
-                            className="nested-inline-paragraph-styles"
+                            className="custom-nested-inline-paragraph-styles"
                             onClick={e => {
                                 const target = e.target;
 

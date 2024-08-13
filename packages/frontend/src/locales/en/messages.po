@@ -67,6 +67,16 @@ msgid "question-card.button-tooltip.hide"
 msgstr "Neil: the button where the teacher can set a question to be hidden (previously was 'question-card.button-tooltip.unapprove')"
 
 #. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:135
+msgid "comment-card.button-tooltip.accept"
+msgstr "Neil: Kommentare: Button 'Annehmen' zu 'Kommentar merken' aendern"
+
+#. js-lingui-explicit-id
+#: src/components/cards/CommentCard.tsx:135
+msgid "comment-card.button-tooltip.not-accepted"
+msgstr "Neil: this is the oposite state for the 'Kommentar merken' that is mentioned right before this record"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:106
 msgid "quiz-stats-tab.switch-label.presentation-mode"
 msgstr "Presentation mode"

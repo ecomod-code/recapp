@@ -127,7 +127,12 @@ export const CommentCardContent: React.FC<
 
                         {isQuizTeacher ? (
                             <ButtonWithTooltip
-                                title={i18n._("comment-card.button-tooltip.accept")}
+                                // title={i18n._("comment-card.button-tooltip.accept")}
+                                title={
+                                    comment.answered
+                                        ? i18n._("comment-card.button-tooltip.not-accepted")
+                                        : i18n._("comment-card.button-tooltip.accept")
+                                }
                                 variant={comment.answered ? "secondary" : "success"}
                                 className="m-1"
                                 onClick={onAccept}

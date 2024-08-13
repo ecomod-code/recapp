@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ import { CharacterTracker } from "../components/CharacterTracker";
 import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../constants/constants";
 
 export const CreateQuiz: React.FC = () => {
+    const [titleAndDescription, setTitleAndDescription] = useState({ title: "", description: "" });
     const nav = useNavigate();
     const tSystem = useContext(SystemContext);
     const [mbState, tActor] = useStatefulActor<CreateQuizState>("CreateQuiz");
@@ -37,17 +38,20 @@ export const CreateQuiz: React.FC = () => {
                             <Breadcrumb.Item active>{i18n._("new-quiz")}</Breadcrumb.Item>
                         </Breadcrumb>
                         <Container className="pb-5">
-                            <Form className="list-group">
+                            <div className="list-group">
                                 <Form.Group className="mb-1">
                                     <CharacterTracker value={quiz.title.length} maxValue={TITLE_MAX_CHARACTERS} />
                                     <Form.Control
                                         type="text"
                                         placeholder={i18n._("quiz-title")}
-                                        value={quiz.title}
+                                        // value={quiz.title}
+                                        value={titleAndDescription.title ? titleAndDescription.title : quiz.title}
                                         onChange={event => {
                                             const value = event.target.value;
                                             const isTextTooLong = value.length >= TITLE_MAX_CHARACTERS;
                                             const text = isTextTooLong ? value?.slice(0, TITLE_MAX_CHARACTERS) : value;
+
+                                            setTitleAndDescription(prev => ({ ...prev, title: text }));
 
                                             return actor.send(
                                                 actor,
@@ -75,13 +79,16 @@ export const CreateQuiz: React.FC = () => {
                                         as="textarea"
                                         rows={5}
                                         placeholder={i18n._("quiz-description")}
-                                        value={quiz.description}
+                                        // value={quiz.description}
+                                        value={titleAndDescription.description ? titleAndDescription.description : quiz.description}
                                         onChange={event => {
                                             const value = event.target.value;
                                             const isTextTooLong = value.length >= DESCRIPTION_MAX_CHARACTERS;
                                             const text = isTextTooLong
                                                 ? value?.slice(0, DESCRIPTION_MAX_CHARACTERS)
                                                 : value;
+                                                
+                                            setTitleAndDescription(prev => ({ ...prev, description: text }));
 
                                             return actor.send(
                                                 actor,
@@ -249,7 +256,7 @@ export const CreateQuiz: React.FC = () => {
                                 >
                                     <Trans id="create-quiz-button" />
                                 </Button>
-                            </Form>
+                            </div>
                         </Container>
                     </Row>
                 </Container>

@@ -68,7 +68,7 @@ export class CreateQuizActor extends StatefulActor<CreateQuizMessage, Unit | Err
 
 	private validate = (q: NewQuiz): Validator<NewQuiz> => {
 		const validation = { ...this.state.validation };
-		validation.title = q.title.length > 3;
+		validation.title = q.title.trim().length > 3; 
 		return validation;
 	};
 

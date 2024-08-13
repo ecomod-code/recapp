@@ -43,10 +43,7 @@ export const QuizCard: React.FC<{
 				{fromTimestamp(quiz.updated ?? -1).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}
 			</div>
 			<Card>
-                <Card.Title
-                    // className={`text-start mx-2 mt-3 custom-line-clamp ${!isQuizEditable ? "custom-nested-inline-paragraph-styles" : ""}`}
-                    className="text-start mx-2 mt-3 custom-line-clamp"
-                >
+                <Card.Title className="text-start mx-2 mt-3 custom-line-clamp">
                     <p
                         className={`m-0 d-inline ${!isQuizEditable ? "text-primary" : ""}`}
                         style={

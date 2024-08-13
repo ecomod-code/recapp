@@ -7,7 +7,7 @@ import Badge from "react-bootstrap/Badge";
 import { ArrowUp, ArrowDown, Pencil, Trash, Eye, EyeSlash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { useRendered } from "../../hooks/useRendered";
-// import { OverviewIcon } from "./OverviewIcon";
+import { OverviewIcon } from "./OverviewIcon";
 
 const CONTAINER_MIN_HEIGHT = 160;
 const ARROW_CONTAINER_MAX_HEIGHT = CONTAINER_MIN_HEIGHT;
@@ -78,20 +78,7 @@ export const QuestionCard = (props: Props) => {
 					</div> */}
 
                     <div className="custom-line-clamp">
-                        <div
-                            className="custom-nested-inline-paragraph-styles"
-                            onClick={e => {
-                                const target = e.target;
-
-                                const isTargetInstanceOfHtmlElement = target instanceof HTMLElement;
-                                if (!isTargetInstanceOfHtmlElement) return;
-
-                                if (target.nodeName.toLowerCase() === "p") {
-                                    props.edit();
-                                }
-                            }}
-                            dangerouslySetInnerHTML={{ __html: rendered }}
-                        />
+                        <div dangerouslySetInnerHTML={{ __html: rendered }} />
                     </div>
 
 					<div className="d-flex justify-content-end gap-2">
@@ -112,17 +99,15 @@ export const QuestionCard = (props: Props) => {
                             >
                                 <Pencil />
                             </ButtonWithTooltip>
-                            ) : null
-                            // (
-                            //     <ButtonWithTooltip
-                            //         title={i18n._("question-card.button-tooltip.view")}
-                            //         onClick={props.edit}
-                            //         variant={props.question.editMode ? "secondary" : "primary"}
-                            //     >
-                            // 		<OverviewIcon size={16} />
-                            //     </ButtonWithTooltip>
-                            // )
-						}
+                        ) : (
+                            <ButtonWithTooltip
+                                title={i18n._("question-card.button-tooltip.view")}
+                                onClick={props.edit}
+                                variant={props.question.editMode ? "secondary" : "primary"}
+                            >
+                                <OverviewIcon size={16} />
+                            </ButtonWithTooltip>
+                        )}
 
 						{/* <ButtonWithTooltip
 							title={i18n._("question-card.button-tooltip.change-group")}

@@ -12,7 +12,7 @@ import { CORRECT_COLOR, WRONG_COLOR } from "../../colorPalette";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 type QuizStatsDetailsProps = Pick<CurrentQuizState, "questionStats" | "questions"> & {
-    groups: CurrentQuizState["quiz"]["groups"];
+    // groups: CurrentQuizState["quiz"]["groups"];
     ownAnswers: Record<string & BRAND<"UID">, OwnAnswer>;
     onBackToQuizClick: () => void;
     changeQuestionHandler: (index: string & BRAND<"UID">) => void;
@@ -21,7 +21,7 @@ type QuizStatsDetailsProps = Pick<CurrentQuizState, "questionStats" | "questions
 export const QuizStatsDetails = ({
     questionStats,
     questions,
-    groups,
+    // groups,
     ownAnswers,
     onBackToQuizClick,
     changeQuestionHandler,
@@ -31,24 +31,32 @@ export const QuizStatsDetails = ({
     /* Question stats */
     const questionIndex = questions.findIndex(q => q.uid === questionStats.questionId)!;
     const question = questions[questionIndex];
-    const questionsByGroup = groups?.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
-    const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
+
+    // const questionsByGroup = groups?.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
+    const questionsList = questions.map(q => q.uid).reverse();
+
+    // const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
+    const questionsByGroupIndex = questionsList.findIndex(q => q === questionStats.questionId)!;
 
     const ownAnswer = ownAnswers[question.uid];
 
     const isPreviousButtonVisible = questionsByGroupIndex > 0;
-    const isNextButtonVisible = questionsByGroupIndex < questionsByGroup.length - 1;
+
+    // const isNextButtonVisible = questionsByGroupIndex < questionsByGroup.length - 1;
+    const isNextButtonVisible = questionsByGroupIndex < questionsList.length - 1;
 
     const onPreviousClick = () => {
         if (!isPreviousButtonVisible) return;
 
-        changeQuestionHandler(questionsByGroup[questionsByGroupIndex - 1]);
+        // changeQuestionHandler(questionsByGroup[questionsByGroupIndex - 1]);
+        changeQuestionHandler(questionsList[questionsByGroupIndex - 1]);
     };
 
     const onNextClick = () => {
         if (!isNextButtonVisible) return;
 
-        changeQuestionHandler(questionsByGroup[questionsByGroupIndex + 1]);
+        // changeQuestionHandler(questionsByGroup[questionsByGroupIndex + 1]);
+        changeQuestionHandler(questionsList[questionsByGroupIndex + 1]);
     };
 
     useEffect(() => {

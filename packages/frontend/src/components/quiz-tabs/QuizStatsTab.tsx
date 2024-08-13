@@ -208,7 +208,7 @@ export const QuizStatsTab: React.FC = () => {
 							<PresentationModeSwitch />
 
 							<QuizStatsDetails
-								groups={groups}
+								// groups={groups}
 								questionStats={questionStats}
 								questions={questions}
 								ownAnswers={ownAnswers}

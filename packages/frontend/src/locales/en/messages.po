@@ -23,58 +23,58 @@ msgstr "Login"
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-student-to-see-statistics"
-msgstr "Neil: allow the students to see the quiz-statistics (the statistics tab) after the student has finished the quiz"
+msgstr "Students can view statistics"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:323
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-data-tab.alert-message.create-new-question-is-disabled"
-msgstr "Neil: the 'New question' button in the quiz-questions-tab is disabled"
+msgstr "The 'New question' button is disabled"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:236
 msgid "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
-msgstr "Neil: the 'New question' button is disabled because the user has disabled all options for 'Allowed question types' in quiz-data-tab"
+msgstr "The 'New question' button is disabled because no options for 'Allowed question types' have been selected."
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:343
 msgid "question-edit-page.save-button-disabled-reason.missing-question"
-msgstr "Neil: the save button is disabled because the user didn't add the question text"
+msgstr "The 'Save question' button is disabled because no question text has been added."
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:343
 msgid "question-edit-page.save-button-disabled-reason.missing-answers"
-msgstr "Neil: the save button is disabled because the user didn't add any answers"
+msgstr "The 'Save question' button is disabled because no answers have been added."
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:343
 msgid "question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer"
-msgstr "Neil: the save button is disabled because the user didn't assign a correct answer"
+msgstr "The 'Save question' button is disabled because no answer has been designated as correct."
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:350
 msgid "question-edit-page.save-button-disabled-reason.empty-answers-not-allowed"
-msgstr "Neil: the save button is disabled because the there is an at least one answer with empty string"
+msgstr "The 'Save question' button is disabled because at least one answer has not been provided."
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-tooltip.show"
-msgstr "Neil: the button where the teacher can set a question to be visible (previously was 'question-card.button-tooltip.approve')"
+msgstr "Show question"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-tooltip.hide"
-msgstr "Neil: the button where the teacher can set a question to be hidden (previously was 'question-card.button-tooltip.unapprove')"
+msgstr "Hide question"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.accept"
-msgstr "Neil: Kommentare: Button 'Annehmen' zu 'Kommentar merken' aendern"
+msgstr "Note comment"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentCard.tsx:135
 msgid "comment-card.button-tooltip.not-accepted"
-msgstr "Neil: this is the oposite state for the 'Kommentar merken' that is mentioned right before this record"
+msgstr "Ignore comment"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:106

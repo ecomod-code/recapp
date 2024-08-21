@@ -13,6 +13,7 @@ import { useStatefulActor } from "ts-actors-react";
 import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz } from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
+import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Breadcrumb from "react-bootstrap/Breadcrumb";
@@ -28,7 +29,8 @@ import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
-import { Modal } from "react-bootstrap";
+
+const MAX_ANSWER_COUNT_ALLOWED = 20;
 
 const sortComments = (a: Comment, b: Comment) => {
 	if (a.answered && !b.answered) return 1;
@@ -167,6 +169,8 @@ export const QuestionEdit: React.FC = () => {
 		setShowMDModal({ type, titleId });
 	};
 
+	console.log({answerCount: question.answers});
+	
 	const addAnswer = () => {
 		const answers = question.answers;
 		answers.push({ correct: false, text: "" });
@@ -328,8 +332,27 @@ export const QuestionEdit: React.FC = () => {
 		tryQuizActor.forEach(actor => actor.send(actor, CurrentQuizMessages.setIsCommentSectionVisible(value)));
 	};
 
-	const hasAnswer = question.answers?.some(q => !!q.text.trim());
-	const isSaveButtonDisabled = (question.type !== "TEXT" && !hasAnswer) || !question.text.trim();
+	const isQuestionAdded = question.text.trim();
+	const isAnswersAdded = question.answers?.some(q => !!q.text.trim());
+	const isAllAnswersContainText = question.answers?.every(q => !!q.text.trim());
+	const isCorrectAnswerAssigned = question.answers.some(answer => answer.correct);
+
+	let saveButtonDisableReason = "";
+	if(!isQuestionAdded){
+		saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-question");
+	}else {
+		if(question.type !== "TEXT"){
+			if(!isAnswersAdded){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-answers");
+			}else if(!isCorrectAnswerAssigned){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer");
+			}else if(!isAllAnswersContainText){
+				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.empty-answers-not-allowed");
+			}
+		}
+	}
+
+	const isSaveButtonDisabled = !!saveButtonDisableReason;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -756,9 +779,13 @@ export const QuestionEdit: React.FC = () => {
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 
-									<Button variant="warning" onClick={addAnswer} disabled={!writeAccess}>
-										<Trans id="add-answer-button" />
-									</Button>
+                                    <Button
+                                        variant="warning"
+                                        onClick={addAnswer}
+                                        disabled={!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED}
+                                    >
+                                        <Trans id="add-answer-button" />
+                                    </Button>
 								</div>
 								<Form className="text-start">
 									{question.answers.map((answer, i) => {
@@ -821,9 +848,15 @@ export const QuestionEdit: React.FC = () => {
 					<Button variant="outline-primary" onClick={onCancelClick}>
 						<Trans id="cancel" />
 					</Button>
-					<Button disabled={isSaveButtonDisabled} onClick={submit}>
+					<ButtonWithTooltip
+						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}
+						title={saveButtonDisableReason}
+						disabled={isSaveButtonDisabled} 
+						onClick={submit}
+						className="col-12 col-lg-auto"
+					>
 						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}
-					</Button>
+					</ButtonWithTooltip>
 				</div>
 			</div>
 		</>

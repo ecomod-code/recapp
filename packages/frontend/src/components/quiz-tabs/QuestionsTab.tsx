@@ -10,14 +10,16 @@ import { Maybe, maybe } from "tsmonads";
 
 // import Accordion from "react-bootstrap/Accordion";
 // import Button, { ButtonProps } from "react-bootstrap/Button";
-import Button from "react-bootstrap/Button";
+// import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 // import { ArrowDown, ArrowUp, Pencil, Plus } from "react-bootstrap-icons";
 import { Plus } from "react-bootstrap-icons";
 import { QuestionCard } from "../cards/QuestionCard";
+import { ButtonWithTooltip } from "../ButtonWithTooltip";
 
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
+import { checkIsCreatingQuestionDisabled } from "../../utils";
 // import { ChangeGroupModal } from "../modals/ChangeGroupModal";
 // import { CreateGroupModal } from "../modals/CreateGroupModal";
 
@@ -37,8 +39,12 @@ export const QuestionsTab: React.FC<{
 	const userId: Id = localUser.map(u => u.uid).orElse(toId("---"));
 	const userRole: UserRole = localUser.map(u => u.role).orElse("STUDENT");
 	const disableForStudentOrMode = disableForStudent || quizData.quiz.state !== "EDITING";
+
+	const teachers: string[] = quizData.quiz.teachers ?? [];
+    const isQuizTeacher = teachers.includes(userId);
+
 	const noQuestions =
-		userRole !== "ADMIN" && !quizData.quiz.teachers.includes(userId) && !quizData.quiz.studentQuestions;
+		userRole !== "ADMIN" && !isQuizTeacher && !quizData.quiz.studentQuestions;
 	const disableForSettingOrMode = noQuestions || quizData.quiz.state !== "EDITING";
 
 	// const [currentGroup, setCurrentGroup] = useState({
@@ -114,9 +120,9 @@ export const QuestionsTab: React.FC<{
 	};
 
 	const editQuestion = (uid: Id, group: string) => {
-		const writeAccess =
-			quizData.quiz.state === "EDITING" &&
-			(teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+        const writeAccess =
+            quizData.quiz.state === "EDITING" &&
+			(isQuizTeacher ||
 				mbQuiz
 					.flatMap(q => maybe(q.questions))
 					.map(
@@ -124,7 +130,7 @@ export const QuestionsTab: React.FC<{
 							!!qs.find(
 								q =>
 									q.uid === uid &&
-									q.authorId === localUser.map(u => u.uid).orElse(toId("")) &&
+									q.authorId === userId &&
 									quizData.quiz.studentQuestions
 							)
 					)
@@ -155,21 +161,21 @@ export const QuestionsTab: React.FC<{
 		setRemoveEditModal(toId(""));
 	};
 
-	const teachers: string[] = quizData.quiz.teachers ?? [];
 	const unfilteredQuestions: Question[] = mbQuiz.map(q => q.questions).orElse([]);
 	const questions = unfilteredQuestions.filter(q => {
-		const user: Id = localUser.map(l => l.uid).orElse(toId(""));
-		if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {
+		if (userRole === "ADMIN") {
 			return true;
 		}
 		if (q.approved) return true;
-		if (q.authorId === user) return true;
-		if (teachers.includes(user)) return true;
-		console.log("The following question will not be displayed", q, "for user ", user, " and teachers ", teachers);
+		if (q.authorId === userId) return true;
+		if (isQuizTeacher) return true;
+		console.log("The following question will not be displayed", q, "for user ", userId, " and teachers ", teachers);
 		return false;
 	});
 
 	const defaultQuestionGroup = quizData.quiz.groups[0];
+
+    const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quizData.quiz.allowedQuestionTypesSettings);
 
 	// const defaultQuestionGroup = [
 	//     quizData.quiz.groups[0],
@@ -220,34 +226,42 @@ export const QuestionsTab: React.FC<{
                 defaultValue={currentGroup.name}
             /> */}
 			<div className="d-flex flex-column h-100 w-100">
-				<div className="d-flex gap-2 align-items-center justify-content-between mb-4 flex-wrap">
+				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
 					<div>
 						{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
 						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
 					</div>
 
-					{quizData.quiz.state === "EDITING" ? (
-						<Button
-							className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
-							variant="primary"
-							disabled={disableForSettingOrMode}
-							onClick={() => {
-								const writeAccess = true;
-								nav(
-									{ pathname: "/Dashboard/Question" },
-									{
-										state: {
-											// group: questionGroup.name,
-											write: writeAccess ? "true" : undefined,
-										},
-									}
-								);
-							}}
-						>
-							<Plus size={28} />
-							<Trans id="quiz-questions-tab-new-question-button" />
-						</Button>
-					) : null}
+                    {quizData.quiz.state === "EDITING" ? (
+                        <ButtonWithTooltip
+                            isTooltipVisibleWhenButtonIsDisabled={isCreatingQuestionDisabled}
+                            title={
+                                isCreatingQuestionDisabled
+                                    ? i18n._(
+                                          "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
+                                      )
+                                    : ""
+                            }
+                            className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+                            variant="primary"
+                            disabled={disableForSettingOrMode || isCreatingQuestionDisabled}
+                            onClick={() => {
+                                const writeAccess = true;
+                                nav(
+                                    { pathname: "/Dashboard/Question" },
+                                    {
+                                        state: {
+                                            // group: questionGroup.name,
+                                            write: writeAccess ? "true" : undefined,
+                                        },
+                                    }
+                                );
+                            }}
+                        >
+                            <Plus size={28} />
+                            <Trans id="quiz-questions-tab-new-question-button" />
+                        </ButtonWithTooltip>
+                    ) : null}
 
 					{/* <Button
                             className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
@@ -278,7 +292,7 @@ export const QuestionsTab: React.FC<{
 								const isStudentQuestionsAllowed = quizData.quiz.studentQuestions;
 
 								const writeAccess =
-									teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+									isQuizTeacher ||
 									mbQuiz
 										.flatMap(q => maybe(q.questions))
 										.map(
@@ -287,7 +301,7 @@ export const QuestionsTab: React.FC<{
 													qu =>
 														isStudentQuestionsAllowed &&
 														qu.uid === q!.uid &&
-														qu.authorId === localUser.map(u => u.uid).orElse(toId(""))
+														qu.authorId === userId
 												)
 										)
 										.orElse(false);
@@ -303,6 +317,7 @@ export const QuestionsTab: React.FC<{
 										state={quizData.quiz.state}
 										moveUp={() => moveQuestion(defaultQuestionGroup.name, q!.uid, true)}
 										moveDown={() => moveQuestion(defaultQuestionGroup.name, q!.uid, false)}
+                                        isQuizTeacher={isQuizTeacher}
 										// changeGroup={() => {
 										//     if (quizData.quiz.groups.length < 2) {
 										//         return;
@@ -312,7 +327,7 @@ export const QuestionsTab: React.FC<{
 										//         currentGroup: questionGroup.name,
 										//     });
 										// }}
-										currentUserUid={localUser.map(u => u.uid).orElse(toId(""))}
+										currentUserUid={userId}
 										disabled={disableForStudentOrMode}
 										isFirst={isFirst}
 										isLast={isLast}

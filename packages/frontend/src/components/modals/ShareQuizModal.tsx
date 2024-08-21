@@ -148,7 +148,8 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                         className="border-secondary"
                                         value={name}
                                         autoFocus
-                                        placeholder="ID, Email oder Pseudonym"
+                                        // placeholder="ID, Email oder Pseudonym"
+                                        placeholder="Email oder Pseudonym"
                                         onChange={event => {
                                             const name = event.target.value;
                                             setName(name);

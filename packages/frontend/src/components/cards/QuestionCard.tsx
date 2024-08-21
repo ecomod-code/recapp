@@ -4,9 +4,10 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Badge from "react-bootstrap/Badge";
 // import { ArrowUp, ArrowDown, Pencil, TrainFront, Check, Trash, Eye } from "react-bootstrap-icons";
-import { ArrowUp, ArrowDown, Pencil, Check, Trash, Eye } from "react-bootstrap-icons";
+import { ArrowUp, ArrowDown, Pencil, Trash, Eye, EyeSlash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { useRendered } from "../../hooks/useRendered";
+import { OverviewIcon } from "./OverviewIcon";
 
 const CONTAINER_MIN_HEIGHT = 160;
 const ARROW_CONTAINER_MAX_HEIGHT = CONTAINER_MIN_HEIGHT;
@@ -26,6 +27,7 @@ type Props = {
 	isLast: boolean;
 	writeAccess: boolean;
 	state: string;
+	isQuizTeacher: boolean
 };
 
 export const QuestionCard = (props: Props) => {
@@ -71,35 +73,42 @@ export const QuestionCard = (props: Props) => {
 						</Badge>
 					</div>
 
-					<div className="custom-line-clamp">
-						{/* <div dangerouslySetInnerHTML={{ __html: props.question.text }} /> */}
-						<div dangerouslySetInnerHTML={{ __html: rendered }} />
-					</div>
+					{/* <div className="custom-line-clamp">
+						<div onClick={props.edit} dangerouslySetInnerHTML={{ __html: rendered }} />
+					</div> */}
+
+                    <div className="custom-line-clamp">
+                        <div dangerouslySetInnerHTML={{ __html: rendered }} />
+                    </div>
 
 					<div className="d-flex justify-content-end gap-2">
-						{props.writeAccess && props.state === "EDITING" ? (
-							<ButtonWithTooltip
-								title={i18n._("question-card.button-tooltip.edit")}
-								onClick={props.edit}
-								variant={props.question.editMode ? "secondary" : "primary"}
-								disabled={
-									(props.disabled &&
-										(props.question.authorId !== props.currentUserUid ||
-											props.question.approved)) ||
-									!props.editMode
-								}
-							>
-								<Pencil />
-							</ButtonWithTooltip>
-						) : (
-							<ButtonWithTooltip
-								title={i18n._("question-card.button-tooltip.view")}
-								onClick={props.edit}
-								variant={props.question.editMode ? "secondary" : "primary"}
-							>
-								<Eye />
-							</ButtonWithTooltip>
-						)}
+
+						{/*  { props.writeAccess ? ( */}
+                        {props.writeAccess && props.state === "EDITING" ? (
+                            <ButtonWithTooltip
+                                title={i18n._("question-card.button-tooltip.edit")}
+                                onClick={props.edit}
+                                variant={props.question.editMode ? "secondary" : "primary"}
+                                // disabled={props.state !== "EDITING"}
+                                // disabled={
+                                // 	(props.disabled &&
+                                // 		(props.question.authorId !== props.currentUserUid ||
+                                // 			props.question.approved)) ||
+                                // 	!props.editMode
+                                // }
+                            >
+                                <Pencil />
+                            </ButtonWithTooltip>
+                        ) : (
+                            <ButtonWithTooltip
+                                title={i18n._("question-card.button-tooltip.view")}
+                                onClick={props.edit}
+                                variant={props.question.editMode ? "secondary" : "primary"}
+                            >
+                                <OverviewIcon size={16} />
+                            </ButtonWithTooltip>
+                        )}
+
 						{/* <ButtonWithTooltip
 							title={i18n._("question-card.button-tooltip.change-group")}
 							onClick={props.changeGroup}
@@ -107,26 +116,34 @@ export const QuestionCard = (props: Props) => {
 						>
 							<TrainFront />
 						</ButtonWithTooltip> */}
-						<ButtonWithTooltip
-							title={
-								props.question.approved
-									? i18n._("question-card.button-tooltip.unapprove")
-									: i18n._("question-card.button-tooltip.approve")
-							}
-							variant={props.question.approved ? "success" : "warning"}
-							onClick={props.approve}
-							disabled={props.disabled || !props.editMode}
-						>
-							<Check />
-						</ButtonWithTooltip>
-						<ButtonWithTooltip
-							title={i18n._("question-card.button-tooltip.delete")}
-							variant="danger"
-							onClick={props.delete}
-							disabled={props.disabled || props.question.approved || !props.editMode}
-						>
-							<Trash />
-						</ButtonWithTooltip>
+
+                        {props.isQuizTeacher ? (
+                            <ButtonWithTooltip
+                                title={
+                                    props.question.approved
+                                        ? i18n._("question-card.button-tooltip.hide")
+                                        : i18n._("question-card.button-tooltip.show")
+                                }
+                                variant={props.question.approved ? "success" : "warning"}
+                                onClick={props.approve}
+                                disabled={props.disabled || !props.editMode}
+                            >
+                                {props.question.approved ? <Eye /> : <EyeSlash />}
+                            </ButtonWithTooltip>
+                        ) : null}
+
+
+                        {props.writeAccess ? (
+                            <ButtonWithTooltip
+                                title={i18n._("question-card.button-tooltip.delete")}
+                                variant="danger"
+                                onClick={props.delete}
+                                // disabled={props.disabled || props.question.approved || !props.editMode}
+                                disabled={props.question.approved || !props.editMode}
+                            >
+                                <Trash />
+                            </ButtonWithTooltip>
+                        ) : null}
 					</div>
 				</div>
 			</Card.Body>

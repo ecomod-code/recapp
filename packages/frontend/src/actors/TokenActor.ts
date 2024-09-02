@@ -7,7 +7,9 @@ const updateToken = () => {
 	const hasToken = !!cookie("bearer");
 	if (hasToken) {
 		Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true }).catch(() => {
-			alert("Could not refresh token. Please report this error");
+			alert(
+				"Could not refresh token. Presumeably the authentication server is unavailable. Please report this error if it happens repeatedly."
+			);
 			window.location.href = "/";
 		});
 	}

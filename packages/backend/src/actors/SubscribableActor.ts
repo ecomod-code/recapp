@@ -41,7 +41,7 @@ export abstract class SubscribableActor<
 
 	private checkOldClients = async () => {
 		const oldClients: ActorUri[] = await this.ask(createActorUri("ErrorActor"), new GetClosedClientList());
-		console.log("CHECKOLD", oldClients);
+		// console.log("CHECKOLD", oldClients);
 		this.state = create(this.state, draft => {
 			const removedSubscribers = new Set<ActorUri>();
 			oldClients.forEach(key => {

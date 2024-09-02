@@ -84,10 +84,10 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			const userStore = createActorUri("UserStore");
 			let role: UserRole = "TEACHER";
 			const decoded = jwt.decode(tokenSet.id_token ?? "") as jwt.JwtPayload;
-			console.error(decoded);
+			/* console.error(decoded);
 			console.error(tokenSet.claims());
 			console.error(tokenSet.scope);
-			console.error("-------", tokenSet.refresh_token);
+			console.error("-------", tokenSet.refresh_token); */
 			const decodedRefresh = jwt.decode(tokenSet.refresh_token ?? "") as jwt.JwtPayload;
 			const uid: Id = decoded.sub as Id;
 			try {
@@ -190,30 +190,39 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 						return e;
 					});
 				if (session instanceof Error) {
+					ctx.set("Set-Cookie", `bearer=; path=/`);
 					ctx.throw(401, "Session unknown");
 				}
-				const newTokenSet = await client.refresh(session.refreshToken);
-				const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;
-				const decodedRefresh = jwt.decode(newTokenSet.refresh_token ?? "") as jwt.JwtPayload;
-				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
-				const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
-				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
-				system.send(
-					sessionStore,
-					SessionStoreMessages.StoreSession({
-						uid: sub as Id,
-						idToken: newTokenSet.id_token ?? "",
-						accessToken: newTokenSet.access_token ?? "",
-						refreshToken: newTokenSet.refresh_token ?? "",
-						idExpires: toTimestamp(expires),
-						refreshExpires: toTimestamp(refreshExpires),
-					})
-				);
-				console.log(`User ${sub} token was refreshed`);
-				ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
-				ctx.body = "O.K.";
+				try {
+					const newTokenSet = await client.refresh(session.refreshToken);
+					const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;
+					const decodedRefresh = jwt.decode(newTokenSet.refresh_token ?? "") as jwt.JwtPayload;
+					const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+					const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
+					console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
+					system.send(
+						sessionStore,
+						SessionStoreMessages.StoreSession({
+							uid: sub as Id,
+							idToken: newTokenSet.id_token ?? "",
+							accessToken: newTokenSet.access_token ?? "",
+							refreshToken: newTokenSet.refresh_token ?? "",
+							idExpires: toTimestamp(expires),
+							refreshExpires: toTimestamp(refreshExpires),
+						})
+					);
+					console.log(`User ${sub} token was refreshed`);
+					ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
+					ctx.body = "O.K.";
+				} catch (e) {
+					console.error("Failed to renew token", e);
+					system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
+					ctx.set("Set-Cookie", `bearer=; path=/`);
+					ctx.throw(401, "Token renewal failure");
+				}
 			} catch (e) {
 				console.error(e);
+				ctx.set("Set-Cookie", `bearer=; path=/`);
 				ctx.throw(401, "Invalid token");
 			}
 		},

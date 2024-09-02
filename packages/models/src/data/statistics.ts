@@ -12,6 +12,7 @@ export const textElementStatisticsSchema = zod
 		maximumParticipants: zod.number().int(), // Total participants of current run
 		participants: zod.number().int(), // Number of participants who answered the question
 		answers: zod.array(zod.string()), // All the given answers
+		wrong: zod.number().int(), // How many people have skipped or not answered this question
 	})
 	.merge(idEntitySchema);
 
@@ -29,6 +30,7 @@ export const choiceElementStatisticsSchema = zod
 		participants: zod.number().int(), // Number of participants who answered the question
 		passed: zod.number().int(), // How many people answered the question correctly
 		answers: zod.array(zod.number().int()), // Number of answers for each option
+		wrong: zod.number().int(), // How many people have skipped or not answered this question
 	})
 	.merge(idEntitySchema);
 
@@ -43,6 +45,7 @@ export const groupStatisticsSchema = zod.object({
 	answers: zod.array(zod.number().int()), // Number of answers to all the questions
 	correctAnswers: zod.array(zod.number().int()), // Number correct answers to all the questions
 	questionIds: zod.array(uidSchema),
+	wrongAnswers: zod.array(zod.number().int()), // How many people have not correctly answered each question
 });
 
 export type GroupStatistics = zod.infer<typeof groupStatisticsSchema>;

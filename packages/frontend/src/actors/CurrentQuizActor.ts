@@ -328,10 +328,12 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								const cleanedAnswers = typeof answer === "string" ? answer : answer.map(a => !!a);
 								const answers = [...this.state.run.answers, cleanedAnswers];
 								const question = this.state.questions.find(q => q.uid === questionId)!;
-								let answerCorrect = false;
+								let answerCorrect: boolean | null = null;
 								if (question.type === "TEXT") {
 									if (answer.length > 0) {
 										answerCorrect = true;
+									} else {
+										answerCorrect = null;
 									}
 								} else {
 									answerCorrect = isMultiChoiceAnsweredCorrectly(
@@ -344,11 +346,19 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 									// TODO: Hendrik !!
 									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
+
+									console.log("MC is correct", answerCorrect);
+
 									if (cleanedAnswers.length === 0) {
-										answerCorrect = question.answers.every(a => !a.correct);
+										console.warn("MC is not answered at all!");
+										answerCorrect = null; // question.answers.every(a => !a.correct);
 									}
 								}
-								const correct = [...this.state.run.correct, answerCorrect];
+								const correct = [...this.state.run.correct, answerCorrect !== null && answerCorrect];
+
+								const wrong = [...this.state.run.wrong, answerCorrect !== null && !answerCorrect];
+
+								alert(`Correct ${correct} wrong ${wrong}`);
 
 								this.send(
 									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
@@ -357,6 +367,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										answers,
 										counter: this.state.run.counter + 1,
 										correct,
+										wrong,
 									})
 								);
 
@@ -371,6 +382,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 											"DEFAULT",
 										answer: answer.toString(),
 										maxParticipants: this.state.quiz.students.length,
+										wrong: answerCorrect !== null && !answerCorrect,
 									};
 								} else {
 									stat = {
@@ -381,7 +393,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 											"DEFAULT",
 										maxParticipants: this.state.quiz.students.length,
 										choices: answer as boolean[],
-										correct: answerCorrect,
+										correct: answerCorrect !== null && answerCorrect,
+										wrong: answerCorrect !== null && !answerCorrect,
 									};
 								}
 								this.send(

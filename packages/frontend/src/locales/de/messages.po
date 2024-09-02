@@ -647,7 +647,15 @@ msgstr "Es wurden folgenden Antworten gegeben"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:247
 msgid "question-stats-correct-answers"
-msgstr "{passed} von {participants} Antworten waren richtig."
+msgstr "{passed} von {participants} Antworten waren <strong>richtig.</strong>"
+
+#. js-lingui-explicit-id
+msgid "question-stats-wrong-answers"
+msgstr "{wrong} von {participants} Antworten waren <strong>falsch</strong>."
+
+#. js-lingui-explicit-id
+msgid "question-stats-sum-answers"
+msgstr "{sum} von {participants} haben die Frage <strong>nicht</strong> beantwortet."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizStatsTab.tsx:259
@@ -1023,7 +1031,7 @@ msgstr "Es wurden folgenden Antworten gegeben"
 
 #. js-lingui-explicit-id
 msgid "question-stats-correct-answers"
-msgstr "{passed} von {participants} Antworten waren richtig."
+msgstr "{passed} von {participants} Antworten waren <strong>richtig</strong>."
 
 #. js-lingui-explicit-id
 msgid "question-stats-answer-prefix"

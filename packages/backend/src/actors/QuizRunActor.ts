@@ -84,6 +84,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 								created: toTimestamp(),
 								updated: toTimestamp(),
 								correct: [],
+								wrong: [],
 							};
 							await this.storeEntity(run);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
@@ -103,10 +104,10 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 				Update: async run => {
 					const existingRun = await this.getEntity(run.uid);
 					return existingRun
-						.map(async c => {
+						.map(async existing => {
 							run.updated = toTimestamp();
 							const { quizId, created, studentId, ...updateDelta } = run;
-							const runToUpdate = quizRunSchema.parse({ ...c, ...updateDelta });
+							const runToUpdate = quizRunSchema.parse({ ...existing, ...updateDelta });
 							await this.storeEntity(runToUpdate);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 								if (runToUpdate.studentId === subscription.userId) {

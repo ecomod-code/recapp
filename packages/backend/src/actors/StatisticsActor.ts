@@ -76,6 +76,7 @@ export class StatisticsActor extends SubscribableActor<
 			answers: [],
 			correctAnswers: [],
 			questionIds: [],
+			wrongAnswers: [],
 		};
 		stats.forEach(s => {
 			quizStats.maximumParticipants = Math.max(quizStats.maximumParticipants, s.participants);
@@ -86,6 +87,7 @@ export class StatisticsActor extends SubscribableActor<
 			} else {
 				quizStats.correctAnswers.push(s.answers.length);
 			}
+			quizStats.wrongAnswers.push(s.wrong);
 		});
 		return quizStats;
 	}
@@ -109,6 +111,7 @@ export class StatisticsActor extends SubscribableActor<
 				participants: 0,
 				passed: 0,
 				answers: [],
+				wrong: 0,
 				tag: "ChoiceElementStatistics",
 			})
 		);
@@ -141,6 +144,7 @@ export class StatisticsActor extends SubscribableActor<
 						answers: [],
 						correctAnswers: [],
 						questionIds: [],
+						wrongAnswers: [],
 					};
 					stats.forEach(s => {
 						groupStats.maximumParticipants = s.maximumParticipants;
@@ -151,6 +155,7 @@ export class StatisticsActor extends SubscribableActor<
 						} else {
 							groupStats.correctAnswers.push(s.participants);
 						}
+						groupStats.wrongAnswers.push(s.wrong);
 					});
 					return groupStats;
 				},
@@ -168,17 +173,23 @@ export class StatisticsActor extends SubscribableActor<
 							if (answer.tag === "TextAnswer") {
 								if (answer.answer) {
 									(stat as TextElementStatistics).answers.push(answer.answer);
+								} else if (answer.wrong) {
+									stat.wrong = stat.wrong + 1;
 								}
 							} else {
-								if (answer.correct) {
-									(stat as ChoiceElementStatistics).passed =
-										(stat as ChoiceElementStatistics).passed + 1;
+								if (answer.wrong) {
+									stat.wrong = stat.wrong + 1;
+								} else {
+									if (answer.correct) {
+										(stat as ChoiceElementStatistics).passed =
+											(stat as ChoiceElementStatistics).passed + 1;
+									}
+									console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
+									(stat as ChoiceElementStatistics).answers = (
+										stat as ChoiceElementStatistics
+									).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
+									console.log("NEWCHOICES", stat.answers);
 								}
-								console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
-								(stat as ChoiceElementStatistics).answers = (
-									stat as ChoiceElementStatistics
-								).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
-								console.log("NEWCHOICES", stat.answers);
 							}
 							console.log("EXISTING CHOICE UPDATE from ", clientUserId);
 							return stat;
@@ -197,6 +208,7 @@ export class StatisticsActor extends SubscribableActor<
 									maximumParticipants: answer.maxParticipants,
 									participants: 1,
 									answers: answer.answer ? [answer.answer] : [],
+									wrong: answer.wrong ? 1 : 0,
 								};
 								return stat;
 							} else {
@@ -212,8 +224,9 @@ export class StatisticsActor extends SubscribableActor<
 									participants: 1,
 									passed: answer.correct ? 1 : 0,
 									answers: answer.choices.map(c => (c ? 1 : 0)),
+									wrong: answer.wrong ? 1 : 0,
 								};
-								console.log("BRAND new choice from ", clientUserId);
+								console.log("BRAND new choice from ", clientUserId, answer);
 								return stat;
 							}
 						}

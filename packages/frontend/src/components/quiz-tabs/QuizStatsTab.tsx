@@ -128,12 +128,12 @@ export const QuizStatsTab: React.FC = () => {
 								</div>
 								<Fragment key={i}>
 									{group.questions.map(qId => {
+										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
 										const question = questions.find(q => q.uid === qId)!;
 										const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
+										const wrong = quizStats.wrongAnswers.at(statIndex) ?? 0;
 										const ownCorrect = ownCorrectAnswers[qId] ?? false;
-
-										console.log("OWN", ownAnswers, ownCorrectAnswers);
 
 										if (!question) return null;
 
@@ -187,7 +187,8 @@ export const QuizStatsTab: React.FC = () => {
 																</em>
 															) : (
 																<QuizBarChart
-																	data={[correct]}
+																	correct={correct}
+																	wrong={wrong}
 																	maxValue={quizStats.maximumParticipants}
 																/>
 															)}
@@ -203,6 +204,7 @@ export const QuizStatsTab: React.FC = () => {
 					});
 				}
 				if (questionStats) {
+					// This is the overview of the details of a single question
 					return (
 						<>
 							<PresentationModeSwitch />

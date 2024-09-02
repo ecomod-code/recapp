@@ -53,7 +53,8 @@ export const quizRunSchema = zod
 		questions: zod.array(uidSchema), // Order of questions to ask
 		counter: zod.number().int(), // Current question that was not answered yet
 		answers: zod.array(zod.union([zod.string(), zod.array(zod.boolean().nullish())])), // The answers the student has given
-		correct: zod.array(zod.boolean()), // Logs whether the answers were correct or not
+		correct: zod.array(zod.boolean()), // Logs whether the answers were correct
+		wrong: zod.array(zod.boolean()), // Logs whether an answer was wrong
 	})
 	.merge(idEntitySchema);
 

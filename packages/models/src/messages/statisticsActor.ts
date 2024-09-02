@@ -8,6 +8,7 @@ export type TextAnswer = {
 	groupName: string;
 	answer: string;
 	maxParticipants: number;
+	wrong: boolean;
 };
 
 export type ChoiceAnswer = {
@@ -17,6 +18,7 @@ export type ChoiceAnswer = {
 	choices: boolean[];
 	correct: boolean;
 	maxParticipants: number;
+	wrong: boolean;
 };
 
 export const StatisticsActorMessages = unionize(

@@ -40,23 +40,23 @@ export const QuizStatsDetails = ({
 
 	const ownAnswer = ownAnswers[question.uid];
 
-	const isPreviousButtonVisible = questionsByGroupIndex > 0;
+	const isNextButtonVisible = questionsByGroupIndex > 0;
 
 	// const isNextButtonVisible = questionsByGroupIndex < questionsByGroup.length - 1;
-	const isNextButtonVisible = questionsByGroupIndex < questionsList.length - 1;
+	const isPreviousButtonVisible = questionsByGroupIndex < questionsList.length - 1;
 
 	const onPreviousClick = () => {
 		if (!isPreviousButtonVisible) return;
 
 		// changeQuestionHandler(questionsByGroup[questionsByGroupIndex - 1]);
-		changeQuestionHandler(questionsList[questionsByGroupIndex - 1]);
+		changeQuestionHandler(questionsList[questionsByGroupIndex + 1]);
 	};
 
 	const onNextClick = () => {
 		if (!isNextButtonVisible) return;
 
 		// changeQuestionHandler(questionsByGroup[questionsByGroupIndex + 1]);
-		changeQuestionHandler(questionsList[questionsByGroupIndex + 1]);
+		changeQuestionHandler(questionsList[questionsByGroupIndex - 1]);
 	};
 
 	useEffect(() => {

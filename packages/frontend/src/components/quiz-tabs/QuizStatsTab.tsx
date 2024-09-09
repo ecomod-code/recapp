@@ -21,7 +21,7 @@ export const QuizStatsTab: React.FC = () => {
 	const [showExportModal, setShowExportModal] = useState(false);
 	const [ownAnswers, setOwnAnswers] = useState<Record<Id, OwnAnswer>>({});
 	const [ownCorrectAnswers, setOwnCorrectAnswers] = useState<Record<Id, boolean>>({});
-	const run = mbQuiz.flatMap(q => maybe(q.result));
+	const run = mbQuiz.flatMap(q => (q?.result && Object.keys(q.result).length > 0 ? maybe(q?.result) : nothing()));
 	const counter = run.map(r => r.counter).orElse(0);
 
 	// TODO Eigene Ergebnisse für das Quiz holen

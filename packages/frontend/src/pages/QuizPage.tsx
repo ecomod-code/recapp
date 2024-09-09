@@ -230,7 +230,9 @@ export const QuizPage: React.FC = () => {
 				};
 
 				const disableForStudent = localUser.map(allowed).orElse(true);
-				const isQuizTeacher = teachers.includes(localUser.map(u => u.uid).orElse(toId("")));
+				const isQuizTeacher =
+					teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
+					localUser.map(u => u.role).is(r => r === "ADMIN");
 				const userName = localUser.map(u => u.username).orElse("---");
 				const userNickname = localUser.flatMap(u => maybe(u.nickname)).orUndefined();
 				const studentsCanSeeStatistics = quizData.quiz.studentsCanSeeStatistics;
@@ -427,15 +429,16 @@ export const QuizPage: React.FC = () => {
 									)}
 								</Tab>
 								{/* {showStatTab && (isQuizTeacher ? true : isQuizCompleted ) && ( */}
-								{showStatTab && (isQuizTeacher ? true : isQuizCompleted && studentsCanSeeStatistics) && (
-									<Tab
-										eventKey={tabRecords.statistics.value}
-										title={i18n._(tabRecords.statistics.label)}
-										tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
-									>
-										<QuizStatsTab />
-									</Tab>
-								)}
+								{showStatTab &&
+									(isQuizTeacher ? true : isQuizCompleted && studentsCanSeeStatistics) && (
+										<Tab
+											eventKey={tabRecords.statistics.value}
+											title={i18n._(tabRecords.statistics.label)}
+											tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
+										>
+											<QuizStatsTab />
+										</Tab>
+									)}
 							</Tabs>
 						</Row>
 					</Container>

@@ -358,8 +358,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 								const wrong = [...this.state.run.wrong, answerCorrect !== null && !answerCorrect];
 
-								alert(`Correct ${correct} wrong ${wrong}`);
-
 								this.send(
 									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									QuizRunActorMessages.Update({

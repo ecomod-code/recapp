@@ -238,7 +238,7 @@ export const QuizPage: React.FC = () => {
 				const studentsCanSeeStatistics = quizData.quiz.studentsCanSeeStatistics;
 
 				// const userRole = localUser.map(u => u.role).orElse("STUDENT");
-				const isQuizCompleted = (quizData.run?.counter ?? 0) === quizData.run?.questions.length;
+				const isQuizCompleted = (quizData.run?.counter ?? 0) >= (quizData.run?.questions.length ?? 0);
 
 				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {

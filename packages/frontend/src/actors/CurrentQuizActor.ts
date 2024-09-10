@@ -306,22 +306,28 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									return question?.approved;
 								});
 
+							console.log(
+								"START_QUIZ",
+								studentId,
+								questions,
+								this.state.quiz.groups,
+								this.state.questions
+							);
+
 							// Die Fragen sollten hier in Reihenfolge stehen. Falls wir das mischen müssen, passiert das jetzt.
 							if (this.state.quiz.shuffleQuestions) {
 								const randomShuffle = shuffle(Math.random);
 								questions = randomShuffle(questions);
 							}
 
-							if (questions.length > 0) {
-								const run: QuizRun = await this.ask(
-									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									QuizRunActorMessages.GetForUser({ studentId, questions })
-								);
-								this.updateState(draft => {
-									draft.run = run;
-									draft.result = run;
-								});
-							}
+							const run: QuizRun = await this.ask(
+								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								QuizRunActorMessages.GetForUser({ studentId, questions })
+							);
+							this.updateState(draft => {
+								draft.run = run;
+								draft.result = run;
+							});
 
 							return unit();
 						},

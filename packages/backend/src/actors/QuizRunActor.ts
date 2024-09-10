@@ -74,6 +74,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 							return run.match<QuizRun | Error>(identity, () => new Error());
 						},
 						async () => {
+							if (questions.length === 0) return undefined as any;
 							const run: QuizRun = {
 								uid: v4() as Id,
 								studentId,

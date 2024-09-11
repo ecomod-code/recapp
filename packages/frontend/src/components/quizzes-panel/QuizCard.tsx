@@ -5,7 +5,7 @@ import { i18n } from "@lingui/core";
 import { fromTimestamp } from "itu-utils";
 import { Quiz, QuestionGroup, toId } from "@recapp/models";
 import Card from "react-bootstrap/Card";
-import { Pencil, Share, Trash } from "react-bootstrap-icons";
+import { Pencil, Play, Share, Trash } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { QuizStateBadge } from "../QuizStateBadge";
 import { useLocalUser } from "../../hooks/state-actor/useLocalUser";
@@ -16,9 +16,10 @@ const getNumberOfQuestions = (groups: Array<QuestionGroup>): number =>
 export const QuizCard: React.FC<{
 	quiz: Partial<Quiz>;
 	teachers: string[];
+	onStart: () => void;
 	onShare: () => void;
 	onDelete?: () => void;
-}> = ({ quiz, teachers, onShare, onDelete }) => {
+}> = ({ quiz, teachers, onShare, onDelete, onStart }) => {
 	const nav = useNavigate();
 	const { localUser } = useLocalUser();
 
@@ -31,7 +32,7 @@ export const QuizCard: React.FC<{
 	const isStudentQuestionAllowed = !!quiz.studentQuestions;
 	const isQuizEditable = !isQuizStarted && (isAuthorized || isStudentQuestionAllowed);
 
-	const navigateToQuizPage = ()=> {
+	const navigateToQuizPage = () => {
 		nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } });
 	};
 
@@ -43,27 +44,27 @@ export const QuizCard: React.FC<{
 				{fromTimestamp(quiz.updated ?? -1).toLocaleString({ dateStyle: "medium", timeStyle: "medium" })}
 			</div>
 			<Card>
-                <Card.Title className="text-start mx-2 mt-3 custom-line-clamp">
-                    <p
-                        className={`m-0 d-inline ${!isQuizEditable ? "text-primary" : ""}`}
-                        style={
-                            !isQuizEditable
-                                ? {
-                                      cursor: "pointer",
-                                      textDecoration: "underline",
-                                      textUnderlineOffset: "3px",
-                                      // color: $primary
-                                  }
-                                : {}
-                        }
-                        onClick={() => {
-                            if (isQuizEditable) return;
-                            navigateToQuizPage();
-                        }}
-                    >
-                        {quiz.title ?? ""}
-                    </p>
-                </Card.Title>
+				<Card.Title className="text-start mx-2 mt-3 custom-line-clamp">
+					<p
+						className={`m-0 d-inline ${!isQuizEditable ? "text-primary" : ""}`}
+						style={
+							!isQuizEditable
+								? {
+										cursor: "pointer",
+										textDecoration: "underline",
+										textUnderlineOffset: "3px",
+										// color: $primary
+									}
+								: {}
+						}
+						onClick={() => {
+							if (isQuizEditable) return;
+							navigateToQuizPage();
+						}}
+					>
+						{quiz.title ?? ""}
+					</p>
+				</Card.Title>
 				<Card.Body>
 					<div>
 						{i18n._("quiz-card-number-of-participants", { count: quiz.students?.length ?? 0 })}&nbsp;
@@ -86,37 +87,47 @@ export const QuizCard: React.FC<{
 
 				<Card.Footer>
 					<div className="d-flex flex-row justify-content-end">
-                        {isQuizEditable ? (
-                            <ButtonWithTooltip
-                                title={i18n._("quiz-card.button-tooltip.edit")}
-                                variant="primary"
-                                onClick={navigateToQuizPage}
-                            >
-                                <Pencil />
-                            </ButtonWithTooltip>
-                        ) : null}
+						{!isQuizStarted && isAuthorized ? (
+							<ButtonWithTooltip
+								title={i18n._("quiz-card.button-tooltip.start")}
+								variant="primary"
+								className="me-2"
+								onClick={onStart}
+							>
+								<Play />
+							</ButtonWithTooltip>
+						) : null}
+						{isQuizEditable ? (
+							<ButtonWithTooltip
+								title={i18n._("quiz-card.button-tooltip.edit")}
+								variant="primary"
+								onClick={navigateToQuizPage}
+							>
+								<Pencil />
+							</ButtonWithTooltip>
+						) : null}
 
-                        {isAuthorized ? (
-                            <ButtonWithTooltip
-                                title={i18n._("quiz-card.button-tooltip.share")}
-                                className="ms-2"
-                                variant="secondary"
-                                onClick={onShare}
-                            >
-                                <Share />
-                            </ButtonWithTooltip>
-                        ) : null}
+						{isAuthorized ? (
+							<ButtonWithTooltip
+								title={i18n._("quiz-card.button-tooltip.share")}
+								className="ms-2"
+								variant="secondary"
+								onClick={onShare}
+							>
+								<Share />
+							</ButtonWithTooltip>
+						) : null}
 
-                        {isAuthorized ? (
-                            <ButtonWithTooltip
-                                title={i18n._("quiz-card.button-tooltip.delete")}
-                                variant="danger"
-                                className="ms-2"
-                                onClick={onDelete}
-                            >
-                                <Trash />
-                            </ButtonWithTooltip>
-                        ) : null}
+						{isAuthorized ? (
+							<ButtonWithTooltip
+								title={i18n._("quiz-card.button-tooltip.delete")}
+								variant="danger"
+								className="ms-2"
+								onClick={onDelete}
+							>
+								<Trash />
+							</ButtonWithTooltip>
+						) : null}
 					</div>
 				</Card.Footer>
 			</Card>

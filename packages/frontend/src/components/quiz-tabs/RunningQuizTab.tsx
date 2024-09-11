@@ -72,13 +72,17 @@ export const RunningQuizTab: React.FC<{
 		const answersCopy = isQuestionTypeSingle ? answers.map(() => false) : [...answers];
 		if (answersCopy.length === 0) {
 			const a = new Array(currentQuestion?.answers.length).map(() => false);
+			for (let i = 0; i < a.length; i++) {
+				// If this gets not initialised properly, the empty array elements get condensed in memory and we get null entries
+				a[i] = false;
+			}
 			a[index] = value;
-			console.log("ANSWERS NEW", a);
+			console.log("ANSWERS NEW", a, value);
 			setAnswers(a);
 		} else {
 			const a = answersCopy;
 			a[index] = value;
-			console.log("ANSWERS", a);
+			console.log("ANSWERS", a, value);
 			setAnswers(a);
 		}
 	};

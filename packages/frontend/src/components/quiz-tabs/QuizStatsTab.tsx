@@ -3,7 +3,7 @@ import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import Button from "react-bootstrap/Button";
-import { Id, User } from "@recapp/models";
+import { Id, toId, User } from "@recapp/models";
 import axios from "axios";
 import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { Trans } from "@lingui/react";
@@ -85,7 +85,15 @@ export const QuizStatsTab: React.FC = () => {
 			q.quiz.uid
 				? maybe({
 						groups: q.quiz.groups,
-						questions: q.questions.filter(qu => qu.approved),
+						questions: q.questions
+							.filter(qu => qu.approved)
+							.sort((a, b) => {
+								const g = q.quiz.groups[0];
+								if (!g) return 1;
+								return (
+									g.questions.findIndex(e => e === a.uid) - g.questions.findIndex(e => e === b.uid)
+								);
+							}),
 						quizStats: q.quizStats,
 						questionStats: q.questionStats,
 						exportFile: q.exportFile,
@@ -130,25 +138,24 @@ export const QuizStatsTab: React.FC = () => {
 									{group.questions.map(qId => {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
-										const question = questions.find(q => q.uid === qId)!;
-										const correct = quizStats.correctAnswers.at(statIndex) ?? 0;
-										const wrong = quizStats.wrongAnswers.at(statIndex) ?? 0;
-										const ownCorrect = ownCorrectAnswers[qId] ?? false;
+										const question =
+											statIndex > -1 ? questions.find(q => q.uid === qId)! : undefined;
+										const correct = statIndex > -1 ? quizStats.correctAnswers.at(statIndex) : 0;
+										const wrong = statIndex > -1 ? quizStats.wrongAnswers.at(statIndex) : 0;
+										const ownCorrect = (statIndex > -1 ? ownCorrectAnswers[qId] : false) ?? false;
 
-										if (!question) return null;
-
-										const noDetails = quizStats.maximumParticipants === 0;
+										const noDetails = !question || quizStats.maximumParticipants === 0;
 
 										return (
 											<div
-												key={question.uid}
+												key={question?.uid ?? qId}
 												className="m-1 p-2 pt-3"
 												style={{ backgroundColor: "lightgrey" }}
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start justify-content-between">
 														<div className="text-overflow-ellipsis">
-															{question.text ?? "---"}
+															{question?.text ?? questions.find(q => q.uid === qId)!.text}
 														</div>
 
 														<Button
@@ -160,7 +167,7 @@ export const QuizStatsTab: React.FC = () => {
 																	actor.send(
 																		actor,
 																		CurrentQuizMessages.ActivateQuestionStats(
-																			question.uid
+																			question?.uid ?? toId("")
 																		)
 																	)
 																)
@@ -187,8 +194,8 @@ export const QuizStatsTab: React.FC = () => {
 																</em>
 															) : (
 																<QuizBarChart
-																	correct={correct}
-																	wrong={wrong}
+																	correct={correct ?? 0}
+																	wrong={wrong ?? 0}
 																	maxValue={quizStats.maximumParticipants}
 																/>
 															)}

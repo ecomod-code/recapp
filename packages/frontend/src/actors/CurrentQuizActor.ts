@@ -333,7 +333,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						},
 						LogAnswer: async ({ questionId, answer }) => {
 							if (this.state.run) {
-								const cleanedAnswers = typeof answer === "string" ? answer : answer.map(a => !!a);
+								const cleanedAnswers =
+									typeof answer === "string"
+										? answer
+										: answer.map(a => {
+												console.log("CLEAN is", a, "will be", a === null ? false : a);
+												return a === null ? false : a;
+											});
+
 								const answers = [...this.state.run.answers, cleanedAnswers];
 								const question = this.state.questions.find(q => q.uid === questionId)!;
 								let answerCorrect: boolean | null = null;
@@ -352,7 +359,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									// 	.map((a, i) => a === question.answers[i].correct)
 									// 	.every(Boolean);
 
-									// TODO: Hendrik !!
 									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
 
 									console.log("MC is correct", answerCorrect);

@@ -133,7 +133,7 @@ export const CommentCardContent: React.FC<
                                         ? i18n._("comment-card.button-tooltip.not-accepted")
                                         : i18n._("comment-card.button-tooltip.accept")
                                 }
-                                variant={comment.answered ? "secondary" : "success"}
+                                variant={comment.answered ? "success" : "secondary"}
                                 className="m-1"
                                 onClick={onAccept}
                                 disabled={!isQuizTeacher}

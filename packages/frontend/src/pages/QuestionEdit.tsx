@@ -60,7 +60,8 @@ export const QuestionEdit: React.FC = () => {
 		isPresentationModeActive: false, 
 	});
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const q: any = mbQuiz.map(q => q.quiz).orUndefined();
+	const q = mbQuiz.map(q => q.quiz).orUndefined();
+	const isQuizStarted = q?.state === "STARTED"; 
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
@@ -796,7 +797,10 @@ export const QuestionEdit: React.FC = () => {
 													label=""
 													name="answer"
 													type="switch"
-													checked={answer.correct}
+													// checked={answer.correct}
+                                                    checked={
+                                                        isQuizStarted ? !isStudent && answer.correct : answer.correct
+                                                    }
 													onChange={() => toggleAnswer(i)}
 													disabled={!writeAccess}
 												/>

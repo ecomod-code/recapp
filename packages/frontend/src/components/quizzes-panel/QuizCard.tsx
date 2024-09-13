@@ -45,21 +45,16 @@ export const QuizCard: React.FC<{
 			<Card>
                 <Card.Title className="text-start mx-2 mt-3 custom-line-clamp">
                     <p
-                        className={`m-0 d-inline ${!isQuizEditable ? "text-primary" : ""}`}
-                        style={
-                            !isQuizEditable
-                                ? {
-                                      cursor: "pointer",
-                                      textDecoration: "underline",
-                                      textUnderlineOffset: "3px",
-                                      // color: $primary
-                                  }
-                                : {}
-                        }
-                        onClick={() => {
-                            if (isQuizEditable) return;
-                            navigateToQuizPage();
+                        className="m-0 d-inline text-primary "
+                        style={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                            textUnderlineOffset: "3px",
+                            // color: $primary
+
                         }}
+                        onClick={navigateToQuizPage}
+                        
                     >
                         {quiz.title ?? ""}
                     </p>

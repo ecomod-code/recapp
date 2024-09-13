@@ -5,6 +5,7 @@ import { BRAND } from "zod";
 import { ChoiceElementStatistics } from "@recapp/models";
 import Button from "react-bootstrap/Button";
 
+import { useRendered } from "../../hooks/useRendered";
 import type { OwnAnswer } from "./QuizStatsTab";
 import type { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { QuestionBarChart } from "./quiz-bar/QuestionBarChart";
@@ -59,6 +60,8 @@ export const QuizStatsDetails = ({
 		changeQuestionHandler(questionsList[questionsByGroupIndex + 1]);
 	};
 
+	const { rendered } = useRendered({ value: question.text });
+
 	useEffect(() => {
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const keydownHandler = (e: any) => {
@@ -81,10 +84,15 @@ export const QuizStatsDetails = ({
 
 	return (
 		<div className="mt-4">
-			<p className="custom-line-clamp h2">
+			{/* <p className="custom-line-clamp h2"> */}
+				{/* {question.text} */}
+			<p className="h2">
 				<Trans id="question-stats-prefix" />
-				{question.text}
 			</p>
+			<div className="p-3 mb-4 bg-light border border-1">
+				<div dangerouslySetInnerHTML={{ __html: rendered }} />
+			</div>
+
 			{/*<div>
 								{i18n._("question-stats-info", {
 									participants: questionStats.participants,

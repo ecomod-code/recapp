@@ -162,11 +162,29 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start justify-content-between">
-														<div className="text-overflow-ellipsis">
-															{question?.text ?? questions.find(q => q.uid === qId)!.text}
-														</div>
+                                                        <div
+                                                            className="text-overflow-ellipsis text-primary"
+                                                            style={{
+                                                                cursor: "pointer",
+                                                                textDecoration: "underline",
+                                                                textUnderlineOffset: "3px",
+                                                                // color: $primary
+                                                            }}
+                                                            onClick={() =>
+                                                                tryActor.forEach(actor =>
+                                                                    actor.send(
+                                                                        actor,
+                                                                        CurrentQuizMessages.ActivateQuestionStats(
+                                                                            question?.uid ?? toId("")
+                                                                        )
+                                                                    )
+                                                                )
+                                                            }
+                                                        >
+                                                            {question?.text ?? questions.find(q => q.uid === qId)!.text}
+                                                        </div>
 
-														<Button
+														{/* <Button
 															size="sm"
 															className="p-0 ms-1"
 															variant="link"
@@ -183,7 +201,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 															disabled={noDetails}
 														>
 															<Trans id="details" />
-														</Button>
+														</Button> */}
 													</div>
 
 													<div className="d-flex align-items-center justify-content-between">

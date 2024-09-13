@@ -521,7 +521,7 @@ msgstr "Teachers"
 #: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
-msgstr "Allow student comments in quiz mode"
+msgstr "Allow student comments"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:230

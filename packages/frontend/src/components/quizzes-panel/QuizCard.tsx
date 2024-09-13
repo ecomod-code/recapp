@@ -27,9 +27,9 @@ export const QuizCard: React.FC<{
 	const isAdmin = localUser?.role === "ADMIN";
 	const isAuthorized = isAdmin || isQuizTeacher;
 
-	const isQuizStarted = quiz.state === "STARTED";
+	const isQuizStateStarted = quiz.state === "STARTED";
 	const isStudentQuestionAllowed = !!quiz.studentQuestions;
-	const isQuizEditable = !isQuizStarted && (isAuthorized || isStudentQuestionAllowed);
+	const isQuizEditable = !isQuizStateStarted && (isAuthorized || isStudentQuestionAllowed);
 
 	const navigateToQuizPage = ()=> {
 		nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } });

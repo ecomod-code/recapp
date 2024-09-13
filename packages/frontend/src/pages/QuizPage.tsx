@@ -443,7 +443,7 @@ export const QuizPage: React.FC = () => {
 											title={i18n._(tabRecords.statistics.label)}
 											tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
 										>
-											<QuizStatsTab />
+											<QuizStatsTab  quizData={quizData} />
 										</Tab>
 									)}
 							</Tabs>

@@ -8,6 +8,8 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import { useRendered } from "../../hooks/useRendered";
+import { TooltipWrapper } from "../TooltipWrapper";
+import { Lightbulb } from "react-bootstrap-icons";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Id, toId } from "@recapp/models";
 // import { MessageModal } from "../modals/MessageModal";
@@ -115,7 +117,7 @@ export const RunningQuizTab: React.FC<{
 								: {}),
 						}}
 						// className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
-						className={"text-start d-flex flex-row"}
+						className="text-start d-flex flex-row justify-content-between align-items-center"
 					>
 						<div className="m-1 align-self-center" style={{ fontSize: 14 }}>
 							<strong>
@@ -123,6 +125,12 @@ export const RunningQuizTab: React.FC<{
 								{run?.questions.length}
 							</strong>
 						</div>
+
+                        {currentQuestion?.hint ? (
+                            <TooltipWrapper title={currentQuestion.hint}>
+                                <Lightbulb />
+                            </TooltipWrapper>
+                        ) : null}
 					</Card.Header>
 					<Card.Body>
 						<div

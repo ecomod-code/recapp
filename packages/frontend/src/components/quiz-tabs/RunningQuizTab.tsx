@@ -8,7 +8,8 @@ import Card from "react-bootstrap/Card";
 import Row from "react-bootstrap/Row";
 import Form from "react-bootstrap/Form";
 import { useRendered } from "../../hooks/useRendered";
-import { TooltipWrapper } from "../TooltipWrapper";
+// import { ButtonWithTooltip } from "../ButtonWithTooltip";
+import { MessageModal } from "../modals/MessageModal";
 import { Lightbulb } from "react-bootstrap-icons";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Id, toId } from "@recapp/models";
@@ -22,6 +23,7 @@ export const RunningQuizTab: React.FC<{
 	quizState: CurrentQuizState;
 	logQuestion: (questionId: Id, answer: string | boolean[]) => void;
 }> = ({ quizState, logQuestion }) => {
+	const [isHintModalOpen, setIsHintModalOpen] = useState(false)
 	const [answered, setAnswered] = useState(false);
 	const [textAnswer, setTextAnswer] = useState("");
 	const [answers, setAnswers] = useState<boolean[]>([]);
@@ -93,6 +95,13 @@ export const RunningQuizTab: React.FC<{
 
 	return (
 		<Row>
+
+			<MessageModal
+                show={isHintModalOpen}
+                titleId="hint-modal.title"
+                textId={currentQuestion?.hint ?? ""}
+				onClose={()=> setIsHintModalOpen(false)}
+            />
 			{/* <MessageModal
                 show={answered}
                 color={correct ? "green" : "red"}
@@ -117,7 +126,7 @@ export const RunningQuizTab: React.FC<{
 								: {}),
 						}}
 						// className={`text-start d-flex flex-row ${!isQuestionTypeText && answered ? (isAnsweredCorrectly ? "answer-bg-correct" : "answer-bg-wrong") : ""}`}
-						className="text-start d-flex flex-row justify-content-between align-items-center"
+						className="text-start d-flex flex-row justify-content-between"
 					>
 						<div className="m-1 align-self-center" style={{ fontSize: 14 }}>
 							<strong>
@@ -127,9 +136,15 @@ export const RunningQuizTab: React.FC<{
 						</div>
 
                         {currentQuestion?.hint ? (
-                            <TooltipWrapper title={currentQuestion.hint}>
-                                <Lightbulb />
-                            </TooltipWrapper>
+                            <Button
+                                variant="link"
+                                className="p-0"
+                                onClick={() => {
+                                    setIsHintModalOpen(true);
+                                }}
+                            >
+                                <Lightbulb style={{ position: "relative", top: "-3px" }} />
+                            </Button>
                         ) : null}
 					</Card.Header>
 					<Card.Body>

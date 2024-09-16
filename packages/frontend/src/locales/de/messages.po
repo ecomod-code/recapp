@@ -138,6 +138,11 @@ msgstr "Fragengruppe"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:496
+msgid "hint-modal.title"
+msgstr "Hinweistext"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:496
 msgid "question-edit-page.input-label.advisory-text"
 msgstr "Hinweistext"
 

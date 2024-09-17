@@ -33,13 +33,14 @@ export const UserAdminPanel: React.FC = () => {
                 <Trans id="user-admin-panel-title" />
             </h1>
             <div>
-                <InputGroup className="mb-3 m-1xx">
+                <InputGroup className="mb-3">
                     <TooltipWrapper title={i18n._("user-admin-panel.button-tooltip.filter")}>
                         <InputGroup.Text>
                             <Funnel />
                         </InputGroup.Text>
                     </TooltipWrapper>
                     <Form.Control
+                        type="search"
                         placeholder={i18n._("user-admin-panel-search-text")}
                         value={filter}
                         onChange={event => setFilter(event.target.value.toLocaleLowerCase())}

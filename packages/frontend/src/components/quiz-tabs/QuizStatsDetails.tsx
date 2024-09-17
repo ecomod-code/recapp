@@ -87,14 +87,13 @@ export const QuizStatsDetails = ({
 	return (
 		<div className="mt-4">
 			{/* <p className="custom-line-clamp h2"> */}
-				{/* {question.text} */}
+			{/* {question.text} */}
 			<p className="h2">
 				<Trans id="question-stats-prefix" />
 			</p>
-			<div className="p-3 mb-4 bg-light border border-1">
+			<div className="p-3 mb-4 bg-light border border-1" style={{ zoom }}>
 				<div dangerouslySetInnerHTML={{ __html: rendered }} />
 			</div>
-
 			{/*<div>
 								{i18n._("question-stats-info", {
 									participants: questionStats.participants,
@@ -118,9 +117,13 @@ export const QuizStatsDetails = ({
 						<div className="mt-2 mb-2">
 							<Trans id="question-stats-given-answers" />:
 						</div>
-						{questionStats.answers.map((a, i) => (
-							<div key={`${a}-${i}`}>{a}</div>
-						))}
+                        {questionStats.answers.length > 0 ? (
+                            <div className="p-2 bg-light border border-1">
+                                {questionStats.answers.map((a, i) => (
+                                    <div key={`${a}-${i}`}>{a}</div>
+                                ))}
+                            </div>
+                        ) : null}
 						{ownAnswer && (
 							<>
 								<div className="mt-2 mb-2">
@@ -171,32 +174,35 @@ export const QuizStatsDetails = ({
 							<Trans id="question-stats-given-answers" />
 						</div>
 						{question.answers.map(({ text, correct }, i) => (
-							<div key={text} className="d-flex flex-row w-100 mb-1">
-								{ownAnswer && (
-									<div
-										className="me-1 d-flex justify-content-center align-items-center"
-										style={{
-											backgroundColor: "lightgray",
-											fontWeight: "bold",
-											padding: 2,
-										}}
-									>
-										<Trans id="address-you" />:{" "}
+							<div key={text} className="mb-1 p-1 d-flex justify-content-end align-items-center flex-wrap bg-light border border-1">
+								<div className="d-flex flex-row flex-fill">
+									{ownAnswer && (
 										<div
-											className="ms-1 d-flex justify-content-center align-items-center"
-											style={{ border: "1px solid gray", width: 18, height: 18 }}
+											className="me-1 d-flex justify-content-center align-items-center"
+											style={{
+												backgroundColor: "lightgray",
+												fontWeight: "bold",
+												padding: 2,
+											}}
 										>
-											{ownAnswer[i] ? CHECK_SYMBOL : null}
+											<Trans id="address-you" />:{" "}
+											<div
+												className="ms-1 d-flex justify-content-center align-items-center"
+												style={{ border: "1px solid gray", width: 18, height: 18 }}
+											>
+												{ownAnswer[i] ? CHECK_SYMBOL : null}
+											</div>
 										</div>
+									)}
+									<div className="flex-fill">
+										<span className="d-flex flex-wrap">
+											<Trans id="question-stats-answer-prefix" />&nbsp;
+											<span>{text}&nbsp;</span>
+										</span>
 									</div>
-								)}
-								<div className="w-50">
-									<span>
-										<Trans id="question-stats-answer-prefix" />
-										{text}&nbsp;
-									</span>
 								</div>
-								<div className="flex-grow-1">
+
+								<div className="flex-grow-1xx d-flex justify-content-end">
 									<QuestionBarChart
 										data={questionStats.answers[i] as number}
 										maxValue={questionStats.participants}

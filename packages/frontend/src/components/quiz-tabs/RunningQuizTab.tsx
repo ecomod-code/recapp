@@ -23,7 +23,7 @@ export const RunningQuizTab: React.FC<{
 	quizState: CurrentQuizState;
 	logQuestion: (questionId: Id, answer: string | boolean[]) => void;
 }> = ({ quizState, logQuestion }) => {
-	const [isHintModalOpen, setIsHintModalOpen] = useState(false)
+	const [isHintModalOpen, setIsHintModalOpen] = useState(false);
 	const [answered, setAnswered] = useState(false);
 	const [textAnswer, setTextAnswer] = useState("");
 	const [answers, setAnswers] = useState<boolean[]>([]);

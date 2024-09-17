@@ -104,6 +104,8 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 		)
 		.match(
 			({ groups, questions, quizStats, questionStats, exportFile, isPresentationModeActive }) => {
+				const zoom = isPresentationModeActive ? "175%" : undefined;
+
 				if (quizStats && groups) {
 					return groups.map((group, i) => {
 						/* Quiz stats */
@@ -142,7 +144,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 										</>
 									)}
 								</div>
-								<Fragment key={i}>
+                                <div key={i} style={{ zoom }}>
 									{group.questions.map(qId => {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
@@ -231,7 +233,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 											</div>
 										);
 									})}
-								</Fragment>
+								</div>
 							</Fragment>
 						);
 					});
@@ -243,6 +245,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 							<PresentationModeSwitch />
 
 							<QuizStatsDetails
+								zoom={zoom}
 								// groups={groups}
 								questionStats={questionStats}
 								questions={questions}

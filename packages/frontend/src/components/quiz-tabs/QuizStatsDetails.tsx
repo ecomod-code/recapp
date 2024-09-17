@@ -17,6 +17,7 @@ type QuizStatsDetailsProps = Pick<CurrentQuizState, "questionStats" | "questions
 	ownAnswers: Record<string & BRAND<"UID">, OwnAnswer>;
 	onBackToQuizClick: () => void;
 	changeQuestionHandler: (index: string & BRAND<"UID">) => void;
+	zoom: string | undefined;
 };
 
 export const QuizStatsDetails = ({
@@ -24,6 +25,7 @@ export const QuizStatsDetails = ({
 	questions,
 	// groups,
 	ownAnswers,
+	zoom,
 	onBackToQuizClick,
 	changeQuestionHandler,
 }: QuizStatsDetailsProps) => {
@@ -103,7 +105,7 @@ export const QuizStatsDetails = ({
 									).toFixed(2),
 								})}
 							</div>*/}
-			<div>
+			<div style={{ zoom }}>
 				{question.type === "TEXT" && (
 					<div className="mb-5">
 						<div>

@@ -458,7 +458,7 @@ msgstr "{count} Fragen"
 #: src/components/quiz-tabs/QuestionsTab.tsx:192
 #: src/components/quizzes-panel/QuizCard.tsx:45
 msgid "quiz-card-number-of-participants"
-msgstr "{count} Teilnehmende "
+msgstr "{count} registrierte Teilnehmende, {max} aktiv Teilnehmende"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:197

@@ -115,6 +115,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 									{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
 									{i18n._("quiz-card-number-of-participants", {
 										count: quizData.quiz.students.length,
+										max: quizStats?.maximumParticipants ?? 0,
 									})}
 								</div>
 
@@ -144,7 +145,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 										</>
 									)}
 								</div>
-                                <div key={i} style={{ zoom }}>
+								<div key={i} style={{ zoom }}>
 									{group.questions.map(qId => {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
@@ -164,27 +165,27 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start justify-content-between">
-                                                        <div
-                                                            className="text-overflow-ellipsis text-primary"
-                                                            style={{
-                                                                cursor: "pointer",
-                                                                textDecoration: "underline",
-                                                                textUnderlineOffset: "3px",
-                                                                // color: $primary
-                                                            }}
-                                                            onClick={() =>
-                                                                tryActor.forEach(actor =>
-                                                                    actor.send(
-                                                                        actor,
-                                                                        CurrentQuizMessages.ActivateQuestionStats(
-                                                                            question?.uid ?? toId("")
-                                                                        )
-                                                                    )
-                                                                )
-                                                            }
-                                                        >
-                                                            {question?.text ?? questions.find(q => q.uid === qId)!.text}
-                                                        </div>
+														<div
+															className="text-overflow-ellipsis text-primary"
+															style={{
+																cursor: "pointer",
+																textDecoration: "underline",
+																textUnderlineOffset: "3px",
+																// color: $primary
+															}}
+															onClick={() =>
+																tryActor.forEach(actor =>
+																	actor.send(
+																		actor,
+																		CurrentQuizMessages.ActivateQuestionStats(
+																			question?.uid ?? toId("")
+																		)
+																	)
+																)
+															}
+														>
+															{question?.text ?? questions.find(q => q.uid === qId)!.text}
+														</div>
 
 														{/* <Button
 															size="sm"

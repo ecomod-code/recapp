@@ -57,7 +57,7 @@ export const QuestionEdit: React.FC = () => {
 		run: undefined,
 		exportFile: undefined,
 		deleted: false,
-		isPresentationModeActive: false, 
+		isPresentationModeActive: false,
 	});
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
@@ -81,6 +81,7 @@ export const QuestionEdit: React.FC = () => {
 			approved: false,
 			editMode: true,
 			quiz: toId(""),
+			answerOrderFixed: false,
 		}
 	);
 	const [hint, setHint] = useState(false);
@@ -170,8 +171,8 @@ export const QuestionEdit: React.FC = () => {
 		setShowMDModal({ type, titleId });
 	};
 
-	console.log({answerCount: question.answers});
-	
+	console.log({ answerCount: question.answers });
+
 	const addAnswer = () => {
 		const answers = question.answers;
 		answers.push({ correct: false, text: "" });
@@ -339,16 +340,20 @@ export const QuestionEdit: React.FC = () => {
 	const isCorrectAnswerAssigned = question.answers.some(answer => answer.correct);
 
 	let saveButtonDisableReason = "";
-	if(!isQuestionAdded){
+	if (!isQuestionAdded) {
 		saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-question");
-	}else {
-		if(question.type !== "TEXT"){
-			if(!isAnswersAdded){
+	} else {
+		if (question.type !== "TEXT") {
+			if (!isAnswersAdded) {
 				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.missing-answers");
-			}else if(!isCorrectAnswerAssigned){
-				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer");
-			}else if(!isAllAnswersContainText){
-				saveButtonDisableReason = i18n._("question-edit-page.save-button-disabled-reason.empty-answers-not-allowed");
+			} else if (!isCorrectAnswerAssigned) {
+				saveButtonDisableReason = i18n._(
+					"question-edit-page.save-button-disabled-reason.did-not-assign-correct-answer"
+				);
+			} else if (!isAllAnswersContainText) {
+				saveButtonDisableReason = i18n._(
+					"question-edit-page.save-button-disabled-reason.empty-answers-not-allowed"
+				);
 			}
 		}
 	}
@@ -366,7 +371,6 @@ export const QuestionEdit: React.FC = () => {
 				<Modal.Title className="py-2 px-3 bg-warning">{i18n._("quiz-error-quiz-title")}</Modal.Title>
 				<Modal.Body>
 					<Trans id={showError} />
-
 				</Modal.Body>
 				<Modal.Footer className="p-0">
 					<Button onClick={onErrorClose}>{i18n._("okay")}</Button>
@@ -780,13 +784,13 @@ export const QuestionEdit: React.FC = () => {
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 
-                                    <Button
-                                        variant="warning"
-                                        onClick={addAnswer}
-                                        disabled={!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED}
-                                    >
-                                        <Trans id="add-answer-button" />
-                                    </Button>
+									<Button
+										variant="warning"
+										onClick={addAnswer}
+										disabled={!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED}
+									>
+										<Trans id="add-answer-button" />
+									</Button>
 								</div>
 								<Form className="text-start">
 									{question.answers.map((answer, i) => {
@@ -855,7 +859,7 @@ export const QuestionEdit: React.FC = () => {
 					<ButtonWithTooltip
 						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}
 						title={saveButtonDisableReason}
-						disabled={isSaveButtonDisabled} 
+						disabled={isSaveButtonDisabled}
 						onClick={submit}
 						className="col-12 col-lg-auto"
 					>

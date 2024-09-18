@@ -26,6 +26,7 @@ export const questionSchema = zod
 		approved: zod.boolean(), // Whether the teacher has approved this question
 		editMode: zod.boolean(), // Whether the question is currently edited by a teacher or its author
 		statistics: zod.union([textElementStatisticsSchema, choiceElementStatisticsSchema]).optional(), // Last statistics for this question (if any)
+		answerOrderFixed: zod.boolean().optional().default(false), // Whether the order of the answers is fixed
 	})
 	.merge(idEntitySchema);
 

@@ -32,6 +32,7 @@ export const QuizzesPanel: React.FC = () => {
 		updateCounter: number;
 		teachers: Map<Id, string[]>;
 	}>("LocalUser");
+
 	useEffect(() => {
 		const counter = state.map(s => s.updateCounter).orElse(0);
 		if (counter === updateCounterRef.current) {
@@ -153,6 +154,9 @@ export const QuizzesPanel: React.FC = () => {
 							<QuizCard
 								key={q.uid}
 								quiz={q}
+								onStart={() => {
+									nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: q.uid, start: true } });
+								}}
 								onShare={() => setShareModal(q.uniqueLink!)}
 								onDelete={() => {
 									if (archiveAllowed(q)) {

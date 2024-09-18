@@ -129,7 +129,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
-		console.log("CURRENTQUIZ MESSAGE", message);
+		console.log("CURRENTQUIZ MESSAGE", message, this.state);
 		if (message.tag === "QuizUpdateMessage") {
 			if (message.quiz.uid !== this.quiz.orElse(toId("-"))) {
 				return nothing();
@@ -652,6 +652,21 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						SetQuiz: async uid => {
 							try {
 								if (uid === this.state.quiz.uid) {
+									if (this.state.quiz.state === "STARTED" && this.state.run === undefined) {
+										const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
+										const quizId: Id = this.quiz.orElse(toId(""));
+										const run = (await this.ask(
+											actorUris.QuizActor,
+											QuizActorMessages.GetUserRun({ studentId, quizId })
+										)) as QuizRun;
+										if (keys(run).length > 0) {
+											this.updateState(draft => {
+												draft.run = run;
+											});
+										} else {
+											this.send(this.ref, CurrentQuizMessages.StartQuiz());
+										}
+									}
 									return unit();
 								}
 								this.state = { ...this.state, comments: [], questions: [], deleted: false };

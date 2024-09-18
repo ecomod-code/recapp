@@ -35,31 +35,38 @@ export const QuizStatsDetails = ({
 	const questionIndex = questions.findIndex(q => q.uid === questionStats.questionId)!;
 	const question = questions[questionIndex];
 
-	// const questionsByGroup = groups?.map(g => g.questions).reduce((p, c) => [...p, ...c], []);
 	const questionsList = questions.map(q => q.uid); // .reverse();
-
-	// const questionsByGroupIndex = questionsByGroup.findIndex(q => q === questionStats.questionId)!;
-	const questionsByGroupIndex = questionsList.findIndex(q => q === questionStats.questionId)!;
 
 	const ownAnswer = ownAnswers[question.uid];
 
-	// const isNextButtonVisible = questionsByGroupIndex > 0;
-
-	const isNextButtonVisible = questionsByGroupIndex < questionsList.length - 1;
-	const isPreviousButtonVisible = questionsByGroupIndex > 0; //  questionsList.length + 1;
+	const isNextButtonVisible = questionIndex < questionsList.length - 1;
+	const isPreviousButtonVisible = questionIndex > 0; //  questionsList.length + 1;
 
 	const onPreviousClick = () => {
 		if (!isPreviousButtonVisible) return;
-
-		// changeQuestionHandler(questionsByGroup[questionsByGroupIndex - 1]);
-		changeQuestionHandler(questionsList[questionsByGroupIndex - 1]);
+		console.log(
+			"QUESTIONS",
+			questions,
+			"current",
+			questionsList[questionIndex],
+			"next",
+			questionsList[questionIndex - 1]
+		);
+		changeQuestionHandler(questionsList[questionIndex - 1]);
 	};
 
 	const onNextClick = () => {
 		if (!isNextButtonVisible) return;
 
-		// changeQuestionHandler(questionsByGroup[questionsByGroupIndex + 1]);
-		changeQuestionHandler(questionsList[questionsByGroupIndex + 1]);
+		console.log(
+			"QUESTIONS",
+			questions,
+			"current",
+			questionsList[questionIndex],
+			"next",
+			questionsList[questionIndex + 1]
+		);
+		changeQuestionHandler(questionsList[questionIndex + 1]);
 	};
 
 	const { rendered } = useRendered({ value: question.text });

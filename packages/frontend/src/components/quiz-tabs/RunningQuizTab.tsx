@@ -44,6 +44,8 @@ export const RunningQuizTab: React.FC<{
 	const questionText = questions.at(run?.counter ?? 0)?.text;
 	const { rendered } = useRendered({ value: questionText ?? "" });
 
+	console.log("ANSWERSTATE", quizState, run);
+
 	if (!quizState.run || !quizState.questions) {
 		return null;
 	}

@@ -74,7 +74,7 @@ restart_pm2() {
 
 # Funktion zum Kopieren der Frontend-Dateien und Setzen der Rechte
 change_frontend_permissions() {
-    if chmod -R o+r "./packages/frontend/dist/*"; then
+    if chmod -R o+r ./packages/frontend/dist/*; then
         log "Made frontend build accessible by webserver."
         return 0
     else

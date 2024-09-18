@@ -3,7 +3,6 @@
 # Konfiguration
 REPO_PATH="/home/cloud/recapp"
 LOG_FILE="/home/cloud/deploy.log"
-WEBSERVER_PATH="/var/www/recapp"
 PM2_PROCESS_NAME="backend"
 
 # Funktion zum Loggen
@@ -73,7 +72,7 @@ restart_pm2() {
 
 # Funktion zum Kopieren der Frontend-Dateien und Setzen der Rechte
 change_frontend_permissions() {
-    if chmod -R 755 "./packages/frontend/dist/*"; then
+    if chmod -R o+r "./packages/frontend/dist/*"; then
         log "Made frontend build accessible by webserver."
         return 0
     else

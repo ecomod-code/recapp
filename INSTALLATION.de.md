@@ -2,6 +2,8 @@
 
 recapp kann auf einem herkömmlichen Linuxserver betrieben werden. Neben einem aktuellen _nodejs_ (und den zugehörigen Tools) wird auch _docker_ benötigt. Für den Betrieb des Backends empfiehlt sich die Nutzung von _PM2_.
 
+Der Benutzer, unter dem die Applikation installiert und ausgeführt wird, **muss** Mitglied der Gruppe `www-data` sein.
+
 # Installation der Software
 
 1. Auschecken des git-Repositories auf dem Rechner
@@ -40,6 +42,8 @@ Der Datenbankcontainer kann im Hauptverzeichnis direkt mit dem Befehl `npm start
 
 Im Verzeichnis `/packages/frontend` kann selbiges mit dem Befehl npm run build erstellt werden. Das resultierende dist-Verzeichnis ist dann in den entsprechenden Bereich des Webservers zu kopieren. Alternativ kann man auch einen symbolischen Link von `dist` an eine Stelle legen, auf die Webserver und lokaler Nutzer Zugriff haben (z.B. `/tmp/recapp`). Auf diese Weise haben wir es auf den derzeitigen Servern gelöst.
 
+**Initiales Deployment:** Die Dateien in dist sind einmal für alle Benutzer lesend zu schalten, z.B. mittels `chmod -R o+r "./packages/frontend/dist/*"`
+
 7. Erstellung des Backends
 
 Das Backend muss nicht erstellt werden. Es kann jedoch nach einem Update sinnvoll sein, einmal in `/packages/backend` den Befehl `npm run build` auszuführen um Programmierfehler oder fehlende Abhängigkeiten auszuschließen.
@@ -72,3 +76,13 @@ Um gecachte Daten regelmässig zu entfernen (und damit den Speicher wieder freiz
    3a. (GWDG) Auf dem Server mit dem Benutzer Cloud anmelden.
    3b. (GWDG) Repository mit `git pull` auf den aktuellsten Stand bringen (ein passender Deployment-Key für den Cloud-Benutzer ist in Github hinterlegt)
 4. Backend einmal neu starten (GWDG als Benutzer `cloud` mit dem folgenden Befehl `pm2 restart backend`)
+
+### Autodeployment
+
+Auf einer einmal laufenden Installation kann mittels des Skripts `deployment.sh` ein automatisiertes Deployment eingerichtet werden. Dafür sind zunächst die im Skript definierten Variablen `REPO_PATH LOG_FILE` und
+`PM2_PROCESS_NAME`
+auf ihre Korrektheit zu überprüfen.
+
+Danach kann das Skript testweise direkt oder in beliebigen Abständen über `cron` ausgeführt werden. Es prüft automatisch auf Änderungen im Zielbranch (der derzeit lokal ausgecheckt ist), erstellt den Code neu und startet auch das Backend erneut. Wir empfehlen eine regelmässige Ausführung mittels cron mindestens einmal in der Stunde, besser alle 10 Minuten:
+
+`*/30 * * * * /home/cloud/recapp/deployment.sh`

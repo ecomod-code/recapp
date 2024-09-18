@@ -11,8 +11,8 @@ interface Props {
 
 export const MessageModal: React.FC<Props> = ({ show, titleId, textId, onClose, color }) => {
 	return (
-		<Modal show={show} dialogClassName="modal-80w">
-			<Modal.Title className="p-1 ps-2 text-bg-primary">
+		<Modal show={show} dialogClassName="modal-80w" contentClassName="overflow-hidden">
+			<Modal.Title className="p-3 text-bg-primary">
 				<div style={{ minWidth: "80vw", color }}>
 					<Trans id={titleId} />
 				</div>

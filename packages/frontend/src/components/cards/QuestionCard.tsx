@@ -139,7 +139,10 @@ export const QuestionCard = (props: Props) => {
                                 variant="danger"
                                 onClick={props.delete}
                                 // disabled={props.disabled || props.question.approved || !props.editMode}
-                                disabled={props.question.approved || !props.editMode}
+                                disabled={
+                                    // props.question.approved || !props.editMode
+                                    (props.isQuizTeacher && props.question.approved) || !props.editMode
+                                }
                             >
                                 <Trash />
                             </ButtonWithTooltip>

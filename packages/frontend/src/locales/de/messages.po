@@ -138,6 +138,11 @@ msgstr "Fragengruppe"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:496
+msgid "hint-modal.title"
+msgstr "Hinweistext"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:496
 msgid "question-edit-page.input-label.advisory-text"
 msgstr "Hinweistext"
 
@@ -516,7 +521,7 @@ msgstr "Lehrpersonen"
 #: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
-msgstr "Studentische Kommentare im Quizmodus erlauben"
+msgstr "Studentische Kommentare erlauben"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:230

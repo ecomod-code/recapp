@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { useStatefulActor } from "ts-actors-react";
 import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
+import { i18n } from "@lingui/core";
 import Button from "react-bootstrap/Button";
 import { Id, toId, User } from "@recapp/models";
 import axios from "axios";
@@ -15,7 +16,7 @@ import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 
 export type OwnAnswer = string | (boolean | null | undefined)[];
 
-export const QuizStatsTab: React.FC = () => {
+export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizData }) => {
 	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [showExportModal, setShowExportModal] = useState(false);
@@ -103,12 +104,21 @@ export const QuizStatsTab: React.FC = () => {
 		)
 		.match(
 			({ groups, questions, quizStats, questionStats, exportFile, isPresentationModeActive }) => {
+				const zoom = isPresentationModeActive ? "175%" : undefined;
+
 				if (quizStats && groups) {
 					return groups.map((group, i) => {
 						/* Quiz stats */
 						return (
 							<Fragment key={i}>
-								<div className="mb-4 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
+								<div className="mb-3 mt-3">
+									{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
+									{i18n._("quiz-card-number-of-participants", {
+										count: quizData.quiz.students.length,
+									})}
+								</div>
+
+								<div className="mb-4 pb-2 d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between">
 									{/* this div is needed to make the buttons maintain the position right when the presentation-mode-switch is not visible */}
 									<div>
 										<PresentationModeSwitch />
@@ -122,7 +132,7 @@ export const QuizStatsTab: React.FC = () => {
 												onClose={cancelExport}
 												onDownload={downloadExport}
 											/>
-											<div className="mb-4 d-flex flex-row">
+											<div className="d-flex flex-row">
 												<Button onClick={exportQuiz}>
 													<Trans id="export-quiz-statistics-button" />
 												</Button>
@@ -134,7 +144,7 @@ export const QuizStatsTab: React.FC = () => {
 										</>
 									)}
 								</div>
-								<Fragment key={i}>
+                                <div key={i} style={{ zoom }}>
 									{group.questions.map(qId => {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
@@ -154,11 +164,29 @@ export const QuizStatsTab: React.FC = () => {
 											>
 												<div className="d-flex flex-column justify-content-between w-100">
 													<div className="d-flex align-items-start justify-content-between">
-														<div className="text-overflow-ellipsis">
-															{question?.text ?? questions.find(q => q.uid === qId)!.text}
-														</div>
+                                                        <div
+                                                            className="text-overflow-ellipsis text-primary"
+                                                            style={{
+                                                                cursor: "pointer",
+                                                                textDecoration: "underline",
+                                                                textUnderlineOffset: "3px",
+                                                                // color: $primary
+                                                            }}
+                                                            onClick={() =>
+                                                                tryActor.forEach(actor =>
+                                                                    actor.send(
+                                                                        actor,
+                                                                        CurrentQuizMessages.ActivateQuestionStats(
+                                                                            question?.uid ?? toId("")
+                                                                        )
+                                                                    )
+                                                                )
+                                                            }
+                                                        >
+                                                            {question?.text ?? questions.find(q => q.uid === qId)!.text}
+                                                        </div>
 
-														<Button
+														{/* <Button
 															size="sm"
 															className="p-0 ms-1"
 															variant="link"
@@ -175,7 +203,7 @@ export const QuizStatsTab: React.FC = () => {
 															disabled={noDetails}
 														>
 															<Trans id="details" />
-														</Button>
+														</Button> */}
 													</div>
 
 													<div className="d-flex align-items-center justify-content-between">
@@ -205,7 +233,7 @@ export const QuizStatsTab: React.FC = () => {
 											</div>
 										);
 									})}
-								</Fragment>
+								</div>
 							</Fragment>
 						);
 					});
@@ -217,6 +245,7 @@ export const QuizStatsTab: React.FC = () => {
 							<PresentationModeSwitch />
 
 							<QuizStatsDetails
+								zoom={zoom}
 								// groups={groups}
 								questionStats={questionStats}
 								questions={questions}

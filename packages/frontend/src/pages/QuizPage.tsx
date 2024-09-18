@@ -123,7 +123,7 @@ export const QuizPage: React.FC = () => {
 		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
 		mbQuiz.map(q => !!q.questionStats).orElse(false);
 
-	// const isQuizStateEditing2 = quizData?.quiz?.state ? quizData.quiz.state === "EDITING" : "STOPPED";
+	// const isQuizStateEditing2 = quizData?.quiz?.state && quizData.quiz.state === "EDITING";
 	const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
 
 	useEffect(() => {
@@ -244,6 +244,14 @@ export const QuizPage: React.FC = () => {
 				// const userRole = localUser.map(u => u.role).orElse("STUDENT");
 				const isQuizCompleted = (quizData.run?.counter ?? 0) >= (quizData.run?.questions.length ?? 0);
 
+                const isQuizStateStarted = quizData.quiz.state === "STARTED";
+                const isStudentCommentsAllowed = quizData.quiz.studentComments;
+                const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+
+				const showCommentArea = !quizData.quiz.hideComments || (isQuizTeacher && isQuizStateEditing);
+
+				const isCommentSectionVisible = quizData.isCommentSectionVisible;
+
 				const addComment = ({ text, name }: CommentEditorModalOnSubmitParams) => {
 					mbLocalUser.forEach(() => {
 						const c: Omit<Comment, "authorId" | "uid"> = {
@@ -269,10 +277,6 @@ export const QuizPage: React.FC = () => {
 					);
 				};
 
-				const showCommentArea =
-					!quizData.quiz.hideComments || (isQuizTeacher && quizData.quiz.state === "EDITING");
-
-				const isCommentSectionVisible = quizData.isCommentSectionVisible;
 
 				const setIsCommentSectionVisible = (value: boolean) => {
 					// quizActorSend(CurrentQuizMessages.setIsCommentSectionVisible(value));
@@ -322,54 +326,57 @@ export const QuizPage: React.FC = () => {
 							</Row>
 						) : null}
 
-						<Row>
-							<CommentsContainer
-								onClickAddComment={() => setShowMDModal(true)}
-								onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-								isCommentSectionVisible={isCommentSectionVisible}
-								showCommentArea={showCommentArea}
-							>
-								{mbQuiz
-									.flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
-									.map(
-										q =>
-											(q.comments ?? [])
-												.map(c => debug(comments.find(cmt => cmt.uid === c)!))
-												.filter(Boolean) as Comment[]
-									)
-									.map(c =>
-										c.sort(sortComments).map(cmt => (
-											<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-												<CommentCard
-													isCommentSectionVisible={isCommentSectionVisible}
-													teachers={teachers}
-													userId={localUser.map(l => l.uid).orElse(toId(""))}
-													comment={cmt}
-													onUpvote={() => upvoteComment(cmt.uid)}
-													onAccept={() => finishComment(cmt.uid)}
-													onDelete={() => deleteComment(cmt.uid)}
-													onJumpToQuestion={() => jumpToQuestion(cmt.relatedQuestion!)}
-													questionText={
-														cmt.relatedQuestion
-															? mbQuiz
-																	.flatMap(q =>
-																		maybe(
-																			q.questions.find(
-																				q => q.uid === cmt.relatedQuestion
-																			)?.text
-																		)
-																	)
-																	.orElse("")
-																	.substring(0, 20)
-															: undefined
-													}
-												/>
-											</div>
-										))
-									)
-									.orElse([<Fragment key="key-1" />])}
-							</CommentsContainer>
-						</Row>
+                        {showCommentSection ? (
+                            <Row>
+                                <CommentsContainer
+                                    onClickAddComment={() => setShowMDModal(true)}
+                                    onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                                    isCommentSectionVisible={isCommentSectionVisible}
+                                    showCommentArea={showCommentArea}
+                                >
+                                    {mbQuiz
+                                        .flatMap(q => (keys(debug(q.quiz)).length > 0 ? maybe(q.quiz) : nothing()))
+                                        .map(
+                                            q =>
+                                                (q.comments ?? [])
+                                                    .map(c => debug(comments.find(cmt => cmt.uid === c)!))
+                                                    .filter(Boolean) as Comment[]
+                                        )
+                                        .map(c =>
+                                            c.sort(sortComments).map(cmt => (
+                                                <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                                    <CommentCard
+                                                        isCommentSectionVisible={isCommentSectionVisible}
+                                                        teachers={teachers}
+                                                        userId={localUser.map(l => l.uid).orElse(toId(""))}
+                                                        comment={cmt}
+                                                        onUpvote={() => upvoteComment(cmt.uid)}
+                                                        onAccept={() => finishComment(cmt.uid)}
+                                                        onDelete={() => deleteComment(cmt.uid)}
+                                                        onJumpToQuestion={() => jumpToQuestion(cmt.relatedQuestion!)}
+                                                        questionText={
+                                                            cmt.relatedQuestion
+                                                                ? mbQuiz
+                                                                      .flatMap(q =>
+                                                                          maybe(
+                                                                              q.questions.find(
+                                                                                  q => q.uid === cmt.relatedQuestion
+                                                                              )?.text
+                                                                          )
+                                                                      )
+                                                                      .orElse("")
+                                                                      .substring(0, 20)
+                                                                : undefined
+                                                        }
+                                                    />
+                                                </div>
+                                            ))
+                                        )
+                                        .orElse([<Fragment key="key-1" />])}
+                                </CommentsContainer>
+                            </Row>
+                        ) : null}
+
 
 						{!quizData.isPresentationModeActive ? (
 							<Row>
@@ -440,7 +447,7 @@ export const QuizPage: React.FC = () => {
 											title={i18n._(tabRecords.statistics.label)}
 											tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
 										>
-											<QuizStatsTab />
+											<QuizStatsTab  quizData={quizData} />
 										</Tab>
 									)}
 							</Tabs>

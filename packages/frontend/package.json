@@ -9,8 +9,7 @@
 		"lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
 		"extract": "lingui extract",
-		"compile": "lingui compile",
-		"postbuild": "chmod -R o+r ./dist"
+		"compile": "lingui compile"
 	},
 	"dependencies": {
 		"@lingui/cli": "^4.7.1",

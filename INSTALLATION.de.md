@@ -86,3 +86,5 @@ auf ihre Korrektheit zu überprüfen.
 Danach kann das Skript testweise direkt oder in beliebigen Abständen über `cron` ausgeführt werden. Es prüft automatisch auf Änderungen im Zielbranch (der derzeit lokal ausgecheckt ist), erstellt den Code neu und startet auch das Backend erneut. Wir empfehlen eine regelmässige Ausführung mittels cron mindestens einmal in der Stunde, besser alle 10 Minuten:
 
 `*/10 * * * * /home/cloud/recapp/deployment.sh`
+
+-

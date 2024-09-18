@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Auto-Deployment for recapp
+
 # Konfiguration
 REPO_PATH="/home/cloud/recapp"
 LOG_FILE="/home/cloud/deploy.log"

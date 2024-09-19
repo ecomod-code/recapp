@@ -822,6 +822,11 @@ msgid "save-question-button"
 msgstr "Frage speichern"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:492
+msgid "save-and-go-to-next-question-button"
+msgstr "Speichern und zur nächste Frage"
+
+#. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:121
 msgid "quiz-not-found-error-message"
 msgstr "Das Quiz konnte nicht geöffnet werden. Das tut uns leid."

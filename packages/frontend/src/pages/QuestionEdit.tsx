@@ -42,6 +42,7 @@ const sortComments = (a: Comment, b: Comment) => {
 export const QuestionEdit: React.FC = () => {
 	const { state } = useLocation();
 	const questionId = state?.quizId ?? "";
+	const [currentQuestionId, setCurrentQuestionId] = useState(questionId);
 	const formerGroup = state?.group ?? "";
 	const writeAccess = state?.write === "true" ?? false;
 	// const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
@@ -62,6 +63,7 @@ export const QuestionEdit: React.FC = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
 	const isQuizStateStarted = q?.state === "STARTED"; 
+	const isQuizStateEditing = q?.state === "EDITING"; 
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
@@ -99,6 +101,11 @@ export const QuestionEdit: React.FC = () => {
 	const isStudentCommentsAllowed = q?.studentComments;
 	const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
 
+	const quiz = mbQuiz.orUndefined();
+	const questionsIds = quiz?.quiz.groups?.[0].questions ?? [];
+	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
+	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
+
 	useEffect(() => {
 		try {
 			if (mbQuiz.isEmpty()) {
@@ -129,8 +136,10 @@ export const QuestionEdit: React.FC = () => {
 				.map(k => k as QuestionType);
 			setAllowedQuestionTypes(aqt);
 
-			if (questionId) {
-				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
+			// if (questionId) {
+			if (currentQuestionId) {
+				// const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
+				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === currentQuestionId) ?? {};
 				const newType: QuestionType = aqt.includes(editQuestion.type ?? question.type)
 					? editQuestion.type ?? question.type
 					: aqt[0];
@@ -142,7 +151,8 @@ export const QuestionEdit: React.FC = () => {
 						actor.send(
 							actor,
 							CurrentQuizMessages.UpdateQuestion({
-								question: { uid: questionId, editMode: true },
+								// question: { uid: questionId, editMode: true },
+								question: { uid: currentQuestionId, editMode: true },
 								group: "", // formerGroup,
 							})
 						)
@@ -160,7 +170,7 @@ export const QuestionEdit: React.FC = () => {
 			}
 			// setGroups(groups);
 		}
-	}, [mbQuiz.hasValue, q]);
+	}, [mbQuiz.hasValue, q, currentQuestionId]);
 
 	const { rendered } = useRendered({ value: question.text });
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
@@ -217,7 +227,7 @@ export const QuestionEdit: React.FC = () => {
 				actor.send(
 					actor.name,
 					CurrentQuizMessages.UpdateQuestion({
-						question: { uid: toId(questionId), editMode: false },
+						question: { uid: toId(currentQuestionId), editMode: false },
 						group: selectedGroup !== formerGroup ? selectedGroup : "",
 					})
 				)
@@ -230,7 +240,14 @@ export const QuestionEdit: React.FC = () => {
 		nav(-1);
 	};
 
-	const submit = async () => {
+	const handleSaveAndGoToNextQuestion = ()=> {
+		if(isLastQuestion) return;
+
+		setCurrentQuestionId(questionsIds[currentQuestionIndex + 1]);
+		submitAndNavigateBack(false);
+	};
+
+	const submitAndNavigateBack = async (navigateBack: boolean) => {
 		if (writeAccess) {
 			const quizQuestion = { ...question };
 			if (quizQuestion.type === "TEXT") {
@@ -260,11 +277,11 @@ export const QuestionEdit: React.FC = () => {
 			);
 
 			tryQuizActor.forEach(actor => {
-				if (questionId) {
+				if (currentQuestionId) {
 					actor.send(
 						actor.name,
 						CurrentQuizMessages.UpdateQuestion({
-							question: { ...quizQuestion, uid: toId(questionId) },
+							question: { ...quizQuestion, uid: toId(currentQuestionId) },
 							group: selectedGroup !== formerGroup ? selectedGroup : "",
 						})
 					);
@@ -276,14 +293,17 @@ export const QuestionEdit: React.FC = () => {
 				}
 			});
 		}
-		nav(
-			{ pathname: "/Dashboard/quiz" },
-			{
-				state: {
-					quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
-				},
-			}
-		);
+
+		if(navigateBack){
+			nav(
+				{ pathname: "/Dashboard/quiz" },
+				{
+					state: {
+						quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
+					},
+				}
+			);
+		}
 	};
 
 	const upvoteComment = (commentId: Id) => {
@@ -479,11 +499,11 @@ export const QuestionEdit: React.FC = () => {
                                     (q.comments ?? [])
                                         .map(c => {
                                             const result = comments.find(
-                                                cmt => cmt.uid === c && cmt.relatedQuestion === questionId
+                                                cmt => cmt.uid === c && cmt.relatedQuestion === currentQuestionId
                                             );
                                             console.log(
                                                 comments.map(c => c.relatedQuestion).join(";"),
-                                                questionId,
+                                                currentQuestionId,
                                                 question.uid,
                                                 result
                                             );
@@ -866,11 +886,18 @@ export const QuestionEdit: React.FC = () => {
 					<Button variant="outline-primary" onClick={onCancelClick}>
 						<Trans id="cancel" />
 					</Button>
+
+                    {question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
+                        <Button onClick={handleSaveAndGoToNextQuestion}>
+							<Trans id="save-and-go-to-next-question-button" /> 
+						</Button>
+                    ) : null}
+
 					<ButtonWithTooltip
 						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}
 						title={saveButtonDisableReason}
 						disabled={isSaveButtonDisabled}
-						onClick={submit}
+						onClick={() => submitAndNavigateBack(true)}
 						className="col-12 col-lg-auto"
 					>
 						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}

@@ -823,6 +823,11 @@ msgid "save-question-button"
 msgstr "Save question"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:492
+msgid "save-and-go-to-next-question-button"
+msgstr "Save and go to next question"
+
+#. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:121
 msgid "quiz-not-found-error-message"
 msgstr "Sorry, the quiz could not be opened"

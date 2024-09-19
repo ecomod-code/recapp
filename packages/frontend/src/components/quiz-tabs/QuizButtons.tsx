@@ -1,66 +1,90 @@
 import { useState } from "react";
-import { useStatefulActor } from "ts-actors-react";
-import { maybe } from "tsmonads";
 import { Trans } from "@lingui/react";
 import { i18n } from "@lingui/core";
-import { Quiz } from "@recapp/models";
+// import { Quiz } from "@recapp/models";
 
+import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 import Button from "react-bootstrap/Button";
+import Modal from "react-bootstrap/Modal";
 import { StopFill, Pencil, Play, QrCode, BoxArrowRight, Trash } from "react-bootstrap-icons";
-import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
+import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { ShareModal } from "../modals/ShareModal";
+import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
+import { downloadFile } from "../../utils";
+
+type NewMode = "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS";
 
 export const QuizButtons = (props: {
 	disableForStudent: boolean;
-	quizState: Quiz["state"];
+	// quizState: Quiz["state"];
 	uniqueLink: string;
 	isQuizCreator: boolean;
 	leaveQuiz: () => void;
 	toggleStudentQuestions: () => void;
 }) => {
 	const [shareModal, setShareModal] = useState("");
-	const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
+    const { quizData, quizActorSend } = useCurrentQuiz();
+    // const [mbQuiz, tryActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz")
 	const [leaveQuizModal, setLeaveQuizModal] = useState(false);
+    const [showToEditModal, setShowToEditModal] = useState(false);
+	const [showExportModal, setShowExportModal] = useState(false);
 
-	const [quizModeChange, setQuizModeChange] = useState<{
-		titleId: string;
-		textId: string;
-		newMode: "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS";
-	}>({ titleId: "", textId: "", newMode: "EDITING" });
+    const [quizModeChange, setQuizModeChange] = useState<{
+        titleId: string;
+        textId: string;
+        newMode: NewMode;
+    }>({ titleId: "", textId: "", newMode: "EDITING" });
 
-	const startQuizMode = () => {
-		if (mbQuiz.flatMap(q => maybe(q.quiz?.state === "STOPPED")).orElse(false)) {
-			setQuizModeChange({
-				titleId: "title-set-quiz-mode-started",
-				textId: "info-set-quiz-mode-started",
-				newMode: "STARTED",
-			});
-		} else {
-			setQuizModeChange({
-				titleId: "title-set-quiz-mode-started",
-				textId: "warning-set-quiz-mode-started",
-				newMode: "STARTED",
-			});
-		}
-	};
+    const resetQuizModeChange = () => {
+        setQuizModeChange({ titleId: "", textId: "", newMode: "EDITING" });
+    };
 
-	const stopQuizMode = () => {
-		setQuizModeChange({
-			titleId: "title-set-quiz-mode-stopped",
-			textId: "info-set-quiz-mode-stopped",
-			newMode: "STOPPED",
-		});
-	};
+    const quizState = quizData?.quiz.state;
 
-	const editQuizMode = () => {
-		setQuizModeChange({
-			titleId: "title-set-quiz-mode-edit",
-			textId: "info-set-quiz-mode-edit",
-			newMode: "EDITING",
-		});
-	};
+    const startQuizMode = () => {
+        changeQuizMode("STARTED");
+
+        // if (mbQuiz.flatMap(q => maybe(q.quiz?.state === "STOPPED")).orElse(false)) {
+		// 	setQuizModeChange({
+		// 		titleId: "title-set-quiz-mode-started",
+		// 		textId: "info-set-quiz-mode-started",
+		// 		newMode: "STARTED",
+		// 	});
+		// } else {
+		// 	setQuizModeChange({
+		// 		titleId: "title-set-quiz-mode-started",
+		// 		textId: "warning-set-quiz-mode-started",
+		// 		newMode: "STARTED",
+		// 	});
+		// }
+    };
+
+    const stopQuizMode = () => {
+        if (quizState === "STARTED" || quizState === "EDITING") {
+            changeQuizMode("STOPPED");
+        } else {
+            setQuizModeChange({
+                titleId: "title-set-quiz-mode-stopped",
+                textId: "info-set-quiz-mode-stopped",
+                newMode: "STOPPED",
+            });
+        }
+    };
+
+    const editQuizMode = () => {
+        if (quizState === "STARTED" || quizState === "STOPPED") {
+            // changeQuizMode("EDITING");
+            setShowToEditModal(true);
+        } else {
+            setQuizModeChange({
+                titleId: "title-set-quiz-mode-edit",
+                textId: "info-set-quiz-mode-edit",
+                newMode: "EDITING",
+            });
+        }
+    };
 
 	const resetStats = () => {
 		setQuizModeChange({
@@ -70,19 +94,96 @@ export const QuizButtons = (props: {
 		});
 	};
 
-	const changeQuizMode = () => {
-		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ChangeState(quizModeChange.newMode)));
-		setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" });
+    const changeQuizMode = (newMode: "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS") => {
+        // tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ChangeState(quizModeChange.newMode)));
+		// setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" });
+
+        quizActorSend(CurrentQuizMessages.ChangeState(newMode));
+        resetQuizModeChange();
+        setShowToEditModal(false);
+    };
+
+    const handleClose = () => {
+        setShowToEditModal(false);
+        resetQuizModeChange();
+    };
+
+    const handleDownloadLinkClick = () => {
+        handleClose();
+        handleExportStatistics();
+    };
+
+    const handleExportStatistics = () => {
+        setShowExportModal(true);
+        quizActorSend(CurrentQuizMessages.ExportQuestionStats());
+    };
+
+	const cancelExport = () => {
+		setShowExportModal(false);
+		quizActorSend(CurrentQuizMessages.ExportDone());
+	};
+
+	const downloadExport = (filename: string) => {
+		setShowExportModal(false);
+		quizActorSend(CurrentQuizMessages.ExportDone());
+		downloadFile(filename);
 	};
 
 	return (
 		<>
 			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
 
+            <StatisticsExportModal
+                show={showExportModal}
+                filename={quizData?.exportFile ?? ""}
+                onClose={cancelExport}
+                onDownload={downloadExport}
+            />
+
+            <Modal show={showToEditModal} dialogClassName="modal-80w" contentClassName="overflow-hidden">
+                <Modal.Title className="p-3 text-bg-primary">
+                    <div style={{ minWidth: "80vw" }}>
+                        <Trans id={"title-set-quiz-mode-edit"} />
+                    </div>
+                </Modal.Title>
+                <Modal.Body>
+                    <Trans
+                        id="info-set-quiz-mode-edit"
+                        components={{
+                            0: (
+                                <a
+                                    className="link fw-bold"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={handleDownloadLinkClick}
+                                />
+                            ),
+                        }}
+                    />
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="outline-primary" className="m-1" onClick={handleClose}>
+                        <Trans id="cancel" />
+                    </Button>
+                    <Button
+                        // ref={submitButtonRef}
+                        // onBlur={() => submitButtonRef.current?.focus()}
+                        className="m-1"
+                        autoFocus
+                        onClick={() => {
+                            changeQuizMode("EDITING");
+                            // setShowToEditModal(false);
+                        }}
+                    >
+                        <Trans id="okay" />
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
 			<YesNoModal
 				show={!!quizModeChange.textId}
-				onClose={() => setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" })}
-				onSubmit={changeQuizMode}
+                // onClose={() => setQuizModeChange({ textId: "", titleId: "", newMode: "EDITING" })}
+                onClose={resetQuizModeChange}
+                onSubmit={() => changeQuizMode(quizModeChange.newMode)}
 				titleId={quizModeChange.titleId}
 				textId={quizModeChange.textId}
 			/>
@@ -109,9 +210,8 @@ export const QuizButtons = (props: {
 				{!props.disableForStudent && (
 					<ButtonWithTooltip
 						variant={
-							mbQuiz.flatMap(q => maybe(q.quiz.studentQuestions)).orElse(false)
-								? "primary"
-								: "outline-primary"
+							// mbQuiz.flatMap(q => maybe(q.quiz.studentQuestions)).orElse(false)
+                            quizData?.quiz.studentQuestions ? "primary" : "outline-primary"
 						}
 						className="ps-2 pe-2 d-flex justify-content-center align-items-center"
 						onClick={() => props.toggleStudentQuestions()}
@@ -121,7 +221,7 @@ export const QuizButtons = (props: {
 					</ButtonWithTooltip>
 				)}
 
-				{!props.disableForStudent && props.quizState !== "EDITING" && (
+				{!props.disableForStudent && quizState !== "EDITING" && (
 					<Button
 						variant="success"
 						className="ps-1 d-flex justify-content-center align-items-center"
@@ -132,7 +232,7 @@ export const QuizButtons = (props: {
 					</Button>
 				)}
 
-				{!props.disableForStudent && props.quizState !== "STOPPED" && (
+				{!props.disableForStudent && quizState !== "STOPPED" && (
 					<Button
 						variant="success"
 						className="ps-1 d-flex justify-content-center align-items-center"
@@ -143,7 +243,7 @@ export const QuizButtons = (props: {
 					</Button>
 				)}
 
-				{!props.disableForStudent && props.quizState !== "STARTED" && (
+				{!props.disableForStudent && quizState !== "STARTED" && (
 					<>
 						<Button
 							variant="success"
@@ -155,16 +255,19 @@ export const QuizButtons = (props: {
 								<Trans id="start-quiz-mode-button" />
 							</span>
 						</Button>
-						<Button
-							variant="success"
-							className="d-flex justify-content-center align-items-center"
-							onClick={resetStats}
-						>
-							<Trash size={18} className="me-1" />
-							<span className="d-flex flex-nowrap">
-								<Trans id="reset-stats-button" />
-							</span>
-						</Button>
+
+                        {quizState !== "EDITING" && (
+                            <Button
+                                variant="success"
+                                className="d-flex justify-content-center align-items-center"
+                                onClick={resetStats}
+                            >
+                                <Trash size={18} className="me-1" />
+                                <span className="d-flex flex-nowrap">
+                                    <Trans id="reset-stats-button" />
+                                </span>
+                            </Button>
+                        )}
 					</>
 				)}
 

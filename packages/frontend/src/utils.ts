@@ -1,4 +1,5 @@
 import { curry } from "rambda";
+import axios from "axios";
 import { ActorSystem, ActorRef } from "ts-actors";
 import { Try, Maybe, nothing, maybe } from "tsmonads";
 import { Question, Quiz, User } from "@recapp/models";
@@ -84,4 +85,19 @@ export const checkIsCreatingQuestionDisabled = (allowedQuestionTypesSettings: Qu
     });
 
     return isCreatingQuestionEnabled;
+};
+
+export const downloadFile = async (filename: string)=> {
+	return await axios
+		.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {
+			responseType: "blob",
+		})
+		.then(response => {
+			const url = window.URL.createObjectURL(response.data);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename;
+			a.click();
+		});
+
 };

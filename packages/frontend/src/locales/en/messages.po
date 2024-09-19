@@ -949,7 +949,7 @@ msgstr "Search text"
 
 #. js-lingui-explicit-id
 #~ msgid "info-set-quiz-mode-edit"
-#~ msgstr "Statistics are invalidated when editing mode is started. Start editing?"
+#~ msgstr "Statistics are deleted when editing mode is started! However, statistics can be downloaded <0>here</0>"
 
 #. js-lingui-explicit-id
 #~ msgid "title-set-quiz-mode-stopped"

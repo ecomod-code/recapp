@@ -383,7 +383,7 @@ export const QuizPage: React.FC = () => {
 								<div className="my-4">
 									<QuizButtons
 										disableForStudent={disableForStudent}
-										quizState={quizData.quiz.state}
+										// quizState={quizData.quiz.state}
 										uniqueLink={quizData.quiz.uniqueLink}
 										leaveQuiz={leaveQuiz}
 										isQuizCreator={

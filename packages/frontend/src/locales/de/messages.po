@@ -948,7 +948,7 @@ msgstr "Suchtext"
 
 #. js-lingui-explicit-id
 #~ msgid "info-set-quiz-mode-edit"
-#~ msgstr "Mit dem Starten des Editiermodus werden die Statistiken invalidiert. Editieren starten?"
+#~ msgstr "Mit dem Starten des Editiermodus werden die Statistiken geloescht! Statistiken koennen allerdings <0>hier</0> heruntergeladen werden"
 
 #. js-lingui-explicit-id
 #~ msgid "title-set-quiz-mode-stopped"

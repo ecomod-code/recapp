@@ -233,6 +233,12 @@ export const QuizPage: React.FC = () => {
 					return false;
 				};
 
+				const run = quizData.run;
+				const qData = quizData.questions;
+				const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
+				const currentQuestion = questions[run?.counter ?? 0];
+				const questionId = currentQuestion?.uid ?? toId("");
+
 				const disableForStudent = localUser.map(allowed).orElse(true);
 				const isQuizTeacher =
 					teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
@@ -262,6 +268,7 @@ export const QuizPage: React.FC = () => {
 							upvoters: [],
 							answered: false,
 							relatedQuiz: quizData.quiz.uid,
+                            ...(!isQuizTeacher ? { relatedQuestion: questionId } : {}),
 						};
 						// quizActorSend(CurrentQuizMessages.AddComment(c));
 						tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
@@ -293,7 +300,8 @@ export const QuizPage: React.FC = () => {
 							show={showMDModal}
 							onClose={() => setShowMDModal(false)}
 							onSubmit={addComment}
-							isStudent={!isQuizTeacher}
+							// isStudent={!isQuizTeacher}
+							isQuizTeacher={isQuizTeacher}
 							userNames={[userName, userNickname ?? ""]}
 							participationOptions={keys(quizData.quiz.studentParticipationSettings)
 								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
@@ -329,6 +337,7 @@ export const QuizPage: React.FC = () => {
                         {showCommentSection ? (
                             <Row>
                                 <CommentsContainer
+									isQuizTeacher={isQuizTeacher}
                                     onClickAddComment={() => setShowMDModal(true)}
                                     onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
                                     isCommentSectionVisible={isCommentSectionVisible}
@@ -339,7 +348,13 @@ export const QuizPage: React.FC = () => {
                                         .map(
                                             q =>
                                                 (q.comments ?? [])
-                                                    .map(c => debug(comments.find(cmt => cmt.uid === c)!))
+                                                    .map(c => debug(comments.find(cmt => {
+														if(isQuizTeacher){
+															return cmt.uid === c;
+														}
+
+														return cmt.uid === c && cmt.relatedQuestion === questionId;
+													})!))
                                                     .filter(Boolean) as Comment[]
                                         )
                                         .map(c =>
@@ -430,7 +445,12 @@ export const QuizPage: React.FC = () => {
 									tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
 								>
 									{disableForStudent && quizData.quiz.state === "STARTED" ? (
-										<RunningQuizTab quizState={quizData} logQuestion={logQuestion} />
+										<RunningQuizTab 
+											isQuizTeacher={isQuizTeacher}
+											onClickAddComment={() => setShowMDModal(true)}
+											quizState={quizData} 
+											logQuestion={logQuestion} 
+										/>
 									) : (
 										<QuestionsTab
 											quizData={quizData}

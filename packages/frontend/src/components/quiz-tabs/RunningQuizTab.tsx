@@ -10,7 +10,7 @@ import Form from "react-bootstrap/Form";
 import { useRendered } from "../../hooks/useRendered";
 // import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { MessageModal } from "../modals/MessageModal";
-import { Lightbulb } from "react-bootstrap-icons";
+import { Lightbulb, ChatRightText } from "react-bootstrap-icons";
 import { CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { Id, toId } from "@recapp/models";
 // import { MessageModal } from "../modals/MessageModal";
@@ -20,9 +20,11 @@ import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 import { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT } from "../../colorPalette";
 
 export const RunningQuizTab: React.FC<{
+	isQuizTeacher:boolean;
+    onClickAddComment: () => void;
 	quizState: CurrentQuizState;
 	logQuestion: (questionId: Id, answer: string | boolean[]) => void;
-}> = ({ quizState, logQuestion }) => {
+}> = ({isQuizTeacher, onClickAddComment, quizState, logQuestion }) => {
 	const [isHintModalOpen, setIsHintModalOpen] = useState(false);
 	const [answered, setAnswered] = useState(false);
 	const [textAnswer, setTextAnswer] = useState("");
@@ -41,6 +43,7 @@ export const RunningQuizTab: React.FC<{
 
 	const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 	const currentQuestion = questions[run?.counter ?? 0];
+	const questionId = currentQuestion?.uid ?? toId("");
 	const questionText = questions.at(run?.counter ?? 0)?.text;
 	const { rendered } = useRendered({ value: questionText ?? "" });
 
@@ -63,7 +66,7 @@ export const RunningQuizTab: React.FC<{
 	};
 
 	const logQuestionClicked = () => {
-		logQuestion(currentQuestion?.uid ?? toId(""), isQuestionTypeText ? textAnswer : answers);
+		logQuestion(questionId, isQuestionTypeText ? textAnswer : answers);
 	};
 
 	const nextQuestion = () => {
@@ -162,7 +165,7 @@ export const RunningQuizTab: React.FC<{
 								{currentQuestion?.answers.map((answer, index) => {
 									return (
 										<Form.Group
-											key={answer.text + index + currentQuestion.uid}
+											key={answer.text + index + questionId}
 											className="d-flex gap-2"
 										>
 											<Form.Check
@@ -220,15 +223,24 @@ export const RunningQuizTab: React.FC<{
 							</div>
 						)}
 
-						<div className="mt-2 d-flex justify-content-between">
-							<Button disabled={answered} onClick={submitAnswer}>
-								<Trans id="running-quiz-tab.button-label.submit" />
-							</Button>
-							{answered && (
-								<Button disabled={!answered} onClick={nextQuestion}>
-									<Trans id="question-stats-next-question-button" />
+						<div className="mt-2 d-flex flex-column-reverse flex-lg-row justify-content-between gap-2">
+							<div className="d-flex flex-column flex-lg-row flex-grow-1 gap-2">
+								<Button className="flex-grow-1 flex-lg-grow-0" disabled={answered} onClick={submitAnswer}>
+									<Trans id="running-quiz-tab.button-label.submit" />
 								</Button>
-							)}
+								{answered && (
+									<Button className="flex-grow-1 flex-lg-grow-0" disabled={!answered} onClick={nextQuestion}>
+										<Trans id="question-stats-next-question-button" />
+									</Button>
+								)}
+							</div>
+
+                            {!isQuizTeacher ? (
+                                <Button variant="outline-primary" onClick={onClickAddComment}>
+                                    <ChatRightText className="me-1" />
+									<Trans id="comment-row-new-comment-button" />
+                                </Button>
+                            ) : null}
 						</div>
 					</Card.Footer>
 				</Card>

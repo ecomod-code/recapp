@@ -9,6 +9,7 @@ type Props = {
     onClickAddComment: () => void;
     onClickToggleButton: () => void;
     isCommentSectionVisible: boolean;
+    isQuizTeacher: boolean;
 } & PropsWithChildren;
 
 export const CommentsContainer = (props: Props) => {
@@ -45,12 +46,16 @@ export const CommentsContainer = (props: Props) => {
                         }}
                     >
                         <div className="d-flex flex-column justify-content-center align-items-center p-4">
-                            <Button variant="secondary" onClick={props.onClickAddComment}>
-                                <Plus size={100} />
-                            </Button>
-                            <span style={{ width: 140, fontSize: "1.2rem", textAlign: "center" }}>
-                                <Trans id="comment-row-new-comment-button" />
-                            </span>
+                            {props.isQuizTeacher ? (
+                                <>
+                                    <Button variant="secondary" onClick={props.onClickAddComment}>
+                                        <Plus size={100} />
+                                    </Button>
+                                    <span style={{ width: 140, fontSize: "1.2rem", textAlign: "center" }}>
+                                        <Trans id="comment-row-new-comment-button" />
+                                    </span>
+                                </>
+                            ) : null}
                         </div>
 
                         {props.children}

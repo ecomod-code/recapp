@@ -148,11 +148,12 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 									)}
 								</div>
 								<div key={i} style={{ zoom }}>
-									{group.questions.map(qId => {
+									{group.questions.map((qId, index )=> {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
 										const question =
 											statIndex > -1 ? questions.find(q => q.uid === qId)! : undefined;
+										const questionId = question?.uid ?? toId("");
 										const correct = statIndex > -1 ? quizStats.correctAnswers.at(statIndex) : 0;
 										const wrong = statIndex > -1 ? quizStats.wrongAnswers.at(statIndex) : 0;
 										const ownCorrect = (statIndex > -1 ? ownCorrectAnswers[qId] : false) ?? false;
@@ -161,7 +162,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 
 										return (
 											<div
-												key={question?.uid ?? qId}
+												key={questionId + index + qId}
 												className="m-1 p-2 pt-3"
 												style={{ backgroundColor: "lightgrey" }}
 											>
@@ -179,14 +180,14 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																tryActor.forEach(actor =>
 																	actor.send(
 																		actor,
-																		CurrentQuizMessages.ActivateQuestionStats(
-																			question?.uid ?? toId("")
-																		)
+                                                                        CurrentQuizMessages.ActivateQuestionStats(
+                                                                            questionId
+                                                                        )
 																	)
 																)
 															}
 														>
-															{question?.text ?? questions.find(q => q.uid === qId)!.text}
+															{question?.text ?? questions.find(q => q.uid === qId)?.text}
 														</div>
 
 														{/* <Button
@@ -198,7 +199,8 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																	actor.send(
 																		actor,
 																		CurrentQuizMessages.ActivateQuestionStats(
-																			question?.uid ?? toId("")
+																			// question?.uid ?? toId("")
+																			questionId
 																		)
 																	)
 																)

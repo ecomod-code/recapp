@@ -114,7 +114,7 @@ export const CommentCardContent: React.FC<
                     </ButtonWithTooltip>
 
                     <div className="d-flex">
-                        {comment.relatedQuestion && questionText && (
+                        {isQuizTeacher && comment.relatedQuestion && questionText && (
                             <ButtonWithTooltip
                                 title={questionText ?? ""}
                                 variant="secondary"

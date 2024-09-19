@@ -19,7 +19,8 @@ interface Props {
     show: boolean;
     titleId: string;
     editorValue: string;
-    isStudent: boolean;
+    // isStudent: boolean;
+    isQuizTeacher: boolean;
     userNames: string[];
     participationOptions: UserParticipation[];
     showRelatedQuestionCheck?: boolean;
@@ -33,14 +34,17 @@ export const CommentEditorModal: React.FC<Props> = ({
     editorValue,
     onClose,
     onSubmit,
-    isStudent,
+    // isStudent,
+    isQuizTeacher,
     userNames,
     showRelatedQuestionCheck,
     participationOptions,
 }) => {
     const [value, setValue] = useState<string>(editorValue);
     const { rendered } = useRendered({ value });
-    const [name, setName] = useState<UserParticipation | undefined>(isStudent ? participationOptions[0] : undefined);
+    // const [name, setName] = useState<UserParticipation | undefined>(isStudent ? participationOptions[0] : undefined);
+    const [name, setName] = useState<UserParticipation | undefined>(!isQuizTeacher ? participationOptions[0] : undefined);
+    // const 
     const [isRelatedToQuestion, setIsRelatedToQuestion] = useState<boolean>(true);
 
     useEffect(() => {
@@ -71,7 +75,7 @@ export const CommentEditorModal: React.FC<Props> = ({
                         </Form.Select>
                     </Form.Group>
 
-                    {showRelatedQuestionCheck ? (
+                    {showRelatedQuestionCheck && isQuizTeacher ? (
                         <Form.Group className="d-flex mb-2">
                             <Form.Label style={{ minWidth: LABEL_MIN_WIDTH }}>
                                 <Trans id="comment-editor-modal.link-to-question.checkbox-label" />
@@ -139,7 +143,14 @@ export const CommentEditorModal: React.FC<Props> = ({
                         const text = value;
                         setValue("");
 
-                        const commonValues = { text, ...(showRelatedQuestionCheck ? { isRelatedToQuestion } : {}) };
+                        const isRelatedToQuestionValue = isQuizTeacher
+                            ? showRelatedQuestionCheck
+                                ? isRelatedToQuestion
+                                : undefined
+                            : true;
+
+                        const commonValues = { text, isRelatedToQuestion: isRelatedToQuestionValue };
+                        // const commonValues = { text, ...(showRelatedQuestionCheck ? { isRelatedToQuestion } : {}) };
 
                         switch (name) {
                             case "ANONYMOUS":

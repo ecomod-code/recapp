@@ -94,6 +94,11 @@ export const QuestionEdit: React.FC = () => {
 	const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
 	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 
+	const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
+	const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+	const isStudentCommentsAllowed = q?.studentComments;
+	const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+
 	useEffect(() => {
 		try {
 			if (mbQuiz.isEmpty()) {
@@ -418,7 +423,8 @@ export const QuestionEdit: React.FC = () => {
 				show={!!showMDModal.titleId && showMDModal.type !== "QUESTION"}
 				onClose={handleClose}
 				showRelatedQuestionCheck
-				isStudent={isStudent}
+				// isStudent={isStudent}
+				isQuizTeacher={isQuizTeacher}
 				userNames={[userName, userNickname ?? ""]}
 				participationOptions={allowedAuthorTypes}
 				onSubmit={({ text, name, isRelatedToQuestion }) => {
@@ -458,49 +464,53 @@ export const QuestionEdit: React.FC = () => {
 					</Breadcrumb>
 				</div>
 
-				<CommentsContainer
-					onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-					isCommentSectionVisible={isCommentSectionVisible}
-					onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
-					showCommentArea={showCommentArea}
-				>
-					{mbQuiz
-						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
-						.map(
-							q =>
-								(q.comments ?? [])
-									.map(c => {
-										const result = comments.find(
-											cmt => cmt.uid === c && cmt.relatedQuestion === questionId
-										);
-										console.log(
-											comments.map(c => c.relatedQuestion).join(";"),
-											questionId,
-											question.uid,
-											result
-										);
-										return result;
-									})
-									.filter(Boolean) as Comment[]
-						)
-						.map(c =>
-							c.sort(sortComments).map(cmt => (
-								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-									<CommentCard
-										isCommentSectionVisible={isCommentSectionVisible}
-										userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-										teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-										comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
-										onUpvote={() => upvoteComment(cmt.uid)}
-										onAccept={() => finishComment(cmt.uid)}
-										onDelete={() => deleteComment(cmt.uid)}
-										onJumpToQuestion={() => {}}
-									/>
-								</div>
-							))
-						)
-						.orElse([<Fragment key={"key-1"} />])}
-				</CommentsContainer>
+                {showCommentSection ? (
+                    <CommentsContainer
+						isQuizTeacher={isQuizTeacher}
+                        onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                        isCommentSectionVisible={isCommentSectionVisible}
+                        onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+                        showCommentArea={showCommentArea}
+                    >
+                        {mbQuiz
+                            .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+                            .map(
+                                q =>
+                                    (q.comments ?? [])
+                                        .map(c => {
+                                            const result = comments.find(
+                                                cmt => cmt.uid === c && cmt.relatedQuestion === questionId
+                                            );
+                                            console.log(
+                                                comments.map(c => c.relatedQuestion).join(";"),
+                                                questionId,
+                                                question.uid,
+                                                result
+                                            );
+                                            return result;
+                                        })
+                                        .filter(Boolean) as Comment[]
+                            )
+                            .map(c =>
+                                c.sort(sortComments).map(cmt => (
+                                    <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                        <CommentCard
+                                            isCommentSectionVisible={isCommentSectionVisible}
+                                            userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+                                            teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+                                            comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
+                                            onUpvote={() => upvoteComment(cmt.uid)}
+                                            onAccept={() => finishComment(cmt.uid)}
+                                            onDelete={() => deleteComment(cmt.uid)}
+                                            onJumpToQuestion={() => {}}
+                                        />
+                                    </div>
+                                ))
+                            )
+                            .orElse([<Fragment key={"key-1"} />])}
+                    </CommentsContainer>
+                ) : null}
+
 				<div className="py-2 mb-4 mt-2 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
 					<span className="">
 						<strong>

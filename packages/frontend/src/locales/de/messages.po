@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:477
+msgid "answer-movement-functionality-activate"
+msgstr "Neil: button to activate the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:477
+msgid "answer-movement-functionality-disable"
+msgstr "Neil: button to disable the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-student-to-see-statistics"
@@ -580,8 +590,14 @@ msgstr "Multiple-Choice Fragen erlauben"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:311
 #: src/pages/CreateQuiz.tsx:207
-msgid "quiz-enable-question-shufflling"
+msgid "quiz-enable-shuffling-question"
 msgstr "Fragen im Quizmodus mischen"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:311
+#: src/pages/CreateQuiz.tsx:207
+msgid "quiz-enable-shuffling-answers"
+msgstr "Antworten mischen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:323

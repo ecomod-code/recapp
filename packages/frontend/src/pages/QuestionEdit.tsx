@@ -20,7 +20,7 @@ import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 // import { DashLg, Pencil, Plus } from "react-bootstrap-icons";
-import { DashLg } from "react-bootstrap-icons";
+import { ArrowDown, ArrowDownUp, ArrowUp, DashLg } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
 // import { MarkdownModal } from "../components/modals/MarkdownModal";
@@ -213,6 +213,30 @@ export const QuestionEdit: React.FC = () => {
 		setQuestion(state => ({ ...state, answers }));
 	};
 
+	const moveAnswer = (answerIndex: number, upwards: boolean) => {
+		const newOrder: Question["answers"] = [];
+		const changeIndex = upwards ? answerIndex - 1 : answerIndex + 1;
+
+		question.answers.forEach((answer, index) => {
+			if (index === answerIndex) {
+				return;
+			}
+			if (index === changeIndex) {
+				if (upwards) {
+					newOrder.push(question.answers[answerIndex]);
+					newOrder.push(answer);
+				} else {
+					newOrder.push(answer);
+					newOrder.push(question.answers[answerIndex]);
+				}
+			} else {
+				newOrder.push(answer);
+			}
+		});
+
+		setQuestion(prev => ({...prev, answers: newOrder }));
+	};
+
 	// const editAnswer = (index: number) => {
 	//     setShowTextModal({
 	//         titleId: "edit-answer-text",
@@ -341,6 +365,8 @@ export const QuestionEdit: React.FC = () => {
 			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
 		});
 	};
+
+	const shuffleAnswers = mbQuiz.flatMap(q => maybe(q.quiz.shuffleAnswers)).orElse(false);
 
 	const comments: Comment[] = mbQuiz.flatMap(q => maybe(q.comments)).orElse([]);
 
@@ -484,6 +510,9 @@ export const QuestionEdit: React.FC = () => {
 					</Breadcrumb>
 				</div>
 
+				{/**
+				 * MARK: Comment-container
+				 */}
                 {showCommentSection ? (
                     <CommentsContainer
 						isQuizTeacher={isQuizTeacher}
@@ -573,6 +602,9 @@ export const QuestionEdit: React.FC = () => {
 							</Form.Group>
 						)}
 
+						{/**
+						 * MARK: Question type
+						 */}
 						<Form.Group>
 							<Form.Label>
 								<Trans id="question-edit-page.input-label.question-type" />:
@@ -624,6 +656,9 @@ export const QuestionEdit: React.FC = () => {
 					</Card.Body>
 				</Card>
 
+				{/**
+				 * MARK: Question:
+				 */}
 				<Card className="mt-3 overflow-hidden">
 					<Card.Header className="p-3 d-flex justify-content-between align-items-center background-grey">
 						<strong>
@@ -809,8 +844,13 @@ export const QuestionEdit: React.FC = () => {
                             </Form.Select>
                         </Form.Group> */}
 
+						{/**
+						 * MARK: Answers
+						 */}
 						{question.type !== "TEXT" && (
 							<div className="mt-3">
+								<hr />
+
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 
@@ -822,8 +862,39 @@ export const QuestionEdit: React.FC = () => {
 										<Trans id="add-answer-button" />
 									</Button>
 								</div>
-								<Form className="text-start">
-									{question.answers.map((answer, i) => {
+
+								{/* <hr /> */}
+
+                                {isQuizTeacher && !shuffleAnswers ? (
+                                    <InputGroup className="mt-2 justify-content-end">
+                                        <Button
+                                            className="d-flex flex-grow-1 flex-lg-grow-0 justify-content-center align-items-center gap-2"
+                                            variant={question.answerOrderFixed ? "outline-primary" : "primary"}
+                                            disabled={!writeAccess}
+                                            onClick={() =>
+                                                setQuestion(prev => ({
+                                                    ...prev,
+                                                    answerOrderFixed: !question.answerOrderFixed,
+                                                }))
+                                            }
+                                        >
+                                            <ArrowDownUp />
+                                            {question.answerOrderFixed ? (
+                                                <Trans id="answer-movement-functionality-activate" />
+                                            ) : (
+                                                <Trans id="answer-movement-functionality-disable" />
+                                            )}
+                                        </Button>
+                                    </InputGroup>
+                                ) : null}
+
+								{/* <hr /> */}
+
+								<Form className="text-start mt-4">
+									{question.answers.map((answer, i, arr) => {
+										const isFirst = i === 0; 
+										const isLast = i === arr.length - 1;
+
 										return (
 											<InputGroup key={i} className="mb-2 mt-2">
 												<Form.Check
@@ -850,6 +921,28 @@ export const QuestionEdit: React.FC = () => {
 														setQuestion(state => ({ ...state, answers }));
 													}}
 												/>
+
+                                                {!question.answerOrderFixed ? (
+                                                    <div className="mx-1 d-flex gap-1">
+                                                        <Button
+                                                            className="rounded-0"
+                                                            disabled={isFirst}
+                                                            variant="outline-primary"
+                                                            onClick={() => moveAnswer(i, true)}
+                                                        >
+                                                            <ArrowUp />
+                                                        </Button>
+                                                        <Button
+                                                            className="rounded-0"
+                                                            disabled={isLast}
+                                                            variant="outline-primary"
+                                                            onClick={() => moveAnswer(i, false)}
+                                                        >
+                                                            <ArrowDown />
+                                                        </Button>
+                                                    </div>
+                                                ) : null}
+
 												{/* <ButtonWithTooltip
                                                     title={i18n._("question-edit.button-tooltip.edit-answer")}
                                                     onClick={() => editAnswer(i)}

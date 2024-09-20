@@ -184,12 +184,12 @@ export class StatisticsActor extends SubscribableActor<
 										(stat as ChoiceElementStatistics).passed =
 											(stat as ChoiceElementStatistics).passed + 1;
 									}
-									console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
-									(stat as ChoiceElementStatistics).answers = (
-										stat as ChoiceElementStatistics
-									).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
-									console.log("FINAL NEWCHOICES", stat.answers);
 								}
+								console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
+								(stat as ChoiceElementStatistics).answers = (
+									stat as ChoiceElementStatistics
+								).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
+								console.log("FINAL NEWCHOICES", stat.answers);
 							}
 							console.log("EXISTING CHOICE UPDATE from ", clientUserId);
 							return stat;

@@ -890,7 +890,8 @@ export const QuestionEdit: React.FC = () => {
 
 								{/* <hr /> */}
 
-								<Form className="text-start mt-4">
+								{/* <Form className="text-start mt-4"> */}
+								<div className="text-start mt-4">
 									{question.answers.map((answer, i, arr) => {
 										const isFirst = i === 0; 
 										const isLast = i === arr.length - 1;
@@ -961,7 +962,8 @@ export const QuestionEdit: React.FC = () => {
 											</InputGroup>
 										);
 									})}
-								</Form>
+								</div>
+								{/* </Form> */}
 							</div>
 						)}
 					</Card.Footer>

@@ -410,6 +410,7 @@ export const QuestionEdit: React.FC = () => {
 	}
 
 	const isSaveButtonDisabled = !!saveButtonDisableReason;
+	const isActivateReorderAnswersVisible = isQuizTeacher && isQuizStateEditing && !shuffleAnswers;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -854,7 +855,8 @@ export const QuestionEdit: React.FC = () => {
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 									<div className="d-flex flex-row flex-wrap">
-										{isQuizTeacher && !shuffleAnswers ? (
+										{/* {isQuizTeacher && !shuffleAnswers ? ( */}
+										{isActivateReorderAnswersVisible ? (
 											<Button
 												className="d-flex flex-grow-1 flex-lg-grow-0 justify-content-center align-items-center gap-2 me-2"
 												variant={question.answerOrderFixed ? "outline-primary" : "primary"}
@@ -925,7 +927,8 @@ export const QuestionEdit: React.FC = () => {
 													}}
 												/>
 
-												{!question.answerOrderFixed ? (
+												{/* {!question.answerOrderFixed ? ( */}
+												{isActivateReorderAnswersVisible && !question.answerOrderFixed ? (
 													<div className="mx-1 d-flex gap-1">
 														<Button
 															className="rounded-0"

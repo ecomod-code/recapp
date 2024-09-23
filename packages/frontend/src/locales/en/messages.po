@@ -22,12 +22,12 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
-msgstr "Adjust answer ordering"
+msgstr "Adjust answer order"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-disable"
-msgstr "Freeze answer ordering"
+msgstr "Freeze answer order"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257

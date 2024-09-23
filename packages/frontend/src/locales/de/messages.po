@@ -22,12 +22,12 @@ msgstr "Anmelden"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
-msgstr "Fragenreihenfolge anpassen"
+msgstr "Antwortreihenfolge anpassen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-disable"
-msgstr "Fragenreihenfolge einfrieren"
+msgstr "Antwortreihenfolge einfrieren"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257

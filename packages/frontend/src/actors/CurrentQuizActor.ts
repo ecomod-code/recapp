@@ -242,7 +242,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 		);
 		this.updateState(draft => {
 			draft.quizStats = gs;
+			draft.quiz.statistics = gs;
 		});
+		this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: this.state.quiz.uid, statistics: gs }));
 	};
 
 	private getQuestionStats = async (id: Id) => {

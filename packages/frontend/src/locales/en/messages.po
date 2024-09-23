@@ -615,6 +615,18 @@ msgid "export-quiz-button"
 msgstr "Export data"
 
 #. js-lingui-explicit-id
+msgid "duplicate-quiz-button"
+msgstr "Duplicate quiz"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-okay"
+msgstr "Quiz was successfully duplicated"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-error"
+msgstr "An error occured when trying to duplicate the quiz"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359
 msgid "quiz-data-tab.button-tooltip.edit"
 msgstr "Edit"

@@ -35,6 +35,7 @@ const newQuiz: NewQuiz = {
 		TEXT: true,
 	},
 	shuffleQuestions: true,
+	shuffleAnswers: false,
 	teachers: [],
 	students: [],
 	groups: [],
@@ -56,6 +57,7 @@ const startValidation: Validator<NewQuiz> = {
 	groups: true,
 	state: true,
 	hideComments: true,
+	shuffleAnswers: false,
 };
 
 export type CreateQuizState = { quiz: NewQuiz; validation: Validator<NewQuiz> };
@@ -68,7 +70,7 @@ export class CreateQuizActor extends StatefulActor<CreateQuizMessage, Unit | Err
 
 	private validate = (q: NewQuiz): Validator<NewQuiz> => {
 		const validation = { ...this.state.validation };
-		validation.title = q.title.trim().length > 3; 
+		validation.title = q.title.trim().length > 3;
 		return validation;
 	};
 

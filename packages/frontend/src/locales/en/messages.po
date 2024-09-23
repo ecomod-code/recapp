@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:477
+msgid "answer-movement-functionality-activate"
+msgstr "Neil: button to activate the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+
+#. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:477
+msgid "answer-movement-functionality-disable"
+msgstr "Neil: button to disable the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-student-to-see-statistics"
@@ -585,8 +595,14 @@ msgstr "Allow multiple-choice questions"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:311
 #: src/pages/CreateQuiz.tsx:207
-msgid "quiz-enable-question-shufflling"
+msgid "quiz-enable-shuffling-question"
 msgstr "Shuffle questions in quiz mode"
+
+#. js-lingui-explicit-id
+#: src/components/quiz-tabs/QuizDataTab.tsx:311
+#: src/pages/CreateQuiz.tsx:207
+msgid "quiz-enable-shuffling-answers"
+msgstr "Shuffle Answers"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:323
@@ -823,6 +839,11 @@ msgid "save-question-button"
 msgstr "Save question"
 
 #. js-lingui-explicit-id
+#: src/pages/QuestionEdit.tsx:492
+msgid "save-and-go-to-next-question-button"
+msgstr "Save and go to next question"
+
+#. js-lingui-explicit-id
 #: src/pages/QuizPage.tsx:121
 msgid "quiz-not-found-error-message"
 msgstr "Sorry, the quiz could not be opened"
@@ -949,7 +970,7 @@ msgstr "Search text"
 
 #. js-lingui-explicit-id
 #~ msgid "info-set-quiz-mode-edit"
-#~ msgstr "Statistics are invalidated when editing mode is started. Start editing?"
+#~ msgstr "Statistics are deleted when editing mode is started! However, statistics can be downloaded <0>here</0>"
 
 #. js-lingui-explicit-id
 #~ msgid "title-set-quiz-mode-stopped"

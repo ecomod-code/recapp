@@ -358,10 +358,19 @@ export const QuizDataTab: React.FC<Props> = props => {
                     <ListGroupContainer>
                         <Form.Switch
                             className="list-group-item ps-5"
-                            label={i18n._("quiz-enable-question-shufflling")}
+                            label={i18n._("quiz-enable-shuffling-question")}
                             checked={quiz.shuffleQuestions}
                             disabled={disabledByMode}
                             onChange={event => update({ shuffleQuestions: event.target.checked })}
+                        />
+                    </ListGroupContainer>
+                    <ListGroupContainer>
+                        <Form.Switch
+                            className="list-group-item ps-5"
+                            label={i18n._("quiz-enable-shuffling-answers")}
+                            checked={quiz.shuffleAnswers}
+                            disabled={disabledByMode}
+                            onChange={event => update({ shuffleAnswers: event.target.checked })}
                         />
                     </ListGroupContainer>
                     <div className="mt-3 d-flex flex-column flex-lg-row justify-content-end gap-2">

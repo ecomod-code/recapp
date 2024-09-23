@@ -20,7 +20,7 @@ import Breadcrumb from "react-bootstrap/Breadcrumb";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 // import { DashLg, Pencil, Plus } from "react-bootstrap-icons";
-import { DashLg } from "react-bootstrap-icons";
+import { ArrowDown, ArrowDownUp, ArrowUp, DashLg } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 import { CommentCard } from "../components/cards/CommentCard";
 // import { MarkdownModal } from "../components/modals/MarkdownModal";
@@ -42,6 +42,7 @@ const sortComments = (a: Comment, b: Comment) => {
 export const QuestionEdit: React.FC = () => {
 	const { state } = useLocation();
 	const questionId = state?.quizId ?? "";
+	const [currentQuestionId, setCurrentQuestionId] = useState(questionId);
 	const formerGroup = state?.group ?? "";
 	const writeAccess = state?.write === "true" ?? false;
 	// const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
@@ -62,6 +63,7 @@ export const QuestionEdit: React.FC = () => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
 	const isQuizStateStarted = q?.state === "STARTED"; 
+	const isQuizStateEditing = q?.state === "EDITING"; 
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
@@ -94,6 +96,16 @@ export const QuestionEdit: React.FC = () => {
 	const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
 	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 
+	const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
+	const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+	const isStudentCommentsAllowed = q?.studentComments;
+	const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+
+	const quiz = mbQuiz.orUndefined();
+	const questionsIds = quiz?.quiz.groups?.[0].questions ?? [];
+	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
+	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
+
 	useEffect(() => {
 		try {
 			if (mbQuiz.isEmpty()) {
@@ -124,8 +136,10 @@ export const QuestionEdit: React.FC = () => {
 				.map(k => k as QuestionType);
 			setAllowedQuestionTypes(aqt);
 
-			if (questionId) {
-				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
+			// if (questionId) {
+			if (currentQuestionId) {
+				// const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === questionId) ?? {};
+				const editQuestion: Partial<Question> = quiz?.questions?.find(q => q.uid === currentQuestionId) ?? {};
 				const newType: QuestionType = aqt.includes(editQuestion.type ?? question.type)
 					? editQuestion.type ?? question.type
 					: aqt[0];
@@ -137,7 +151,8 @@ export const QuestionEdit: React.FC = () => {
 						actor.send(
 							actor,
 							CurrentQuizMessages.UpdateQuestion({
-								question: { uid: questionId, editMode: true },
+								// question: { uid: questionId, editMode: true },
+								question: { uid: currentQuestionId, editMode: true },
 								group: "", // formerGroup,
 							})
 						)
@@ -155,7 +170,7 @@ export const QuestionEdit: React.FC = () => {
 			}
 			// setGroups(groups);
 		}
-	}, [mbQuiz.hasValue, q]);
+	}, [mbQuiz.hasValue, q, currentQuestionId]);
 
 	const { rendered } = useRendered({ value: question.text });
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
@@ -198,6 +213,30 @@ export const QuestionEdit: React.FC = () => {
 		setQuestion(state => ({ ...state, answers }));
 	};
 
+	const moveAnswer = (answerIndex: number, upwards: boolean) => {
+		const newOrder: Question["answers"] = [];
+		const changeIndex = upwards ? answerIndex - 1 : answerIndex + 1;
+
+		question.answers.forEach((answer, index) => {
+			if (index === answerIndex) {
+				return;
+			}
+			if (index === changeIndex) {
+				if (upwards) {
+					newOrder.push(question.answers[answerIndex]);
+					newOrder.push(answer);
+				} else {
+					newOrder.push(answer);
+					newOrder.push(question.answers[answerIndex]);
+				}
+			} else {
+				newOrder.push(answer);
+			}
+		});
+
+		setQuestion(prev => ({...prev, answers: newOrder }));
+	};
+
 	// const editAnswer = (index: number) => {
 	//     setShowTextModal({
 	//         titleId: "edit-answer-text",
@@ -212,7 +251,7 @@ export const QuestionEdit: React.FC = () => {
 				actor.send(
 					actor.name,
 					CurrentQuizMessages.UpdateQuestion({
-						question: { uid: toId(questionId), editMode: false },
+						question: { uid: toId(currentQuestionId), editMode: false },
 						group: selectedGroup !== formerGroup ? selectedGroup : "",
 					})
 				)
@@ -225,7 +264,14 @@ export const QuestionEdit: React.FC = () => {
 		nav(-1);
 	};
 
-	const submit = async () => {
+	const handleSaveAndGoToNextQuestion = ()=> {
+		if(isLastQuestion) return;
+
+		setCurrentQuestionId(questionsIds[currentQuestionIndex + 1]);
+		submitAndNavigateBack(false);
+	};
+
+	const submitAndNavigateBack = async (navigateBack: boolean) => {
 		if (writeAccess) {
 			const quizQuestion = { ...question };
 			if (quizQuestion.type === "TEXT") {
@@ -255,11 +301,11 @@ export const QuestionEdit: React.FC = () => {
 			);
 
 			tryQuizActor.forEach(actor => {
-				if (questionId) {
+				if (currentQuestionId) {
 					actor.send(
 						actor.name,
 						CurrentQuizMessages.UpdateQuestion({
-							question: { ...quizQuestion, uid: toId(questionId) },
+							question: { ...quizQuestion, uid: toId(currentQuestionId) },
 							group: selectedGroup !== formerGroup ? selectedGroup : "",
 						})
 					);
@@ -271,14 +317,17 @@ export const QuestionEdit: React.FC = () => {
 				}
 			});
 		}
-		nav(
-			{ pathname: "/Dashboard/quiz" },
-			{
-				state: {
-					quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
-				},
-			}
-		);
+
+		if(navigateBack){
+			nav(
+				{ pathname: "/Dashboard/quiz" },
+				{
+					state: {
+						quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")),
+					},
+				}
+			);
+		}
 	};
 
 	const upvoteComment = (commentId: Id) => {
@@ -316,6 +365,8 @@ export const QuestionEdit: React.FC = () => {
 			actor.send(actor, CurrentQuizMessages.DeleteComment(commentId));
 		});
 	};
+
+	const shuffleAnswers = mbQuiz.flatMap(q => maybe(q.quiz.shuffleAnswers)).orElse(false);
 
 	const comments: Comment[] = mbQuiz.flatMap(q => maybe(q.comments)).orElse([]);
 
@@ -418,7 +469,8 @@ export const QuestionEdit: React.FC = () => {
 				show={!!showMDModal.titleId && showMDModal.type !== "QUESTION"}
 				onClose={handleClose}
 				showRelatedQuestionCheck
-				isStudent={isStudent}
+				// isStudent={isStudent}
+				isQuizTeacher={isQuizTeacher}
 				userNames={[userName, userNickname ?? ""]}
 				participationOptions={allowedAuthorTypes}
 				onSubmit={({ text, name, isRelatedToQuestion }) => {
@@ -458,49 +510,56 @@ export const QuestionEdit: React.FC = () => {
 					</Breadcrumb>
 				</div>
 
-				<CommentsContainer
-					onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-					isCommentSectionVisible={isCommentSectionVisible}
-					onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
-					showCommentArea={showCommentArea}
-				>
-					{mbQuiz
-						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
-						.map(
-							q =>
-								(q.comments ?? [])
-									.map(c => {
-										const result = comments.find(
-											cmt => cmt.uid === c && cmt.relatedQuestion === questionId
-										);
-										console.log(
-											comments.map(c => c.relatedQuestion).join(";"),
-											questionId,
-											question.uid,
-											result
-										);
-										return result;
-									})
-									.filter(Boolean) as Comment[]
-						)
-						.map(c =>
-							c.sort(sortComments).map(cmt => (
-								<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-									<CommentCard
-										isCommentSectionVisible={isCommentSectionVisible}
-										userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-										teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-										comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
-										onUpvote={() => upvoteComment(cmt.uid)}
-										onAccept={() => finishComment(cmt.uid)}
-										onDelete={() => deleteComment(cmt.uid)}
-										onJumpToQuestion={() => {}}
-									/>
-								</div>
-							))
-						)
-						.orElse([<Fragment key={"key-1"} />])}
-				</CommentsContainer>
+				{/**
+				 * MARK: Comment-container
+				 */}
+                {showCommentSection ? (
+                    <CommentsContainer
+						isQuizTeacher={isQuizTeacher}
+                        onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+                        isCommentSectionVisible={isCommentSectionVisible}
+                        onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+                        showCommentArea={showCommentArea}
+                    >
+                        {mbQuiz
+                            .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+                            .map(
+                                q =>
+                                    (q.comments ?? [])
+                                        .map(c => {
+                                            const result = comments.find(
+                                                cmt => cmt.uid === c && cmt.relatedQuestion === currentQuestionId
+                                            );
+                                            console.log(
+                                                comments.map(c => c.relatedQuestion).join(";"),
+                                                currentQuestionId,
+                                                question.uid,
+                                                result
+                                            );
+                                            return result;
+                                        })
+                                        .filter(Boolean) as Comment[]
+                            )
+                            .map(c =>
+                                c.sort(sortComments).map(cmt => (
+                                    <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+                                        <CommentCard
+                                            isCommentSectionVisible={isCommentSectionVisible}
+                                            userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+                                            teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+                                            comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
+                                            onUpvote={() => upvoteComment(cmt.uid)}
+                                            onAccept={() => finishComment(cmt.uid)}
+                                            onDelete={() => deleteComment(cmt.uid)}
+                                            onJumpToQuestion={() => {}}
+                                        />
+                                    </div>
+                                ))
+                            )
+                            .orElse([<Fragment key={"key-1"} />])}
+                    </CommentsContainer>
+                ) : null}
+
 				<div className="py-2 mb-4 mt-2 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
 					<span className="">
 						<strong>
@@ -543,6 +602,9 @@ export const QuestionEdit: React.FC = () => {
 							</Form.Group>
 						)}
 
+						{/**
+						 * MARK: Question type
+						 */}
 						<Form.Group>
 							<Form.Label>
 								<Trans id="question-edit-page.input-label.question-type" />:
@@ -594,6 +656,9 @@ export const QuestionEdit: React.FC = () => {
 					</Card.Body>
 				</Card>
 
+				{/**
+				 * MARK: Question:
+				 */}
 				<Card className="mt-3 overflow-hidden">
 					<Card.Header className="p-3 d-flex justify-content-between align-items-center background-grey">
 						<strong>
@@ -779,8 +844,13 @@ export const QuestionEdit: React.FC = () => {
                             </Form.Select>
                         </Form.Group> */}
 
+						{/**
+						 * MARK: Answers
+						 */}
 						{question.type !== "TEXT" && (
 							<div className="mt-3">
+								<hr />
+
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
 
@@ -792,8 +862,40 @@ export const QuestionEdit: React.FC = () => {
 										<Trans id="add-answer-button" />
 									</Button>
 								</div>
-								<Form className="text-start">
-									{question.answers.map((answer, i) => {
+
+								{/* <hr /> */}
+
+                                {isQuizTeacher && !shuffleAnswers ? (
+                                    <InputGroup className="mt-2 justify-content-end">
+                                        <Button
+                                            className="d-flex flex-grow-1 flex-lg-grow-0 justify-content-center align-items-center gap-2"
+                                            variant={question.answerOrderFixed ? "outline-primary" : "primary"}
+                                            disabled={!writeAccess}
+                                            onClick={() =>
+                                                setQuestion(prev => ({
+                                                    ...prev,
+                                                    answerOrderFixed: !question.answerOrderFixed,
+                                                }))
+                                            }
+                                        >
+                                            <ArrowDownUp />
+                                            {question.answerOrderFixed ? (
+                                                <Trans id="answer-movement-functionality-activate" />
+                                            ) : (
+                                                <Trans id="answer-movement-functionality-disable" />
+                                            )}
+                                        </Button>
+                                    </InputGroup>
+                                ) : null}
+
+								{/* <hr /> */}
+
+								{/* <Form className="text-start mt-4"> */}
+								<div className="text-start mt-4">
+									{question.answers.map((answer, i, arr) => {
+										const isFirst = i === 0; 
+										const isLast = i === arr.length - 1;
+
 										return (
 											<InputGroup key={i} className="mb-2 mt-2">
 												<Form.Check
@@ -820,6 +922,28 @@ export const QuestionEdit: React.FC = () => {
 														setQuestion(state => ({ ...state, answers }));
 													}}
 												/>
+
+                                                {!question.answerOrderFixed ? (
+                                                    <div className="mx-1 d-flex gap-1">
+                                                        <Button
+                                                            className="rounded-0"
+                                                            disabled={isFirst}
+                                                            variant="outline-primary"
+                                                            onClick={() => moveAnswer(i, true)}
+                                                        >
+                                                            <ArrowUp />
+                                                        </Button>
+                                                        <Button
+                                                            className="rounded-0"
+                                                            disabled={isLast}
+                                                            variant="outline-primary"
+                                                            onClick={() => moveAnswer(i, false)}
+                                                        >
+                                                            <ArrowDown />
+                                                        </Button>
+                                                    </div>
+                                                ) : null}
+
 												{/* <ButtonWithTooltip
                                                     title={i18n._("question-edit.button-tooltip.edit-answer")}
                                                     onClick={() => editAnswer(i)}
@@ -838,7 +962,8 @@ export const QuestionEdit: React.FC = () => {
 											</InputGroup>
 										);
 									})}
-								</Form>
+								</div>
+								{/* </Form> */}
 							</div>
 						)}
 					</Card.Footer>
@@ -856,11 +981,18 @@ export const QuestionEdit: React.FC = () => {
 					<Button variant="outline-primary" onClick={onCancelClick}>
 						<Trans id="cancel" />
 					</Button>
+
+                    {question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
+                        <Button onClick={handleSaveAndGoToNextQuestion}>
+							<Trans id="save-and-go-to-next-question-button" /> 
+						</Button>
+                    ) : null}
+
 					<ButtonWithTooltip
 						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}
 						title={saveButtonDisableReason}
 						disabled={isSaveButtonDisabled}
-						onClick={submit}
+						onClick={() => submitAndNavigateBack(true)}
 						className="col-12 col-lg-auto"
 					>
 						{writeAccess ? <Trans id="save-question-button" /> : <Trans id="back-to-quiz-button" />}

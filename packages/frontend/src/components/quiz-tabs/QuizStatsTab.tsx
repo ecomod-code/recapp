@@ -5,7 +5,7 @@ import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizA
 import { i18n } from "@lingui/core";
 import Button from "react-bootstrap/Button";
 import { Id, toId, User } from "@recapp/models";
-import axios from "axios";
+// import axios from "axios";
 import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { Trans } from "@lingui/react";
 import { isNil, range } from "rambda";
@@ -13,6 +13,7 @@ import { QuizStatsDetails } from "./QuizStatsDetails";
 import { QuizBarChart } from "./quiz-bar/QuizBarChart";
 import { PresentationModeSwitch } from "./PresentationModeSwitch";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
+import { downloadFile } from "../../utils";
 
 export type OwnAnswer = string | (boolean | null | undefined)[];
 
@@ -68,17 +69,18 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 	const downloadExport = (filename: string) => {
 		setShowExportModal(false);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportDone()));
-		axios
-			.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {
-				responseType: "blob",
-			})
-			.then(response => {
-				const url = window.URL.createObjectURL(response.data);
-				const a = document.createElement("a");
-				a.href = url;
-				a.download = filename;
-				a.click();
-			});
+		downloadFile(filename);
+		// axios
+		// 	.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {
+		// 		responseType: "blob",
+		// 	})
+		// 	.then(response => {
+		// 		const url = window.URL.createObjectURL(response.data);
+		// 		const a = document.createElement("a");
+		// 		a.href = url;
+		// 		a.download = filename;
+		// 		a.click();
+		// 	});
 	};
 
 	return mbQuiz
@@ -146,11 +148,12 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 									)}
 								</div>
 								<div key={i} style={{ zoom }}>
-									{group.questions.map(qId => {
+									{group.questions.map((qId, index )=> {
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
 										const question =
 											statIndex > -1 ? questions.find(q => q.uid === qId)! : undefined;
+										const questionId = question?.uid ?? toId("");
 										const correct = statIndex > -1 ? quizStats.correctAnswers.at(statIndex) : 0;
 										const wrong = statIndex > -1 ? quizStats.wrongAnswers.at(statIndex) : 0;
 										const ownCorrect = (statIndex > -1 ? ownCorrectAnswers[qId] : false) ?? false;
@@ -159,7 +162,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 
 										return (
 											<div
-												key={question?.uid ?? qId}
+												key={questionId + index + qId}
 												className="m-1 p-2 pt-3"
 												style={{ backgroundColor: "lightgrey" }}
 											>
@@ -177,14 +180,14 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																tryActor.forEach(actor =>
 																	actor.send(
 																		actor,
-																		CurrentQuizMessages.ActivateQuestionStats(
-																			question?.uid ?? toId("")
-																		)
+                                                                        CurrentQuizMessages.ActivateQuestionStats(
+                                                                            questionId
+                                                                        )
 																	)
 																)
 															}
 														>
-															{question?.text ?? questions.find(q => q.uid === qId)!.text}
+															{question?.text ?? questions.find(q => q.uid === qId)?.text}
 														</div>
 
 														{/* <Button
@@ -196,7 +199,8 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																	actor.send(
 																		actor,
 																		CurrentQuizMessages.ActivateQuestionStats(
-																			question?.uid ?? toId("")
+																			// question?.uid ?? toId("")
+																			questionId
 																		)
 																	)
 																)

@@ -22,12 +22,12 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
-msgstr "Neil: button to activate the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+msgstr "Adjust answer ordering"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-disable"
-msgstr "Neil: button to disable the state to activate the answers movement functionality so the user can move the answers order 'up' and 'down'"
+msgstr "Freeze answer ordering"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257

@@ -408,6 +408,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						created: toTimestamp(),
 						updated: toTimestamp(),
 						createdBy: clientUserId,
+						shuffleAnswers: false,
 					};
 					const uid = await this.create(quiz, clientUserRole, clientUserId);
 					const rawQuestions: Question[] = importedObject.questions;

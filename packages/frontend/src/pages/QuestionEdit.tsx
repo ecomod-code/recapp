@@ -62,8 +62,8 @@ export const QuestionEdit: React.FC = () => {
 	});
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
-	const isQuizStateStarted = q?.state === "STARTED"; 
-	const isQuizStateEditing = q?.state === "EDITING"; 
+	const isQuizStateStarted = q?.state === "STARTED";
+	const isQuizStateEditing = q?.state === "EDITING";
 
 	const [mbUser] = useStatefulActor<{ user: User }>("LocalUser");
 
@@ -234,7 +234,7 @@ export const QuestionEdit: React.FC = () => {
 			}
 		});
 
-		setQuestion(prev => ({...prev, answers: newOrder }));
+		setQuestion(prev => ({ ...prev, answers: newOrder }));
 	};
 
 	// const editAnswer = (index: number) => {
@@ -264,8 +264,8 @@ export const QuestionEdit: React.FC = () => {
 		nav(-1);
 	};
 
-	const handleSaveAndGoToNextQuestion = ()=> {
-		if(isLastQuestion) return;
+	const handleSaveAndGoToNextQuestion = () => {
+		if (isLastQuestion) return;
 
 		setCurrentQuestionId(questionsIds[currentQuestionIndex + 1]);
 		submitAndNavigateBack(false);
@@ -318,7 +318,7 @@ export const QuestionEdit: React.FC = () => {
 			});
 		}
 
-		if(navigateBack){
+		if (navigateBack) {
 			nav(
 				{ pathname: "/Dashboard/quiz" },
 				{
@@ -513,52 +513,52 @@ export const QuestionEdit: React.FC = () => {
 				{/**
 				 * MARK: Comment-container
 				 */}
-                {showCommentSection ? (
-                    <CommentsContainer
+				{showCommentSection ? (
+					<CommentsContainer
 						isQuizTeacher={isQuizTeacher}
-                        onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
-                        isCommentSectionVisible={isCommentSectionVisible}
-                        onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
-                        showCommentArea={showCommentArea}
-                    >
-                        {mbQuiz
-                            .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
-                            .map(
-                                q =>
-                                    (q.comments ?? [])
-                                        .map(c => {
-                                            const result = comments.find(
-                                                cmt => cmt.uid === c && cmt.relatedQuestion === currentQuestionId
-                                            );
-                                            console.log(
-                                                comments.map(c => c.relatedQuestion).join(";"),
-                                                currentQuestionId,
-                                                question.uid,
-                                                result
-                                            );
-                                            return result;
-                                        })
-                                        .filter(Boolean) as Comment[]
-                            )
-                            .map(c =>
-                                c.sort(sortComments).map(cmt => (
-                                    <div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
-                                        <CommentCard
-                                            isCommentSectionVisible={isCommentSectionVisible}
-                                            userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-                                            teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
-                                            comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
-                                            onUpvote={() => upvoteComment(cmt.uid)}
-                                            onAccept={() => finishComment(cmt.uid)}
-                                            onDelete={() => deleteComment(cmt.uid)}
-                                            onJumpToQuestion={() => {}}
-                                        />
-                                    </div>
-                                ))
-                            )
-                            .orElse([<Fragment key={"key-1"} />])}
-                    </CommentsContainer>
-                ) : null}
+						onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
+						isCommentSectionVisible={isCommentSectionVisible}
+						onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
+						showCommentArea={showCommentArea}
+					>
+						{mbQuiz
+							.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q.quiz) : nothing()))
+							.map(
+								q =>
+									(q.comments ?? [])
+										.map(c => {
+											const result = comments.find(
+												cmt => cmt.uid === c && cmt.relatedQuestion === currentQuestionId
+											);
+											console.log(
+												comments.map(c => c.relatedQuestion).join(";"),
+												currentQuestionId,
+												question.uid,
+												result
+											);
+											return result;
+										})
+										.filter(Boolean) as Comment[]
+							)
+							.map(c =>
+								c.sort(sortComments).map(cmt => (
+									<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
+										<CommentCard
+											isCommentSectionVisible={isCommentSectionVisible}
+											userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
+											teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+											comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
+											onUpvote={() => upvoteComment(cmt.uid)}
+											onAccept={() => finishComment(cmt.uid)}
+											onDelete={() => deleteComment(cmt.uid)}
+											onJumpToQuestion={() => {}}
+										/>
+									</div>
+								))
+							)
+							.orElse([<Fragment key={"key-1"} />])}
+					</CommentsContainer>
+				) : null}
 
 				<div className="py-2 mb-4 mt-2 d-flex gap-3 flex-column flex-lg-row align-items-lg-center justify-content-between border-2 border-bottom">
 					<span className="">
@@ -853,47 +853,47 @@ export const QuestionEdit: React.FC = () => {
 
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									<Trans id="activate-all-correct-answers" />
-
-									<Button
-										variant="warning"
-										onClick={addAnswer}
-										disabled={!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED}
-									>
-										<Trans id="add-answer-button" />
-									</Button>
+									<div className="d-flex flex-row flex-wrap">
+										{isQuizTeacher && !shuffleAnswers ? (
+											<Button
+												className="d-flex flex-grow-1 flex-lg-grow-0 justify-content-center align-items-center gap-2 me-2"
+												variant={question.answerOrderFixed ? "outline-primary" : "primary"}
+												disabled={!writeAccess}
+												onClick={() =>
+													setQuestion(prev => ({
+														...prev,
+														answerOrderFixed: !question.answerOrderFixed,
+													}))
+												}
+											>
+												<ArrowDownUp />
+												{question.answerOrderFixed ? (
+													<Trans id="answer-movement-functionality-activate" />
+												) : (
+													<Trans id="answer-movement-functionality-disable" />
+												)}
+											</Button>
+										) : null}
+										<Button
+											variant="warning"
+											onClick={addAnswer}
+											disabled={
+												!writeAccess || question.answers.length >= MAX_ANSWER_COUNT_ALLOWED
+											}
+										>
+											<Trans id="add-answer-button" />
+										</Button>
+									</div>
 								</div>
 
 								{/* <hr /> */}
-
-                                {isQuizTeacher && !shuffleAnswers ? (
-                                    <InputGroup className="mt-2 justify-content-end">
-                                        <Button
-                                            className="d-flex flex-grow-1 flex-lg-grow-0 justify-content-center align-items-center gap-2"
-                                            variant={question.answerOrderFixed ? "outline-primary" : "primary"}
-                                            disabled={!writeAccess}
-                                            onClick={() =>
-                                                setQuestion(prev => ({
-                                                    ...prev,
-                                                    answerOrderFixed: !question.answerOrderFixed,
-                                                }))
-                                            }
-                                        >
-                                            <ArrowDownUp />
-                                            {question.answerOrderFixed ? (
-                                                <Trans id="answer-movement-functionality-activate" />
-                                            ) : (
-                                                <Trans id="answer-movement-functionality-disable" />
-                                            )}
-                                        </Button>
-                                    </InputGroup>
-                                ) : null}
 
 								{/* <hr /> */}
 
 								{/* <Form className="text-start mt-4"> */}
 								<div className="text-start mt-4">
 									{question.answers.map((answer, i, arr) => {
-										const isFirst = i === 0; 
+										const isFirst = i === 0;
 										const isLast = i === arr.length - 1;
 
 										return (
@@ -904,9 +904,11 @@ export const QuestionEdit: React.FC = () => {
 													name="answer"
 													type="switch"
 													// checked={answer.correct}
-                                                    checked={
-                                                        isQuizStateStarted ? !isStudent && answer.correct : answer.correct
-                                                    }
+													checked={
+														isQuizStateStarted
+															? !isStudent && answer.correct
+															: answer.correct
+													}
 													onChange={() => toggleAnswer(i)}
 													disabled={!writeAccess}
 												/>
@@ -923,26 +925,26 @@ export const QuestionEdit: React.FC = () => {
 													}}
 												/>
 
-                                                {!question.answerOrderFixed ? (
-                                                    <div className="mx-1 d-flex gap-1">
-                                                        <Button
-                                                            className="rounded-0"
-                                                            disabled={isFirst}
-                                                            variant="outline-primary"
-                                                            onClick={() => moveAnswer(i, true)}
-                                                        >
-                                                            <ArrowUp />
-                                                        </Button>
-                                                        <Button
-                                                            className="rounded-0"
-                                                            disabled={isLast}
-                                                            variant="outline-primary"
-                                                            onClick={() => moveAnswer(i, false)}
-                                                        >
-                                                            <ArrowDown />
-                                                        </Button>
-                                                    </div>
-                                                ) : null}
+												{!question.answerOrderFixed ? (
+													<div className="mx-1 d-flex gap-1">
+														<Button
+															className="rounded-0"
+															disabled={isFirst}
+															variant="outline-primary"
+															onClick={() => moveAnswer(i, true)}
+														>
+															<ArrowUp />
+														</Button>
+														<Button
+															className="rounded-0"
+															disabled={isLast}
+															variant="outline-primary"
+															onClick={() => moveAnswer(i, false)}
+														>
+															<ArrowDown />
+														</Button>
+													</div>
+												) : null}
 
 												{/* <ButtonWithTooltip
                                                     title={i18n._("question-edit.button-tooltip.edit-answer")}
@@ -982,11 +984,11 @@ export const QuestionEdit: React.FC = () => {
 						<Trans id="cancel" />
 					</Button>
 
-                    {question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
-                        <Button onClick={handleSaveAndGoToNextQuestion}>
-							<Trans id="save-and-go-to-next-question-button" /> 
+					{question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
+						<Button onClick={handleSaveAndGoToNextQuestion}>
+							<Trans id="save-and-go-to-next-question-button" />
 						</Button>
-                    ) : null}
+					) : null}
 
 					<ButtonWithTooltip
 						isTooltipVisibleWhenButtonIsDisabled={!!saveButtonDisableReason}

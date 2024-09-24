@@ -22,12 +22,12 @@ msgstr "Login"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
-msgstr "Adjust answer ordering"
+msgstr "Adjust answer order"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-disable"
-msgstr "Freeze answer ordering"
+msgstr "Freeze answer order"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
@@ -613,6 +613,18 @@ msgstr "Archive quiz"
 #: src/components/quiz-tabs/QuizDataTab.tsx:332
 msgid "export-quiz-button"
 msgstr "Export data"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-button"
+msgstr "Duplicate quiz"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-okay"
+msgstr "Quiz was successfully duplicated"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-error"
+msgstr "An error occured when trying to duplicate the quiz"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359

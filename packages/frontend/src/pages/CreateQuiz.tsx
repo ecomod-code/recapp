@@ -36,6 +36,8 @@ export const CreateQuiz: React.FC = () => {
 				!quiz.allowedQuestionTypesSettings.SINGLE &&
 				!quiz.allowedQuestionTypesSettings.MULTIPLE &&
 				!quiz.allowedQuestionTypesSettings.TEXT;
+
+			console.log(validation, noQuestionsAllowed);
 			return (
 				<Container fluid>
 					<Row>
@@ -246,7 +248,7 @@ export const CreateQuiz: React.FC = () => {
 								<ListGroupContainer>
 									<Form.Switch
 										className="list-group-item ps-5"
-										label={i18n._("quiz-enable-question-shufflling")}
+										label={i18n._("quiz-enable-shuffling-question")}
 										checked={quiz.shuffleQuestions}
 										onChange={event =>
 											actor.send(

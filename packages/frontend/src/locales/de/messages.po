@@ -22,12 +22,12 @@ msgstr "Anmelden"
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
-msgstr "Fragenreihenfolge anpassen"
+msgstr "Antwortreihenfolge anpassen"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-disable"
-msgstr "Fragenreihenfolge einfrieren"
+msgstr "Antwortreihenfolge einfrieren"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
@@ -608,6 +608,18 @@ msgstr "Quiz archivieren"
 #: src/components/quiz-tabs/QuizDataTab.tsx:332
 msgid "export-quiz-button"
 msgstr "Daten exportieren"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-button"
+msgstr "Quiz duplizieren"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-okay"
+msgstr "Quiz wurde erfolgreich dupliziert"
+
+#. js-lingui-explicit-id
+msgid "duplicate-quiz-error"
+msgstr "Ein Fehler ist aufgetreten. Die Duplikation ist fehlgeschlagen."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:359

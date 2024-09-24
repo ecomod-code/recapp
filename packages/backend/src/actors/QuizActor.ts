@@ -364,7 +364,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					});
 					return unit();
 				},
-				Import: async ({ filename }) => {
+				Import: async ({ filename, titlePrefix }) => {
 					console.log(filename);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
 					const importedObject = JSON.parse(jsonBuffer.toString());
@@ -401,7 +401,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						studentParticipationSettings: importedObject.studentParticipationSettings,
 						studentQuestions: importedObject.studentQuestions,
 						hideComments: importedObject.hideComments ?? false,
-						title: importedObject.title,
+						title: titlePrefix ? `(${titlePrefix}) ${importedObject.title}` : importedObject.title,
 						comments: [],
 						teachers: [clientUserId],
 						students: [],
@@ -494,6 +494,24 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							return new Error("Unknown quiz");
 						}
 					);
+				},
+				Duplicate: async uid => {
+					try {
+						const filename = (await this.ask(this.ref, QuizActorMessages.Export(uid))) as string | Error;
+						if (typeof filename === "string") {
+							const newQuizId = (await this.ask(
+								this.ref,
+								QuizActorMessages.Import({ filename, titlePrefix: "DUP" })
+							)) as Id | Error;
+							if (newQuizId instanceof Error) {
+								throw new Error("Import failed");
+							}
+							return newQuizId;
+						}
+						throw new Error("Export failed");
+					} catch {
+						return new Error("Unknown quiz or corrupted quiz data");
+					}
 				},
 				default: async () => {
 					this.logger.error(`Unknown message from ${from.name} in QuizActor: ${JSON.stringify(message)}`);

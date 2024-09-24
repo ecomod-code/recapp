@@ -64,6 +64,7 @@ export const CurrentQuizMessages = unionize(
 		ActivateQuestionStats: ofType<Id>(),
 		ActivateGroupStats: ofType<string>(),
 		ActivateQuizStats: {},
+		Duplicate: {},
 		Export: {},
 		ExportQuizStats: {},
 		ExportQuestionStats: {},
@@ -242,7 +243,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 		);
 		this.updateState(draft => {
 			draft.quizStats = gs;
+			draft.quiz.statistics = gs;
 		});
+		this.send(actorUris.QuizActor, QuizActorMessages.Update({ uid: this.state.quiz.uid, statistics: gs }));
 	};
 
 	private getQuestionStats = async (id: Id) => {
@@ -812,6 +815,19 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								});
 							} else {
 								console.error(filename);
+							}
+							return unit();
+						},
+						Duplicate: async () => {
+							const result = await this.ask(
+								actorUris.QuizActor,
+								QuizActorMessages.Duplicate(this.quiz.orElse(toId(""))),
+								seconds(10).valueOf()
+							);
+							if (typeof result === "string") {
+								alert(i18n._("duplicate-quiz-okay"));
+							} else {
+								alert(i18n._("duplicate-quiz-error"));
 							}
 							return unit();
 						},

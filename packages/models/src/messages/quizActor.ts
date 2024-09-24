@@ -5,7 +5,7 @@ import { Quiz } from "../data/quiz";
 export const QuizActorMessages = unionize(
 	{
 		Create: ofType<Omit<Quiz, "uniqueLink" | "uid">>(), // Create a new quiz, returns the quiz uid (generated if not set)
-		Import: ofType<{ filename: string }>(), // Import the json with the given filename
+		Import: ofType<{ filename: string; titlePrefix: string | undefined }>(), // Import the json with the given filename
 		Update: ofType<Partial<Quiz> & { uid: Id }>(), // Update quiz data, answers updated Quiz
 		Delete: ofType<Id>(), // Completely delete a quiz, including all comments and questions
 		GetAll: {}, // Get all quizzes accessible by the requester, will send back all quizzes in this list to the requester
@@ -19,6 +19,7 @@ export const QuizActorMessages = unionize(
 		UnsubscribeFrom: ofType<Id>(), // Unsubscribe from a specific quiz's changes, including comments and questions
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes
 		Export: ofType<Id>(), // Export a quiz to a json file, returns the download uri
+		Duplicate: ofType<Id>(), // Duplicate a quiz
 		GetUserRun: ofType<{ studentId: Id; quizId: Id }>(), // Get the current quiz run of the given user
 	},
 	{ tag: "QuizActorMessage", value: "value" }

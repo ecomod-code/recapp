@@ -41,6 +41,7 @@ const newQuiz: NewQuiz = {
 	groups: [],
 	state: "ACTIVE",
 	hideComments: false,
+	shuffleAnswers: false,
 };
 
 const startValidation: Validator<NewQuiz> = {
@@ -57,7 +58,7 @@ const startValidation: Validator<NewQuiz> = {
 	groups: true,
 	state: true,
 	hideComments: true,
-	shuffleAnswers: false,
+	shuffleAnswers: true,
 };
 
 export type CreateQuizState = { quiz: NewQuiz; validation: Validator<NewQuiz> };

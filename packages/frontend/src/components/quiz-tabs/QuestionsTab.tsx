@@ -41,10 +41,9 @@ export const QuestionsTab: React.FC<{
 	const disableForStudentOrMode = disableForStudent || quizData.quiz.state !== "EDITING";
 
 	const teachers: string[] = quizData.quiz.teachers ?? [];
-    const isQuizTeacher = teachers.includes(userId);
+	const isQuizTeacher = teachers.includes(userId);
 
-	const noQuestions =
-		userRole !== "ADMIN" && !isQuizTeacher && !quizData.quiz.studentQuestions;
+	const noQuestions = userRole !== "ADMIN" && !isQuizTeacher && !quizData.quiz.studentQuestions;
 	const disableForSettingOrMode = noQuestions || quizData.quiz.state !== "EDITING";
 
 	// const [currentGroup, setCurrentGroup] = useState({
@@ -120,20 +119,12 @@ export const QuestionsTab: React.FC<{
 	};
 
 	const editQuestion = (uid: Id, group: string) => {
-        const writeAccess =
-            quizData.quiz.state === "EDITING" &&
+		const writeAccess =
+			quizData.quiz.state === "EDITING" &&
 			(isQuizTeacher ||
 				mbQuiz
 					.flatMap(q => maybe(q.questions))
-					.map(
-						qs =>
-							!!qs.find(
-								q =>
-									q.uid === uid &&
-									q.authorId === userId &&
-									quizData.quiz.studentQuestions
-							)
-					)
+					.map(qs => !!qs.find(q => q.uid === uid && q.authorId === userId && quizData.quiz.studentQuestions))
 					.orElse(false));
 
 		if (quizData.questions.find(q => q.uid === uid)?.editMode && writeAccess) {
@@ -175,7 +166,7 @@ export const QuestionsTab: React.FC<{
 
 	const defaultQuestionGroup = quizData.quiz.groups[0];
 
-    const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quizData.quiz.allowedQuestionTypesSettings);
+	const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quizData.quiz.allowedQuestionTypesSettings);
 
 	// const defaultQuestionGroup = [
 	//     quizData.quiz.groups[0],
@@ -229,39 +220,42 @@ export const QuestionsTab: React.FC<{
 				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
 					<div>
 						{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
-						{i18n._("quiz-card-number-of-participants", { count: quizData.quiz.students.length })}
+						{i18n._("quiz-card-number-of-participants", {
+							count: quizData.quiz.students.length,
+							max: quizData.quizStats?.maximumParticipants ?? 0,
+						})}
 					</div>
 
-                    {quizData.quiz.state === "EDITING" ? (
-                        <ButtonWithTooltip
-                            isTooltipVisibleWhenButtonIsDisabled={isCreatingQuestionDisabled}
-                            title={
-                                isCreatingQuestionDisabled
-                                    ? i18n._(
-                                          "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
-                                      )
-                                    : ""
-                            }
-                            className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
-                            variant="primary"
-                            disabled={disableForSettingOrMode || isCreatingQuestionDisabled}
-                            onClick={() => {
-                                const writeAccess = true;
-                                nav(
-                                    { pathname: "/Dashboard/Question" },
-                                    {
-                                        state: {
-                                            // group: questionGroup.name,
-                                            write: writeAccess ? "true" : undefined,
-                                        },
-                                    }
-                                );
-                            }}
-                        >
-                            <Plus size={28} />
-                            <Trans id="quiz-questions-tab-new-question-button" />
-                        </ButtonWithTooltip>
-                    ) : null}
+					{quizData.quiz.state === "EDITING" ? (
+						<ButtonWithTooltip
+							isTooltipVisibleWhenButtonIsDisabled={isCreatingQuestionDisabled}
+							title={
+								isCreatingQuestionDisabled
+									? i18n._(
+											"quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
+										)
+									: ""
+							}
+							className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center"
+							variant="primary"
+							disabled={disableForSettingOrMode || isCreatingQuestionDisabled}
+							onClick={() => {
+								const writeAccess = true;
+								nav(
+									{ pathname: "/Dashboard/Question" },
+									{
+										state: {
+											// group: questionGroup.name,
+											write: writeAccess ? "true" : undefined,
+										},
+									}
+								);
+							}}
+						>
+							<Plus size={28} />
+							<Trans id="quiz-questions-tab-new-question-button" />
+						</ButtonWithTooltip>
+					) : null}
 
 					{/* <Button
                             className="ps-1 col-12 col-lg-auto d-flex justify-content-center align-items-center mb-3"
@@ -317,7 +311,7 @@ export const QuestionsTab: React.FC<{
 										state={quizData.quiz.state}
 										moveUp={() => moveQuestion(defaultQuestionGroup.name, q!.uid, true)}
 										moveDown={() => moveQuestion(defaultQuestionGroup.name, q!.uid, false)}
-                                        isQuizTeacher={isQuizTeacher}
+										isQuizTeacher={isQuizTeacher}
 										// changeGroup={() => {
 										//     if (quizData.quiz.groups.length < 2) {
 										//         return;

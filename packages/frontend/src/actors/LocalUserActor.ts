@@ -147,7 +147,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 		} else if (message.tag == "UploadQuizMessage") {
 			const result: Error | Unit = await this.ask(
 				actorUris["QuizActor"],
-				QuizActorMessages.Import({ filename: message.filename })
+				QuizActorMessages.Import({ filename: message.filename, titlePrefix: undefined })
 			);
 			if ((result as any).message) {
 				this.updateState(draft => {

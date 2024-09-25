@@ -1169,6 +1169,14 @@ msgid "answer-correct"
 msgstr "Your answer is correct."
 
 #. js-lingui-explicit-id
+msgid "correct"
+msgstr "Correct"
+
+#. js-lingui-explicit-id
+msgid "wrong"
+msgstr "Incorrect"
+
+#. js-lingui-explicit-id
 msgid "answer-wrong-title"
 msgstr "Incorrect"
 

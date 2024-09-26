@@ -36,7 +36,7 @@ const storeSelectedLocal = (selectedLocal: SupportedLocale) => {
     localStorage.setItem(STORED_SELECTED_LOCALE_KEY, JSON.stringify(localInfo));
 };
 
-export const LocaleSelect = () => {
+export const LocaleSelect = (props: { label?: string }) => {
     const navigation = useNavigate();
 
     const {
@@ -57,21 +57,24 @@ export const LocaleSelect = () => {
     const flagSrc = locales[activeLocale as SupportedLocale].flag;
 
     return (
-        <div style={style}>
-            <div>
-                <Form.Select onChange={onChange} style={{ minWidth: HEADER_SELECT_MIN_WIDTH }} value={activeLocale}>
-                    {Object.entries(locales).map(([local, label]) => {
-                        return (
-                            <option key={local} value={local}>
-                                {label.label}
-                            </option>
-                        );
-                    })}
-                </Form.Select>
-            </div>
+        <div>
+            {props.label ? <span style={{fontSize: 14 }}>{props.label}</span> : null}
+            <div style={style}>
+                <div>
+                    <Form.Select onChange={onChange} style={{ minWidth: HEADER_SELECT_MIN_WIDTH, cursor: "pointer" }} value={activeLocale}>
+                        {Object.entries(locales).map(([local, label]) => {
+                            return (
+                                <option key={local} value={local}>
+                                    {label.label}
+                                </option>
+                            );
+                        })}
+                    </Form.Select>
+                </div>
 
-            <div className="ms-2" style={{ marginBottom: 4, width: 34 }}>
-                <img src={flagSrc} alt="country flag" style={{ width: "100%", height: "100%" }} />
+                <div className="ms-2" style={{ marginBottom: 4, width: 34 }}>
+                    <img src={flagSrc} alt="country flag" style={{ width: "100%", height: "100%" }} />
+                </div>
             </div>
         </div>
     );

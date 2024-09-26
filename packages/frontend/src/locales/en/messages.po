@@ -20,6 +20,21 @@ msgid "login-page.login"
 msgstr "Login"
 
 #. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.default-participation-username"
+msgstr "Neil: label for input-select to select the default participation username 'NAONYMOUS', 'NAME' or 'NICKNAME'"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.language"
+msgstr "Neil: label for input-select to select the language"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.color-palette"
+msgstr "Neil: label for input-select to select the color-palette"
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
 msgstr "Adjust answer order"

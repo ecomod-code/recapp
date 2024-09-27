@@ -126,14 +126,13 @@ export const QuestionEdit: React.FC = () => {
 				.map(k => k as UserParticipation);
 
 			setAllowedAuthorTypes(aat);
-			// todo: is it okay to comment out this code? 
-			// if (!aat.includes("ANONYMOUS")) {
-			// 	if (!aat.includes("NICKNAME")) {
-			// 		setAuthorType("NAME");
-			// 	} else {
-			// 		setAuthorType("NICKNAME");
-			// 	}
-			// }
+			if (!aat.includes("ANONYMOUS")) {
+				if (!aat.includes("NICKNAME")) {
+					setAuthorType("NAME");
+				} else {
+					setAuthorType("NICKNAME");
+				}
+			}
 
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])

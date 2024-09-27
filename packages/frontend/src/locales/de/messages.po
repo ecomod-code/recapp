@@ -20,6 +20,16 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-label.show-all-question"
+msgstr "Neil: Show all questions"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-label.hide-all-question"
+msgstr "Neil: Hide all questions"
+
+#. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.settings-label.default-participation-username"
 msgstr "Neil: label for input-select to select the default participation username 'NAONYMOUS', 'NAME' or 'NICKNAME'"

@@ -29,6 +29,7 @@ import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
+import { getStoredParticipationValue } from "../components/layout/UserParticipationSelect";
 
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
@@ -124,15 +125,7 @@ export const QuestionEdit: React.FC = () => {
 			const aat: UserParticipation[] = keys(quiz?.quiz.studentParticipationSettings)
 				.filter(k => !!quiz?.quiz.studentParticipationSettings[k as UserParticipation])
 				.map(k => k as UserParticipation);
-
 			setAllowedAuthorTypes(aat);
-			if (!aat.includes("ANONYMOUS")) {
-				if (!aat.includes("NICKNAME")) {
-					setAuthorType("NAME");
-				} else {
-					setAuthorType("NICKNAME");
-				}
-			}
 
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
@@ -171,6 +164,20 @@ export const QuestionEdit: React.FC = () => {
 					);
 				}
 			} else {
+				const storedValue = getStoredParticipationValue();
+				// if (storedValue && (isQuizTeacher || aat.includes(storedValue))) {
+				if (storedValue && aat.includes(storedValue)) {
+					setAuthorType(storedValue);
+				}else {
+					if (!aat.includes("ANONYMOUS")) {
+						if (!aat.includes("NICKNAME")) {
+							setAuthorType("NAME");
+						} else {
+							setAuthorType("NICKNAME");
+						}
+					}
+				}
+
 				const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
 
 				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });

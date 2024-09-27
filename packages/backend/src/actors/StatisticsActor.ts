@@ -292,7 +292,7 @@ export class StatisticsActor extends SubscribableActor<
 								const qstats = await this.getStatsForQuestion(question.uid);
 								if (qstats.tag === "TextElementStatistics") {
 									lines.push(
-										`${question.text.slice(0, 30)};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
+										`${question.text};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
 											`${qstats.answers[0] ?? ""};${!!qstats.answers[0] ? 1 : 0};` +
 											`${qstats.answers[1] ?? ""};${!!qstats.answers[1] ? 1 : 0};` +
 											`${qstats.answers[2] ?? ""};${!!qstats.answers[2] ? 1 : 0};` +
@@ -302,7 +302,7 @@ export class StatisticsActor extends SubscribableActor<
 									);
 								} else {
 									lines.push(
-										`${question.text.slice(0, 30)};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
+										`${question.text};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
 											`${question.answers[0]?.text ?? ""};${qstats.answers[0] ?? 0};` +
 											`${question.answers[1]?.text ?? ""};${qstats.answers[1] ?? 0};` +
 											`${question.answers[2]?.text ?? ""};${qstats.answers[2] ?? 0};` +
@@ -341,7 +341,7 @@ export class StatisticsActor extends SubscribableActor<
 						<th>
 							<strong>Correct</strong>
 						</th></tr><tr>
-										<td>${question.text.slice(0, 30)}</td>
+										<td>${question.text}</td>
 										<td>${question.type}</td>
 										<td>${stats.maximumParticipants}</td>
 										<td>${stats.answers[index]}</td>
@@ -410,7 +410,7 @@ export class StatisticsActor extends SubscribableActor<
 						</th>
 						<th>
 							<strong>Correct</strong>
-						</th></tr><tr><td>${question.text.slice(0, 30)}</td>
+						</th></tr><tr><td>${question.text}</td>
 									<td>${question.type}</td>
 									<td>${stats.maximumParticipants}</td>
 									<td>${stats.answers[index]}</td>
@@ -518,7 +518,7 @@ export class StatisticsActor extends SubscribableActor<
 					questions.forEach((question, index) => {
 						if (question) {
 							lines.push(
-								`${question.text.slice(0, 30)};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]}`
+								`${question.text};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]}`
 							);
 						}
 					});
@@ -565,7 +565,7 @@ export class StatisticsActor extends SubscribableActor<
 							.map((question, index) => {
 								if (!question) return "";
 								return `<tr>
-							<td style="max-width: 30%; word-wrap: break-word;">${question.text.slice(0, 80)}</td>
+							<td style="max-width: 30%; word-wrap: break-word;">${question.text}</td>
 							<td>${question.type}</td>
 							<td>${stats.maximumParticipants}</td>
 							<td>${stats.answers[index]}</td>

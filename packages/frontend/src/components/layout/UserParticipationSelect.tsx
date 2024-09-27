@@ -1,9 +1,10 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { i18n } from "@lingui/core";
 import Form from "react-bootstrap/Form";
 import { UserParticipation } from "@recapp/models";
 import { HEADER_SELECT_MIN_WIDTH } from "../../constants/layout";
 
-const userParticipationOptions: UserParticipation[] = ["ANONYMOUS", "NICKNAME", "NAME"];
+// const userParticipationOptions: UserParticipation[] = ["ANONYMOUS", "NICKNAME", "NAME"];
 
 const STORED_PARTICIPATION_LOCAL_KEY = "default-selected-participation-value";
 const DEFAULT_PARTICIPATION_VALUE: UserParticipation = "ANONYMOUS";
@@ -43,6 +44,21 @@ export const UserParticipationSelect = (props: Props) => {
 
     const storedValue = getStoredParticipationValue();
 
+    const userParticipationOptions: Record<UserParticipation, {value: UserParticipation, label: string; }> = {
+        ANONYMOUS: {
+            value: "ANONYMOUS", 
+            label: i18n._("participation-select-option.anonymous")
+        },
+        NICKNAME: {
+            value: "NICKNAME", 
+            label: i18n._("participation-select-option.nickname")
+        },
+        NAME: {
+            value: "NAME", 
+            label: i18n._("participation-select-option.name")
+        },
+    };
+
     useEffect(() => {
         if (storedValue) {
             setSelectedParticipation(storedValue);
@@ -62,10 +78,10 @@ export const UserParticipationSelect = (props: Props) => {
                         style={{ minWidth: HEADER_SELECT_MIN_WIDTH, cursor: "pointer" }}
                         value={selectedParticipation}
                     >
-                        {userParticipationOptions.map(value => {
+                        {Object.values(userParticipationOptions).map(item => {
                             return (
-                                <option key={value} value={value}>
-                                    {value}
+                                <option key={item.value} value={item.value}>
+                                    {item.label}
                                 </option>
                             );
                         })}

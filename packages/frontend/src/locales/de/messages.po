@@ -22,42 +22,42 @@ msgstr "Anmelden"
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-label.show-all-question"
-msgstr "Neil: Show all questions"
+msgstr "Alle Fragen zeigen"
 
 #. js-lingui-explicit-id
 #: src/components/cards/QuestionCard.tsx:81
 msgid "question-card.button-label.hide-all-question"
-msgstr "Neil: Hide all questions"
+msgstr "Alle Fragen ausblenden"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "participation-select-option.anonymous"
-msgstr "Neil: anonymous"
+msgstr "Anonym"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "participation-select-option.nickname"
-msgstr "Neil: nickname"
+msgstr "Spitzname"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "participation-select-option.name"
-msgstr "Neil: name"
+msgstr "Name"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.settings-label.default-participation-username"
-msgstr "Neil: label for input-select to select the default participation username 'NAONYMOUS', 'NAME' or 'NICKNAME'"
+msgstr "Optionen zur Teilnahme"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.settings-label.language"
-msgstr "Neil: label for input-select to select the language"
+msgstr "Sprache"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "header-section.settings-label.color-palette"
-msgstr "Neil: label for input-select to select the color-palette"
+msgstr "Farbpalette"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477

@@ -137,6 +137,34 @@ export const CreateQuiz: React.FC = () => {
 											)
 										}
 									/>
+
+									<Form.Switch
+										className="list-group-item ps-5"
+										label={i18n._("quiz-allows-student-to-see-statistics")}
+										checked={quiz.studentsCanSeeStatistics}
+										onChange={event =>
+											actor.send(
+												actor,
+												CreateQuizMessages.Update({
+													studentsCanSeeStatistics: event.target.checked
+												})
+											)
+										}
+									/>
+
+									<Form.Switch
+										className="list-group-item ps-5"
+										label={i18n._("quiz-hide-comments-switch")}
+										checked={quiz.hideComments}
+										onChange={event =>
+											actor.send(
+												actor,
+												CreateQuizMessages.Update({
+													hideComments: event.target.checked
+												})
+											)
+										}
+									/>
 								</ListGroupContainer>
 
 								<ListGroupContainer header={i18n._("quiz-student-participation")}>
@@ -255,6 +283,22 @@ export const CreateQuiz: React.FC = () => {
 												actor,
 												CreateQuizMessages.Update({
 													shuffleQuestions: event.target.checked,
+												})
+											)
+										}
+									/>
+								</ListGroupContainer>
+
+								<ListGroupContainer>
+									<Form.Switch
+										className="list-group-item ps-5"
+										label={i18n._("quiz-enable-shuffling-answers")}
+										checked={quiz.shuffleAnswers}
+										onChange={event =>
+											actor.send(
+												actor,
+												CreateQuizMessages.Update({
+													shuffleAnswers: event.target.checked,
 												})
 											)
 										}

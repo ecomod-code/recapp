@@ -29,6 +29,7 @@ import { CommentsContainer } from "../components/cards/CommentsContainer";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
+import { getStoredParticipationValue } from "../components/layout/UserParticipationSelect";
 
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
@@ -106,6 +107,9 @@ export const QuestionEdit: React.FC = () => {
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
 
+	const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
+	const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
+
 	useEffect(() => {
 		try {
 			if (mbQuiz.isEmpty()) {
@@ -121,15 +125,7 @@ export const QuestionEdit: React.FC = () => {
 			const aat: UserParticipation[] = keys(quiz?.quiz.studentParticipationSettings)
 				.filter(k => !!quiz?.quiz.studentParticipationSettings[k as UserParticipation])
 				.map(k => k as UserParticipation);
-
 			setAllowedAuthorTypes(aat);
-			if (!aat.includes("ANONYMOUS")) {
-				if (!aat.includes("NICKNAME")) {
-					setAuthorType("NAME");
-				} else {
-					setAuthorType("NICKNAME");
-				}
-			}
 
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])
@@ -143,6 +139,15 @@ export const QuestionEdit: React.FC = () => {
 				const newType: QuestionType = aqt.includes(editQuestion.type ?? question.type)
 					? editQuestion.type ?? question.type
 					: aqt[0];
+
+                const authorName = editQuestion.authorName;
+                if (authorName === userName) {
+                    setAuthorType("NAME");
+                } else if (authorName === userNickname) {
+                    setAuthorType("NICKNAME");
+                } else {
+                    setAuthorType("ANONYMOUS");
+                }
 
 				setQuestion({ ...question, ...editQuestion, type: newType });
 				setHint(!!editQuestion.hint);
@@ -159,6 +164,20 @@ export const QuestionEdit: React.FC = () => {
 					);
 				}
 			} else {
+				const storedValue = getStoredParticipationValue();
+				// if (storedValue && (isQuizTeacher || aat.includes(storedValue))) {
+				if (storedValue && aat.includes(storedValue)) {
+					setAuthorType(storedValue);
+				}else {
+					if (!aat.includes("ANONYMOUS")) {
+						if (!aat.includes("NICKNAME")) {
+							setAuthorType("NAME");
+						} else {
+							setAuthorType("NICKNAME");
+						}
+					}
+				}
+
 				const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
 
 				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
@@ -342,8 +361,6 @@ export const QuestionEdit: React.FC = () => {
 		});
 	};
 
-	const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
-	const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
 
 	const addComment = ({ text, name, isRelatedToQuestion }: CommentEditorModalOnSubmitParams) => {
 		const c: Omit<Comment, "authorId" | "uid"> = {
@@ -576,6 +593,9 @@ export const QuestionEdit: React.FC = () => {
 
 				<Card className="overflow-hidden">
 					<Card.Body className="d-flex flex-column gap-3 background-grey">
+						{/**
+						 * MARK: Author
+						 */}
 						{isStudent && writeAccess && (
 							<Form.Group>
 								<Form.Label className="m-0">{i18n._("author")}:</Form.Label>

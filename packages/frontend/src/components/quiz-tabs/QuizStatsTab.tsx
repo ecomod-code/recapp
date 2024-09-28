@@ -12,8 +12,9 @@ import { isNil, range } from "rambda";
 import { QuizStatsDetails } from "./QuizStatsDetails";
 import { QuizBarChart } from "./quiz-bar/QuizBarChart";
 import { PresentationModeSwitch } from "./PresentationModeSwitch";
-import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
+// import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 import { downloadFile } from "../../utils";
+import { CORRECT_COLOR, WRONG_COLOR } from "../../colorPalette";
 
 export type OwnAnswer = string | (boolean | null | undefined)[];
 
@@ -148,7 +149,8 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 									)}
 								</div>
 								<div key={i} style={{ zoom }}>
-									{group.questions.map((qId, index )=> {
+									{group.questions.map((qId, index, arr)=> {
+										const isLast = arr.length - 1 === index;
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
 										const question =
@@ -163,10 +165,11 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 										return (
 											<div
 												key={questionId + index + qId}
-												className="m-1 p-2 pt-3"
-												style={{ backgroundColor: "lightgrey" }}
+												className="m-1xx p-2 pt-3 pb-3"
+												// style={{ backgroundColor: "lightgrey" }}
+												style={{ borderBottom: !isLast ?  "2px solid lightgray" : undefined }}
 											>
-												<div className="d-flex flex-column justify-content-between w-100">
+												<div className="d-flex flex-column justify-content-between w-100 row-gap-1">
 													<div className="d-flex align-items-start justify-content-between">
 														<div
 															className="text-overflow-ellipsis text-primary"
@@ -211,14 +214,30 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 														</Button> */}
 													</div>
 
-													<div className="d-flex align-items-center justify-content-between">
+													<div className="d-flex align-items-center justify-content-between flex-wrap row-gap-1">
 														<div>
-															{!isNil(ownCorrectAnswers[qId]) && (
-																<>
-																	(<Trans id="address-you" />:{" "}
-																	{ownCorrect ? CHECK_SYMBOL : X_SYMBOL})
-																</>
-															)}
+                                                            {!isNil(ownCorrectAnswers[qId]) && (
+                                                                <>
+                                                                    {/* (<Trans id="address-you" />:{" "} */}
+                                                                    {/* {ownCorrect ? CHECK_SYMBOL : X_SYMBOL}) */}
+                                                                    <span
+                                                                        style={{
+                                                                            color: ownCorrect
+                                                                                ? CORRECT_COLOR
+                                                                                : WRONG_COLOR,
+                                                                            fontWeight: "bold",
+                                                                            fontSize: 14,
+                                                                        }}
+                                                                    >
+																		({ownCorrect ? (
+                                                                            <Trans id="correct" />
+                                                                        ) : (
+                                                                            <Trans id="wrong" />
+                                                                        )})
+                                                                    </span>
+                                                                    {/* ) */}
+                                                                </>
+                                                            )}
 														</div>
 														<div className="lh-1 ">
 															{noDetails ? (

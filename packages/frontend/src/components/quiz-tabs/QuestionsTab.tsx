@@ -9,7 +9,7 @@ import { useStatefulActor } from "ts-actors-react";
 import { Maybe, maybe } from "tsmonads";
 
 // import Accordion from "react-bootstrap/Accordion";
-// import Button, { ButtonProps } from "react-bootstrap/Button";
+import Button from "react-bootstrap/Button";
 // import Button from "react-bootstrap/Button";
 import Row from "react-bootstrap/Row";
 // import { ArrowDown, ArrowUp, Pencil, Plus } from "react-bootstrap-icons";
@@ -217,14 +217,48 @@ export const QuestionsTab: React.FC<{
                 defaultValue={currentGroup.name}
             /> */}
 			<div className="d-flex flex-column h-100 w-100">
-				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-2">
-					<div>
-						{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
-						{i18n._("quiz-card-number-of-participants", {
-							count: quizData.quiz.students.length,
-							max: quizData.quizStats?.maximumParticipants ?? 0,
-						})}
-					</div>
+				<div>
+					{i18n._("quiz-card-number-of-questions", { count: quizData.questions.length })},{" "}
+					{i18n._("quiz-card-number-of-participants", {
+						count: quizData.quiz.students.length,
+						max: quizData.quizStats?.maximumParticipants ?? 0,
+					})}
+				</div>
+
+				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-end gap-2">
+                    {isQuizTeacher && quizData.quiz.state === "EDITING" ? (
+                        <>
+                            <Button
+                                variant="outline-primary"
+								className="col-12 col-lg-auto d-flex justify-content-center align-items-center gap-1"
+                                onClick={() => {
+                                    quizData.questions.forEach(question => {
+										if(!question.approved){
+											approveQuestion(question.uid, false);
+										}
+                                    });
+                                }}
+                            >
+                                {/* <Eye />  */}
+								<Trans id="question-card.button-label.show-all-question" />
+                            </Button>
+
+                            <Button
+                                variant="outline-primary"
+								className="col-12 col-lg-auto d-flex justify-content-center align-items-center gap-1"
+                                onClick={() => {
+                                    quizData.questions.forEach(question => {
+										if(question.approved){
+											approveQuestion(question.uid, true);
+										}
+                                    });
+                                }}
+                            >
+								{/* <EyeSlash />  */}
+								<Trans id="question-card.button-label.hide-all-question" />
+                            </Button>
+                        </>
+                    ) : null}
 
 					{quizData.quiz.state === "EDITING" ? (
 						<ButtonWithTooltip
@@ -252,7 +286,7 @@ export const QuestionsTab: React.FC<{
 								);
 							}}
 						>
-							<Plus size={28} />
+							<Plus size={24} />
 							<Trans id="quiz-questions-tab-new-question-button" />
 						</ButtonWithTooltip>
 					) : null}

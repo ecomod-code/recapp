@@ -120,6 +120,7 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 					}
 					return questionToCreate.uid;
 				},
+				// MARK: Update
 				Update: async question => {
 					const existingQuestion = await this.getEntity(question.uid);
 					return existingQuestion
@@ -131,7 +132,8 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 								return new Error("Invalid write access to comment");
 							}
 							c.updated = toTimestamp();
-							const { quiz, created, authorId, authorName, ...updateDelta } = question;
+							// const { quiz, created, authorId, authorName, ...updateDelta } = question;
+							const { quiz, created, authorId, ...updateDelta } = question;
 							const questionToUpdate = questionSchema.parse({ ...c, ...updateDelta });
 							await this.storeEntity(questionToUpdate);
 							for (const [subscriber, subscription] of this.state.collectionSubscribers) {

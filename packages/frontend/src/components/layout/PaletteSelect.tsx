@@ -5,7 +5,7 @@ import { HEADER_SELECT_MIN_WIDTH } from "../../constants/layout";
 import { PaletteKey, getStoredPaletteKey, storePaletteKey } from "../../colorPalette";
 import { colorPalette } from "../../colorPalette";
 
-export const PaletteSelect = () => {
+export const PaletteSelect = (props: { label?: string }) => {
     const navigation = useNavigate();
     const [activePaletteKey, setActivePaletteKey] = useState<PaletteKey>(() => getStoredPaletteKey());
 
@@ -23,41 +23,48 @@ export const PaletteSelect = () => {
     const activePalette = colorPalette[activePaletteKey];
 
     return (
-        <div className="d-flex align-items-center">
-            <div>
-                <Form.Select onChange={onChange} style={{ minWidth: HEADER_SELECT_MIN_WIDTH }} value={activePaletteKey}>
-                    {Object.entries(colorPalette).map(([paletteKey]) => {
-                        return (
-                            <option key={paletteKey} value={paletteKey}>
-                                {paletteKey}
-                            </option>
-                        );
-                    })}
-                </Form.Select>
-            </div>
+        <div>
+            {props.label ? <span style={{fontSize: 14 }}>{props.label}</span> : null}
+            <div className="d-flex align-items-center">
+                <div>
+                    <Form.Select
+                        onChange={onChange}
+                        style={{ minWidth: HEADER_SELECT_MIN_WIDTH, cursor: "pointer" }}
+                        value={activePaletteKey}
+                    >
+                        {Object.entries(colorPalette).map(([paletteKey]) => {
+                            return (
+                                <option key={paletteKey} value={paletteKey}>
+                                    {paletteKey}
+                                </option>
+                            );
+                        })}
+                    </Form.Select>
+                </div>
 
-            <div className="ms-2">
-                <div className="d-flex flex-1 align-items-center gap-1">
-                    {Object.entries(activePalette).map(([key, { color, textColor, symbol }]) => {
-                        return (
-                            <div
-                                key={key}
-                                className="d-flex justify-content-center align-items-center"
-                                style={{
-                                    backgroundColor: color,
-                                    color: textColor,
-                                    width: 30,
-                                    aspectRatio: 1,
-                                    borderRadius: 5,
-                                    // outline: "2px solid lightgray",
-                                }}
-                            >
-                                <span className="fw-bold" style={{ fontSize: 12 }}>
-                                    {symbol}
-                                </span>
-                            </div>
-                        );
-                    })}
+                <div className="ms-2">
+                    <div className="d-flex flex-1 align-items-center gap-1">
+                        {Object.entries(activePalette).map(([key, { color, textColor, symbol }]) => {
+                            return (
+                                <div
+                                    key={key}
+                                    className="d-flex justify-content-center align-items-center"
+                                    style={{
+                                        backgroundColor: color,
+                                        color: textColor,
+                                        width: 30,
+                                        aspectRatio: 1,
+                                        borderRadius: 5,
+                                        // outline: "2px solid lightgray",
+                                    }}
+                                >
+                                    <span className="fw-bold" style={{ fontSize: 12 }}>
+                                        {symbol}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </div>
         </div>

@@ -11,16 +11,17 @@ import Dropdown from "react-bootstrap/Dropdown";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import Form from "react-bootstrap/Form";
-import InputGroup from "react-bootstrap/InputGroup";
 import { BoxArrowRight, Pencil } from "react-bootstrap-icons";
 import { LocaleSelect } from "../components/layout/LocaleSelect";
 import { PaletteSelect } from "../components/layout/PaletteSelect";
 import { InitialsBubble } from "../components/InitialsBubble";
+import { UserParticipationSelect } from "../components/layout/UserParticipationSelect";
 import { ChangeNicknameModal } from "../components/modals/ChangeNicknameModal";
 import { ErrorModal } from "../components/modals/ErrorModal";
 import { TooltipWrapper } from "../components/TooltipWrapper";
 import { actorUris } from "../actorUris";
 import { CurrentQuizState } from "../actors/CurrentQuizActor";
+import { ButtonWithTooltip } from "../components/ButtonWithTooltip";
 
 export const HEADER_HEIGHT = 40;
 
@@ -85,7 +86,7 @@ export const HeaderSection: React.FC = () => {
 
                                 {!quizData?.isPresentationModeActive ? (
                                     <Nav className="justify-content-end flex-grow-1 pe-3">
-                                        <Dropdown align="end" style={{ minWidth: 36 }} autoClose="outside">
+                                        <Dropdown align="end" style={{ minWidth: 36 }}  autoClose="outside">
                                             <Dropdown.Toggle as={CustomToggle} variant="light">
                                                 <InitialsBubble username={user.username} />
                                             </Dropdown.Toggle>
@@ -94,7 +95,7 @@ export const HeaderSection: React.FC = () => {
                                                 <Dropdown.Header className="fs-6">
                                                     <span className="fw-bold">{user.username}</span>&nbsp;{role}
                                                 </Dropdown.Header>
-                                                <Dropdown.Item onClick={() => setNameModal(true)}>
+                                                {/* <Dropdown.Item onClick={() => setNameModal(true)}>
                                                     <InputGroup className="mb-1">
                                                         <InputGroup.Text>Pseudonym</InputGroup.Text>
                                                         <Form.Control disabled value={nickname} />
@@ -108,12 +109,35 @@ export const HeaderSection: React.FC = () => {
                                                             </InputGroup.Text>
                                                         </TooltipWrapper>
                                                     </InputGroup>
+                                                </Dropdown.Item> */}
+                                                <Dropdown.Item style={{cursor: "default"}}>
+                                                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
+                                                        <span style={{fontSize: 14 }}>Pseudonym: </span>
+                                                        <ButtonWithTooltip
+                                                            title={i18n._("header-section.button-tooltip.edit-or-add-pseudonym")}
+                                                            variant="link"
+                                                            className="p-0"
+                                                            onClick={() => setNameModal(true)}
+                                                        >
+                                                            <Pencil />
+                                                            <span className="ms-1">
+                                                                {i18n._("button-label-edit")}
+                                                            </span>
+                                                        </ButtonWithTooltip>
+                                                    </div>
+                                                    <Form.Control disabled value={nickname} />
                                                 </Dropdown.Item>
-                                                <Dropdown.Item>
-                                                    <LocaleSelect />
+                                                <Dropdown.Item style={{cursor: "default"}}>
+                                                    {/* <UserParticipationSelect label="default participation username: " /> */}
+                                                    <UserParticipationSelect label={i18n._("header-section.settings-label.default-participation-username")} />
                                                 </Dropdown.Item>
-                                                <Dropdown.Item>
-                                                   <PaletteSelect /> 
+                                                <Dropdown.Item style={{cursor: "default"}}>
+                                                    {/* <LocaleSelect label="Language: " /> */}
+                                                    <LocaleSelect label={i18n._("header-section.settings-label.language")} />
+                                                </Dropdown.Item>
+                                                <Dropdown.Item style={{cursor: "default"}}>
+                                                   {/* <PaletteSelect label="color palette: " />  */}
+                                                   <PaletteSelect label={i18n._("header-section.settings-label.color-palette")} /> 
                                                 </Dropdown.Item>
                                                 <Dropdown.Divider></Dropdown.Divider>
                                                 <Dropdown.Item href={`${import.meta.env.VITE_BACKEND_URI}/auth/logout`}>

@@ -10,6 +10,7 @@ import MDEditor, { commands } from "@uiw/react-md-editor";
 import { UserParticipation } from "@recapp/models";
 import { maybe } from "tsmonads";
 import { useRendered } from "../../hooks/useRendered";
+import { getStoredParticipationValue } from "../layout/UserParticipationSelect";
 
 const LABEL_MIN_WIDTH = 140;
 
@@ -50,6 +51,14 @@ export const CommentEditorModal: React.FC<Props> = ({
     useEffect(() => {
         setValue(editorValue);
     }, [editorValue]);
+
+    const storedValue = getStoredParticipationValue();
+    useEffect(() => {
+        // if (storedValue && (isQuizTeacher || participationOptions.includes(storedValue))) {
+        if (storedValue && participationOptions.includes(storedValue)) {
+            setName(storedValue);
+        }
+    }, [storedValue]);
 
     return (
         <Modal show={show} dialogClassName="modal-80w">

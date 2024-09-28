@@ -20,6 +20,46 @@ msgid "login-page.login"
 msgstr "Anmelden"
 
 #. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-label.show-all-question"
+msgstr "Alle Fragen zeigen"
+
+#. js-lingui-explicit-id
+#: src/components/cards/QuestionCard.tsx:81
+msgid "question-card.button-label.hide-all-question"
+msgstr "Alle Fragen ausblenden"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "participation-select-option.anonymous"
+msgstr "Anonym"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "participation-select-option.nickname"
+msgstr "Spitzname"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "participation-select-option.name"
+msgstr "Name"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.default-participation-username"
+msgstr "Optionen zur Teilnahme"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.language"
+msgstr "Sprache"
+
+#. js-lingui-explicit-id
+#: src/layout/HeaderSection.tsx:88
+msgid "header-section.settings-label.color-palette"
+msgstr "Farbpalette"
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:477
 msgid "answer-movement-functionality-activate"
 msgstr "Antwortreihenfolge anpassen"
@@ -1162,6 +1202,14 @@ msgstr "Antwort richtig"
 #. js-lingui-explicit-id
 msgid "answer-correct"
 msgstr "Die Frage wurde richtig beantwortet."
+
+#. js-lingui-explicit-id
+msgid "correct"
+msgstr "Richtig"
+
+#. js-lingui-explicit-id
+msgid "wrong"
+msgstr "Falsch"
 
 #. js-lingui-explicit-id
 msgid "answer-wrong-title"

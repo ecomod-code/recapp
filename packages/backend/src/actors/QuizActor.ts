@@ -14,6 +14,7 @@ import {
 	toId,
 	QuizRun,
 	User,
+	UserRole,
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
@@ -364,7 +365,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					});
 					return unit();
 				},
-				Import: async ({ filename, titlePrefix }) => {
+				Import: async ({ filename, titlePrefix, userId, userRole }) => {
 					console.log(filename);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
 					const importedObject = JSON.parse(jsonBuffer.toString());
@@ -403,20 +404,20 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						hideComments: importedObject.hideComments ?? false,
 						title: titlePrefix ? `(${titlePrefix}) ${importedObject.title}` : importedObject.title,
 						comments: [],
-						teachers: [clientUserId],
+						teachers: [userId ?? clientUserId],
 						students: [],
 						created: toTimestamp(),
 						updated: toTimestamp(),
-						createdBy: clientUserId,
+						createdBy: userId ?? clientUserId,
 						shuffleAnswers: false,
 					};
-					const uid = await this.create(quiz, clientUserRole, clientUserId);
+					const uid = await this.create(quiz, userRole ?? clientUserRole, userId ?? clientUserId);
 					const rawQuestions: Question[] = importedObject.questions;
 					const questionOldIdToNewId = new Map<Id, Id>();
 					const db = await this.connector.db();
 					const userData: User = await this.ask(
 						"actors://recapp-backend/UserStore",
-						UserStoreMessages.Get(clientUserId)
+						UserStoreMessages.Get(userId ?? clientUserId)
 					);
 					await Promise.all(
 						rawQuestions.map(async (q: Question) => {
@@ -424,7 +425,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							questionOldIdToNewId.set(q.uid, newId);
 							q.uid = newId;
 							q.quiz = uid;
-							q.authorId = clientUserId;
+							q.authorId = userId ?? clientUserId;
 							q.authorName = userData.username;
 							q.created = toTimestamp();
 							q.updated = toTimestamp();
@@ -501,7 +502,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						if (typeof filename === "string") {
 							const newQuizId = (await this.ask(
 								this.ref,
-								QuizActorMessages.Import({ filename, titlePrefix: "DUP" })
+								QuizActorMessages.Import({
+									filename,
+									titlePrefix: "DUP",
+									userId: clientUserId,
+									userRole: clientUserRole as UserRole,
+								})
 							)) as Id | Error;
 							if (newQuizId instanceof Error) {
 								throw new Error("Import failed");

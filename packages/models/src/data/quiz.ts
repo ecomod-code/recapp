@@ -1,5 +1,5 @@
 import zod, { ZodBoolean } from "zod";
-import { idEntitySchema, timestampSchema, uidSchema } from "./base";
+import { Id, idEntitySchema, timestampSchema, uidSchema } from "./base";
 import { userParticipationSchema } from "./user";
 import { textElementStatisticsSchema, choiceElementStatisticsSchema, groupStatisticsSchema } from "./statistics";
 
@@ -94,6 +94,11 @@ export const quizSchema = zod
 	.merge(idEntitySchema);
 
 export type Quiz = zod.infer<typeof quizSchema>;
+
+export const isInTeachersList = (quiz: Quiz, userId: Id): boolean =>
+	quiz.teachers.includes(userId) && !(quiz.previewers ?? []).includes(userId);
+export const isInStudentList = (quiz: Quiz, userId: Id): boolean =>
+	quiz.students.includes(userId) || (quiz.previewers ?? []).includes(userId);
 
 export const testPackage = zod.object({
 	studentId: uidSchema,

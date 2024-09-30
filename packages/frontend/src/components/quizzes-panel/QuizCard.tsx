@@ -81,9 +81,8 @@ export const QuizCard: React.FC<{
 				</Card.Title> */}
 				<Card.Body>
 					<div>
-						{i18n._("quiz-card-number-of-participants", {
+						{i18n._("quiz-card-number-of-participants-count", {
 							count: quiz.students?.length ?? 0,
-							max: quiz.statistics?.maximumParticipants ?? 0,
 						})}
 						,&nbsp;
 						{i18n._("quiz-card-number-of-questions", { count: getNumberOfQuestions(quiz.groups ?? []) })}

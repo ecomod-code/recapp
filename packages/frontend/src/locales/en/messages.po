@@ -516,6 +516,10 @@ msgid "quiz-card-number-of-participants"
 msgstr "{count} registered participants, {max} active participants"
 
 #. js-lingui-explicit-id
+msgid "quiz-card-number-of-participants-count"
+msgstr "{count} registered participants"
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:197
 msgid "quiz-show-qr-code-button"
 msgstr "Show QR code"

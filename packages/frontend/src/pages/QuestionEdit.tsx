@@ -34,8 +34,8 @@ import { getStoredParticipationValue } from "../components/layout/UserParticipat
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
 const sortComments = (a: Comment, b: Comment) => {
-	if (a.answered && !b.answered) return 1;
-	if (!a.answered && b.answered) return -1;
+	if (a.answered && !b.answered) return -1;
+	if (!a.answered && b.answered) return 1;
 	if (a.upvoters.length !== b.upvoters.length) return b.upvoters.length - a.upvoters.length;
 	return b.updated.value - a.updated.value;
 };
@@ -140,14 +140,14 @@ export const QuestionEdit: React.FC = () => {
 					? editQuestion.type ?? question.type
 					: aqt[0];
 
-                const authorName = editQuestion.authorName;
-                if (authorName === userName) {
-                    setAuthorType("NAME");
-                } else if (authorName === userNickname) {
-                    setAuthorType("NICKNAME");
-                } else {
-                    setAuthorType("ANONYMOUS");
-                }
+				const authorName = editQuestion.authorName;
+				if (authorName === userName) {
+					setAuthorType("NAME");
+				} else if (authorName === userNickname) {
+					setAuthorType("NICKNAME");
+				} else {
+					setAuthorType("ANONYMOUS");
+				}
 
 				setQuestion({ ...question, ...editQuestion, type: newType });
 				setHint(!!editQuestion.hint);
@@ -168,7 +168,7 @@ export const QuestionEdit: React.FC = () => {
 				// if (storedValue && (isQuizTeacher || aat.includes(storedValue))) {
 				if (storedValue && aat.includes(storedValue)) {
 					setAuthorType(storedValue);
-				}else {
+				} else {
 					if (!aat.includes("ANONYMOUS")) {
 						if (!aat.includes("NICKNAME")) {
 							setAuthorType("NAME");
@@ -360,7 +360,6 @@ export const QuestionEdit: React.FC = () => {
 			actor.send(actor, CurrentQuizMessages.FinishComment(commentId));
 		});
 	};
-
 
 	const addComment = ({ text, name, isRelatedToQuestion }: CommentEditorModalOnSubmitParams) => {
 		const c: Omit<Comment, "authorId" | "uid"> = {

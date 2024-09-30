@@ -928,9 +928,10 @@ export const QuestionEdit: React.FC = () => {
 													type="switch"
 													// checked={answer.correct}
 													checked={
-														isQuizStateStarted
-															? !isStudent && answer.correct
-															: answer.correct
+														(writeAccess || !isStudent) && answer.correct
+														// isQuizStateStarted
+														// 	? !isStudent && answer.correct
+														// 	: answer.correct
 													}
 													onChange={() => toggleAnswer(i)}
 													disabled={!writeAccess}

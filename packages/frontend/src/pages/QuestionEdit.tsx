@@ -427,7 +427,8 @@ export const QuestionEdit: React.FC = () => {
 	}
 
 	const isSaveButtonDisabled = !!saveButtonDisableReason;
-	const isActivateReorderAnswersVisible = isQuizTeacher && isQuizStateEditing && !shuffleAnswers;
+	// const isActivateReorderAnswersVisible = isQuizTeacher && isQuizStateEditing && !shuffleAnswers;
+	const isActivateReorderAnswersVisible = writeAccess && isQuizStateEditing && !shuffleAnswers;
 
 	const onErrorClose = () => {
 		setShowError("");

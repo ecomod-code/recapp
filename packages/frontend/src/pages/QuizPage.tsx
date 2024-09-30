@@ -336,7 +336,7 @@ export const QuizPage: React.FC = () => {
 						{showCommentSection ? (
 							<Row>
 								<CommentsContainer
-									isQuizTeacher={isQuizTeacher}
+									isQuizTeacher={false}
 									onClickAddComment={() => setShowMDModal(true)}
 									onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
 									isCommentSectionVisible={isCommentSectionVisible}

@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, toId, Comment, Id, QuestionGroup, UserParticipation } from "@recapp/models";
+import { User, toId, Comment, Id, QuestionGroup, UserParticipation, isInTeachersList } from "@recapp/models";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 
@@ -112,6 +112,17 @@ export const QuizPage: React.FC = () => {
 	}, [quizId, tryQuizActor.hasValue]);
 
 	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
+	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));
+
+    const quizData = mbQuiz
+        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+        .match(
+            quizData => quizData,
+            () => null
+        );
+
+    const isUserInTeachersList = quizData ? isInTeachersList(quizData?.quiz, userId) : false;
+
 	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
@@ -397,6 +408,8 @@ export const QuizPage: React.FC = () => {
 							<Row>
 								<div className="my-4">
 									<QuizButtons
+										isUserInTeachersList={isUserInTeachersList}
+										userId={userId}
 										disableForStudent={disableForStudent}
 										// quizState={quizData.quiz.state}
 										uniqueLink={quizData.quiz.uniqueLink}

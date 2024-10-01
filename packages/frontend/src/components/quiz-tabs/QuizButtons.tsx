@@ -139,8 +139,10 @@ export const QuizButtons = (props: {
 
 		quizActorSend(CurrentQuizMessages.Update({previewers: updatedPreviewers }));
 
-		if(!props.isUserInTeachersList){
-			startQuizMode();
+		if(props.isUserInTeachersList && quizState !== "STARTED"){
+			setTimeout(() => {
+				startQuizMode();
+			}, 10);
 		}
 	};
 
@@ -303,13 +305,13 @@ export const QuizButtons = (props: {
             <div className="mt-2 d-flex justify-content-end flex-column flex-lg-row">
                 {!props.disableForStudent && (
                     <Button
-                        variant={props.isUserInTeachersList ? "primary" : "outline-primary" }
+                        variant={props.isUserInTeachersList ? "outline-primary" : "primary" }
                         className="d-flex justify-content-center align-items-center gap-1"
                         onClick={togglePreviewMode}
                     >
 						<Easel size={20} />
                         {/* <Trans id="quiz-show-qr-code-button" /> */}
-                        {props.isUserInTeachersList ? "End preview" : "Start preview"}
+                        {props.isUserInTeachersList ? "Start preview" : "End preview"}
                     </Button>
                 )}
             </div>

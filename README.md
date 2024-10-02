@@ -16,9 +16,7 @@ See also our [Installation Guide](INSTALLATION.de.md) (at the moment, German onl
 
 ## Contributing
 
-**recapp** is a free and open-source project. Therefore, in case you want to suggest new
-metrics or functions and in the best case even contribute code, we
-warmly welcome to do so! For more information see
+**recapp** is a free and open-source project. Therefore, we warmly welcome your suggestions, bug reports, or, in the best case, code contributions! For more information, see
 [CONTRIBUTING](CONTRIBUTING.md).
 
 Maintainers and contributors must follow this repository’s [CODE OF

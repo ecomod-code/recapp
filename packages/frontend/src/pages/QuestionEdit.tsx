@@ -10,7 +10,7 @@ import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
 import { useStatefulActor } from "ts-actors-react";
-import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz } from "@recapp/models";
+import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz, isInTeachersList } from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
 import Modal from "react-bootstrap/Modal";
@@ -96,16 +96,22 @@ export const QuestionEdit: React.FC = () => {
 	const nav = useNavigate();
 	const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
 	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+	const userId: Id = mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""));
 
-	const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
-	const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
-	const isStudentCommentsAllowed = q?.studentComments;
-	const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+	// const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
+	// const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+
 
 	const quiz = mbQuiz.orUndefined();
 	const questionsIds = quiz?.quiz.groups?.[0].questions ?? [];
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
+
+    const isUserInTeachersList = quiz && userId ? isInTeachersList(quiz.quiz, userId) : false;
+	// const isStudent = quiz && userId ? isInStudentList(quiz.quiz, userId ) : true;
+
+	const isStudentCommentsAllowed = q?.studentComments;
+	const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
 
 	const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
 	const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
@@ -427,7 +433,7 @@ export const QuestionEdit: React.FC = () => {
 	}
 
 	const isSaveButtonDisabled = !!saveButtonDisableReason;
-	const isActivateReorderAnswersVisible = isQuizTeacher && isQuizStateEditing && !shuffleAnswers;
+	const isActivateReorderAnswersVisible = isUserInTeachersList && isQuizStateEditing && !shuffleAnswers;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -488,7 +494,7 @@ export const QuestionEdit: React.FC = () => {
 				onClose={handleClose}
 				showRelatedQuestionCheck
 				// isStudent={isStudent}
-				isQuizTeacher={isQuizTeacher}
+				isUserInTeachersList={isUserInTeachersList}
 				userNames={[userName, userNickname ?? ""]}
 				participationOptions={allowedAuthorTypes}
 				onSubmit={({ text, name, isRelatedToQuestion }) => {
@@ -533,7 +539,7 @@ export const QuestionEdit: React.FC = () => {
 				 */}
 				{showCommentSection ? (
 					<CommentsContainer
-						isQuizTeacher={isQuizTeacher}
+						isUserInTeachersList={isUserInTeachersList}
 						onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
 						isCommentSectionVisible={isCommentSectionVisible}
 						onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
@@ -564,7 +570,8 @@ export const QuestionEdit: React.FC = () => {
 										<CommentCard
 											isCommentSectionVisible={isCommentSectionVisible}
 											userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-											teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+											// teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+											isUserInTeachersList={isUserInTeachersList}
 											comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
 											onUpvote={() => upvoteComment(cmt.uid)}
 											onAccept={() => finishComment(cmt.uid)}
@@ -1007,7 +1014,7 @@ export const QuestionEdit: React.FC = () => {
 						<Trans id="cancel" />
 					</Button>
 
-					{question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
+					{question.uid && isQuizStateEditing && isUserInTeachersList && !isLastQuestion ? (
 						<Button onClick={handleSaveAndGoToNextQuestion}>
 							<Trans id="save-and-go-to-next-question-button" />
 						</Button>

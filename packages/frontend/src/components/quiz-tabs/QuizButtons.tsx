@@ -19,6 +19,7 @@ type NewMode = "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS";
 
 export const QuizButtons = (props: {
 	isUserInTeachersList: boolean;
+	isQuizTeacher: boolean;
 	userId:Id;
 	disableForStudent: boolean;
 	// quizState: Quiz["state"];
@@ -303,7 +304,7 @@ export const QuizButtons = (props: {
 			</div>
 
             <div className="mt-2 d-flex justify-content-end flex-column flex-lg-row">
-                {!props.disableForStudent && (
+                {props.isQuizTeacher && (
                     <Button
                         variant={props.isUserInTeachersList ? "outline-primary" : "primary" }
                         className="d-flex justify-content-center align-items-center gap-1"

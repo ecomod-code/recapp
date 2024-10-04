@@ -5,6 +5,7 @@ on:
     branches: [main, testing, production]
   pull_request:
     branches: [main, testing, production]
+  workflow_dispatch:
 
 jobs:
   deploy-recapp:

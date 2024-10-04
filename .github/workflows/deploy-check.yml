@@ -5,6 +5,7 @@ on:
     branches: [main, testing, production]
   pull_request:
     branches: [main, testing, production]
+  workflow_dispatch:
 
 jobs:
   deploy-recapp:
@@ -16,7 +17,6 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
-        with:
-            path: $HOME
+
       - name: run deployment script
-        run: sh ./deployment.sh
+        run: sh deployment.sh $GITHUB_WORKSPACE force-build

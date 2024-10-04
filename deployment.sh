@@ -3,8 +3,14 @@
 # Auto-Deployment for recapp
 
 # Konfiguration
-REPO_PATH="$HOME/recapp"
-LOG_FILE="$HOME/deploy.log"
+if [ $# -eq 0 ]; then
+    REPO_PATH="/home/cloud/recapp"
+    LOG_FILE="/home/cloud/recapp/deploy.log"
+else
+    REPO_PATH="$1"
+    LOG_FILE="$1/deploy.log"
+fi
+
 PM2_PROCESS_NAME="backend"
 
 # Funktion zum Loggen
@@ -97,12 +103,13 @@ rollback() {
 main() {
     cd "$REPO_PATH" || { log "Fehler: Konnte nicht in das Repository-Verzeichnis wechseln."; exit 1; }
 
-    if check_remote_changes; then
+    if [check_remote_changes] || [$1 == 'force-build']; then
         if pull_changes && build_projects && restart_pm2 && change_frontend_permissions; then
             log "New version was deployed"
         else
             log "An error occured"
             rollback
+            exit 1
         fi
     else
         log "No action neccessary."
@@ -110,4 +117,4 @@ main() {
 }
 
 # Ausführung der Hauptfunktion
-main
+main $2

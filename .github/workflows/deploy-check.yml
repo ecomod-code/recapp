@@ -14,7 +14,9 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v4
-
+      - name: Checkout the repo
+        uses: actions/checkout@v4
+        with:
+            path: $HOME
       - name: run deployment script
         run: sh ./deployment.sh

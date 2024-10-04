@@ -19,4 +19,4 @@ jobs:
         with:
             path: $HOME
       - name: run deployment script
-        run: sh ./deployment.sh
+        run: sh $HOME/recapp/deployment.sh

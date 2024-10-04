@@ -1,0 +1,23 @@
+name: RECAPP deployment check
+
+on:
+  push:
+    branches: [main, testing, production]
+  pull_request:
+    branches: [main, testing, production]
+
+
+name: deploy-recapp
+
+jobs:
+  deploy-recapp:
+    runs-on: ubuntu-24.04
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: run deployment script
+        run: sh ./deployment.sh

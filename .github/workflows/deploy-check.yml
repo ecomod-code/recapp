@@ -17,7 +17,6 @@ jobs:
     steps:
       - name: Checkout the repo
         uses: actions/checkout@v4
-        with:
-            path: "$HOME/recapp"
+
       - name: run deployment script
-        run: sh $HOME/recapp/deployment.sh
+        run: sh deployment.sh $GITHUB_WORKSPACE

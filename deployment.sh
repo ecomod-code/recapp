@@ -3,8 +3,8 @@
 # Auto-Deployment for recapp
 
 # Konfiguration
-REPO_PATH="/home/cloud/recapp"
-LOG_FILE="/home/cloud/deploy.log"
+REPO_PATH="$HOME/recapp"
+LOG_FILE="$HOME/deploy.log"
 PM2_PROCESS_NAME="backend"
 
 # Funktion zum Loggen

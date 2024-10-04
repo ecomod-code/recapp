@@ -12,7 +12,7 @@ Please note that the **recapp** project is released with a [Contributor Code of 
 
 ### Ask a question :interrobang:
 
-Browse the [documentation](https://ecomod-code.github.io/recapp/) to see if you can find a solution. Still stuck? Open an [issue on GitHub](https://github.com/ecomod-code/recapp/issues) on GitHub. We'll try to do our best to address it, as questions often lead to better documentation or the discovery of bugs.
+Browse the [documentation](https://ecomod-code.github.io/recapp/) to see if you can find a solution. Still stuck? Open an [issue on GitHub](https://github.com/ecomod-code/recapp/issues). We'll try to do our best to address it, as questions often lead to better documentation or the discovery of bugs.
 
 If you want to ask a question in private get in contact by [recapp-app@uni-goettingen.de](mailto:recapp-app@uni-goettingen.de).
 

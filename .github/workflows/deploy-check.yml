@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [main, testing, production]
 
-
-name: deploy-recapp
-
 jobs:
   deploy-recapp:
     runs-on: ubuntu-24.04

@@ -3,6 +3,7 @@ build/
 architecture/
 process_documentation/
 sandbox.nbb
+deploy.log
 .env
 .env.production
 .env.development

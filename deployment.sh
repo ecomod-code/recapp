@@ -103,7 +103,18 @@ rollback() {
 main() {
     cd "$REPO_PATH" || { log "Fehler: Konnte nicht in das Repository-Verzeichnis wechseln."; exit 1; }
 
-    if [check_remote_changes] || [$1 == 'force-build']; then
+    if [ "$1" = "build-force" ]; then
+        log "Forced deployment."
+        if build_projects && restart_pm2 && change_frontend_permissions; then
+            log "New version was deployed"
+        else
+            log "An error occured"
+            exit 1
+        fi
+        return
+    fi  
+
+    if check_remote_changes; then
         if pull_changes && build_projects && restart_pm2 && change_frontend_permissions; then
             log "New version was deployed"
         else

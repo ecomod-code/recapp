@@ -27,7 +27,7 @@ type Props = {
 	isLast: boolean;
 	writeAccess: boolean;
 	state: string;
-	isQuizTeacher: boolean
+	isUserInTeachersList: boolean
 };
 
 export const QuestionCard = (props: Props) => {
@@ -117,7 +117,7 @@ export const QuestionCard = (props: Props) => {
 							<TrainFront />
 						</ButtonWithTooltip> */}
 
-                        {props.isQuizTeacher ? (
+                        {props.isUserInTeachersList ? (
                             <ButtonWithTooltip
                                 title={
                                     props.question.approved
@@ -141,7 +141,7 @@ export const QuestionCard = (props: Props) => {
                                 // disabled={props.disabled || props.question.approved || !props.editMode}
                                 disabled={
                                     // props.question.approved || !props.editMode
-                                    (props.isQuizTeacher && props.question.approved) || !props.editMode
+                                    (props.isUserInTeachersList && props.question.approved) || !props.editMode
                                 }
                             >
                                 <Trash />

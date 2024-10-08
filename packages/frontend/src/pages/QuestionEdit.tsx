@@ -10,7 +10,18 @@ import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
 import { useStatefulActor } from "ts-actors-react";
-import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz, isInTeachersList, isInStudentList } from "@recapp/models";
+import {
+	User,
+	toId,
+	Comment,
+	Question,
+	Id,
+	QuestionType,
+	UserParticipation,
+	Quiz,
+	isInTeachersList,
+	isInStudentList,
+} from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
 import Modal from "react-bootstrap/Modal";
@@ -34,8 +45,8 @@ import { getStoredParticipationValue } from "../components/layout/UserParticipat
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
 const sortComments = (a: Comment, b: Comment) => {
-	if (a.answered && !b.answered) return 1;
-	if (!a.answered && b.answered) return -1;
+	if (a.answered && !b.answered) return -1;
+	if (!a.answered && b.answered) return 1;
 	if (a.upvoters.length !== b.upvoters.length) return b.upvoters.length - a.upvoters.length;
 	return b.updated.value - a.updated.value;
 };
@@ -45,7 +56,7 @@ export const QuestionEdit: React.FC = () => {
 	const questionId = state?.quizId ?? "";
 	const [currentQuestionId, setCurrentQuestionId] = useState(questionId);
 	const formerGroup = state?.group ?? "";
-	const writeAccess = state?.write === "true" ?? false;
+	const writeAccess = state?.write === "true";
 	// const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz", {
 		quiz: {} as Quiz,
@@ -106,8 +117,8 @@ export const QuestionEdit: React.FC = () => {
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
 
-    const isUserInTeachersList = quiz && userId ? isInTeachersList(quiz.quiz, userId) : false;
-	const isUserInStudentsList = quiz && userId ? isInStudentList(quiz.quiz, userId ) : true;
+	const isUserInTeachersList = quiz && userId ? isInTeachersList(quiz.quiz, userId) : false;
+	const isUserInStudentsList = quiz && userId ? isInStudentList(quiz.quiz, userId) : true;
 
 	const isStudentCommentsAllowed = q?.studentComments;
 	const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
@@ -145,14 +156,14 @@ export const QuestionEdit: React.FC = () => {
 					? editQuestion.type ?? question.type
 					: aqt[0];
 
-                const authorName = editQuestion.authorName;
-                if (authorName === userName) {
-                    setAuthorType("NAME");
-                } else if (authorName === userNickname) {
-                    setAuthorType("NICKNAME");
-                } else {
-                    setAuthorType("ANONYMOUS");
-                }
+				const authorName = editQuestion.authorName;
+				if (authorName === userName) {
+					setAuthorType("NAME");
+				} else if (authorName === userNickname) {
+					setAuthorType("NICKNAME");
+				} else {
+					setAuthorType("ANONYMOUS");
+				}
 
 				setQuestion({ ...question, ...editQuestion, type: newType });
 				setHint(!!editQuestion.hint);
@@ -173,7 +184,7 @@ export const QuestionEdit: React.FC = () => {
 				// if (storedValue && (isQuizTeacher || aat.includes(storedValue))) {
 				if (storedValue && aat.includes(storedValue)) {
 					setAuthorType(storedValue);
-				}else {
+				} else {
 					if (!aat.includes("ANONYMOUS")) {
 						if (!aat.includes("NICKNAME")) {
 							setAuthorType("NAME");
@@ -366,7 +377,6 @@ export const QuestionEdit: React.FC = () => {
 		});
 	};
 
-
 	const addComment = ({ text, name, isRelatedToQuestion }: CommentEditorModalOnSubmitParams) => {
 		const c: Omit<Comment, "authorId" | "uid"> = {
 			text: text,
@@ -432,7 +442,8 @@ export const QuestionEdit: React.FC = () => {
 	}
 
 	const isSaveButtonDisabled = !!saveButtonDisableReason;
-	const isActivateReorderAnswersVisible = isUserInTeachersList && isQuizStateEditing && !shuffleAnswers;
+	const isActivateReorderAnswersVisible =
+		isUserInTeachersList && writeAccess && isQuizStateEditing && !shuffleAnswers;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -934,7 +945,7 @@ export const QuestionEdit: React.FC = () => {
 													// checked={answer.correct}
 													checked={
 														isQuizStateStarted
-															? !isUserInStudentsList && answer.correct
+															? (writeAccess || !isUserInStudentsList) && answer.correct
 															: answer.correct
 													}
 													onChange={() => toggleAnswer(i)}

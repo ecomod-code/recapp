@@ -320,6 +320,21 @@ export const QuestionsTab: React.FC<{
 								const isLast = i === arr.length - 1;
 								const isStudentQuestionsAllowed = quizData.quiz.studentQuestions;
 
+                                const isQuestionVisibleToStudents = mbQuiz
+                                    .flatMap(q => maybe(q.questions))
+                                    .map(
+                                        qs =>
+                                            !!qs.find(qu => {
+                                                const isAuthorTeacher = qu.uid === q!.uid && !qu.authorId;
+                                                const isOwnQuestion = qu.uid === q!.uid && qu.authorId === userId;
+
+                                                return isAuthorTeacher || isOwnQuestion;
+                                            })
+                                    )
+                                    .orElse(false);
+
+                                if (!isQuizTeacher && !isQuestionVisibleToStudents) return null;
+
 								const writeAccess =
 									isUserInTeachersList ||
 									mbQuiz

@@ -8,9 +8,19 @@ Also make sure to create a `.env.development` (or `.env.production`) file from t
 
 Make sure to edit the `.env` file in the frontend project to the proper URIs.
 
-## Model generator
+### Model generator
 
 There is simple generator for new data schemas/models if needed. It can be called via `npx pinion generators/model.template.ts`.
+
+See also our [Installation Guide](INSTALLATION.de.md) (at the moment, German only)
+
+## Contributing
+
+**recapp** is a free and open-source project. Therefore, we warmly welcome your suggestions, bug reports, or, in the best case, code contributions! For more information, see
+[CONTRIBUTING](CONTRIBUTING.md).
+
+Maintainers and contributors must follow this repository’s [CODE OF
+CONDUCT](CODE_OF_CONDUCT.md).
 
 ## ENTWICKLUNG UND FÖRDERUNG
 

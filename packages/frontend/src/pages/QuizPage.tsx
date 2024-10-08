@@ -121,7 +121,10 @@ export const QuizPage: React.FC = () => {
 			() => null
 		);
 
-	const isUserInTeachersList = quizData ? isInTeachersList(quizData?.quiz, userId) : false;
+	let isUserInTeachersList = quizData ? isInTeachersList(quizData?.quiz, userId) : false;
+	if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {
+		isUserInTeachersList = !quizData?.quiz.previewers?.includes(userId);
+	}
 
 	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);

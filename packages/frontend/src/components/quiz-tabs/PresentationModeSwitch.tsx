@@ -2,8 +2,8 @@ import { i18n } from "@lingui/core";
 import Form from "react-bootstrap/Form";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 import { useLocalUser } from "../../hooks/state-actor/useLocalUser";
-import { checkIsQuizTeacher } from "../../utils";
 import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
+import { isInTeachersList, toId } from "@recapp/models";
 
 export const PresentationModeSwitch = () => {
     const { quizData, quizActorSend } = useCurrentQuiz();
@@ -11,9 +11,10 @@ export const PresentationModeSwitch = () => {
 
     const isPresentationModeActive = quizData?.isPresentationModeActive;
 
-    const isQuizTeacher = checkIsQuizTeacher(quizData, localUser);
+    const userId = localUser?.uid ?? toId("");
+    const isUserInTeachersList = quizData ? isInTeachersList(quizData.quiz, userId) : false;
 
-    if (!isQuizTeacher) {
+    if (!isUserInTeachersList) {
         return null;
     }
 

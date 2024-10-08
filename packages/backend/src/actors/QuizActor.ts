@@ -15,6 +15,7 @@ import {
 	QuizRun,
 	User,
 	UserRole,
+	isInTeachersList,
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
@@ -274,12 +275,13 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					const result = await existingQuiz
 						.map(async c => {
 							if (!(keys(quiz).length === 2)) {
-								if (!quiz.students && !quiz.comments && !quiz.groups) {
+								if (!quiz.students && !quiz.comments && !quiz.groups && !quiz.previewers) {
 									if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
 										console.error(clientUserRole, "is not TEACHER or ADMIN");
 										return new Error("Invalid write access to quiz");
 									}
-									if (clientUserRole === "TEACHER" && !c.teachers.some(i => i === clientUserId)) {
+									if (clientUserRole === "TEACHER" && !isInTeachersList(c, clientUserId)) {
+										// } c.teachers.some(i => i === clientUserId)) {
 										console.error(clientUserId, "is not in teacher list", c.teachers, keys(quiz));
 										return new Error("Quiz not shared with teacher");
 									}

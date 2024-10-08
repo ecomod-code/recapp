@@ -18,7 +18,8 @@ const CUTOFF_CONTAINER_HEIGHT = MAX_LINES * EM * LINE_HEIGHT;
 interface Props {
     comment: Comment;
     userId: Id;
-    teachers: string[];
+    // teachers: string[];
+    isUserInTeachersList: boolean;
     questionText?: string;
     onUpvote: () => void;
     onAccept: () => void;
@@ -53,7 +54,8 @@ export const CommentCardContent: React.FC<
     onUpvote,
     onAccept,
     onDelete,
-    teachers,
+    // teachers,
+    isUserInTeachersList,
     userId,
     questionText,
     onJumpToQuestion,
@@ -63,7 +65,7 @@ export const CommentCardContent: React.FC<
 }) => {
     const { rendered } = useRendered({ value: comment.text });
 
-    const isQuizTeacher = teachers.includes(userId);
+    // const isQuizTeacher = teachers.includes(userId);
 
     return (
         <Card
@@ -114,7 +116,7 @@ export const CommentCardContent: React.FC<
                     </ButtonWithTooltip>
 
                     <div className="d-flex">
-                        {isQuizTeacher && comment.relatedQuestion && questionText && (
+                        {isUserInTeachersList && comment.relatedQuestion && questionText && (
                             <ButtonWithTooltip
                                 title={questionText ?? ""}
                                 variant="secondary"
@@ -125,7 +127,7 @@ export const CommentCardContent: React.FC<
                             </ButtonWithTooltip>
                         )}
 
-                        {isQuizTeacher ? (
+                        {isUserInTeachersList ? (
                             <ButtonWithTooltip
                                 // title={i18n._("comment-card.button-tooltip.accept")}
                                 title={
@@ -136,19 +138,19 @@ export const CommentCardContent: React.FC<
                                 variant={comment.answered ? "success" : "secondary"}
                                 className="m-1"
                                 onClick={onAccept}
-                                disabled={!isQuizTeacher}
+                                disabled={!isUserInTeachersList}
                             >
                                 <Calendar2Check size={18} />
                             </ButtonWithTooltip>
                         ) : null}
 
-                        {comment.authorId === userId || isQuizTeacher ? (
+                        {comment.authorId === userId || isUserInTeachersList ? (
                             <ButtonWithTooltip
                                 title={i18n._("comment-card.button-tooltip.delete")}
                                 variant="danger"
                                 className="m-1"
                                 onClick={onDelete}
-                                disabled={comment.authorId !== userId && !isQuizTeacher}
+                                disabled={comment.authorId !== userId && !isUserInTeachersList}
                             >
                                 <Trash />
                             </ButtonWithTooltip>

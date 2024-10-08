@@ -26,10 +26,11 @@ import { checkIsCreatingQuestionDisabled } from "../../utils";
 // const BUTTON_CONTAINER_WIDTH = 40;
 
 export const QuestionsTab: React.FC<{
+	isUserInTeachersList:boolean;
 	quizData: CurrentQuizState;
 	localUser: Maybe<User>;
 	disableForStudent: boolean;
-}> = ({ quizData, disableForStudent, localUser }) => {
+}> = ({isUserInTeachersList, quizData, disableForStudent, localUser }) => {
 	const nav = useNavigate();
 	const [deleteModal, setDeleteModal] = useState(toId(""));
 	const [removeEditModal, setRemoveEditModal] = useState(toId(""));
@@ -41,9 +42,9 @@ export const QuestionsTab: React.FC<{
 	const disableForStudentOrMode = disableForStudent || quizData.quiz.state !== "EDITING";
 
 	const teachers: string[] = quizData.quiz.teachers ?? [];
-	const isQuizTeacher = teachers.includes(userId);
+	// const isQuizTeacher = teachers.includes(userId);
 
-	const noQuestions = userRole !== "ADMIN" && !isQuizTeacher && !quizData.quiz.studentQuestions;
+	const noQuestions = userRole !== "ADMIN" && !isUserInTeachersList && !quizData.quiz.studentQuestions;
 	const disableForSettingOrMode = noQuestions || quizData.quiz.state !== "EDITING";
 
 	// const [currentGroup, setCurrentGroup] = useState({
@@ -121,7 +122,7 @@ export const QuestionsTab: React.FC<{
 	const editQuestion = (uid: Id, group: string) => {
 		const writeAccess =
 			quizData.quiz.state === "EDITING" &&
-			(isQuizTeacher ||
+			(isUserInTeachersList ||
 				mbQuiz
 					.flatMap(q => maybe(q.questions))
 					.map(qs => !!qs.find(q => q.uid === uid && q.authorId === userId && quizData.quiz.studentQuestions))
@@ -159,7 +160,7 @@ export const QuestionsTab: React.FC<{
 		}
 		if (q.approved) return true;
 		if (q.authorId === userId) return true;
-		if (isQuizTeacher) return true;
+		if (isUserInTeachersList) return true;
 		console.log("The following question will not be displayed", q, "for user ", userId, " and teachers ", teachers);
 		return false;
 	});
@@ -226,7 +227,7 @@ export const QuestionsTab: React.FC<{
 				</div>
 
 				<div className="mb-4 mt-3 d-flex flex-column flex-lg-row align-items-lg-center justify-content-end gap-2">
-                    {isQuizTeacher && quizData.quiz.state === "EDITING" ? (
+                    {isUserInTeachersList && quizData.quiz.state === "EDITING" ? (
                         <>
                             <Button
                                 variant="outline-primary"
@@ -320,7 +321,7 @@ export const QuestionsTab: React.FC<{
 								const isStudentQuestionsAllowed = quizData.quiz.studentQuestions;
 
 								const writeAccess =
-									isQuizTeacher ||
+									isUserInTeachersList ||
 									mbQuiz
 										.flatMap(q => maybe(q.questions))
 										.map(
@@ -345,7 +346,7 @@ export const QuestionsTab: React.FC<{
 										state={quizData.quiz.state}
 										moveUp={() => moveQuestion(defaultQuestionGroup.name, q!.uid, true)}
 										moveDown={() => moveQuestion(defaultQuestionGroup.name, q!.uid, false)}
-										isQuizTeacher={isQuizTeacher}
+										isUserInTeachersList={isUserInTeachersList}
 										// changeGroup={() => {
 										//     if (quizData.quiz.groups.length < 2) {
 										//         return;

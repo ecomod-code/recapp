@@ -6,17 +6,21 @@ import { i18n } from "@lingui/core";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-import { StopFill, Pencil, Play, QrCode, BoxArrowRight, Trash } from "react-bootstrap-icons";
+import { StopFill, Pencil, Play, QrCode, BoxArrowRight, Trash, Easel } from "react-bootstrap-icons";
 import { CurrentQuizMessages } from "../../actors/CurrentQuizActor";
 import { YesNoModal } from "../modals/YesNoModal";
 import { ShareModal } from "../modals/ShareModal";
 import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { downloadFile } from "../../utils";
+import { Id } from "@recapp/models";
 
 type NewMode = "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS";
 
 export const QuizButtons = (props: {
+	isUserInTeachersList: boolean;
+	isQuizTeacher: boolean;
+	userId:Id;
 	disableForStudent: boolean;
 	// quizState: Quiz["state"];
 	uniqueLink: string;
@@ -127,6 +131,20 @@ export const QuizButtons = (props: {
 		setShowExportModal(false);
 		quizActorSend(CurrentQuizMessages.ExportDone());
 		downloadFile(filename);
+	};
+
+	const togglePreviewMode = ()=> {
+        const updatedPreviewers = props.isUserInTeachersList
+            ? [...(quizData?.quiz.previewers ?? []), props.userId]
+            : (quizData?.quiz.previewers ?? []).filter(uid => uid !== props.userId);
+
+		quizActorSend(CurrentQuizMessages.Update({previewers: updatedPreviewers }));
+
+		if(props.isUserInTeachersList && quizState !== "STARTED"){
+			setTimeout(() => {
+				startQuizMode();
+			}, 10);
+		}
 	};
 
 	return (
@@ -284,6 +302,20 @@ export const QuizButtons = (props: {
 					</Button>
 				)}
 			</div>
+
+            <div className="mt-2 d-flex justify-content-end flex-column flex-lg-row">
+                {props.isQuizTeacher && (
+                    <Button
+                        variant={props.isUserInTeachersList ? "outline-primary" : "primary" }
+                        className="d-flex justify-content-center align-items-center gap-1"
+                        onClick={togglePreviewMode}
+                    >
+						<Easel size={20} />
+                        {/* <Trans id="quiz-show-qr-code-button" /> */}
+                        {props.isUserInTeachersList ? "Start preview" : "End preview"}
+                    </Button>
+                )}
+            </div>
 		</>
 	);
 };

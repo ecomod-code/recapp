@@ -19,6 +19,7 @@ type NewMode = "EDITING" | "STARTED" | "STOPPED" | "RESETSTATS";
 
 export const QuizButtons = (props: {
 	isUserInTeachersList: boolean;
+	lastPreviewer: boolean;
 	isQuizTeacher: boolean;
 	userId: Id;
 	disableForStudent: boolean;
@@ -138,12 +139,27 @@ export const QuizButtons = (props: {
 			? [...(quizData?.quiz.previewers ?? []), props.userId]
 			: (quizData?.quiz.previewers ?? []).filter(uid => uid !== props.userId);
 
+		const startQuiz = props.isUserInTeachersList && quizState !== "STARTED";
+		const stopQuiz = props.lastPreviewer && updatedPreviewers.length === 0 && quizState === "STARTED";
+
+		alert(
+			JSON.stringify(
+				{ previewers: quizData?.quiz.previewers, updatedPreviewers, startQuiz, stopQuiz },
+				undefined,
+				2
+			)
+		);
+
 		quizActorSend(CurrentQuizMessages.Update({ previewers: updatedPreviewers }));
 
-		if (props.isUserInTeachersList && quizState !== "STARTED") {
+		if (startQuiz) {
 			setTimeout(() => {
 				startQuizMode();
-			}, 10);
+			}, 150);
+		} else if (stopQuiz) {
+			setTimeout(() => {
+				stopQuizMode();
+			}, 150);
 		}
 	};
 

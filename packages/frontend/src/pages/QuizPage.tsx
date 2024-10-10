@@ -245,6 +245,8 @@ export const QuizPage: React.FC = () => {
 					return false;
 				};
 
+				console.log("TL", isUserInTeachersList, quizData.quiz.previewers);
+
 				const run = quizData.run;
 				const qData = quizData.questions;
 				const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
@@ -414,6 +416,7 @@ export const QuizPage: React.FC = () => {
 								<div className="my-4">
 									<QuizButtons
 										isUserInTeachersList={isUserInTeachersList}
+										lastPreviewer={quizData.quiz.previewers?.length === 1}
 										isQuizTeacher={isQuizTeacher}
 										userId={userId}
 										disableForStudent={disableForStudent}

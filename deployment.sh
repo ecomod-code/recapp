@@ -105,7 +105,7 @@ main() {
 
     if [ "$1" = "build-force" ]; then
         log "Forced deployment."
-        if build_projects && restart_pm2 && change_frontend_permissions; then
+        if build_projects; then
             log "New version was deployed"
         else
             log "An error occured"

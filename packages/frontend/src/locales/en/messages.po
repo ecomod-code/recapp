@@ -1304,3 +1304,11 @@ msgstr "Student questions"
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions-tooltip"
 msgstr "Allow students to create/edit questions"
+
+#. js-lingui-explicit-id
+msgid "quiz-button-label-end-preview"
+msgstr "End preview"
+
+#. js-lingui-explicit-id
+msgid "quiz-button-label-start-preview"
+msgstr "Start preview"

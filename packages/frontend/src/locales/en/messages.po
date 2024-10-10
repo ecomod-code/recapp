@@ -1202,7 +1202,7 @@ msgstr "You are about to leave the quiz. It will no longer be displayed in your 
 
 #. js-lingui-explicit-id
 msgid "quiz-card-teachers-label"
-msgstr "Teaching staff:"
+msgstr "Teaching staff"
 
 #. js-lingui-explicit-id
 msgid "answer-correct-title"

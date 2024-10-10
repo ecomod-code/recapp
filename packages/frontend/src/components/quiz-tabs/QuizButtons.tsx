@@ -312,7 +312,9 @@ export const QuizButtons = (props: {
 					>
 						<Easel size={20} />
 						{/* <Trans id="quiz-show-qr-code-button" /> */}
-						{!props.isUserInTeachersList ? "End preview" : "Start preview"}
+						{!props.isUserInTeachersList
+							? i18n._("quiz-button-label-end-preview")
+							: i18n._("quiz-button-label-start-preview")}
 					</Button>
 				)}
 			</div>

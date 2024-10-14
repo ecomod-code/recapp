@@ -142,14 +142,6 @@ export const QuizButtons = (props: {
 		const startQuiz = props.isUserInTeachersList && quizState !== "STARTED";
 		const stopQuiz = props.lastPreviewer && updatedPreviewers.length === 0 && quizState === "STARTED";
 
-		alert(
-			JSON.stringify(
-				{ previewers: quizData?.quiz.previewers, updatedPreviewers, startQuiz, stopQuiz },
-				undefined,
-				2
-			)
-		);
-
 		quizActorSend(CurrentQuizMessages.Update({ previewers: updatedPreviewers }));
 
 		if (startQuiz) {

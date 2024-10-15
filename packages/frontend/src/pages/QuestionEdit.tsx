@@ -42,6 +42,8 @@ import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { getStoredParticipationValue } from "../components/layout/UserParticipationSelect";
 
+type QuestionState = Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id };
+
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
 const sortComments = (a: Comment, b: Comment) => {
@@ -86,7 +88,7 @@ export const QuestionEdit: React.FC = () => {
 		if (deleted) setShowError("quiz-error-quiz-deleted");
 	}, [deleted]);
 
-	const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id }>(
+	const [defaultQuestion, setDefaultQuestion] = useState<QuestionState>(
 		{
 			text: "",
 			type: "TEXT",
@@ -98,6 +100,19 @@ export const QuestionEdit: React.FC = () => {
 			answerOrderFixed: false,
 		}
 	);
+	const [question, setQuestion] = useState<QuestionState>(
+		{
+			text: "",
+			type: "TEXT",
+			authorId: toId(""),
+			answers: [],
+			approved: false,
+			editMode: true,
+			quiz: toId(""),
+			answerOrderFixed: false,
+		}
+	);
+
 	const [hint, setHint] = useState(false);
 	// const [groups, setGroups] = useState<string[]>([]);
 	const [selectedGroup, setSelectedGroup] = useState("");
@@ -165,7 +180,10 @@ export const QuestionEdit: React.FC = () => {
 					setAuthorType("ANONYMOUS");
 				}
 
-				setQuestion({ ...question, ...editQuestion, type: newType });
+				// setQuestion({ ...question, ...editQuestion, type: newType });
+				setQuestion(prev => ({ ...prev, ...structuredClone(editQuestion), type: newType }));
+				setDefaultQuestion(prev => ({ ...prev, ...structuredClone(editQuestion), type: newType }));
+
 				setHint(!!editQuestion.hint);
 				if (writeAccess) {
 					tryQuizActor.forEach(actor =>
@@ -196,7 +214,9 @@ export const QuestionEdit: React.FC = () => {
 
 				const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
 
-				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
+				// setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
+				setQuestion(prev => ({ ...prev, quiz: quiz?.quiz?.uid ?? toId(""), type: newType }));
+				setDefaultQuestion(prev => ({ ...prev, quiz: quiz?.quiz?.uid ?? toId(""), type: newType }));
 			}
 			if (formerGroup) {
 				setSelectedGroup(formerGroup);
@@ -210,6 +230,36 @@ export const QuestionEdit: React.FC = () => {
 	const { rendered } = useRendered({ value: question.text });
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
 	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
+
+	const confirmBeforeLeaving = (callBack: ()=> void)=> {
+		if (!checkIsQuestionChanged() || confirm("Changes that you made may not be saved.")) {
+			callBack();
+		}
+	};
+
+	const checkIsQuestionChanged = ()=> {
+		const isQuestionChanged = (Object.keys(question) as (keyof QuestionState)[]).some((key) => {
+			return JSON.stringify(question[key]) !== JSON.stringify(defaultQuestion[key]);
+		});
+
+		return isQuestionChanged;
+	};
+
+    useEffect(() => {
+		const isQuestionChanged = checkIsQuestionChanged();
+        if (!isQuestionChanged) return;
+
+        const handleOnBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = "";
+            return "";
+        };
+        window.addEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+
+        return () => {
+            window.removeEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+        };
+    }, [question]);
 
 	const handleClose = () => {
 		setShowMDModal({ type: "", titleId: "" });
@@ -295,8 +345,10 @@ export const QuestionEdit: React.FC = () => {
 	};
 
 	const onCancelClick = () => {
-		resetQuestionEditModeFlag();
-		nav(-1);
+		confirmBeforeLeaving(()=> {
+			resetQuestionEditModeFlag();
+			nav(-1);
+		});
 	};
 
 	const handleSaveAndGoToNextQuestion = () => {
@@ -521,8 +573,10 @@ export const QuestionEdit: React.FC = () => {
 					<Breadcrumb>
 						<Breadcrumb.Item
 							onClick={() => {
-								resetQuestionEditModeFlag();
-								nav({ pathname: "/Dashboard" });
+								confirmBeforeLeaving(()=> {
+									resetQuestionEditModeFlag();
+									nav({ pathname: "/Dashboard" });
+								});
 							}}
 						>
 							Dashboard
@@ -531,11 +585,13 @@ export const QuestionEdit: React.FC = () => {
 							className="text-overflow-ellipsis"
 							style={{ maxWidth: 400 }}
 							onClick={() => {
-								resetQuestionEditModeFlag();
-								nav(
-									{ pathname: "/Dashboard/quiz" },
-									{ state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
-								);
+								confirmBeforeLeaving(()=> {
+									resetQuestionEditModeFlag();
+									nav(
+										{ pathname: "/Dashboard/quiz" },
+										{ state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
+									);
+								});
 							}}
 						>
 							{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}

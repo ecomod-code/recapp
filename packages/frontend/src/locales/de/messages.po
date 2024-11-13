@@ -37,7 +37,7 @@ msgstr "Anonym"
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
 msgid "participation-select-option.nickname"
-msgstr "Spitzname"
+msgstr "Pseudonym"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88

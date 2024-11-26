@@ -2,7 +2,7 @@ import { Fragment, useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, toId, Comment, Id, QuestionGroup, UserParticipation } from "@recapp/models";
+import { User, toId, Comment, Id, QuestionGroup, UserParticipation, isInTeachersList } from "@recapp/models";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 
@@ -112,6 +112,20 @@ export const QuizPage: React.FC = () => {
 	}, [quizId, tryQuizActor.hasValue]);
 
 	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
+	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));
+
+	const quizData = mbQuiz
+		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+		.match(
+			quizData => quizData,
+			() => null
+		);
+
+	let isUserInTeachersList = quizData ? isInTeachersList(quizData?.quiz, userId) : false;
+	if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {
+		isUserInTeachersList = !quizData?.quiz.previewers?.includes(userId);
+	}
+
 	const teachers: string[] = mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([]);
 	const comments: Comment[] = mbQuiz.map(q => q.comments).orElse([]);
 
@@ -223,15 +237,15 @@ export const QuizPage: React.FC = () => {
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
 		.match(
 			quizData => {
-				const allowed = (user: User) => {
-					if (user.role === "STUDENT") {
+				const allowed = () => {
+					if (!isUserInTeachersList) {
 						return true;
 					}
-					if (user.role === "TEACHER" && !quizData.quiz.teachers.includes(user.uid)) {
-						return true;
-					}
+
 					return false;
 				};
+
+				console.log("TL", isUserInTeachersList, quizData.quiz.previewers);
 
 				const run = quizData.run;
 				const qData = quizData.questions;
@@ -252,9 +266,9 @@ export const QuizPage: React.FC = () => {
 
 				const isQuizStateStarted = quizData.quiz.state === "STARTED";
 				const isStudentCommentsAllowed = quizData.quiz.studentComments;
-				const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+				const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
 
-				const showCommentArea = !quizData.quiz.hideComments || (isQuizTeacher && isQuizStateEditing);
+				const showCommentArea = !quizData.quiz.hideComments || (isUserInTeachersList && isQuizStateEditing);
 
 				const isCommentSectionVisible = quizData.isCommentSectionVisible;
 
@@ -268,7 +282,7 @@ export const QuizPage: React.FC = () => {
 							upvoters: [],
 							answered: false,
 							relatedQuiz: quizData.quiz.uid,
-							...(!isQuizTeacher ? { relatedQuestion: questionId } : {}),
+							...(!isUserInTeachersList ? { relatedQuestion: questionId } : {}),
 						};
 						// quizActorSend(CurrentQuizMessages.AddComment(c));
 						tryQuizActor.forEach(q => q.send(q, CurrentQuizMessages.AddComment(c)));
@@ -300,7 +314,7 @@ export const QuizPage: React.FC = () => {
 							onClose={() => setShowMDModal(false)}
 							onSubmit={addComment}
 							// isStudent={!isQuizTeacher}
-							isQuizTeacher={isQuizTeacher}
+							isUserInTeachersList={isUserInTeachersList}
 							userNames={[userName, userNickname ?? ""]}
 							participationOptions={keys(quizData.quiz.studentParticipationSettings)
 								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
@@ -336,7 +350,7 @@ export const QuizPage: React.FC = () => {
 						{showCommentSection ? (
 							<Row>
 								<CommentsContainer
-									isQuizTeacher={false}
+									isUserInTeachersList={false}
 									onClickAddComment={() => setShowMDModal(true)}
 									onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
 									isCommentSectionVisible={isCommentSectionVisible}
@@ -367,7 +381,7 @@ export const QuizPage: React.FC = () => {
 												<div key={cmt.uid} style={{ width: "20rem", maxWidth: "95%" }}>
 													<CommentCard
 														isCommentSectionVisible={isCommentSectionVisible}
-														teachers={teachers}
+														isUserInTeachersList={isUserInTeachersList}
 														userId={localUser.map(l => l.uid).orElse(toId(""))}
 														comment={cmt}
 														onUpvote={() => upvoteComment(cmt.uid)}
@@ -401,6 +415,10 @@ export const QuizPage: React.FC = () => {
 							<Row>
 								<div className="my-4">
 									<QuizButtons
+										isUserInTeachersList={isUserInTeachersList}
+										lastPreviewer={quizData.quiz.previewers?.length === 1}
+										isQuizTeacher={isQuizTeacher}
+										userId={userId}
 										disableForStudent={disableForStudent}
 										// quizState={quizData.quiz.state}
 										uniqueLink={quizData.quiz.uniqueLink}
@@ -450,13 +468,14 @@ export const QuizPage: React.FC = () => {
 								>
 									{disableForStudent && quizData.quiz.state === "STARTED" ? (
 										<RunningQuizTab
-											isQuizTeacher={isQuizTeacher}
+											isUserInTeachersList={isUserInTeachersList}
 											onClickAddComment={() => setShowMDModal(true)}
 											quizState={quizData}
 											logQuestion={logQuestion}
 										/>
 									) : (
 										<QuestionsTab
+											isUserInTeachersList={isUserInTeachersList}
 											quizData={quizData}
 											localUser={localUser}
 											disableForStudent={disableForStudent}
@@ -465,7 +484,7 @@ export const QuizPage: React.FC = () => {
 								</Tab>
 								{/* {showStatTab && (isQuizTeacher ? true : isQuizCompleted ) && ( */}
 								{showStatTab &&
-									(isQuizTeacher ? true : isQuizCompleted && studentsCanSeeStatistics) && (
+									(isUserInTeachersList ? true : isQuizCompleted && studentsCanSeeStatistics) && (
 										<Tab
 											eventKey={tabRecords.statistics.value}
 											title={i18n._(tabRecords.statistics.label)}

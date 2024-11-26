@@ -1300,3 +1300,12 @@ msgstr "Fragen von Teilnehmenden"
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions-tooltip"
 msgstr "Teilnehmende können Fragen stellen"
+
+#. js-lingui-explicit-id
+msgid "quiz-button-label-end-preview"
+msgstr "Vorschau beenden"
+
+#. js-lingui-explicit-id
+msgid "quiz-button-label-start-preview"
+msgstr "Vorschau starten"
+

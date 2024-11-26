@@ -10,7 +10,18 @@ import { Trans } from "@lingui/react";
 import { keys } from "rambda";
 import "katex/dist/katex.css";
 import { useStatefulActor } from "ts-actors-react";
-import { User, toId, Comment, Question, Id, QuestionType, UserParticipation, Quiz } from "@recapp/models";
+import {
+	User,
+	toId,
+	Comment,
+	Question,
+	Id,
+	QuestionType,
+	UserParticipation,
+	Quiz,
+	isInTeachersList,
+	isInStudentList,
+} from "@recapp/models";
 
 import { useRendered } from "../hooks/useRendered";
 import Modal from "react-bootstrap/Modal";
@@ -31,6 +42,8 @@ import { toTimestamp, debug } from "itu-utils";
 import { CommentEditorModal, CommentEditorModalOnSubmitParams } from "../components/modals/CommentEditorModal";
 import { getStoredParticipationValue } from "../components/layout/UserParticipationSelect";
 
+type QuestionState = Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id };
+
 const MAX_ANSWER_COUNT_ALLOWED = 20;
 
 const sortComments = (a: Comment, b: Comment) => {
@@ -45,7 +58,7 @@ export const QuestionEdit: React.FC = () => {
 	const questionId = state?.quizId ?? "";
 	const [currentQuestionId, setCurrentQuestionId] = useState(questionId);
 	const formerGroup = state?.group ?? "";
-	const writeAccess = state?.write === "true" ?? false;
+	const writeAccess = state?.write === "true";
 	// const [mbQuiz, tryQuizActor] = useStatefulActor<{ quiz: Quiz; comments: Comment[]; questions: Question[] }>(
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz", {
 		quiz: {} as Quiz,
@@ -75,7 +88,7 @@ export const QuestionEdit: React.FC = () => {
 		if (deleted) setShowError("quiz-error-quiz-deleted");
 	}, [deleted]);
 
-	const [question, setQuestion] = useState<Omit<Question, "uid" | "created" | "updated" | "authorID"> & { uid?: Id }>(
+	const [defaultQuestion, setDefaultQuestion] = useState<QuestionState>(
 		{
 			text: "",
 			type: "TEXT",
@@ -87,6 +100,19 @@ export const QuestionEdit: React.FC = () => {
 			answerOrderFixed: false,
 		}
 	);
+	const [question, setQuestion] = useState<QuestionState>(
+		{
+			text: "",
+			type: "TEXT",
+			authorId: toId(""),
+			answers: [],
+			approved: false,
+			editMode: true,
+			quiz: toId(""),
+			answerOrderFixed: false,
+		}
+	);
+
 	const [hint, setHint] = useState(false);
 	// const [groups, setGroups] = useState<string[]>([]);
 	const [selectedGroup, setSelectedGroup] = useState("");
@@ -94,18 +120,23 @@ export const QuestionEdit: React.FC = () => {
 	const [allowedAuthorTypes, setAllowedAuthorTypes] = useState<UserParticipation[]>([]);
 	const [authorType, setAuthorType] = useState<UserParticipation>("ANONYMOUS");
 	const nav = useNavigate();
-	const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
-	const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+	// const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
+	// const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
+	const userId: Id = mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""));
 
-	const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
-	const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
-	const isStudentCommentsAllowed = q?.studentComments;
-	const showCommentSection = isQuizTeacher || (isQuizStateStarted && isStudentCommentsAllowed);
+	// const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
+	// const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 
 	const quiz = mbQuiz.orUndefined();
 	const questionsIds = quiz?.quiz.groups?.[0].questions ?? [];
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
+
+	const isUserInTeachersList = quiz && userId ? isInTeachersList(quiz.quiz, userId) : false;
+	const isUserInStudentsList = quiz && userId ? isInStudentList(quiz.quiz, userId) : true;
+
+	const isStudentCommentsAllowed = q?.studentComments;
+	const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
 
 	const userName = mbUser.flatMap(u => maybe(u.user.username)).orElse("---");
 	const userNickname = mbUser.flatMap(u => maybe(u.user.nickname)).orUndefined();
@@ -149,7 +180,10 @@ export const QuestionEdit: React.FC = () => {
 					setAuthorType("ANONYMOUS");
 				}
 
-				setQuestion({ ...question, ...editQuestion, type: newType });
+				// setQuestion({ ...question, ...editQuestion, type: newType });
+				setQuestion(prev => ({ ...prev, ...structuredClone(editQuestion), type: newType }));
+				setDefaultQuestion(prev => ({ ...prev, ...structuredClone(editQuestion), type: newType }));
+
 				setHint(!!editQuestion.hint);
 				if (writeAccess) {
 					tryQuizActor.forEach(actor =>
@@ -180,7 +214,9 @@ export const QuestionEdit: React.FC = () => {
 
 				const newType: QuestionType = aqt.includes(question.type) ? question.type : aqt[0];
 
-				setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
+				// setQuestion({ ...question, quiz: quiz?.quiz?.uid ?? toId(""), type: newType });
+				setQuestion(prev => ({ ...prev, quiz: quiz?.quiz?.uid ?? toId(""), type: newType }));
+				setDefaultQuestion(prev => ({ ...prev, quiz: quiz?.quiz?.uid ?? toId(""), type: newType }));
 			}
 			if (formerGroup) {
 				setSelectedGroup(formerGroup);
@@ -194,6 +230,36 @@ export const QuestionEdit: React.FC = () => {
 	const { rendered } = useRendered({ value: question.text });
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
 	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
+
+	const confirmBeforeLeaving = (callBack: ()=> void)=> {
+		if (!checkIsQuestionChanged() || confirm("Changes that you made may not be saved.")) {
+			callBack();
+		}
+	};
+
+	const checkIsQuestionChanged = ()=> {
+		const isQuestionChanged = (Object.keys(question) as (keyof QuestionState)[]).some((key) => {
+			return JSON.stringify(question[key]) !== JSON.stringify(defaultQuestion[key]);
+		});
+
+		return isQuestionChanged;
+	};
+
+    useEffect(() => {
+		const isQuestionChanged = checkIsQuestionChanged();
+        if (!isQuestionChanged) return;
+
+        const handleOnBeforeUnload = (event: BeforeUnloadEvent) => {
+            event.preventDefault();
+            event.returnValue = "";
+            return "";
+        };
+        window.addEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+
+        return () => {
+            window.removeEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+        };
+    }, [question]);
 
 	const handleClose = () => {
 		setShowMDModal({ type: "", titleId: "" });
@@ -279,8 +345,10 @@ export const QuestionEdit: React.FC = () => {
 	};
 
 	const onCancelClick = () => {
-		resetQuestionEditModeFlag();
-		nav(-1);
+		confirmBeforeLeaving(()=> {
+			resetQuestionEditModeFlag();
+			nav(-1);
+		});
 	};
 
 	const handleSaveAndGoToNextQuestion = () => {
@@ -299,7 +367,7 @@ export const QuestionEdit: React.FC = () => {
 			const user = mbUser.map(u => u.user);
 			user.match(
 				userData => {
-					if (isStudent) {
+					if (isUserInStudentsList) {
 						quizQuestion.authorId = userData.uid;
 						switch (authorType) {
 							case "ANONYMOUS":
@@ -388,7 +456,7 @@ export const QuestionEdit: React.FC = () => {
 
 	const showCommentArea =
 		!mbQuiz.flatMap(q => maybe(q.quiz.hideComments)).orElse(false) ||
-		(!isStudent && mbQuiz.flatMap(q => maybe(q.quiz.state)).orElse("EDITING") === "EDITING");
+		(!isUserInStudentsList && mbQuiz.flatMap(q => maybe(q.quiz.state)).orElse("EDITING") === "EDITING");
 
 	const isCommentSectionVisible = mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -426,8 +494,8 @@ export const QuestionEdit: React.FC = () => {
 	}
 
 	const isSaveButtonDisabled = !!saveButtonDisableReason;
-	// const isActivateReorderAnswersVisible = isQuizTeacher && isQuizStateEditing && !shuffleAnswers;
-	const isActivateReorderAnswersVisible = writeAccess && isQuizStateEditing && !shuffleAnswers;
+	const isActivateReorderAnswersVisible =
+		isUserInTeachersList && writeAccess && isQuizStateEditing && !shuffleAnswers;
 
 	const onErrorClose = () => {
 		setShowError("");
@@ -488,7 +556,7 @@ export const QuestionEdit: React.FC = () => {
 				onClose={handleClose}
 				showRelatedQuestionCheck
 				// isStudent={isStudent}
-				isQuizTeacher={isQuizTeacher}
+				isUserInTeachersList={isUserInTeachersList}
 				userNames={[userName, userNickname ?? ""]}
 				participationOptions={allowedAuthorTypes}
 				onSubmit={({ text, name, isRelatedToQuestion }) => {
@@ -505,8 +573,10 @@ export const QuestionEdit: React.FC = () => {
 					<Breadcrumb>
 						<Breadcrumb.Item
 							onClick={() => {
-								resetQuestionEditModeFlag();
-								nav({ pathname: "/Dashboard" });
+								confirmBeforeLeaving(()=> {
+									resetQuestionEditModeFlag();
+									nav({ pathname: "/Dashboard" });
+								});
 							}}
 						>
 							Dashboard
@@ -515,11 +585,13 @@ export const QuestionEdit: React.FC = () => {
 							className="text-overflow-ellipsis"
 							style={{ maxWidth: 400 }}
 							onClick={() => {
-								resetQuestionEditModeFlag();
-								nav(
-									{ pathname: "/Dashboard/quiz" },
-									{ state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
-								);
+								confirmBeforeLeaving(()=> {
+									resetQuestionEditModeFlag();
+									nav(
+										{ pathname: "/Dashboard/quiz" },
+										{ state: { quizId: mbQuiz.flatMap(q => maybe(q.quiz?.uid)).orElse(toId("")) } }
+									);
+								});
 							}}
 						>
 							{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
@@ -533,7 +605,7 @@ export const QuestionEdit: React.FC = () => {
 				 */}
 				{showCommentSection ? (
 					<CommentsContainer
-						isQuizTeacher={isQuizTeacher}
+						isUserInTeachersList={isUserInTeachersList}
 						onClickToggleButton={() => setIsCommentSectionVisible(!isCommentSectionVisible)}
 						isCommentSectionVisible={isCommentSectionVisible}
 						onClickAddComment={() => handleMDShow("COMMENT", "edit-comment-text")}
@@ -564,7 +636,8 @@ export const QuestionEdit: React.FC = () => {
 										<CommentCard
 											isCommentSectionVisible={isCommentSectionVisible}
 											userId={mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""))}
-											teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+											// teachers={mbQuiz.flatMap(q => maybe(q.quiz?.teachers)).orElse([])}
+											isUserInTeachersList={isUserInTeachersList}
 											comment={debug(cmt, `${mbQuiz.flatMap(q => maybe(q.questions))}`)}
 											onUpvote={() => upvoteComment(cmt.uid)}
 											onAccept={() => finishComment(cmt.uid)}
@@ -596,7 +669,7 @@ export const QuestionEdit: React.FC = () => {
 						{/**
 						 * MARK: Author
 						 */}
-						{isStudent && writeAccess && (
+						{isUserInStudentsList && writeAccess && (
 							<Form.Group>
 								<Form.Label className="m-0">{i18n._("author")}:</Form.Label>
 								<Form.Select
@@ -927,10 +1000,9 @@ export const QuestionEdit: React.FC = () => {
 													type="switch"
 													// checked={answer.correct}
 													checked={
-														(writeAccess || !isStudent) && answer.correct
-														// isQuizStateStarted
-														// 	? !isStudent && answer.correct
-														// 	: answer.correct
+														isQuizStateStarted
+															? (writeAccess || !isUserInStudentsList) && answer.correct
+															: answer.correct
 													}
 													onChange={() => toggleAnswer(i)}
 													disabled={!writeAccess}
@@ -1008,7 +1080,7 @@ export const QuestionEdit: React.FC = () => {
 						<Trans id="cancel" />
 					</Button>
 
-					{question.uid && isQuizStateEditing && isQuizTeacher && !isLastQuestion ? (
+					{question.uid && isQuizStateEditing && isUserInTeachersList && !isLastQuestion ? (
 						<Button onClick={handleSaveAndGoToNextQuestion}>
 							<Trans id="save-and-go-to-next-question-button" />
 						</Button>

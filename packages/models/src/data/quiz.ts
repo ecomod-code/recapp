@@ -1,5 +1,5 @@
 import zod, { ZodBoolean } from "zod";
-import { idEntitySchema, timestampSchema, uidSchema } from "./base";
+import { Id, idEntitySchema, timestampSchema, uidSchema } from "./base";
 import { userParticipationSchema } from "./user";
 import { textElementStatisticsSchema, choiceElementStatisticsSchema, groupStatisticsSchema } from "./statistics";
 
@@ -81,18 +81,24 @@ export const quizSchema = zod
 			zod.boolean()
 		), // Which element types are allowed in this quiz
 		shuffleQuestions: zod.boolean(), // Whether elements should be shuffled when running the quiz
-		shuffleAnswers: zod.boolean().optional().default(false), // Whether the Answers should be shuffled when running the quiz  
+		shuffleAnswers: zod.boolean().optional().default(false), // Whether the Answers should be shuffled when running the quiz
 		studentsCanSeeStatistics: zod.boolean().optional(), // Whether students can see the statistics in quiz mode after answering their questions
 		statistics: groupStatisticsSchema.optional(), // Statistics for quiz, if any
 		lastExport: timestampSchema.optional(), // Date of last export
 		createdBy: uidSchema.optional(),
 		teachers: zod.array(uidSchema), // Teachers who can access and change the quiz
+		previewers: zod.array(uidSchema).optional(), // Optional array of teachers who preview the quiz as students
 		students: zod.array(uidSchema), // Students participating in this quiz
 		hideComments: zod.boolean().optional().default(false), // Hide the comments from all student participants. For teachers, they will stay visible, but only in edit mode.
 	})
 	.merge(idEntitySchema);
 
 export type Quiz = zod.infer<typeof quizSchema>;
+
+export const isInTeachersList = (quiz: Quiz, userId: Id): boolean =>
+	quiz.teachers.includes(userId) && !(quiz.previewers ?? []).includes(userId);
+export const isInStudentList = (quiz: Quiz, userId: Id): boolean =>
+	quiz.students.includes(userId) || (quiz.previewers ?? []).includes(userId);
 
 export const testPackage = zod.object({
 	studentId: uidSchema,

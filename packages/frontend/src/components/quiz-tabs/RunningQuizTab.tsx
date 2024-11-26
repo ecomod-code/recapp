@@ -20,11 +20,11 @@ import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 import { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT } from "../../colorPalette";
 
 export const RunningQuizTab: React.FC<{
-	isQuizTeacher:boolean;
+	isUserInTeachersList:boolean;
     onClickAddComment: () => void;
 	quizState: CurrentQuizState;
 	logQuestion: (questionId: Id, answer: string | boolean[]) => void;
-}> = ({isQuizTeacher, onClickAddComment, quizState, logQuestion }) => {
+}> = ({isUserInTeachersList, onClickAddComment, quizState, logQuestion }) => {
 	const [isHintModalOpen, setIsHintModalOpen] = useState(false);
 	const [answered, setAnswered] = useState(false);
 	const [textAnswer, setTextAnswer] = useState("");
@@ -235,7 +235,7 @@ export const RunningQuizTab: React.FC<{
 								)}
 							</div>
 
-                            {!isQuizTeacher ? (
+                            {!isUserInTeachersList ? (
                                 <Button variant="outline-primary" onClick={onClickAddComment}>
                                     <ChatRightText className="me-1" />
 									<Trans id="comment-row-new-comment-button" />

@@ -35,12 +35,12 @@ const newQuiz: NewQuiz = {
 		TEXT: true,
 	},
 	shuffleQuestions: true,
+	shuffleAnswers: false,
 	teachers: [],
 	students: [],
 	groups: [],
 	state: "ACTIVE",
 	hideComments: false,
-	shuffleAnswers: false,
 };
 
 const startValidation: Validator<NewQuiz> = {

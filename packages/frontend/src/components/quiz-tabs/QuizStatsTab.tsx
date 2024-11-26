@@ -4,11 +4,11 @@ import { maybe, nothing } from "tsmonads";
 import { CurrentQuizMessages, CurrentQuizState } from "../../actors/CurrentQuizActor";
 import { i18n } from "@lingui/core";
 import Button from "react-bootstrap/Button";
-import { Id, toId, User } from "@recapp/models";
+import { Id, isInStudentList, toId, User } from "@recapp/models";
 // import axios from "axios";
 import { StatisticsExportModal } from "../modals/StatisticsExportModal";
 import { Trans } from "@lingui/react";
-import { isNil, range } from "rambda";
+import { isNil, keys, range } from "rambda";
 import { QuizStatsDetails } from "./QuizStatsDetails";
 import { QuizBarChart } from "./quiz-bar/QuizBarChart";
 import { PresentationModeSwitch } from "./PresentationModeSwitch";
@@ -32,10 +32,17 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 		if (tryActor.succeeded) {
 			mbUser
 				.map(u => u.user.uid)
-				.forEach(uid => {
-					const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
-					console.log("STUD", isStudent, run);
-					if (isStudent && run.hasValue) {
+				.forEach(userId => {
+					// const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
+                    const quizData = mbQuiz
+                        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+                        .match(
+                            quizData => quizData,
+                            () => null
+                        );
+					const isUserInStudentsList = quizData ? isInStudentList(quizData.quiz, userId) : true;
+					console.log("STUD", isUserInStudentsList, run);
+					if (isUserInStudentsList && run.hasValue) {
 						run.forEach(run => {
 							range(0, run.questions?.length ?? 0).forEach(index => {
 								setOwnAnswers(state => ({ ...state, [run.questions[index]]: run.answers[index] }));

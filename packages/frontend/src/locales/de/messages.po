@@ -73,7 +73,7 @@ msgstr "Antwortreihenfolge einfrieren"
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-student-to-see-statistics"
-msgstr "Studenten können Statistiken einsehen"
+msgstr "Teilnehmende können Statistiken einsehen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:323
@@ -314,7 +314,7 @@ msgstr "Lehrperson"
 #: src/components/cards/UserCard.tsx:40
 #: src/components/modals/ChangeRoleModal.tsx:25
 msgid "role-name-student"
-msgstr "Student"
+msgstr "Teilnehmende*r"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:101
@@ -470,7 +470,7 @@ msgstr "Herunterladen"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
 msgid "share-qr-code-header"
-msgstr "Studierende können sich jetzt über Code oder Link in das Quiz einschreiben"
+msgstr "Teilnehmende können sich jetzt über Code oder Link in das Quiz einschreiben"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:54
@@ -577,19 +577,19 @@ msgstr "Lehrpersonen"
 #: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
-msgstr "Studentische Kommentare erlauben"
+msgstr "Kommentare von Teilnehmenden erlauben"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:230
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
-msgstr "Fragen durch Studierende erstellen lassen"
+msgstr "Fragen durch Teilnehmende erstellen lassen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
-msgstr "Studentische Teilnahmemöglichkeiten"
+msgstr "Teilnahmemöglichkeiten von Teilnehmenden"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:239
@@ -1295,8 +1295,8 @@ msgstr "Die ausgewählte Datei ist ungültig."
 
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions"
-msgstr "Studierendenfragen"
+msgstr "Fragen von Teilnehmenden"
 
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions-tooltip"
-msgstr "Studierende können Fragen stellen"
+msgstr "Teilnehmende können Fragen stellen"

@@ -73,7 +73,7 @@ msgstr "Freeze answer order"
 #: src/components/quiz-tabs/QuizDataTab.tsx:257
 #: src/pages/CreateQuiz.tsx:135
 msgid "quiz-allows-student-to-see-statistics"
-msgstr "Students can view statistics"
+msgstr "Participants can view statistics"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:323
@@ -319,7 +319,7 @@ msgstr "Teacher"
 #: src/components/cards/UserCard.tsx:40
 #: src/components/modals/ChangeRoleModal.tsx:25
 msgid "role-name-student"
-msgstr "Student"
+msgstr "Participant"
 
 #. js-lingui-explicit-id
 #: src/components/cards/UserCard.tsx:101
@@ -475,7 +475,7 @@ msgstr "Download"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareModal.tsx:17
 msgid "share-qr-code-header"
-msgstr "Students can now register for the quiz via code or link"
+msgstr "Participants can now register for the quiz via code or link"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:54
@@ -580,19 +580,19 @@ msgstr "Teachers"
 #: src/components/quiz-tabs/QuizDataTab.tsx:223
 #: src/pages/CreateQuiz.tsx:73
 msgid "quiz-allows-student-comments"
-msgstr "Allow student comments"
+msgstr "Allow participant comments"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:230
 #: src/pages/CreateQuiz.tsx:85
 msgid "quiz-allows-student-questions"
-msgstr "Allow students to set questions"
+msgstr "Allow participants to set questions"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
-msgstr "Student participation options"
+msgstr "Participant participation options"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:239
@@ -1299,11 +1299,11 @@ msgstr "The selected file is invalid."
 
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions"
-msgstr "Student questions"
+msgstr "Participant questions"
 
 #. js-lingui-explicit-id
 msgid "quiz-toggle-student-questions-tooltip"
-msgstr "Allow students to create/edit questions"
+msgstr "Allow participants to create/edit questions"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-end-preview"

@@ -876,6 +876,10 @@ msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
 
 #. js-lingui-explicit-id
+msgid "activate-correct-answer"
+msgstr "Aktiviere die richtige Antwort"
+
+#. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460
 msgid "question-edit.button-tooltip.edit-answer"
 msgstr "Antwort bearbeiten"

@@ -159,7 +159,7 @@ msgstr "Frage"
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:167
 msgid "running-quiz-tab.button-label.submit"
-msgstr "Abschließen"
+msgstr "Einreichen"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/RunningQuizTab.tsx:191

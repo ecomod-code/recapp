@@ -179,7 +179,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 
 						setTitleAndDescription(prev => ({ ...prev, title: text }));
 
-						if (text.length > 3) {
+						if (text.length > 0) {
 							updateDebounced({ title: text });
 							setTitleValidationError("");
 						} else {

@@ -56,6 +56,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
+			return unit();
 		}
 		console.log("QUIZRUNACTOR", from.name, JSON.stringify(message, undefined, 4));
 		try {

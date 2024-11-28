@@ -98,6 +98,7 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 		console.debug("QUESTIONACTOR", from.name, message);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
+			return unit();
 		}
 		try {
 			return await QuestionActorMessages.match<Promise<ResultType>>(message, {
@@ -212,7 +213,7 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 			});
 			//#endregion
 		} catch (e) {
-			console.error("QUESTIONACTOR", e);
+			console.error("QUESTIONACTOR unhandled error", message, e);
 			throw e;
 		}
 	}

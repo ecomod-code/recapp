@@ -31,10 +31,11 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 	}
 
 	public override async afterStart(): Promise<void> {
-		this.logger.debug("Storing actor initiallized");
+		this.logger.debug(`Storing actor ${this.name} initiallized`);
 	}
 
 	public override async beforeShutdown(): Promise<void> {
+		this.logger.debug(`Shutting down ${this.name}`);
 		clearInterval(this.checkInterval);
 	}
 

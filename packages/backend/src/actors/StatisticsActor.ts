@@ -122,6 +122,7 @@ export class StatisticsActor extends SubscribableActor<
 		console.debug("STATISTICSACTOR", from.name, message);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
+			return unit();
 		}
 		try {
 			return await StatisticsActorMessages.match<Promise<ResultType>>(message, {
@@ -592,7 +593,7 @@ export class StatisticsActor extends SubscribableActor<
 				},
 			});
 		} catch (e) {
-			console.error("QUESTIONACTOR", e);
+			console.error("STATISTICSACTOR Uncaught error", message.value, e);
 			throw e;
 		}
 	}

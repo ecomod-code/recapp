@@ -290,12 +290,13 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							c.updated = toTimestamp();
 							const { created, ...updateDelta } = quiz;
 							const combined = { ...c, ...updateDelta };
-							if (!combined.statistics?.quizId) {
+							if (combined.statistics && !combined.statistics?.quizId) {
 								console.error("ERROR, quiz", combined.uid, "has no valid statistics block");
 								if (!quiz.statistics?.quizId) {
 									console.error("Update DATA lacks proper statistics block");
 									if (!c.statistics?.quizId) {
 										console.error("Original DATA lacks proper statistics block");
+										delete combined.statistics;
 									} else {
 										console.error("Using original statistics block");
 										combined.statistics = c.statistics;

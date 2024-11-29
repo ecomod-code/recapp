@@ -238,9 +238,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 	private getQuizStats = async () => {
 		const gs: GroupStatistics = await this.ask(
-			`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+			`${actorUris.StatsActorPrefix}${this.state.quiz.uid}`,
 			StatisticsActorMessages.GetForQuiz()
 		);
+		if (!gs.quizId) {
+			console.error("getQuizStats: Quiz ID not set for statistics, should be " + this.state.quiz.uid);
+			return;
+		}
 		this.updateState(draft => {
 			draft.quizStats = gs;
 			draft.quiz.statistics = gs;

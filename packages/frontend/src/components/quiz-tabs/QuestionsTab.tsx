@@ -333,7 +333,11 @@ export const QuestionsTab: React.FC<{
 									)
 									.orElse(false);
 
-								if (!isInTeachersList(quizData.quiz, userId) && !isQuestionVisibleToStudents)
+								if (
+									userRole !== "ADMIN" &&
+									!isInTeachersList(quizData.quiz, userId) &&
+									!isQuestionVisibleToStudents
+								)
 									return null;
 
 								const writeAccess =

@@ -16,7 +16,7 @@ import multer from "@koa/multer";
 import type { File } from "@koa/multer";
 import type { IncomingMessage } from "http";
 import koaLogger from "koa-logger-winston";
-import { authLogin, authLogout, authProviderCallback, authRefresh } from "./middlewares/authRoutes";
+import { authLogin, authLogout, authProviderCallback, authRefresh, authTempAccount } from "./middlewares/authRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logger } from "./logger";
 import { authenticationMiddleware } from "./middlewares/authMiddleware";
@@ -56,6 +56,7 @@ router
 	.get("/auth/callback", authProviderCallback)
 	.get("/auth/logout", authLogout)
 	.get("/auth/refresh", authRefresh)
+	.get("/auth/temp", authTempAccount)
 	.get("/ping", ctx => {
 		ctx.status = 200;
 		ctx.body = "PONG";

@@ -134,6 +134,19 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const maybeUser = await this.getEntity(userId);
 					return maybeUser.match<User | Error>(identity, () => new Error(`User id ${userId} does not exist`));
 				},
+				GetByFingerprint: async fp => {
+					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
+						return new Error(`Operation not allowed`);
+					}
+					const db = await this.connector.db();
+					const maybeUser = maybe(
+						await db.collection<User>(this.collectionName).findOne({ fingerprint: fp })
+					);
+					return maybeUser.match<User | Error>(
+						identity,
+						() => new Error(`User fingerprint ${fp} does not exist`)
+					);
+				},
 				GetAll: async () => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);

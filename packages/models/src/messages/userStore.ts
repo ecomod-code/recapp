@@ -12,6 +12,7 @@ export const UserStoreMessages = unionize(
 		Get: ofType<Id>(), // Get user, answers with User
 		GetOwn: {}, // Return the info of the requesting user, answers with User
 		GetRole: ofType<Id>(), // Return the role of the given user, answers with UserRole
+		GetByFingerprint: ofType<string>(), // Return a user for the given fingerprint
 		GetNames: ofType<Array<Id>>(), // Return the names for the given User Ids
 		SubscribeTo: ofType<Id>(), // Subscribe to all changes of the specific user, sends back all updates to requester
 		SubscribeToCollection: ofType<string[]>(), // Subscribe to all changes of the specific user, sends back all updates to requester. Returns only the requested properties.

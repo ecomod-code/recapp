@@ -4,11 +4,12 @@ import { Issuer, Client, ClientMetadata } from "openid-client";
 import Container from "typedi";
 import koa from "koa";
 import { ActorSystem } from "ts-actors";
-import { createActorUri } from "../utils";
+import { calculateFingerprint, createActorUri, createTempJwt } from "../utils";
 import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
 import { toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
+import { v4 } from "uuid";
 
 const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI, REQUIRES_OFFLINE_SCOPE } =
 	process.env;
@@ -50,6 +51,62 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);
+};
+
+export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
+	// Fingerprint berechnen
+	const fingerprint = calculateFingerprint(ctx);
+	// Prüfen ob gesperrt
+	const system = Container.get<ActorSystem>("actor-system");
+	const userStore = createActorUri("UserStore");
+	try {
+		const existingUser: User | Error = await system.ask(userStore, UserStoreMessages.GetByFingerprint(fingerprint));
+		if (existingUser instanceof Error) {
+			console.debug("A new fingerprint has been generated");
+		} else if (!existingUser.active) {
+			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
+			return;
+		}
+	} catch (e) {
+		console.error(e);
+	}
+	// Wenn nicht, dann Token, temporären User und Session anlegen
+	const uid = v4() as Id;
+	const token = createTempJwt(uid, fingerprint);
+	const decoded = jwt.decode(token) as jwt.JwtPayload;
+	const sessionStore = createActorUri("SessionStore");
+	const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+	await system.send(
+		userStore,
+		UserStoreMessages.Create({
+			uid,
+			role: "STUDENT",
+			lastLogin: toTimestamp(),
+			created: toTimestamp(),
+			updated: toTimestamp(),
+			username: "Temporary account",
+			email: "",
+			active: true,
+			quizUsage: new Map(),
+			isTemporary: true,
+		})
+	);
+	await system.send(
+		sessionStore,
+		SessionStoreMessages.StoreSession({
+			idToken: token,
+			accessToken: token,
+			refreshToken: token,
+			uid,
+			idExpires: toTimestamp(expires),
+			refreshExpires: toTimestamp(expires),
+			role: "STUDENT",
+			fingerprint,
+		})
+	);
+	// Cookie setzen und zurückleiten
+	ctx.set("Set-Cookie", `bearer=${token}; path=/`);
+	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
 
 /**
@@ -193,6 +250,12 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				if (session instanceof Error) {
 					ctx.set("Set-Cookie", `bearer=; path=/`);
 					ctx.throw(401, "Session unknown");
+				}
+				// If this is a temporary account, just return
+				if (session.fingerprint) {
+					console.debug("Nothing to do for temporary account", session.fingerprint);
+					ctx.body = "O.K.";
+					return;
 				}
 				try {
 					const newTokenSet = await client.refresh(session.refreshToken);

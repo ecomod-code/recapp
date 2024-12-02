@@ -23,6 +23,7 @@ export const userSchema = zod
 		lastLogin: timestampSchema, // Date of last login
 		active: zod.boolean(), // Whether the user can login
 		quizUsage: zod.map(uidSchema, quizUsageType), // How the user decided to participate in each individual quiz
+		isTemporary: zod.boolean().optional().default(false), // Is this a temporary account
 	})
 	.merge(idEntitySchema);
 

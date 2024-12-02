@@ -13,6 +13,7 @@ export const sessionSchema = zod.object({
 	role: userRoleSchema,
 	created: timestampSchema,
 	updated: timestampSchema,
+	fingerprint: zod.string().optional(), // Fingerprint, is set if this is a temporary account
 });
 
 export type Session = zod.infer<typeof sessionSchema>;

@@ -105,6 +105,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 							email: decoded.email ?? "",
 							active: true,
 							quizUsage: new Map(),
+							isTemporary: false,
 						})
 					);
 				} else {

@@ -55,6 +55,7 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
+			return unit();
 		}
 		console.log("COMMENTACTOR", from.name, message);
 		try {

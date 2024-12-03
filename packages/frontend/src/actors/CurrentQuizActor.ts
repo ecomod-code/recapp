@@ -238,9 +238,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 	private getQuizStats = async () => {
 		const gs: GroupStatistics = await this.ask(
-			`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+			`${actorUris.StatsActorPrefix}${this.state.quiz.uid}`,
 			StatisticsActorMessages.GetForQuiz()
 		);
+		if (!gs.quizId) {
+			console.error("getQuizStats: Quiz ID not set for statistics, should be " + this.state.quiz.uid);
+			return;
+		}
 		this.updateState(draft => {
 			draft.quizStats = gs;
 			draft.quiz.statistics = gs;
@@ -655,6 +659,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						},
 						SetQuiz: async uid => {
 							try {
+								if (!uid) {
+									console.error("No UID given for SetQuiz. This should never happen!");
+									return unit();
+								}
 								if (uid === this.state.quiz.uid) {
 									if (this.state.quiz.state === "STARTED" && this.state.run === undefined) {
 										const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
@@ -662,10 +670,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										const run = (await this.ask(
 											actorUris.QuizActor,
 											QuizActorMessages.GetUserRun({ studentId, quizId })
-										)) as QuizRun;
-										if (keys(run).length > 0) {
+										)) as QuizRun | Error;
+										if ((run as Error)?.message !== "No run for user" && keys(run).length > 0) {
 											this.updateState(draft => {
-												draft.run = run;
+												draft.run = run as QuizRun;
 											});
 										} else {
 											this.send(this.ref, CurrentQuizMessages.StartQuiz());
@@ -676,36 +684,25 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.state = { ...this.state, comments: [], questions: [], deleted: false };
 								this.quiz.forEach(q => {
 									this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
-								});
-								this.quiz.forEach(q => {
 									this.send(
-										`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										`${actorUris.CommentActorPrefix}${q}`,
 										CommentActorMessages.UnsubscribeFromCollection()
 									);
 									this.send(
-										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										`${actorUris.QuestionActorPrefix}${q}`,
 										QuestionActorMessages.UnsubscribeFromCollection()
 									);
 									this.send(
-										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										`${actorUris.QuizRunActorPrefix}${q}`,
 										QuizRunActorMessages.UnsubscribeFromCollection()
 									);
 									this.send(
-										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+										`${actorUris.StatsActorPrefix}${q}`,
 										StatisticsActorMessages.UnsubscribeFromCollection()
 									);
 								});
 								this.quiz = maybe(uid);
 								const quizData: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(uid));
-								this.send(this.ref, CurrentQuizMessages.GetTeacherNames(quizData.teachers));
-								this.send(
-									`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									CommentActorMessages.GetAll()
-								);
-								this.send(
-									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									QuestionActorMessages.GetAll()
-								);
 								this.updateState(draft => {
 									draft.run = undefined;
 									draft.result = undefined;
@@ -715,23 +712,30 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									draft.quiz = quizData;
 									draft.deleted = !quizData || keys(quizData).length === 0;
 								});
-								this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(uid));
-								this.send(
-									`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									CommentActorMessages.SubscribeToCollection()
-								);
-								this.send(
-									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									QuestionActorMessages.SubscribeToCollection()
-								);
-								this.send(
-									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									QuizRunActorMessages.SubscribeToCollection()
-								);
-								this.send(
-									`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									StatisticsActorMessages.SubscribeToCollection()
-								);
+
+								this.send(this.ref, CurrentQuizMessages.GetTeacherNames(quizData.teachers));
+								this.quiz.forEach(q => {
+									this.send(actorUris.QuizActor, QuizActorMessages.SubscribeTo(q));
+									this.send(
+										`${actorUris.CommentActorPrefix}${q}`,
+										CommentActorMessages.SubscribeToCollection()
+									);
+									this.send(
+										`${actorUris.QuestionActorPrefix}${q}`,
+										QuestionActorMessages.SubscribeToCollection()
+									);
+									this.send(
+										`${actorUris.QuizRunActorPrefix}${q}`,
+										QuizRunActorMessages.SubscribeToCollection()
+									);
+									this.send(
+										`${actorUris.StatsActorPrefix}${q}`,
+										StatisticsActorMessages.SubscribeToCollection()
+									);
+									this.send(`${actorUris.CommentActorPrefix}${q}`, CommentActorMessages.GetAll());
+									this.send(`${actorUris.QuestionActorPrefix}${q}`, QuestionActorMessages.GetAll());
+								});
+
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
 								} else {
@@ -739,7 +743,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										studentId: this.user.map(u => u.uid).orElse(toId("")),
 										quizId: this.state.quiz.uid,
 									});
-									const run: any = await this.ask(
+									const run: Error | QuizRun = await this.ask(
 										actorUris.QuizActor,
 										QuizActorMessages.GetUserRun({
 											studentId: this.user.map(u => u.uid).orElse(toId("")),
@@ -747,9 +751,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										})
 									);
 									console.log("RUN", run);
-									if (run?.message !== "No run for user") {
+									if ((run as Error)?.message !== "No run for user" && Object.keys(run).length > 0) {
 										this.updateState(draft => {
-											draft.result = run;
+											draft.result = run as QuizRun;
 										});
 									}
 								}
@@ -767,7 +771,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							return unit();
 						},
 						GetTeacherNames: async () => {
-							const names: any[] = await this.ask(
+							const names: Array<{ nickname?: string; username: string }> = await this.ask(
 								actorUris.UserStore,
 								UserStoreMessages.GetNames(this.state.quiz.teachers)
 							);

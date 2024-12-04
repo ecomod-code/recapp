@@ -21,7 +21,7 @@ import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
 import { checkIsCreatingQuestionDisabled, debounce } from "../../utils";
 import { CharacterTracker } from "../CharacterTracker";
-import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../../constants/constants";
+import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS, TITLE_MIN_CHARACTERS } from "../../constants/constants";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 // import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 // import { keys } from "rambda";
@@ -179,7 +179,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 
 						setTitleAndDescription(prev => ({ ...prev, title: text }));
 
-						if (text.length > 3) {
+						if (text.length >= TITLE_MIN_CHARACTERS) {
 							updateDebounced({ title: text });
 							setTitleValidationError("");
 						} else {

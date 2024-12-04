@@ -6,6 +6,8 @@ import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
 import { clone, keys } from "rambda";
 
+import { TITLE_MIN_CHARACTERS } from "../constants/constants";
+
 export type NewQuiz = Omit<Quiz, "uniqueLink" | "uid" | "created" | "updated">;
 export const CreateQuizMessages = unionize(
 	{
@@ -70,7 +72,7 @@ export class CreateQuizActor extends StatefulActor<CreateQuizMessage, Unit | Err
 
 	private validate = (q: NewQuiz): Validator<NewQuiz> => {
 		const validation = { ...this.state.validation };
-		validation.title = q.title.trim().length > 0;
+		validation.title = q.title.trim().length >= TITLE_MIN_CHARACTERS; // 
 		return validation;
 	};
 

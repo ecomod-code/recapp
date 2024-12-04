@@ -589,7 +589,7 @@ msgstr "Fragen durch Teilnehmende erstellen lassen"
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
-msgstr "Teilnahmemöglichkeiten von Teilnehmenden"
+msgstr "Teilnahmemöglichkeiten"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:239
@@ -874,6 +874,10 @@ msgstr "Bearbeiten"
 #: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
+
+#. js-lingui-explicit-id
+msgid "activate-correct-answer"
+msgstr "Aktiviere die richtige Antwort"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460

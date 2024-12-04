@@ -946,7 +946,6 @@ export const QuestionEdit: React.FC = () => {
 								<hr />
 
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
-									<Trans id="activate-all-correct-answers" />
 									{question.type === "SINGLE" && <Trans id="activate-all-correct-answers" />}
         							{question.type === "MULTIPLE" && <Trans id="activate-correct-answer" />}
 									<div className="d-flex flex-row flex-wrap">

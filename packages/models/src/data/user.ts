@@ -24,6 +24,7 @@ export const userSchema = zod
 		active: zod.boolean(), // Whether the user can login
 		quizUsage: zod.map(uidSchema, quizUsageType), // How the user decided to participate in each individual quiz
 		isTemporary: zod.boolean().optional().default(false), // Is this a temporary account
+		initialQuiz: zod.string().optional(), // Initial quiz, if any (will be set if the user logged in or was created with a link)
 	})
 	.merge(idEntitySchema);
 

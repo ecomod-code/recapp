@@ -20,6 +20,7 @@ export const UserStoreMessages = unionize(
 		UnsubscribeFromCollection: {}, // Unsubscribe from collection changes
 		GetTeachers: {}, // Returns a list of minimal information on all teachers (uid, name, pseudonym)
 		IsNicknameUnique: ofType<string>(), // Returns a boolean to signal whether the given pseudonym is unique. Note that you should not test for the user's own nickname since this will always be false
+		Remove: ofType<Id>(), // Removes a temporary user from the user store and db
 	},
 	{ tag: "UserStoreMessage", value: "value" }
 );

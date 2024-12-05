@@ -27,13 +27,12 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 	const run = mbQuiz.flatMap(q => (q?.result && Object.keys(q.result).length > 0 ? maybe(q?.result) : nothing()));
 	const counter = run.map(r => r.counter).orElse(0);
 
-	const isTemporaryAccount = mbUser.map(u => u.user.isTemporary).orElse(false);
+	const isTemporaryAccount = mbUser.flatMap(u => maybe(u.user.isTemporary)).orElse(false);
 
-	// TODO Eigene Ergebnisse für das Quiz holen
 	useEffect(() => {
 		if (tryActor.succeeded) {
 			mbUser
-				.map(u => u.user.uid)
+				.flatMap(u => maybe(u.user.uid))
 				.forEach(userId => {
 					// const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
 					const quizData = mbQuiz
@@ -60,13 +59,11 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 	}, [tryActor.succeeded, counter]);
 
 	const exportQuiz = () => {
-		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuizStats()));
 	};
 
 	const exportQuestions = () => {
-		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuestionStats()));
 	};

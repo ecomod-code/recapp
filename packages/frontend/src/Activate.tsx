@@ -39,7 +39,7 @@ export const Activate: React.FC = () => {
 						variant="primary"
 						className="m-4"
 						style={{ maxWidth: 150 }}
-						href={`${import.meta.env.VITE_BACKEND_URI}/auth/temp`}
+						href={`${import.meta.env.VITE_BACKEND_URI}/auth/temp?quiz=${quiz}`}
 					>
 						<Trans id="login-page.login" />
 					</Button>

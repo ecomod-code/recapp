@@ -56,6 +56,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 	// Fingerprint berechnen
 	const fingerprint = calculateFingerprint(ctx);
+	const quiz = ctx.query.quiz?.toString();
 	// Prüfen ob gesperrt
 	const system = Container.get<ActorSystem>("actor-system");
 	const userStore = createActorUri("UserStore");
@@ -89,6 +90,7 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			active: true,
 			quizUsage: new Map(),
 			isTemporary: true,
+			initialQuiz: quiz && quiz !== "false" ? quiz : undefined,
 		})
 	);
 	await system.send(
@@ -216,6 +218,41 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
  * Also performs a local session logout.
  */
 export const authLogout = async (ctx: koa.Context): Promise<void> => {
+	const maybeIdToken = maybe<string>(ctx.request.headers.cookie)
+		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=([^;]+)/.exec(cookie)))
+		.flatMap(match => maybe(match[1]));
+
+	await maybeIdToken.match(
+		async idToken => {
+			try {
+				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
+				const system = Container.get<ActorSystem>("actor-system");
+				const sessionStore = createActorUri("SessionStore");
+				const session: Session = await system
+					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
+					.then(s => s as Session)
+					.catch((e: Error) => {
+						return e;
+					});
+				await system.send(sessionStore, SessionStoreMessages.RemoveSession(session.uid));
+				if (session.fingerprint) {
+					const userStore = createActorUri("UserStore");
+					await system.send(
+						userStore,
+						UserStoreMessages.Remove(session.uid)
+					);
+				}
+			} catch (e) {
+				console.error("authLogout", e);
+				throw e;
+			}
+		},
+		() => ctx.throw(401, "Unable to sign out.")
+	);
+	
+	// TODO - Remove the session from the session store
+
+	// TODO - Remove the user if it is a temporary user
 	ctx.set("Set-Cookie", `bearer=; path=/; max-age=0`);
 	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };

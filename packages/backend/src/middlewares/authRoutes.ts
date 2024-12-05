@@ -228,12 +228,15 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
 				const system = Container.get<ActorSystem>("actor-system");
 				const sessionStore = createActorUri("SessionStore");
-				const session: Session = await system
+				const session: Session | Error = await system
 					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
 					.then(s => s as Session)
 					.catch((e: Error) => {
 						return e;
 					});
+				if (session instanceof Error) {
+					throw session;
+				}
 				await system.send(sessionStore, SessionStoreMessages.RemoveSession(session.uid));
 				if (session.fingerprint) {
 					const userStore = createActorUri("UserStore");

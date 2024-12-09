@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { Button, Modal, Form } from "react-bootstrap";
 import { Trans } from "@lingui/react";
 import { useNavigate } from "react-router-dom";
 import { cookie } from "./utils";
@@ -9,6 +9,7 @@ export const Activate: React.FC = () => {
 	const quiz = document.location.search.includes("quiz=") && document.location.search.split("=")[1];
 	const nav = useNavigate();
 	const [showTempReminder, setShowTempReminder] = useState(false);
+	const [persistentCookie, setPersistentCookie] = useState(true);
 
 	useEffect(() => {
 		if (cookie("bearer")) {
@@ -33,13 +34,24 @@ export const Activate: React.FC = () => {
 				</Modal.Title>
 				<Modal.Body>
 					<Trans id="login-page.temp-login-reminder" />
+					<Form.Group className="d-flex mb-2">
+						<Form.Label>
+							<Trans id="login-page.store-cookie-checkbox" />
+						</Form.Label>
+						<Form.Check
+							name="store"
+							type="checkbox"
+							checked={persistentCookie}
+							onChange={event => setPersistentCookie(event.target.checked)}
+						/>
+					</Form.Group>
 				</Modal.Body>
 				<Modal.Footer>
 					<Button
 						variant="primary"
 						className="m-4"
 						style={{ maxWidth: 150 }}
-						href={`${import.meta.env.VITE_BACKEND_URI}/auth/temp?quiz=${quiz}`}
+						href={`${import.meta.env.VITE_BACKEND_URI}/auth/temp?quiz=${quiz}&persistent=${persistentCookie}`}
 					>
 						<Trans id="login-page.login" />
 					</Button>

@@ -1319,7 +1319,11 @@ msgstr "Quizteilnahme ohne Anmeldung"
 
 #. js-lingui-explicit-id
 msgid "login-page.temp-login-reminder"
-msgstr "Du kannst ohne Anmeldung an dem Quiz teilnehmen. Um Missbrauch vorzubeugen, wird für deinen Browser und dein Gerät ein sogenannter Fingerprint erzeugt, mit dem wir dich während deiner Teilnahme identifzieren können. Dem stimmst du durch deine Teilnahme zu. Um dich später abzumelden, schließe einfach deinen Browser."
+msgstr "Du kannst ohne Anmeldung an dem Quiz teilnehmen. Um Missbrauch vorzubeugen, wird für deinen Browser und dein Gerät ein sogenannter Fingerprint erzeugt, mit dem wir dich während deiner Teilnahme identifzieren können. Dem stimmst du durch deine Teilnahme zu."
+
+#. js-lingui-explicit-id
+msgid "login-page.store-cookie-checkbox"
+msgstr "Ich möchte dass meine Anmeldung für 30 Tage erhalten bleibt, auch wenn ich das Browserfenster schließe."
 
 #. js-lingui-explicit-id
 msgid "login-page.info-text"

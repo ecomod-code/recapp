@@ -1323,7 +1323,11 @@ msgstr "Participate without logging in"
 
 #. js-lingui-explicit-id
 msgid "login-page.temp-login-reminder"
-msgstr "You can participate in the quiz without logging in. To prevent abuse, a so-called fingerprint is created for your browser and device, which allows us to identify you during your participation. By participating, you agree to this. To log out later, simply close your browser."
+msgstr "You can participate in the quiz without logging in. To prevent abuse, a so-called fingerprint is created for your browser and device, which allows us to identify you during your participation. By participating, you agree to this."
+
+#. js-lingui-explicit-id
+msgid "login-page.store-cookie-checkbox"
+msgstr "I want my login to be stored for 30 days, even if I close the browser window."
 
 #. js-lingui-explicit-id
 msgid "login-page.info-text"

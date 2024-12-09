@@ -57,6 +57,7 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 	// Fingerprint berechnen
 	const fingerprint = calculateFingerprint(ctx);
 	const quiz = ctx.query.quiz?.toString();
+	const persistentCookie = !!ctx.query.persistent;
 	// Prüfen ob gesperrt
 	const system = Container.get<ActorSystem>("actor-system");
 	const userStore = createActorUri("UserStore");
@@ -103,11 +104,14 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			idExpires: toTimestamp(expires),
 			refreshExpires: toTimestamp(expires),
 			role: "STUDENT",
+			persistentCookie,
 			fingerprint,
 		})
 	);
 	// Cookie setzen und zurückleiten
-	ctx.set("Set-Cookie", `bearer=${token}; path=/`);
+	const thirtyDaysFromNow = new Date();
+	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+	ctx.set("Set-Cookie", `bearer=${token}; path=/; Expires=${thirtyDaysFromNow.toUTCString()}`);
 	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
 
@@ -253,9 +257,6 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 		() => ctx.throw(401, "Unable to sign out.")
 	);
 	
-	// TODO - Remove the session from the session store
-
-	// TODO - Remove the user if it is a temporary user
 	ctx.set("Set-Cookie", `bearer=; path=/; max-age=0`);
 	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
@@ -269,14 +270,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 		async idToken => {
 			try {
 				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				/* if (fromTimestamp(exp! * 1000) < DateTime.local().minus(minutes(45))) {
-					console.log("Refresh not needed yet");
-					console.log(
-						`Session ${fromTimestamp(exp! * 1000).toISO()} < ${DateTime.local().minus(minutes(45))}`
-					);
-					ctx.body = "O.K.";
-					return; // We do not need to refresh the token yet
-				} */
+				
 				// Refresh the token
 				const client = await getOidc();
 				const system = Container.get<ActorSystem>("actor-system");
@@ -293,7 +287,10 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				}
 				// If this is a temporary account, just return
 				if (session.fingerprint) {
-					console.debug("Nothing to do for temporary account", session.fingerprint);
+					const token = createTempJwt(session.uid, session.fingerprint);
+					const thirtyDaysFromNow = new Date();
+					thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+					ctx.set("Set-Cookie", `bearer=${token}; path=/; expires=${thirtyDaysFromNow.toUTCString()}`);
 					ctx.body = "O.K.";
 					return;
 				}

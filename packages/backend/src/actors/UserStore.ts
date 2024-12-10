@@ -177,9 +177,9 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const users = await db.collection<User>(this.collectionName).find({}).toArray();
 					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
-						if (clientUserRole === "SYSTEM" || !rest.isTemporary) {
+						//if (clientUserRole === "SYSTEM" || !rest.isTemporary) {
 							this.send(from, new UserUpdateMessage(rest));
-						}
+						//}
 					});
 					return unit();
 				},

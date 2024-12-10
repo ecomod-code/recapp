@@ -2,6 +2,7 @@ import { ActorUri } from "@recapp/models";
 
 export const actorUris: Record<string, ActorUri> = {
 	UserStore: "actors://recapp-backend/UserStore" as ActorUri,
+	FingerprintStore: "actors://recapp-backend/FingerprintStore" as ActorUri,
 	SessionStore: "actors://recapp-backend/SessionStore" as ActorUri,
 	QuizActor: "actors://recapp-backend/QuizActor" as ActorUri,
 	CommentActorPrefix: "actors://recapp-backend/QuizActor/Comment_" as ActorUri,

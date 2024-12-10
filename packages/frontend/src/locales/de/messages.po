@@ -1336,3 +1336,25 @@ msgstr "Login-Fehler. Account deaktiviert."
 #. js-lingui-explicit-id
 msgid "login-page.account-deactivated-message"
 msgstr "Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+
+#. js-lingui-explicit-id
+msgid "fingerprint.card-last-seen: {date}"
+msgstr "Letzte Tokenaktualisierung: {date}"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.search-text"
+msgstr "Fingerprint suchen"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.button-tooltip.filter"
+msgstr "Teile des Fingerprints eingeben um zu filtern"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.title"
+msgstr "Fingerprint Verwaltung (Temporäre Accounts)"
+
+#. js-lingui-explicit-id
+msgid "dashboard-tab-label-fingerprints"
+msgstr "Temporäre Accounts"
+
+

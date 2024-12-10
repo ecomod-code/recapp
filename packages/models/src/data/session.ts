@@ -9,6 +9,8 @@ export const fingerprintSchema = zod.object({
 	lastSeen: timestampSchema,
 	usageCount: zod.number().int(),
 	blocked: zod.boolean(),
+	userUid: uidSchema,
+	initialQuiz: uidSchema.optional()
 });
 
 export type Fingerprint = zod.infer<typeof fingerprintSchema>;

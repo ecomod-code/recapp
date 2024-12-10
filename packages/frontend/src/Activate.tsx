@@ -34,16 +34,17 @@ export const Activate: React.FC = () => {
 				</Modal.Title>
 				<Modal.Body>
 					<Trans id="login-page.temp-login-reminder" />
-					<Form.Group className="d-flex mb-2">
-						<Form.Label>
-							<Trans id="login-page.store-cookie-checkbox" />
-						</Form.Label>
+					<Form.Group className="d-flex mb-2 mt-2">
 						<Form.Check
 							name="store"
 							type="checkbox"
 							checked={persistentCookie}
 							onChange={event => setPersistentCookie(event.target.checked)}
 						/>
+						<Form.Label>
+							&nbsp;<Trans id="login-page.store-cookie-checkbox" />
+						</Form.Label>
+						
 					</Form.Group>
 				</Modal.Body>
 				<Modal.Footer>

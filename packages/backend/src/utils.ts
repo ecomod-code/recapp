@@ -11,7 +11,7 @@ import crypto from "crypto";
 
 export const systemName = "recapp-backend";
 
-export const createActorUri = (actorName: "SessionStore" | "UserStore" | "QuizActor" | "ErrorActor"): ActorUri => {
+export const createActorUri = (actorName: "SessionStore" | "UserStore" | "QuizActor" | "ErrorActor" | "FingerprintStore"): ActorUri => {
 	return `actors://${join(systemName, actorName)}` as ActorUri;
 };
 

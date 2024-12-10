@@ -1,8 +1,8 @@
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { ActorRef, ActorSystem } from "ts-actors";
 import { create } from "mutative";
-import { ActorUri, Fingerprint, FingerprintStoreMessage, FingerprintStoreMessages, FingerprintUpdateMessage, Id } from "@recapp/models";
-import { pick } from "rambda";
+import { ActorUri, Fingerprint, FingerprintStoreMessage, FingerprintStoreMessages, FingerprintUpdateMessage, Id, User, UserStoreMessage, UserStoreMessages } from "@recapp/models";
+import { identity, pick } from "rambda";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 
 type FingerprintStoreResult = Unit | Error | Fingerprint | boolean;
@@ -43,27 +43,36 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 	}
 
 	public async receive(from: ActorRef, message: FingerprintStoreMessage): Promise<FingerprintStoreResult> {
-		const [clientUserRole] = await this.determineRole(from);
+		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 			return new Error(`Operation not allowed`);
 		}
 		const result = await FingerprintStoreMessages.match<Promise<FingerprintStoreResult>>(message, {
-			StoreFingerprint: async session => {
+			StoreFingerprint: async fingerprint => {
 				this.state = await create(this.state, async draft => {
-					const currentSession = (await this.getEntity(session.uid)).orElse({} as Fingerprint);
-					session.updated = toTimestamp();
-					const newSession = { ...currentSession, ...session };
-					draft.cache.set(session.uid, newSession);
-					this.storeEntity(newSession);
+					const currentFingerprint = (await this.getEntity(fingerprint.uid)).orElse({} as Fingerprint);
+					fingerprint.updated = toTimestamp();
+					const newFingerprint = { ...currentFingerprint, ...fingerprint };
+					draft.cache.set(fingerprint.uid, newFingerprint);
+					console.debug("SToring new fingerprint", newFingerprint);
+					this.storeEntity(newFingerprint);
 				});
 				return unit();
 			},
+			Get: async id => {
+				const result = await this.getEntity(id);
+				const retVal = result.match<Error | Fingerprint>(identity, () => new Error(`Unknown fingerprint id ${id}`));
+				return Promise.resolve(retVal)
+			},
 			Block: async id => {
 				const mbFingerprint = await this.getEntity(id)
+				const {uid} = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
 				return mbFingerprint.match<Unit|Error>(
 					fp => {
 						this.storeEntity({...fp, blocked: true});
 						this.updateSubscribers({...fp, blocked: true})
+						if (uid)
+							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid: fp.uid, active: false }));
 						return unit();
 					},
 					() => {
@@ -73,10 +82,13 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 			},
 			Unblock: async id => {
 				const mbFingerprint = await this.getEntity(id)
+				const {uid} = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
 				return mbFingerprint.match<Unit|Error>(
 					fp => {
 						this.storeEntity({...fp, blocked: false});
-						this.updateSubscribers({...fp, blocked: true})
+						this.updateSubscribers({...fp, blocked: false})
+						if (uid)
+							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid: fp.uid, active: true }));
 						return unit();
 					},
 					() => {
@@ -84,16 +96,16 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 					}
 				)
 			},
-			IncreaseCount: async id => {
-				const mbFingerprint = await this.getEntity(id)
+			IncreaseCount: async ({fingerprint, userUid, initialQuiz}) => {
+				const mbFingerprint = await this.getEntity(fingerprint)
 				return mbFingerprint.match<Unit|Error>(
 					fp => {
-						this.storeEntity({...fp, usageCount: fp.usageCount + 1});
-						this.updateSubscribers({...fp, blocked: true})
+						this.storeEntity({...fp, usageCount: fp.usageCount + 1, lastSeen: toTimestamp(), userUid, initialQuiz: initialQuiz ?? fp.initialQuiz});
+						this.updateSubscribers({...fp, usageCount: fp.usageCount + 1, lastSeen: toTimestamp(), userUid, initialQuiz: initialQuiz ?? fp.initialQuiz})
 						return unit();
 					},
 					() => {
-						return new Error(`Unknown fingerprint id ${id}`);
+						return new Error(`Unknown fingerprint id ${fingerprint}`);
 					}
 				)
 			},
@@ -106,7 +118,18 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 				});
 				return unit();
 			},
-			default: async () => new Error(`Unknown message from ${from.name}`),
+			SubscribeToCollection: async () => {
+				this.state = create(this.state, draft => {
+					draft.lastSeen.set(from.name as ActorUri, toTimestamp());
+					draft.collectionSubscribers.set(from.name as ActorUri, {
+						properties: [],
+						userId: clientUserId,
+						userRole: clientUserRole,
+					});
+				});
+				return unit();
+			},
+			default: async () => new Error(`Unknown message from ${from.name}: ${JSON.stringify(message, undefined, 2)}`),
 		});
 		return result;
 	}

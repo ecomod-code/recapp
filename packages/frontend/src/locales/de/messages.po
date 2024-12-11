@@ -1319,7 +1319,7 @@ msgstr "Teilnehmendenansicht"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-tooltip-preview"
-msgstr "Achtung: In der Teilnehmeransicht wird das Quiz automatisch gestartet. Es wird nur gestoppt, wenn niemand mehr teilnimmt."
+msgstr "Startet das Quiz in der Teilnehmeransicht. Das Quiz stoppt, wenn alle beigetretenen Lehrer diesen Modus verlassen."
 
 #. js-lingui-explicit-id
 msgid "login-page.temporary-account-button"

@@ -55,7 +55,7 @@ const sortComments = (a: Comment, b: Comment) => {
 
 export const QuestionEdit: React.FC = () => {
 	const { state } = useLocation();
-	const questionId = state?.quizId ?? "";
+	const questionId = state?.questionId ?? "";
 	const [currentQuestionId, setCurrentQuestionId] = useState(questionId);
 	const formerGroup = state?.group ?? "";
 	const writeAccess = state?.write === "true";
@@ -87,6 +87,11 @@ export const QuestionEdit: React.FC = () => {
 	useEffect(() => {
 		if (deleted) setShowError("quiz-error-quiz-deleted");
 	}, [deleted]);
+	useEffect(() => {
+		if (state.quiz && (mbQuiz.isEmpty() || mbQuiz.map(q => keys(q.quiz).length === 0))) {
+			tryQuizActor.forEach(a => a.send(a, CurrentQuizMessages.SetQuiz(state.quiz as Id)));
+		}
+	}, [state.quiz, mbQuiz]);
 
 	const [defaultQuestion, setDefaultQuestion] = useState<QuestionState>(
 		{
@@ -133,8 +138,10 @@ export const QuestionEdit: React.FC = () => {
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
 
-	const isUserInTeachersList = quiz && userId ? isInTeachersList(quiz.quiz, userId) : false;
-	const isUserInStudentsList = quiz && userId ? isInStudentList(quiz.quiz, userId) : true;
+	console.log("LOCATION state", state, "QUIZ", quiz);	
+
+	const isUserInTeachersList = quiz?.quiz && keys(quiz?.quiz).length > 0 && userId ? isInTeachersList(quiz.quiz, userId) : false;
+	const isUserInStudentsList = quiz?.quiz && keys(quiz?.quiz).length > 0 && userId ? isInStudentList(quiz.quiz, userId) : true;
 
 	const isStudentCommentsAllowed = q?.studentComments;
 	const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
@@ -948,7 +955,7 @@ export const QuestionEdit: React.FC = () => {
 
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 									{question.type === "SINGLE" && <Trans id="activate-all-correct-answers" />}
-        							{question.type === "MULTIPLE" && <Trans id="activate-correct-answer" />}
+									{question.type === "MULTIPLE" && <Trans id="activate-correct-answer" />}
 									<div className="d-flex flex-row flex-wrap">
 										{/* {isQuizTeacher && !shuffleAnswers ? ( */}
 										{isActivateReorderAnswersVisible ? (

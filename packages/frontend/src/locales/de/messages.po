@@ -83,7 +83,7 @@ msgstr "Die Schaltfläche 'Neue Frage erstellen' ist deaktiviert."
 
 #. js-lingui-explicit-id
 msgid "quiz-data-tab.alert-message.participation-is-disabled"
-msgstr "Die Schaltfläche 'Neue Frage erstellen' ist deaktiviert."
+msgstr "Fragen- und Kommentarerstellung sind für Teilnehmende deaktiviert."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:236

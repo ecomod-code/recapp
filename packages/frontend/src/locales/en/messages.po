@@ -83,7 +83,7 @@ msgstr "The 'New question' button is disabled"
 
 #. js-lingui-explicit-id
 msgid "quiz-data-tab.alert-message.participation-is-disabled"
-msgstr "The 'New question' button is disabled"
+msgstr "Submission of questions and comments is disabled for participants."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:236

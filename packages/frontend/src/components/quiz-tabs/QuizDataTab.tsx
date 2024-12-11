@@ -108,7 +108,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 	const isTitleAndDescriptionDisabled = props.disableForStudent || disabledByMode;
 
 	const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quiz.allowedQuestionTypesSettings);
-	const isParticipationDisabled = checkIsParticipationDisabled(quizData.quiz.studentParticipationSettings);
+	const isParticipationDisabled = checkIsParticipationDisabled(quiz.studentParticipationSettings);
 
 	return (
 		<Form>

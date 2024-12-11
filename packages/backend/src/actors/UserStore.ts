@@ -19,6 +19,9 @@ import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { AccessRole } from "./StoringActor";
 import { maybe } from "tsmonads";
 import { createActorUri } from "../utils";
+import { DateTime } from "luxon";
+
+const REMOVE_TEMPS_INTERVAL = 1; // 30; // 30 days
 
 type ListedUser = Omit<User, "quizUsage">;
 
@@ -64,6 +67,25 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 	protected override updateIndices(draft: State, user: User): void {
 		maybe(user.nickname).forEach(draft.nicknames.add);
 		draft.teachers.set(user.uid, { uid: user.uid, username: user.username, nickname: user.nickname });
+	}
+
+	protected override cleanup(): void {
+		super.cleanup();
+		const cleanupTemps = async () => { 
+			const cleanupTimestamp = toTimestamp(DateTime.utc().minus({ days: REMOVE_TEMPS_INTERVAL }));
+			const db = await this.connector.db()
+			const temporaryUsers = await db.collection<User>(this.collectionName).find({ isTemporary: true }).toArray();
+			temporaryUsers.forEach(user => {
+				if (user.lastLogin < cleanupTimestamp) {
+					this.logger.debug(`Deleting old temporary user ${user.uid} ${user.username}`);
+					db.collection<User>(this.collectionName).deleteOne({ uid: user.uid });
+					this.state.lastTouched.delete(user.uid);
+					this.state.cache.delete(user.uid);
+					this.afterEntityRemovedFromCache(user.uid);
+				}
+			})
+		}
+		cleanupTemps();	
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
@@ -134,6 +156,19 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const maybeUser = await this.getEntity(userId);
 					return maybeUser.match<User | Error>(identity, () => new Error(`User id ${userId} does not exist`));
 				},
+				GetByFingerprint: async fp => {
+					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
+						return new Error(`Operation not allowed`);
+					}
+					const db = await this.connector.db();
+					const maybeUser = maybe(
+						await db.collection<User>(this.collectionName).findOne({ fingerprint: fp })
+					);
+					return maybeUser.match<User | Error>(
+						identity,
+						() => new Error(`User fingerprint ${fp} does not exist`)
+					);
+				},
 				GetAll: async () => {
 					if (!["ADMIN", "SYSTEM"].includes(clientUserRole)) {
 						return new Error(`Operation not allowed`);
@@ -142,7 +177,9 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					const users = await db.collection<User>(this.collectionName).find({}).toArray();
 					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
-						this.send(from, new UserUpdateMessage(rest));
+						//if (clientUserRole === "SYSTEM" || !rest.isTemporary) {
+							this.send(from, new UserUpdateMessage(rest));
+						//}
 					});
 					return unit();
 				},
@@ -231,6 +268,25 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						.find({ uid: { $in: ids } }, { username: 1, nickname: 1, uid: 1, _id: 0 } as any)
 						.toArray();
 					return users;
+				},
+				Remove: async uid => {
+					const db = await this.connector.db();
+					const mbUser = maybe(await db.collection<User>(this.collectionName).findOne({uid}));
+					return mbUser.match<Unit | Error>(
+						user => {
+							if (user.isTemporary) {
+								this.deleteEntity(user.uid);
+								this.state.lastTouched.delete(uid);
+								this.state.cache.delete(uid);
+							} else {
+								this.logger.warn(`Trying to remove non-temporary user ${uid}. Operation not allowed and therefore skipped.`);
+							}
+							return unit();
+						},
+						() => {
+							return new Error(`User not found with id <${uid}>`);
+						}
+					)
 				},
 				default: async () => {
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);

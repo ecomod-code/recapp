@@ -123,6 +123,7 @@ export const QuestionEdit: React.FC = () => {
 	// const students = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.students));
 	// const isStudent = mbUser.map(u => students.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
 	const userId: Id = mbUser.flatMap(u => maybe(u.user?.uid)).orElse(toId(""));
+	const isTemporary = mbUser.flatMap(u => maybe(u.user?.isTemporary)).orElse(false);
 
 	// const teachers = mbQuiz.flatMap(q => maybe(q.quiz)).flatMap(q => maybe(q.teachers));
 	// const isQuizTeacher = mbUser.map(u => teachers.map(s => s.includes(u.user.uid)).orElse(false)).orElse(false);
@@ -156,7 +157,7 @@ export const QuestionEdit: React.FC = () => {
 			const aat: UserParticipation[] = keys(quiz?.quiz.studentParticipationSettings)
 				.filter(k => !!quiz?.quiz.studentParticipationSettings[k as UserParticipation])
 				.map(k => k as UserParticipation);
-			setAllowedAuthorTypes(aat);
+			setAllowedAuthorTypes(isTemporary ? aat.filter(at => at !== "NAME") : aat);
 
 			const aqt: QuestionType[] = keys(quiz?.quiz.allowedQuestionTypesSettings)
 				.filter(k => !!quiz?.quiz.allowedQuestionTypesSettings[k as QuestionType])

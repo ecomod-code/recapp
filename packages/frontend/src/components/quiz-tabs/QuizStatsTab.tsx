@@ -27,19 +27,20 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 	const run = mbQuiz.flatMap(q => (q?.result && Object.keys(q.result).length > 0 ? maybe(q?.result) : nothing()));
 	const counter = run.map(r => r.counter).orElse(0);
 
-	// TODO Eigene Ergebnisse für das Quiz holen
+	const isTemporaryAccount = mbUser.flatMap(u => maybe(u.user.isTemporary)).orElse(false);
+
 	useEffect(() => {
 		if (tryActor.succeeded) {
 			mbUser
-				.map(u => u.user.uid)
+				.flatMap(u => maybe(u.user.uid))
 				.forEach(userId => {
 					// const isStudent = mbQuiz.map(q => q.quiz.students.includes(uid)).orElse(false);
-                    const quizData = mbQuiz
-                        .flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
-                        .match(
-                            quizData => quizData,
-                            () => null
-                        );
+					const quizData = mbQuiz
+						.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+						.match(
+							quizData => quizData,
+							() => null
+						);
 					const isUserInStudentsList = quizData ? isInStudentList(quizData.quiz, userId) : true;
 					console.log("STUD", isUserInStudentsList, run);
 					if (isUserInStudentsList && run.hasValue) {
@@ -58,13 +59,11 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 	}, [tryActor.succeeded, counter]);
 
 	const exportQuiz = () => {
-		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuizStats()));
 	};
 
 	const exportQuestions = () => {
-		// TODO: Fragen ob csv oder pdf
 		setShowExportModal(true);
 		tryActor.forEach(actor => actor.send(actor, CurrentQuizMessages.ExportQuestionStats()));
 	};
@@ -135,7 +134,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 										<PresentationModeSwitch />
 									</div>
 
-									{i == 0 && !isPresentationModeActive && (
+									{i == 0 && !isPresentationModeActive && !isTemporaryAccount && (
 										<>
 											<StatisticsExportModal
 												show={showExportModal}
@@ -156,7 +155,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 									)}
 								</div>
 								<div key={i} style={{ zoom }}>
-									{group.questions.map((qId, index, arr)=> {
+									{group.questions.map((qId, index, arr) => {
 										const isLast = arr.length - 1 === index;
 										// This is the overview of all questions
 										const statIndex = quizStats.questionIds.findIndex(f => f === qId)!;
@@ -174,7 +173,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 												key={questionId + index + qId}
 												className="m-1xx p-2 pt-3 pb-3"
 												// style={{ backgroundColor: "lightgrey" }}
-												style={{ borderBottom: !isLast ?  "2px solid lightgray" : undefined }}
+												style={{ borderBottom: !isLast ? "2px solid lightgray" : undefined }}
 											>
 												<div className="d-flex flex-column justify-content-between w-100 row-gap-1">
 													<div className="d-flex align-items-start justify-content-between">
@@ -190,9 +189,9 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																tryActor.forEach(actor =>
 																	actor.send(
 																		actor,
-                                                                        CurrentQuizMessages.ActivateQuestionStats(
-                                                                            questionId
-                                                                        )
+																		CurrentQuizMessages.ActivateQuestionStats(
+																			questionId
+																		)
 																	)
 																)
 															}
@@ -223,28 +222,30 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 
 													<div className="d-flex align-items-center justify-content-between flex-wrap row-gap-1">
 														<div>
-                                                            {!isNil(ownCorrectAnswers[qId]) && (
-                                                                <>
-                                                                    {/* (<Trans id="address-you" />:{" "} */}
-                                                                    {/* {ownCorrect ? CHECK_SYMBOL : X_SYMBOL}) */}
-                                                                    <span
-                                                                        style={{
-                                                                            color: ownCorrect
-                                                                                ? CORRECT_COLOR
-                                                                                : WRONG_COLOR,
-                                                                            fontWeight: "bold",
-                                                                            fontSize: 14,
-                                                                        }}
-                                                                    >
-																		({ownCorrect ? (
-                                                                            <Trans id="correct" />
-                                                                        ) : (
-                                                                            <Trans id="wrong" />
-                                                                        )})
-                                                                    </span>
-                                                                    {/* ) */}
-                                                                </>
-                                                            )}
+															{!isNil(ownCorrectAnswers[qId]) && (
+																<>
+																	{/* (<Trans id="address-you" />:{" "} */}
+																	{/* {ownCorrect ? CHECK_SYMBOL : X_SYMBOL}) */}
+																	<span
+																		style={{
+																			color: ownCorrect
+																				? CORRECT_COLOR
+																				: WRONG_COLOR,
+																			fontWeight: "bold",
+																			fontSize: 14,
+																		}}
+																	>
+																		(
+																		{ownCorrect ? (
+																			<Trans id="correct" />
+																		) : (
+																			<Trans id="wrong" />
+																		)}
+																		)
+																	</span>
+																	{/* ) */}
+																</>
+															)}
 														</div>
 														<div className="lh-1 ">
 															{noDetails ? (

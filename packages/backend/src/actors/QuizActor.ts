@@ -452,6 +452,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							q.quiz = uid;
 							q.authorId = userId ?? clientUserId;
 							q.authorName = userData.username;
+							q.authorFingerprint = userData.fingerprint;
 							q.created = toTimestamp();
 							q.updated = toTimestamp();
 							await db.collection("questions").insertOne(q);

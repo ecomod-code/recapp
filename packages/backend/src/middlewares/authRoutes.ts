@@ -133,6 +133,7 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			active: true,
 			quizUsage: new Map(),
 			isTemporary: true,
+			fingerprint,
 			initialQuiz: quiz && quiz !== "false" ? quiz : undefined,
 		})
 	);

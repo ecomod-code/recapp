@@ -1311,8 +1311,8 @@ msgstr "Allow participants to create/edit questions"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-end-preview"
-msgstr "End preview"
+msgstr "Teacher view"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-start-preview"
-msgstr "Start preview"
+msgstr "Participant view"

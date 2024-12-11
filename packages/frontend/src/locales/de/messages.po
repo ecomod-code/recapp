@@ -1313,3 +1313,7 @@ msgstr "Lehrpersonenansicht"
 msgid "quiz-button-label-start-preview"
 msgstr "Teilnehmendenansicht"
 
+#. js-lingui-explicit-id
+msgid "quiz-button-tooltip-preview"
+msgstr "Achtung: In der Teilnehmeransicht wird das Quiz automatisch gestartet. Es wird nur gestoppt, wenn niemand mehr teilnimmt."
+

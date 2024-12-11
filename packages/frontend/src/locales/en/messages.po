@@ -1315,8 +1315,33 @@ msgstr "Teacher view"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-start-preview"
-msgstr "Participant view"
+msgstr "Start preview"
 
 #. js-lingui-explicit-id
-msgid "quiz-button-tooltip-preview"
-msgstr "Attention: The Participant view will automatically start the quiz. It will only stop if no one is taking part."
+msgid "login-page.temporary-account-button"
+msgstr "Continue without login"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-header"
+msgstr "Participate without logging in"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-reminder"
+msgstr "You can participate in the quiz without logging in. To prevent abuse, a so-called fingerprint is created for your browser and device, which allows us to identify you during your participation. By participating, you agree to this."
+
+#. js-lingui-explicit-id
+msgid "login-page.store-cookie-checkbox"
+msgstr "I want my login to be stored for 30 days, even if I close the browser window."
+
+#. js-lingui-explicit-id
+msgid "login-page.info-text"
+msgstr "You can login with your account or participate without logging in."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-title"
+msgstr "Login error. Account deactivated."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-message"
+msgstr "Your account was deactivated. Please contact the administrator."
+

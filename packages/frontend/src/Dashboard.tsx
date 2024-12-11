@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { UserAdminPanel } from "./UserAdminPanel";
+import { FingerprintPanel } from "./FingerprintPanel";
 import { Tab, Tabs } from "react-bootstrap";
 import { i18n } from "@lingui/core";
 import { QuizzesPanel } from "./components/quizzes-panel/QuizzesPanel";
@@ -47,6 +48,11 @@ export const Dashboard: React.FC = () => {
 				{isAdmin && (
 					<Tab eventKey="users" className={tabClasses} title={i18n._("dashboard-tab-label-users")}>
 						<UserAdminPanel />
+					</Tab>
+				)}
+				{isAdmin && (
+					<Tab eventKey="fingerprints" className={tabClasses} title={i18n._("dashboard-tab-label-fingerprints")}>
+						<FingerprintPanel />
 					</Tab>
 				)}
 			</Tabs>

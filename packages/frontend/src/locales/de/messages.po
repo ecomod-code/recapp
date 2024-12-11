@@ -1317,3 +1317,52 @@ msgstr "Teilnehmendenansicht"
 msgid "quiz-button-tooltip-preview"
 msgstr "Achtung: In der Teilnehmeransicht wird das Quiz automatisch gestartet. Es wird nur gestoppt, wenn niemand mehr teilnimmt."
 
+#. js-lingui-explicit-id
+msgid "login-page.temporary-account-button"
+msgstr "Ohne Anmeldung fortfahren"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-header"
+msgstr "Quizteilnahme ohne Anmeldung"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-reminder"
+msgstr "Du kannst ohne Anmeldung an dem Quiz teilnehmen. Um Missbrauch vorzubeugen, wird für deinen Browser und dein Gerät ein sogenannter Fingerprint erzeugt, mit dem wir dich während deiner Teilnahme identifzieren können. Dem stimmst du durch deine Teilnahme zu."
+
+#. js-lingui-explicit-id
+msgid "login-page.store-cookie-checkbox"
+msgstr "Ich möchte dass meine Anmeldung für 30 Tage erhalten bleibt, auch wenn ich das Browserfenster schließe."
+
+#. js-lingui-explicit-id
+msgid "login-page.info-text"
+msgstr "Du kannst dich anmelden oder ohne Anmeldung am Quiz teilnehmen."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-title"
+msgstr "Login-Fehler. Account deaktiviert."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-message"
+msgstr "Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+
+#. js-lingui-explicit-id
+msgid "fingerprint.card-last-seen: {date}"
+msgstr "Letzte Tokenaktualisierung: {date}"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.search-text"
+msgstr "Fingerprint suchen"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.button-tooltip.filter"
+msgstr "Teile des Fingerprints eingeben um zu filtern"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.title"
+msgstr "Fingerprint Verwaltung (Temporäre Accounts)"
+
+#. js-lingui-explicit-id
+msgid "dashboard-tab-label-fingerprints"
+msgstr "Temporäre Accounts"
+
+

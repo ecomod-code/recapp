@@ -1315,7 +1315,7 @@ msgstr "Participant view"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-tooltip-preview"
-msgstr "Attention: The Participant view will automatically start the quiz. It will only stop if no one is taking part."
+msgstr "Starts quiz in participant view. Quiz stops when all joined teachers exit this mode."
 
 #. js-lingui-explicit-id
 msgid "login-page.temporary-account-button"

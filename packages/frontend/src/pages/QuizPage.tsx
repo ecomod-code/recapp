@@ -254,6 +254,7 @@ export const QuizPage: React.FC = () => {
 				const questionId = currentQuestion?.uid ?? toId("");
 
 				const disableForStudent = localUser.map(allowed).orElse(true);
+				const isTemporary = localUser.flatMap(u => maybe(u.isTemporary)).orElse(false);
 				const isQuizTeacher =
 					teachers.includes(localUser.map(u => u.uid).orElse(toId(""))) ||
 					localUser.map(u => u.role).is(r => r === "ADMIN");
@@ -305,6 +306,19 @@ export const QuizPage: React.FC = () => {
 					);
 				};
 
+				let participationOptions = 
+					keys(quizData.quiz.studentParticipationSettings)
+								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
+								.map(k => k as UserParticipation);
+				if (isTemporary) {
+					participationOptions = participationOptions.filter(p => p !== "NAME");
+					if (participationOptions.length === 0) {
+						// TODO: Fehler anzeigen. Der Nutzer kann an dem Quiz nicht teilnehmen.
+						return <Container fluid>
+							<h1>Dieses Quiz hat Realnamenzwang. Melde dich bitte ab und mit deinem Uniaccount an.</h1>
+							</Container>;
+					}
+				}
 				return (
 					<Container fluid>
 						<CommentEditorModal
@@ -316,9 +330,7 @@ export const QuizPage: React.FC = () => {
 							// isStudent={!isQuizTeacher}
 							isUserInTeachersList={isUserInTeachersList}
 							userNames={[userName, userNickname ?? ""]}
-							participationOptions={keys(quizData.quiz.studentParticipationSettings)
-								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
-								.map(k => k as UserParticipation)}
+							participationOptions={participationOptions}
 						/>
 
 						{!quizData.isPresentationModeActive ? (

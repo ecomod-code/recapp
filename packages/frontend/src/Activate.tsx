@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Button, Modal } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Modal, Form } from "react-bootstrap";
 import { Trans } from "@lingui/react";
 import { useNavigate } from "react-router-dom";
 import { cookie } from "./utils";
@@ -8,6 +8,8 @@ export const Activate: React.FC = () => {
 	const error = document.location.search.includes("error=userdeactivated");
 	const quiz = document.location.search.includes("quiz=") && document.location.search.split("=")[1];
 	const nav = useNavigate();
+	const [showTempReminder, setShowTempReminder] = useState(false);
+	const [persistentCookie, setPersistentCookie] = useState(true);
 
 	useEffect(() => {
 		if (cookie("bearer")) {
@@ -19,21 +21,77 @@ export const Activate: React.FC = () => {
 	return (
 		<div className="text-center w-100 d-flex flex-column vh-100">
 			<Modal show={error}>
-				<Modal.Title className="ps-2 p-1 text-bg-primary">Login-Fehler</Modal.Title>
-				<Modal.Body>Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator.</Modal.Body>
+				<Modal.Title className="ps-2 p-1 text-bg-primary">
+					<Trans id="login-page.account-deactivated-title" />
+				</Modal.Title>
+				<Modal.Body>
+					<Trans id="login-page.account-deactivated-message" />
+				</Modal.Body>
+			</Modal>
+			<Modal show={showTempReminder}>
+				<Modal.Title className="ps-2 p-1 text-bg-primary">
+					<Trans id="login-page.temp-login-header" />
+				</Modal.Title>
+				<Modal.Body>
+					<Trans id="login-page.temp-login-reminder" />
+					<Form.Group className="d-flex mb-2 mt-2">
+						<Form.Check
+							name="store"
+							type="checkbox"
+							checked={persistentCookie}
+							onChange={event => setPersistentCookie(event.target.checked)}
+						/>
+						<Form.Label>
+							&nbsp;<Trans id="login-page.store-cookie-checkbox" />
+						</Form.Label>
+						
+					</Form.Group>
+				</Modal.Body>
+				<Modal.Footer>
+					<Button
+						variant="primary"
+						className="m-4"
+						style={{ maxWidth: 150 }}
+						href={`${import.meta.env.VITE_BACKEND_URI}/auth/temp?quiz=${quiz}&persistent=${persistentCookie}`}
+					>
+						<Trans id="login-page.login" />
+					</Button>
+					<Button
+						variant="secondary"
+						className="m-4"
+						style={{ maxWidth: 150 }}
+						onClick={() => setShowTempReminder(false)}
+					>
+						<Trans id="cancel" />
+					</Button>
+				</Modal.Footer>
 			</Modal>
 			<div>
 				<h1>RECAPP</h1>
 			</div>
-			<div>Melde dich an um am Quiz teilzunehmen.</div>
+			<div>
+				<Trans id="login-page.info-text" />
+			</div>
 			<div>
 				<Button
 					variant="primary"
 					href={`${import.meta.env.VITE_BACKEND_URI}/auth/login`}
 					className="m-4"
-					style={{ maxWidth: "30%" }}
+					style={{ maxWidth: "30%", width: "30%" }}
 				>
 					<Trans id="login-page.login" />
+				</Button>
+			</div>
+			<div>oder</div>
+
+			<div>
+				<Button
+					variant="primary"
+					className="m-4"
+					style={{ maxWidth: "30%", width: "30%" }}
+					onClick={() => setShowTempReminder(true)}
+				>
+					<Trans id="login-page.temporary-account-button" />
 				</Button>
 			</div>
 			<div className="m-4 d-flex flex-row justify-items-center flex-grow-1 align-items-end">

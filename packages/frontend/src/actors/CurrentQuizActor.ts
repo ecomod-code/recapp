@@ -565,6 +565,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuestionActorMessages.Create({
 											authorId: u.uid,
+											authorFingerprint: u.fingerprint,
 											...question,
 										})
 									);

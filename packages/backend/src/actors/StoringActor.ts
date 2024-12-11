@@ -39,13 +39,13 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		clearInterval(this.checkInterval);
 	}
 
-	protected determineRole = async (from: ActorRef): Promise<[AccessRole, Id]> => {
+	protected determineRole = async (from: ActorRef): Promise<[UserRole: AccessRole, UserID: Id, IsTemporaryAccount: boolean]> => {
 		if (systemEquals(this.actorRef!, from)) {
-			return ["SYSTEM", "SYSTEM" as Id];
+			return ["SYSTEM", "SYSTEM" as Id, false];
 		}
 		if (extractSystemName(this.actorRef!.name) === from.name.replace("actors://", "")) {
 			// It's our actor system that's asking directly
-			return ["SYSTEM", "SYSTEM" as Id];
+			return ["SYSTEM", "SYSTEM" as Id, false];
 		}
 
 		const session: Session = await this.ask(
@@ -55,9 +55,9 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 			.then(s => s as Session)
 			.catch((e: Error): Session => {
 				console.error(e);
-				return { role: "STUDENT", uid: "" } as Session;
+				return { role: "STUDENT", uid: "", fingerprint: "-"} as Session;
 			});
-		return [session.role, session.uid];
+		return [session.role, session.uid, !!session.fingerprint];
 	};
 
 	protected async afterEntityRemovedFromCache(_uid: Id) {

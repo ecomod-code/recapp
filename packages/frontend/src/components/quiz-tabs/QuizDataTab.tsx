@@ -276,8 +276,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 						/>
 					</ListGroupContainer>
 
-					<ListGroupContainer header={i18n._("quiz-student-participation")}>
-						
+					<ListGroupContainer header={i18n._("quiz-student-participation")}>				
 						{/* // remove comment when functionality is implemented
 							{isParticipationDisabled ? (
 							<Alert variant="warning" className="d-flex align-items-start">

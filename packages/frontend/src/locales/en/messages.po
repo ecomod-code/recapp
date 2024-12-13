@@ -596,7 +596,7 @@ msgstr "Allow participants to set questions"
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
-msgstr "Participant participation options"
+msgstr "Participation options"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:239
@@ -877,6 +877,10 @@ msgstr "Edit title"
 #: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Activate all correct answers"
+
+#. js-lingui-explicit-id
+msgid "activate-correct-answer"
+msgstr "Activate the correct answer"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460

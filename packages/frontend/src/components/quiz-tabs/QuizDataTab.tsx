@@ -276,8 +276,9 @@ export const QuizDataTab: React.FC<Props> = props => {
 						/>
 					</ListGroupContainer>
 
-					<ListGroupContainer header={i18n._("quiz-student-participation")}>
-						{isParticipationDisabled ? (
+					<ListGroupContainer header={i18n._("quiz-student-participation")}>				
+						{/* // remove comment when functionality is implemented
+							{isParticipationDisabled ? (
 							<Alert variant="warning" className="d-flex align-items-start">
 								<div className="d-flex">
 									<ExclamationTriangle size={20} />
@@ -287,7 +288,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 									{i18n._("quiz-data-tab.alert-message.participation-is-disabled")}
 								</span>
 							</Alert>
-						) : null}
+						) : null} */}
 
 						<Form.Switch
 							className="list-group-item ps-5"

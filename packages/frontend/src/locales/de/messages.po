@@ -1369,4 +1369,10 @@ msgstr "Fingerprint Verwaltung (Temporäre Accounts)"
 msgid "dashboard-tab-label-fingerprints"
 msgstr "Temporäre Accounts"
 
+#. js-lingui-explicit-id
+msgid "new-question"
+msgstr "Neue Frage"
 
+#. js-lingui-explicit-id
+msgid "question"
+msgstr "Frage"

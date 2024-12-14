@@ -1352,3 +1352,11 @@ msgstr "Login error. Account deactivated."
 #. js-lingui-explicit-id
 msgid "login-page.account-deactivated-message"
 msgstr "Your account was deactivated. Please contact the administrator."
+
+#. js-lingui-explicit-id
+msgid "new-question"
+msgstr "New question"
+
+#. js-lingui-explicit-id
+msgid "question"
+msgstr "Question"

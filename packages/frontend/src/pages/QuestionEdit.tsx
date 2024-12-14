@@ -604,7 +604,7 @@ export const QuestionEdit: React.FC = () => {
 						>
 							{mbQuiz.flatMap(q => maybe(q.quiz?.title)).orElse("---")}
 						</Breadcrumb.Item>
-						<Breadcrumb.Item active>{question.uid ? "Frage" : "Neue Frage"}</Breadcrumb.Item>
+						<Breadcrumb.Item active>{question.uid ? i18n._("question") : i18n._("new-question")}</Breadcrumb.Item>
 					</Breadcrumb>
 				</div>
 

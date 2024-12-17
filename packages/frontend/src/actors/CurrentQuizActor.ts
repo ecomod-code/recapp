@@ -327,6 +327,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								questions = randomShuffle(questions);
 							}
 
+							// Shuffle answers 
+							if (this.state.quiz.shuffleAnswers) {
+								const randomShuffle = shuffle(Math.random);
+								// if I shuffle the answers of this.state.questions, will that change the order of answers for all? 
+								// And I would need to check wether the answers are fixed as well...
+							}
+
 							const run: QuizRun = await this.ask(
 								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuizRunActorMessages.GetForUser({ studentId, questions })

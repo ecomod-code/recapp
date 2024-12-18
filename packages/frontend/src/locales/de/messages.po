@@ -223,12 +223,12 @@ msgstr "Fragetyp"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221
 msgid "share-quiz-modal.error-alert.already-exists"
-msgstr "Benutzer ist bereits ausgewählt"
+msgstr "Benutzer*in ist bereits ausgewählt"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:229
 msgid "share-quiz-modal.error-alert.do-not-exist"
-msgstr "Benutzer existiert nicht"
+msgstr "Benutzer*in nicht bei RECAPP"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44
@@ -333,12 +333,12 @@ msgstr "Letze Anmeldung: {date}"
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-deactivate-user-button"
-msgstr "Benutzer deaktivieren"
+msgstr "Benutzer*in deaktivieren"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-activate-user-button"
-msgstr "Benutzer aktivieren"
+msgstr "Benutzer*in aktivieren"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:19
@@ -802,7 +802,7 @@ msgstr "Quizze"
 #. js-lingui-explicit-id
 #: src/Dashboard.tsx:44
 msgid "dashboard-tab-label-users"
-msgstr "Benutzer"
+msgstr "Benutzer*in"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
@@ -1015,11 +1015,11 @@ msgstr "Suchtext"
 
 #. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated"
-#~ msgstr "Ihr Benutzer wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+#~ msgstr "Ihr*e Benutzer*in wurde deaktiviert. Bitte wenden Sie sich an Ihre*n Administrator*in."
 
 #. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated-title"
-#~ msgstr "Nutzer gesperrt"
+#~ msgstr "Nutzer*in gesperrt"
 
 #. js-lingui-explicit-id
 #~ msgid "archive-quiz-title"

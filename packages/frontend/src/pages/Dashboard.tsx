@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
-import { UserAdminPanel } from "./UserAdminPanel";
-import { FingerprintPanel } from "./FingerprintPanel";
+import { UserAdminPanel } from "../UserAdminPanel";
+import { FingerprintPanel } from "../FingerprintPanel";
 import { Tab, Tabs } from "react-bootstrap";
 import { i18n } from "@lingui/core";
-import { QuizzesPanel } from "./components/quizzes-panel/QuizzesPanel";
+import { QuizzesPanel } from "../components/quizzes-panel/QuizzesPanel";
 import { User } from "@recapp/models";
 import { useStatefulActor } from "ts-actors-react";
-import { ErrorMessages } from "./actors/ErrorActor";
+import { ErrorMessages } from "../actors/ErrorActor";
 import { useNavigate } from "react-router-dom";
-import { cookie } from "./utils";
-import { CurrentQuizMessages, CurrentQuizState } from "./actors/CurrentQuizActor";
+import { cookie } from "../utils";
+import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
 
 // const tabClasses = "bg-content-container py-3";
 const tabClasses = "py-3";

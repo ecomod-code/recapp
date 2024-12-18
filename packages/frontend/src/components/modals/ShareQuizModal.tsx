@@ -149,7 +149,7 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                         value={name}
                                         autoFocus
                                         // placeholder="ID, Email oder Pseudonym"
-                                        placeholder="Email oder Pseudonym"
+                                        placeholder={i18n._("email-pseudonym-placeholder")}
                                         onChange={event => {
                                             const name = event.target.value;
                                             setName(name);

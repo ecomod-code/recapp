@@ -1360,3 +1360,7 @@ msgstr "New question"
 #. js-lingui-explicit-id
 msgid "question"
 msgstr "Question"
+
+#. js-lingui-explicit-id
+msgid "email-pseudonym-placeholder"
+msgstr "Email or pseudonym"

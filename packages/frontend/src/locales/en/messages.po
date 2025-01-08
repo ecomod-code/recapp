@@ -228,7 +228,7 @@ msgstr "User already selected"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:229
 msgid "share-quiz-modal.error-alert.do-not-exist"
-msgstr "User doesn't exist"
+msgstr "User not on RECAPP"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44

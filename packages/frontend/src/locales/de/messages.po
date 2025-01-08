@@ -499,7 +499,11 @@ msgstr "Hinzufügen"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93
 msgid "share-with-confirmed-users"
-msgstr "Mit bestätigten Nutzern teilen"
+msgstr "Quiz teilen"
+
+#. js-lingui-explicit-id
+msgid "share-with-confirmed-users-tooltip"
+msgstr "Quiz erscheint im Dashboard der hinzugefügten Lehrpersonen."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:191

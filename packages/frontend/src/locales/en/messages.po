@@ -502,6 +502,10 @@ msgid "share-quiz-modal.button-label.add"
 msgstr "Add"
 
 #. js-lingui-explicit-id
+msgid "share-quiz-modal.button-label.add-tooltip"
+msgstr "Only teachers who have previously accessed RecApp are eligible to be added."
+
+#. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93
 msgid "share-with-confirmed-users"
 msgstr "Share quiz"

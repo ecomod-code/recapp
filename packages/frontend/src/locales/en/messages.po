@@ -504,7 +504,7 @@ msgstr "Add"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93
 msgid "share-with-confirmed-users"
-msgstr "Share with confirmed users"
+msgstr "Share quiz"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:191

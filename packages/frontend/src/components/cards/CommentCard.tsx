@@ -63,6 +63,14 @@ export const CommentCardContent: React.FC<
     isDisplayedInModal,
     isCommentSectionVisible,
 }) => {
+
+    const [upvoted, setUpvoted] = useState(false);
+
+    const onUpvoteHandler = () => {
+        setUpvoted(!upvoted);
+        onUpvote();
+    };
+    
     const { rendered } = useRendered({ value: comment.text });
 
     // const isQuizTeacher = teachers.includes(userId);
@@ -107,8 +115,8 @@ export const CommentCardContent: React.FC<
                 <div className="d-flex align-items-between justify-content-between">
                     <ButtonWithTooltip
                         title={i18n._("comment-card.button-tooltip.upvote")}
-                        variant="primary"
-                        onClick={onUpvote}
+                        variant={upvoted ? "success" : "primary"}
+                        onClick={onUpvoteHandler}
                         className="px-2 m-1 d-flex"
                     >
                         <HandThumbsUp size={20} />

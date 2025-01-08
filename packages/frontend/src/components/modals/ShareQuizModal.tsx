@@ -172,9 +172,14 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                     <Trans id="cancel" />
                                 </Button>
 
-                                <Button variant="primary" className="align-self-stretch" onClick={share}>
+                                <ButtonWithTooltip 
+                                    variant="primary" 
+                                    className="align-self-stretch" 
+                                    onClick={share}
+                                    title={i18n._("share-with-confirmed-users-tooltip")}
+                                >
                                     <Trans id="share-with-confirmed-users" />
-                                </Button>
+                                </ButtonWithTooltip>
                             </Form.Group>
                         </Modal.Footer>
                     </Modal>

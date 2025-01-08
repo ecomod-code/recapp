@@ -155,14 +155,15 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                             setName(name);
                                         }}
                                     />
-                                    <Button
+                                    <ButtonWithTooltip
                                         variant="warning"
                                         disabled={!name}
                                         type="submit"
                                         // onClick={add}
+                                        title={i18n._("share-quiz-modal.button-label.add-tooltip")}
                                     >
                                         <Trans id="share-quiz-modal.button-label.add" />
-                                    </Button>
+                                    </ButtonWithTooltip>
                                 </Form.Group>
                             </Form>
                         </Modal.Body>

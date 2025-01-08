@@ -507,6 +507,10 @@ msgid "share-with-confirmed-users"
 msgstr "Share quiz"
 
 #. js-lingui-explicit-id
+msgid "share-with-confirmed-users-tooltip"
+msgstr "Quiz appears in the dashboard of the added teachers."
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:191
 #: src/components/quiz-tabs/QuestionsTab.tsx:230
 #: src/components/quizzes-panel/QuizCard.tsx:46

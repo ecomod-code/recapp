@@ -493,7 +493,7 @@ msgstr "Hinzuzufügende Personen"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:92
-msgid "<share-quiz-modal.button-label.add>"
+msgid "share-quiz-modal.button-label.add"
 msgstr "Hinzufügen"
 
 #. js-lingui-explicit-id

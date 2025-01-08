@@ -64,13 +64,14 @@ export const CommentCardContent: React.FC<
     isCommentSectionVisible,
 }) => {
 
-    const [upvoted, setUpvoted] = useState(false);
+    //const [upvoted, setUpvoted] = useState(false);
+    // this needs to be saved for every participant not in general
 
-    const onUpvoteHandler = () => {
-        setUpvoted(!upvoted);
-        onUpvote();
-    };
-    
+    //const onUpvoteHandler = () => {
+    //    setUpvoted(!upvoted);
+    //    onUpvote();
+    //};
+
     const { rendered } = useRendered({ value: comment.text });
 
     // const isQuizTeacher = teachers.includes(userId);
@@ -115,8 +116,8 @@ export const CommentCardContent: React.FC<
                 <div className="d-flex align-items-between justify-content-between">
                     <ButtonWithTooltip
                         title={i18n._("comment-card.button-tooltip.upvote")}
-                        variant={upvoted ? "success" : "primary"}
-                        onClick={onUpvoteHandler}
+                        variant= {"primary"}//{upvoted ? "success" : "primary"}
+                        onClick={onUpvote} //onUpvoteHandler
                         className="px-2 m-1 d-flex"
                     >
                         <HandThumbsUp size={20} />

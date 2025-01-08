@@ -493,8 +493,12 @@ msgstr "Hinzuzufügende Personen"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:92
-msgid "share-quiz-modal.button-label.add"
+msgid "<share-quiz-modal.button-label.add>"
 msgstr "Hinzufügen"
+
+#. js-lingui-explicit-id
+msgid "share-quiz-modal.button-label.add-tooltip"
+msgstr "Nur Lehrpersonen, die zuvor auf RecApp zugegriffen haben, können hinzugefügt werden."
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93

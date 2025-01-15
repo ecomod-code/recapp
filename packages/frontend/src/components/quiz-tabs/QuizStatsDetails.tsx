@@ -149,7 +149,7 @@ export const QuizStatsDetails = ({
 				{question.type !== "TEXT" && (
 					<div className="mb-5">
 						<div>
-							<p
+							<p style={{ margin: 0 }}
 								dangerouslySetInnerHTML={{
 									__html: i18n._("question-stats-sum-answers", {
 										sum:
@@ -160,7 +160,7 @@ export const QuizStatsDetails = ({
 									}),
 								}}
 							/>
-							<p
+							<p style={{ margin: 0 }}
 								dangerouslySetInnerHTML={{
 									__html: i18n._("question-stats-correct-answers", {
 										passed: (questionStats as ChoiceElementStatistics).passed,
@@ -168,7 +168,7 @@ export const QuizStatsDetails = ({
 									}),
 								}}
 							/>
-							<p
+							<p style={{ margin: 0 }}
 								dangerouslySetInnerHTML={{
 									__html: i18n._("question-stats-wrong-answers", {
 										wrong: (questionStats as ChoiceElementStatistics).wrong,

@@ -95,8 +95,8 @@ export const QuizStatsDetails = ({
 		<div className="mt-4">
 			{/* <p className="custom-line-clamp h2"> */}
 			{/* {question.text} */}
-			<p className="h2">
-				<Trans id="question-stats-prefix" />
+			<p className="h2" style={{ fontSize: 14 }}>
+				<Trans id="question-stats-prefix" /> {(questionIndex) + 1} /{" "} {questionsList.length}
 			</p>
 			<div className="p-3 mb-4 bg-light border border-1" style={{ zoom }}>
 				<div dangerouslySetInnerHTML={{ __html: rendered }} />

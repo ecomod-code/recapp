@@ -1,0 +1,7 @@
+# Database for recapp
+version: "3.7"
+
+services:
+  recapp-db:
+    ports:
+      - ${MONGODB_PORT}:27017

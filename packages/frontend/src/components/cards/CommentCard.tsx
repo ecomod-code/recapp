@@ -108,7 +108,7 @@ export const CommentCardContent: React.FC<
                 <div className="d-flex align-items-between justify-content-between">
                     <ButtonWithTooltip
                         title={i18n._("comment-card.button-tooltip.upvote")}
-                        variant= {userId in comment.upvoters ? "success" : "primary"} // {"primary"}
+                        variant= {comment.upvoters.includes(userId) ? "success" : "primary"} // {"primary"}
                         onClick={onUpvote}
                         className="px-2 m-1 d-flex"
                     >

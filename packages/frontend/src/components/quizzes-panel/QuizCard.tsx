@@ -114,7 +114,7 @@ export const QuizCard: React.FC<{
 								<Play />
 							</ButtonWithTooltip>
 						) : null}
-						{isQuizEditable ? (
+						{/* </div> {isQuizEditable ? (
 							<ButtonWithTooltip
 								title={i18n._("quiz-card.button-tooltip.edit")}
 								variant="primary"
@@ -122,7 +122,7 @@ export const QuizCard: React.FC<{
 							>
 								<Pencil />
 							</ButtonWithTooltip>
-						) : null}
+						) : null} */}
 
 						{isAuthorized ? (
 							<ButtonWithTooltip

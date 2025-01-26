@@ -120,7 +120,7 @@ export const QuizCard: React.FC<{
 								title={i18n._("quiz-card.button-tooltip.stop")}
 								variant="primary"
 								className="me-2"
-								onClick={onStop} // TODO: onStop
+								onClick={onStop} 
 							>
 								<StopFill />
 							</ButtonWithTooltip>

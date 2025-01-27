@@ -5,7 +5,7 @@ import { i18n } from "@lingui/core";
 import { fromTimestamp } from "itu-utils";
 import { Quiz, QuestionGroup, toId } from "@recapp/models";
 import Card from "react-bootstrap/Card";
-import { Pencil, Play, Share, Trash } from "react-bootstrap-icons";
+import { Pencil, Play, Share, Trash, StopFill } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { QuizStateBadge } from "../QuizStateBadge";
 import { useLocalUser } from "../../hooks/state-actor/useLocalUser";
@@ -17,9 +17,10 @@ export const QuizCard: React.FC<{
 	quiz: Partial<Quiz>;
 	teachers: string[];
 	onStart: () => void;
+	onStop: () => void;
 	onShare: () => void;
 	onDelete?: () => void;
-}> = ({ quiz, teachers, onShare, onDelete, onStart }) => {
+}> = ({ quiz, teachers, onShare, onDelete, onStart, onStop }) => {
 	const nav = useNavigate();
 	const { localUser } = useLocalUser();
 
@@ -112,6 +113,16 @@ export const QuizCard: React.FC<{
 								onClick={onStart}
 							>
 								<Play />
+							</ButtonWithTooltip>
+						) : null}
+						{isQuizStateStarted && isAuthorized ? (
+							<ButtonWithTooltip
+								title={i18n._("quiz-card.button-tooltip.stop")}
+								variant="primary"
+								className="me-2"
+								onClick={onStop} 
+							>
+								<StopFill />
 							</ButtonWithTooltip>
 						) : null}
 						{/* </div> {isQuizEditable ? (

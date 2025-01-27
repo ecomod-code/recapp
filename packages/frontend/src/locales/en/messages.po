@@ -787,6 +787,10 @@ msgid "quiz-card.button-tooltip.start"
 msgstr "Start"
 
 #. js-lingui-explicit-id
+msgid "quiz-card.button-tooltip.stop"
+msgstr "Stop"
+
+#. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 msgid "quiz-card.button-tooltip.share"
 msgstr "Share"

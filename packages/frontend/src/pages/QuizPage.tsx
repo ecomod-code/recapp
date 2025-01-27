@@ -63,6 +63,7 @@ export const QuizPage: React.FC = () => {
 	const quizId: Id = state?.quizId;
 	const activate = state?.activate;
 	const start: boolean = state?.start ?? false;
+	const stop: boolean = state?.stop ?? false;
 	const system = useActorSystem();
 	const [mbLocalUser] = useStatefulActor<{ user: User }>("LocalUser");
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
@@ -106,6 +107,9 @@ export const QuizPage: React.FC = () => {
 				q.send(q, CurrentQuizMessages.SetQuiz(toId(quizId)));
 				if (start) {
 					setTimeout(() => q.send(q, CurrentQuizMessages.ChangeState("STARTED")), 500);
+				}
+				if (stop) {
+					setTimeout(() => q.send(q, CurrentQuizMessages.ChangeState("STOPPED")), 500);
 				}
 			});
 		});

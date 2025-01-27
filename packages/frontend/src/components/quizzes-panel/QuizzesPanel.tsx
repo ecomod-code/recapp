@@ -161,6 +161,9 @@ export const QuizzesPanel: React.FC = () => {
 								onStart={() => {
 									nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: q.uid, start: true } });
 								}}
+								onStop={() => {
+									nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: q.uid, stop: true } });
+								}}
 								onShare={() => setShareModal(q.uniqueLink!)}
 								onDelete={() => {
 									if (archiveAllowed(q)) {

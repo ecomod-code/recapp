@@ -494,6 +494,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								state: "EDITING",
 								groups: [{ name: i18n._("new-quiz-group"), questions: [] }],
 								studentQuestions: true,
+								studentsCanSeeStatistics: true,
 								studentParticipationSettings: { ANONYMOUS: true, NAME: true, NICKNAME: true },
 								allowedQuestionTypesSettings: { MULTIPLE: true, SINGLE: true, TEXT: true },
 								shuffleQuestions: false,

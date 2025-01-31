@@ -4,11 +4,12 @@ import { Issuer, Client, ClientMetadata } from "openid-client";
 import Container from "typedi";
 import koa from "koa";
 import { ActorSystem } from "ts-actors";
-import { createActorUri } from "../utils";
-import { Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
+import { calculateFingerprint, createActorUri, createTempJwt } from "../utils";
+import { Fingerprint, FingerprintStoreMessages, Id, Session, SessionStoreMessages, User, UserRole, UserStoreMessages } from "@recapp/models";
 import { toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
+import { v4 } from "uuid";
 
 const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI, REQUIRES_OFFLINE_SCOPE } =
 	process.env;
@@ -50,6 +51,111 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);
+};
+
+export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
+	// Fingerprint berechnen
+	const fingerprint = calculateFingerprint(ctx);
+	const quiz = ctx.query.quiz?.toString();
+	const persistentCookie = !!ctx.query.persistent;
+	// Prüfen ob gesperrt
+	const system = Container.get<ActorSystem>("actor-system");
+	const userStore = createActorUri("UserStore");
+	const fpStore = createActorUri("FingerprintStore");
+	const uid = v4() as Id;
+	
+	try {
+		let fpData: Fingerprint | Error = await system.ask(fpStore, FingerprintStoreMessages.Get(fingerprint as Id));
+		console.log("New fingerprint", fingerprint, fpData);
+		if (fpData instanceof Error) {
+			console.debug("A new fingerprint has been found", fingerprint);
+			const fp: Fingerprint = {
+				uid: fingerprint as Id,
+				created: toTimestamp(),
+				updated: toTimestamp(),
+				lastSeen: toTimestamp(),
+				usageCount: 1,
+				blocked: false,
+				userUid: uid,
+				initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
+			};
+			await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
+			fpData = fp;
+		} 
+		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined}));
+		if (fpData.blocked) {
+			console.debug("Fingerprint was blocked", fingerprint);
+			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
+			return;
+		}
+	} catch (e) {
+		console.error(e);
+		console.debug("A new fingerprint has been found", fingerprint);
+			const fp: Fingerprint = {
+				uid: fingerprint as Id,
+				created: toTimestamp(),
+				updated: toTimestamp(),
+				lastSeen: toTimestamp(),
+				usageCount: 1,
+				blocked: false,
+				userUid: uid,
+				initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
+			};
+			await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
+		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined}));
+	}
+	try {
+		const existingUser: User | Error = await system.ask(userStore, UserStoreMessages.GetByFingerprint(fingerprint));
+		if (existingUser instanceof Error) {
+			console.debug("A new fingerprint has been generated");
+		} else if (!existingUser.active) {
+			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
+			return;
+		}
+	} catch (e) {
+		console.error(e);
+	}
+	// Wenn nicht, dann Token, temporären User und Session anlegen
+	const token = createTempJwt(uid, fingerprint);
+	const decoded = jwt.decode(token) as jwt.JwtPayload;
+	const sessionStore = createActorUri("SessionStore");
+	const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
+	await system.send(
+		userStore,
+		UserStoreMessages.Create({
+			uid,
+			role: "STUDENT",
+			lastLogin: toTimestamp(),
+			created: toTimestamp(),
+			updated: toTimestamp(),
+			username: "Temporary account",
+			email: "",
+			active: true,
+			quizUsage: new Map(),
+			isTemporary: true,
+			fingerprint,
+			initialQuiz: quiz && quiz !== "false" ? quiz : undefined,
+		})
+	);
+	await system.send(
+		sessionStore,
+		SessionStoreMessages.StoreSession({
+			idToken: token,
+			accessToken: token,
+			refreshToken: token,
+			uid,
+			idExpires: toTimestamp(expires),
+			refreshExpires: toTimestamp(expires),
+			role: "STUDENT",
+			persistentCookie,
+			fingerprint,
+		})
+	);
+	// Cookie setzen und zurückleiten
+	const thirtyDaysFromNow = new Date();
+	thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+	ctx.set("Set-Cookie", `bearer=${token}; path=/; Expires=${thirtyDaysFromNow.toUTCString()}`);
+	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
 
 /**
@@ -105,6 +211,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 							email: decoded.email ?? "",
 							active: true,
 							quizUsage: new Map(),
+							isTemporary: false,
 						})
 					);
 				} else {
@@ -158,6 +265,41 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
  * Also performs a local session logout.
  */
 export const authLogout = async (ctx: koa.Context): Promise<void> => {
+	const maybeIdToken = maybe<string>(ctx.request.headers.cookie)
+		.flatMap(cookie => maybe<RegExpExecArray>(/bearer=([^;]+)/.exec(cookie)))
+		.flatMap(match => maybe(match[1]));
+
+	await maybeIdToken.match(
+		async idToken => {
+			try {
+				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
+				const system = Container.get<ActorSystem>("actor-system");
+				const sessionStore = createActorUri("SessionStore");
+				const session: Session | Error = await system
+					.ask(sessionStore, SessionStoreMessages.GetSessionForUserId(sub as Id))
+					.then(s => s as Session)
+					.catch((e: Error) => {
+						return e;
+					});
+				if (session instanceof Error) {
+					throw session;
+				}
+				await system.send(sessionStore, SessionStoreMessages.RemoveSession(session.uid));
+				if (session.fingerprint) {
+					const userStore = createActorUri("UserStore");
+					await system.send(
+						userStore,
+						UserStoreMessages.Remove(session.uid)
+					);
+				}
+			} catch (e) {
+				console.error("authLogout", e);
+				throw e;
+			}
+		},
+		() => ctx.throw(401, "Unable to sign out.")
+	);
+	
 	ctx.set("Set-Cookie", `bearer=; path=/; max-age=0`);
 	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
@@ -171,14 +313,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 		async idToken => {
 			try {
 				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				/* if (fromTimestamp(exp! * 1000) < DateTime.local().minus(minutes(45))) {
-					console.log("Refresh not needed yet");
-					console.log(
-						`Session ${fromTimestamp(exp! * 1000).toISO()} < ${DateTime.local().minus(minutes(45))}`
-					);
-					ctx.body = "O.K.";
-					return; // We do not need to refresh the token yet
-				} */
+				
 				// Refresh the token
 				const client = await getOidc();
 				const system = Container.get<ActorSystem>("actor-system");
@@ -193,6 +328,29 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					ctx.set("Set-Cookie", `bearer=; path=/`);
 					ctx.throw(401, "Session unknown");
 				}
+				// If this is a temporary account, just return
+				if (session.fingerprint) {
+					const fpStore = createActorUri("FingerprintStore");
+					try {
+						let fpData: Fingerprint = await system.ask(fpStore, FingerprintStoreMessages.Get(session.fingerprint as Id));
+						await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: session.fingerprint as Id, userUid: session.uid, initialQuiz: undefined}));
+						if (fpData.blocked) {
+							system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
+							ctx.set("Set-Cookie", `bearer=; path=/`);
+							ctx.throw(401, "Token renewal failure");
+							return;
+						}
+					} catch (e) {
+						console.error(e);
+					}
+					const token = createTempJwt(session.uid, session.fingerprint);
+					const thirtyDaysFromNow = new Date();
+					thirtyDaysFromNow.setDate(thirtyDaysFromNow.getDate() + 30);
+					ctx.set("Set-Cookie", `bearer=${token}; path=/; expires=${thirtyDaysFromNow.toUTCString()}`);
+					ctx.body = "O.K.";
+					return;
+				}
+				 
 				try {
 					const newTokenSet = await client.refresh(session.refreshToken);
 					const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;

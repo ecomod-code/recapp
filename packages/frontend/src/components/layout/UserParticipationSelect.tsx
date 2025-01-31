@@ -31,6 +31,7 @@ const storeParticipationValue = (value: UserParticipation) => {
 
 interface Props {
     label?: string;
+    temporary: boolean;
 }
 
 export const UserParticipationSelect = (props: Props) => {
@@ -58,6 +59,9 @@ export const UserParticipationSelect = (props: Props) => {
             label: i18n._("participation-select-option.name")
         },
     };
+    if (props.temporary) {
+        delete (userParticipationOptions as any).NAME;
+    }
 
     useEffect(() => {
         if (storedValue) {

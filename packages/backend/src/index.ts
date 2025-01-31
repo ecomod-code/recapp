@@ -16,7 +16,7 @@ import multer from "@koa/multer";
 import type { File } from "@koa/multer";
 import type { IncomingMessage } from "http";
 import koaLogger from "koa-logger-winston";
-import { authLogin, authLogout, authProviderCallback, authRefresh } from "./middlewares/authRoutes";
+import { authLogin, authLogout, authProviderCallback, authRefresh, authTempAccount } from "./middlewares/authRoutes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { logger } from "./logger";
 import { authenticationMiddleware } from "./middlewares/authMiddleware";
@@ -24,6 +24,7 @@ import { QuizActor } from "./actors/QuizActor";
 import { ErrorActor } from "./actors/ErrorActor";
 import { createReadStream, existsSync } from "fs";
 import * as path from "path";
+import { FingerprintStore } from "./actors/FingerprintStore";
 
 const config = {
 	port: parseInt(process.env.SERVER_PORT ?? "3123"),
@@ -56,6 +57,7 @@ router
 	.get("/auth/callback", authProviderCallback)
 	.get("/auth/logout", authLogout)
 	.get("/auth/refresh", authRefresh)
+	.get("/auth/temp", authTempAccount)
 	.get("/ping", ctx => {
 		ctx.status = 200;
 		ctx.body = "PONG";
@@ -105,6 +107,7 @@ const start = async () => {
 		const system = await DistributedActorSystem.create({ distributor, systemName, logger });
 		Container.set("actor-system", system);
 		await system.createActor(SessionStore, { name: "SessionStore", strategy: "Restart" });
+		await system.createActor(FingerprintStore, { name: "FingerprintStore", strategy: "Restart" });
 		await system.createActor(UserStore, { name: "UserStore", strategy: "Restart" });
 		await system.createActor(QuizActor, { name: "QuizActor", strategy: "Restart" });
 		await system.createActor(ErrorActor, { name: "ErrorActor", strategy: "Restart", errorReceiver: true });

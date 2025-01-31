@@ -8,6 +8,7 @@ import { ArrowUp, ArrowDown, Pencil, Trash, Eye, EyeSlash } from "react-bootstra
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { useRendered } from "../../hooks/useRendered";
 import { OverviewIcon } from "./OverviewIcon";
+import { TooltipWrapper } from "../TooltipWrapper";
 
 const CONTAINER_MIN_HEIGHT = 160;
 const ARROW_CONTAINER_MAX_HEIGHT = CONTAINER_MIN_HEIGHT;
@@ -65,9 +66,13 @@ export const QuestionCard = (props: Props) => {
 				</div>
 				<div className="flex-fill align-self-stretch d-flex flex-column justify-content-between">
 					<div className="d-flex justify-content-between">
-						<span className="text-secondary">
-							{i18n._("authored-by", { author: props.question.authorName })}
-						</span>
+						{ props.question.authorFingerprint ? <TooltipWrapper title={props.question.authorFingerprint}>
+							<span className="text-secondary">
+								{i18n._("authored-by", { author: props.question.authorName })}
+							</span>
+						</TooltipWrapper> : <span className="text-secondary">
+								{i18n._("authored-by", { author: props.question.authorName })}
+							</span>}
 						<Badge as="div" className="align-self-center" bg="info">
 							{props.question.type}
 						</Badge>

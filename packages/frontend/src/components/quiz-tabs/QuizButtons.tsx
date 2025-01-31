@@ -313,17 +313,18 @@ export const QuizButtons = (props: {
 
 			<div className="mt-2 d-flex justify-content-end flex-column flex-lg-row">
 				{props.isQuizTeacher && (
-					<Button
+					<ButtonWithTooltip
 						variant={!props.isUserInTeachersList ? "primary" : "outline-primary"}
 						className="d-flex justify-content-center align-items-center gap-1"
 						onClick={togglePreviewMode}
+						title={i18n._("quiz-button-tooltip-preview")}
 					>
 						<Easel size={20} />
 						{/* <Trans id="quiz-show-qr-code-button" /> */}
 						{!props.isUserInTeachersList
 							? i18n._("quiz-button-label-end-preview")
 							: i18n._("quiz-button-label-start-preview")}
-					</Button>
+					</ButtonWithTooltip>
 				)}
 			</div>
 		</>

@@ -1,6 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Login } from "./Login";
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "./pages/Dashboard";
 import { useEffect } from "react";
 import { dynamicActivate, defaultLocale } from "./i18n";
 import { getStoredSelectedLocal } from "./components/layout/LocaleSelect";

@@ -200,9 +200,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	public async receive(from: ActorRef, message: QuizActorMessage): Promise<ResultType> {
 		console.log("QUIZACTOR", from.name, message);
 		try {
-			const [clientUserRole, clientUserId] = await this.determineRole(from);
+			const [clientUserRole, clientUserId, clientIsTemporary] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
+					if (clientIsTemporary){
+						return serializeError(new Error("Cannot export as a temporary user"));
+					}			
 					return this.create(quiz, clientUserRole, clientUserId);
 				},
 				GetUserRun: async ({ studentId, quizId }) => {
@@ -385,6 +388,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					return unit();
 				},
 				Import: async ({ filename, titlePrefix, userId, userRole }) => {
+					if (clientIsTemporary){
+						return serializeError(new Error("Cannot export as a temporary user"));
+					}
 					console.log(filename);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
 					const importedObject = JSON.parse(jsonBuffer.toString());
@@ -446,6 +452,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							q.quiz = uid;
 							q.authorId = userId ?? clientUserId;
 							q.authorName = userData.username;
+							q.authorFingerprint = userData.fingerprint;
 							q.created = toTimestamp();
 							q.updated = toTimestamp();
 							await db.collection("questions").insertOne(q);
@@ -469,6 +476,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					return uid;
 				},
 				Export: async uid => {
+					if (clientIsTemporary){
+						return serializeError(new Error("Cannot export as a temporary user"));
+					}
 					const db = await this.connector.db();
 					const mbQuiz = maybe(await db.collection<Quiz>(this.collectionName).findOne({ uid }));
 					return mbQuiz.match<Promise<Error | string>>(
@@ -516,6 +526,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					);
 				},
 				Duplicate: async uid => {
+					if (clientIsTemporary){
+						return serializeError(new Error("Cannot export as a temporary user"));
+					}
 					try {
 						const filename = (await this.ask(this.ref, QuizActorMessages.Export(uid))) as string | Error;
 						if (typeof filename === "string") {

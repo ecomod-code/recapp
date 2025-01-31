@@ -327,6 +327,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								questions = randomShuffle(questions);
 							}
 
+
 							const run: QuizRun = await this.ask(
 								`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 								QuizRunActorMessages.GetForUser({ studentId, questions })
@@ -565,6 +566,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
 										QuestionActorMessages.Create({
 											authorId: u.uid,
+											authorFingerprint: u.fingerprint,
 											...question,
 										})
 									);

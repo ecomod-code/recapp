@@ -133,7 +133,7 @@ export const QuestionsTab: React.FC<{
 		} else {
 			nav(
 				{ pathname: "/Dashboard/Question" },
-				{ state: { quizId: uid, group, write: writeAccess ? "true" : undefined } }
+				{ state: { questionId: uid, quiz: quizData.quiz.uid, group, write: writeAccess ? "true" : undefined } }
 			);
 		}
 	};
@@ -282,6 +282,7 @@ export const QuestionsTab: React.FC<{
 										state: {
 											// group: questionGroup.name,
 											write: writeAccess ? "true" : undefined,
+											quiz: quizData.quiz.uid
 										},
 									}
 								);

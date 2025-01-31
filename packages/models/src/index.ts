@@ -5,6 +5,7 @@ export * from "./data/statistics";
 export * from "./data/comment";
 export * from "./data/session";
 export * from "./messages/sessionStore";
+export * from "./messages/fingerprintStore";
 export * from "./messages/userStore";
 export * from "./messages/commentActor";
 export * from "./messages/questionActor";

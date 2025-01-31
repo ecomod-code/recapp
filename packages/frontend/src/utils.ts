@@ -77,6 +77,14 @@ export const checkIsCreatingQuestionDisabled = (allowedQuestionTypesSettings: Qu
     return isCreatingQuestionEnabled;
 };
 
+export const checkIsParticipationDisabled = (studentParticipationSettings: Quiz["studentParticipationSettings"]) => {
+    const isParticipationEnabled = Object.values(studentParticipationSettings).every(value => {
+        return !value;
+    });
+
+    return isParticipationEnabled;
+};
+
 export const downloadFile = async (filename: string)=> {
 	return await axios
 		.get(`${import.meta.env.VITE_BACKEND_URI}/download/${filename}`, {

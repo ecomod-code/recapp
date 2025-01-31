@@ -149,20 +149,21 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                         value={name}
                                         autoFocus
                                         // placeholder="ID, Email oder Pseudonym"
-                                        placeholder="Email oder Pseudonym"
+                                        placeholder={i18n._("email-pseudonym-placeholder")}
                                         onChange={event => {
                                             const name = event.target.value;
                                             setName(name);
                                         }}
                                     />
-                                    <Button
+                                    <ButtonWithTooltip
                                         variant="warning"
                                         disabled={!name}
                                         type="submit"
                                         // onClick={add}
+                                        title={i18n._("share-quiz-modal.button-label.add-tooltip")}
                                     >
                                         <Trans id="share-quiz-modal.button-label.add" />
-                                    </Button>
+                                    </ButtonWithTooltip>
                                 </Form.Group>
                             </Form>
                         </Modal.Body>
@@ -172,9 +173,14 @@ export const ShareQuizModal: React.FC<Props> = ({ quiz, show, onClose }) => {
                                     <Trans id="cancel" />
                                 </Button>
 
-                                <Button variant="primary" className="align-self-stretch" onClick={share}>
+                                <ButtonWithTooltip 
+                                    variant="primary" 
+                                    className="align-self-stretch" 
+                                    onClick={share}
+                                    title={i18n._("share-with-confirmed-users-tooltip")}
+                                >
                                     <Trans id="share-with-confirmed-users" />
-                                </Button>
+                                </ButtonWithTooltip>
                             </Form.Group>
                         </Modal.Footer>
                     </Modal>

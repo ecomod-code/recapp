@@ -129,7 +129,7 @@ export const HeaderSection: React.FC = () => {
                                                 </Dropdown.Item>
                                                 <Dropdown.Item style={{cursor: "default"}}>
                                                     {/* <UserParticipationSelect label="default participation username: " /> */}
-                                                    <UserParticipationSelect label={i18n._("header-section.settings-label.default-participation-username")} />
+                                                    <UserParticipationSelect label={i18n._("header-section.settings-label.default-participation-username")} temporary={!!user.isTemporary}/>
                                                 </Dropdown.Item>
                                                 <Dropdown.Item style={{cursor: "default"}}>
                                                     {/* <LocaleSelect label="Language: " /> */}

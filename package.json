@@ -10,19 +10,19 @@
 		"itu-utils": "^1.8.2",
 		"lerna": "^8.1.2",
 		"serialize-error": "8.1.0",
-		"ts-actors": "^3.4.2",
+		"ts-actors": "^3.3.0",
 		"tsmonads": "^3.4.0",
 		"typescript": "^5.3.3",
 		"zod": "^3.22.4"
 	},
 	"name": "recapp",
 	"scripts": {
-		"start:docker:dev": "docker-compose --env-file .env.development -f docker/docker-compose.yaml -f docker/docker-compose.dev.yaml up -d",
-		"build:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml build --no-cache ",
-		"start:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml up -d",
-		"stop:docker:dev": "docker-compose --env-file .env.development -f docker/docker-compose.yaml -f docker/docker-compose.dev.yaml down",
-		"stop:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml down",
+		"start:docker:dev": "cd docker && docker-compose --env-file ../.env.development up -d",
+		"start:docker:prod": "cd docker && docker-compose --env-file ../.env.production up -d",
+		"stop:docker:dev": "cd docker && docker-compose --env-file ../.env.development down",
+		"stop:docker:prod": "cd docker && docker-compose --env-file ../.env.production down",
 		"bootstrap": "lerna bootstrap",
+		"postinstall": "manypkg check",
 		"dev": "lerna run dev",
 		"build": "lerna run build"
 	}

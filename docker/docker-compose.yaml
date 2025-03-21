@@ -1,14 +1,9 @@
-# Database for recapp
-version: "3.7"
+# Base configuration - what we need in dev and prod
+version: "3.8"
 
 services:
-    recapp-db:
-        restart: always
-        image: mongo:6
-        ports:
-            - ${MONGODB_PORT}:27017
-        volumes:
-            - ./mongo/data/db:/data/db
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
-            MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PW}
+  recapp-db:
+    restart: always
+    image: mongo:6
+    volumes:
+      - ./mongo/data/db:/data/db

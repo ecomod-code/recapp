@@ -7,8 +7,8 @@ services:
       context: ..
       dockerfile: packages/frontend/Dockerfile
       args:
-        - VITE_API_URL=${API_URL:-http://localhost:3123}
-        - VITE_APP_URL=${APP_URL:-http://localhost:5173}
+        - VITE_API_URL=${BACKEND_URI:-http://localhost:3123}
+        - VITE_APP_URL=${FRONTEND_URI:-http://localhost:5173}
         - VITE_INACTIVITY_LIMIT=1
     environment:
       - FRONTEND_URI=${FRONTEND_URI}

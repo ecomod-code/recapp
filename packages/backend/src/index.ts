@@ -125,7 +125,7 @@ const start = async () => {
       server: httpServer,
       authenticationMiddleware,
       headers: {
-        Authorization: "apikey=25868755-c11c-42ee-b4ed-2115ac982ba4",
+        Authorization: "apikey="+Container.get<string[]>("api-keys")[0]
       },
     });
     const system = await DistributedActorSystem.create({

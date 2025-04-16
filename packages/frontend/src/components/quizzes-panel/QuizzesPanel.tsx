@@ -18,7 +18,7 @@ import { TooltipWrapper } from "../TooltipWrapper";
 
 export const QuizzesPanel: React.FC = () => {
 	const nav = useNavigate();
-    const [filter, setFilter] = useState("");
+	const [filter, setFilter] = useState("");
 	const [shareModal, setShareModal] = useState("");
 	const [deleteModal, setDeleteModal] = useState(toId(""));
 	const [showDelete, setShowDelete] = useState(false);
@@ -56,6 +56,8 @@ export const QuizzesPanel: React.FC = () => {
 		);
 	}, [state]);
 
+	const isNotTemporaryAccount = state.map(s => !s.user?.isTemporary).orElse(true);
+
 	const archiveAllowed = (quiz: Partial<Quiz>): true | undefined => {
 		const isAdmin = state
 			.map(s => s.user)
@@ -90,7 +92,7 @@ export const QuizzesPanel: React.FC = () => {
 		setDeleteModal(toId(""));
 	};
 
-    const filteredQuizzes = (quizzes ?? []).filter(u => u.title?.toLocaleLowerCase().includes(filter));
+	const filteredQuizzes = (quizzes ?? []).filter(u => u.title?.toLocaleLowerCase().includes(filter));
 
 	return (
 		<>
@@ -107,22 +109,24 @@ export const QuizzesPanel: React.FC = () => {
 			<ShareModal quizLink={shareModal} onClose={() => setShareModal("")} />
 
 			<div>
-				<div className="d-flex gap-2 justify-content-end mt-3 mb-3">
-					<Button
-						className="ps-1 d-flex justify-content-center align-items-center"
-						onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}
-					>
-						<Plus size={28} />
-						<Trans id="button-new-quiz" />
-					</Button>
-					<Button
-						className="ps-1 d-flex justify-content-center align-items-center"
-						onClick={() => setImportModal(true)}
-					>
-						<Download size={20} className="mx-2" />
-						<Trans id="button-import-quiz" />
-					</Button>
-				</div>
+				{isNotTemporaryAccount && (
+					<div className="d-flex gap-2 justify-content-end mt-3 mb-3">
+						<Button
+							className="ps-1 d-flex justify-content-center align-items-center"
+							onClick={() => nav({ pathname: "/Dashboard/CreateQuiz" })}
+						>
+							<Plus size={28} />
+							<Trans id="button-new-quiz" />
+						</Button>
+						<Button
+							className="ps-1 d-flex justify-content-center align-items-center"
+							onClick={() => setImportModal(true)}
+						>
+							<Download size={20} className="mx-2" />
+							<Trans id="button-import-quiz" />
+						</Button>
+					</div>
+				)}
 
 				<InputGroup className="mb-3 mt-5">
 					<TooltipWrapper title={i18n._("user-admin-panel.button-tooltip.filter")}>
@@ -139,16 +143,16 @@ export const QuizzesPanel: React.FC = () => {
 				</InputGroup>
 
 				<div className="pt-2 border-2 border-top">
-                    <div>
-                        <Form.Switch
-                            className="mb-5 ps-5 list-group-item"
-                            label={i18n._("dashboard-show-archived-quizzes-switch")}
-                            checked={state.map(s => s.showArchived).orElse(false)}
-                            onChange={event =>
-                                tryLocalUserActor.forEach(q => q.send(q, new ToggleShowArchived(event.target.checked)))
-                            }
-                        />
-                    </div>
+					<div>
+						<Form.Switch
+							className="mb-5 ps-5 list-group-item"
+							label={i18n._("dashboard-show-archived-quizzes-switch")}
+							checked={state.map(s => s.showArchived).orElse(false)}
+							onChange={event =>
+								tryLocalUserActor.forEach(q => q.send(q, new ToggleShowArchived(event.target.checked)))
+							}
+						/>
+					</div>
 					{filteredQuizzes.map(q => {
 						return (
 							<QuizCard
@@ -156,6 +160,9 @@ export const QuizzesPanel: React.FC = () => {
 								quiz={q}
 								onStart={() => {
 									nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: q.uid, start: true } });
+								}}
+								onStop={() => {
+									nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: q.uid, stop: true } });
 								}}
 								onShare={() => setShareModal(q.uniqueLink!)}
 								onDelete={() => {

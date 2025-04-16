@@ -19,9 +19,9 @@ import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
-import { checkIsCreatingQuestionDisabled, debounce } from "../../utils";
+import { checkIsCreatingQuestionDisabled, checkIsParticipationDisabled, debounce } from "../../utils";
 import { CharacterTracker } from "../CharacterTracker";
-import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS } from "../../constants/constants";
+import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS, TITLE_MIN_CHARACTERS } from "../../constants/constants";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 // import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
 // import { keys } from "rambda";
@@ -108,6 +108,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 	const isTitleAndDescriptionDisabled = props.disableForStudent || disabledByMode;
 
 	const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quiz.allowedQuestionTypesSettings);
+	const isParticipationDisabled = checkIsParticipationDisabled(quiz.studentParticipationSettings);
 
 	return (
 		<Form>
@@ -179,7 +180,7 @@ export const QuizDataTab: React.FC<Props> = props => {
 
 						setTitleAndDescription(prev => ({ ...prev, title: text }));
 
-						if (text.length > 3) {
+						if (text.length >= TITLE_MIN_CHARACTERS) {
 							updateDebounced({ title: text });
 							setTitleValidationError("");
 						} else {
@@ -275,7 +276,20 @@ export const QuizDataTab: React.FC<Props> = props => {
 						/>
 					</ListGroupContainer>
 
-					<ListGroupContainer header={i18n._("quiz-student-participation")}>
+					<ListGroupContainer header={i18n._("quiz-student-participation")}>				
+						{/* // remove comment when functionality is implemented
+							{isParticipationDisabled ? (
+							<Alert variant="warning" className="d-flex align-items-start">
+								<div className="d-flex">
+									<ExclamationTriangle size={20} />
+								</div>
+
+								<span className="ms-1">
+									{i18n._("quiz-data-tab.alert-message.participation-is-disabled")}
+								</span>
+							</Alert>
+						) : null} */}
+
 						<Form.Switch
 							className="list-group-item ps-5"
 							label={i18n._("quiz-allows-anonymous-participation")}

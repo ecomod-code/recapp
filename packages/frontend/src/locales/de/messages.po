@@ -82,6 +82,10 @@ msgid "quiz-data-tab.alert-message.create-new-question-is-disabled"
 msgstr "Die Schaltfläche 'Neue Frage erstellen' ist deaktiviert."
 
 #. js-lingui-explicit-id
+msgid "quiz-data-tab.alert-message.participation-is-disabled"
+msgstr "Fragen- und Kommentarerstellung sind für Teilnehmende deaktiviert."
+
+#. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:236
 msgid "quiz-questions-tab-new-question-button.button-tooltip.create-question-disabled"
 msgstr "Die Schaltfläche 'Neue Frage erstellen' ist deaktiviert, da keine Optionen für 'Erlaubte Fragetypen' ausgewählt wurden."
@@ -219,12 +223,12 @@ msgstr "Fragetyp"
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:221
 msgid "share-quiz-modal.error-alert.already-exists"
-msgstr "Benutzer ist bereits ausgewählt"
+msgstr "Benutzer*in ist bereits ausgewählt"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:229
 msgid "share-quiz-modal.error-alert.do-not-exist"
-msgstr "Benutzer existiert nicht"
+msgstr "Benutzer*in nicht bei RECAPP"
 
 #. js-lingui-explicit-id
 #: src/components/cards/CommentsContainer.tsx:44
@@ -329,12 +333,12 @@ msgstr "Letze Anmeldung: {date}"
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-deactivate-user-button"
-msgstr "Benutzer deaktivieren"
+msgstr "Benutzer*in deaktivieren"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:16
 msgid "user-activate-user-button"
-msgstr "Benutzer aktivieren"
+msgstr "Benutzer*in aktivieren"
 
 #. js-lingui-explicit-id
 #: src/components/modals/ChangeActiveModal.tsx:19
@@ -493,9 +497,17 @@ msgid "share-quiz-modal.button-label.add"
 msgstr "Hinzufügen"
 
 #. js-lingui-explicit-id
+msgid "share-quiz-modal.button-label.add-tooltip"
+msgstr "Nur Lehrpersonen, die zuvor auf RecApp zugegriffen haben, können hinzugefügt werden."
+
+#. js-lingui-explicit-id
 #: src/components/modals/ShareQuizModal.tsx:93
 msgid "share-with-confirmed-users"
-msgstr "Mit bestätigten Nutzern teilen"
+msgstr "Quiz teilen"
+
+#. js-lingui-explicit-id
+msgid "share-with-confirmed-users-tooltip"
+msgstr "Quiz erscheint im Dashboard der hinzugefügten Lehrpersonen."
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuestionsTab.tsx:191
@@ -589,7 +601,7 @@ msgstr "Fragen durch Teilnehmende erstellen lassen"
 #: src/components/quiz-tabs/QuizDataTab.tsx:236
 #: src/pages/CreateQuiz.tsx:98
 msgid "quiz-student-participation"
-msgstr "Teilnahmemöglichkeiten von Teilnehmenden"
+msgstr "Teilnahmemöglichkeiten"
 
 #. js-lingui-explicit-id
 #: src/components/quiz-tabs/QuizDataTab.tsx:239
@@ -776,6 +788,10 @@ msgid "quiz-card.button-tooltip.start"
 msgstr "Starten"
 
 #. js-lingui-explicit-id
+msgid "quiz-card.button-tooltip.stop"
+msgstr "Stoppen"
+
+#. js-lingui-explicit-id
 #: src/components/quizzes-panel/QuizCard.tsx:66
 msgid "quiz-card.button-tooltip.share"
 msgstr "Teilen"
@@ -798,7 +814,7 @@ msgstr "Quizze"
 #. js-lingui-explicit-id
 #: src/Dashboard.tsx:44
 msgid "dashboard-tab-label-users"
-msgstr "Benutzer"
+msgstr "Benutzer*in"
 
 #. js-lingui-explicit-id
 #: src/layout/HeaderSection.tsx:88
@@ -874,6 +890,10 @@ msgstr "Bearbeiten"
 #: src/pages/QuestionEdit.tsx:443
 msgid "activate-all-correct-answers"
 msgstr "Aktiviere alle richtigen Antworten"
+
+#. js-lingui-explicit-id
+msgid "activate-correct-answer"
+msgstr "Aktiviere die richtige Antwort"
 
 #. js-lingui-explicit-id
 #: src/pages/QuestionEdit.tsx:460
@@ -1007,11 +1027,11 @@ msgstr "Suchtext"
 
 #. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated"
-#~ msgstr "Ihr Benutzer wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+#~ msgstr "Ihr*e Benutzer*in wurde deaktiviert. Bitte wenden Sie sich an Ihre*n Administrator*in."
 
 #. js-lingui-explicit-id
 #~ msgid "error-message-user-deactivated-title"
-#~ msgstr "Nutzer gesperrt"
+#~ msgstr "Nutzer*in gesperrt"
 
 #. js-lingui-explicit-id
 #~ msgid "archive-quiz-title"
@@ -1303,9 +1323,72 @@ msgstr "Teilnehmende können Fragen stellen"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-end-preview"
-msgstr "Vorschau beenden"
+msgstr "Lehrpersonenansicht"
 
 #. js-lingui-explicit-id
 msgid "quiz-button-label-start-preview"
-msgstr "Vorschau starten"
+msgstr "Teilnehmendenansicht"
 
+#. js-lingui-explicit-id
+msgid "quiz-button-tooltip-preview"
+msgstr "Startet das Quiz in der Teilnehmeransicht. Das Quiz stoppt, wenn alle beigetretenen Lehrer diesen Modus verlassen."
+
+#. js-lingui-explicit-id
+msgid "login-page.temporary-account-button"
+msgstr "Ohne Anmeldung fortfahren"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-header"
+msgstr "Quizteilnahme ohne Anmeldung"
+
+#. js-lingui-explicit-id
+msgid "login-page.temp-login-reminder"
+msgstr "Du kannst ohne Anmeldung an dem Quiz teilnehmen. Um Missbrauch vorzubeugen, wird für deinen Browser und dein Gerät ein sogenannter Fingerprint erzeugt, mit dem wir dich während deiner Teilnahme identifzieren können. Dem stimmst du durch deine Teilnahme zu."
+
+#. js-lingui-explicit-id
+msgid "login-page.store-cookie-checkbox"
+msgstr "Ich möchte dass meine Anmeldung für 30 Tage erhalten bleibt, auch wenn ich das Browserfenster schließe."
+
+#. js-lingui-explicit-id
+msgid "login-page.info-text"
+msgstr "Du kannst dich anmelden oder ohne Anmeldung am Quiz teilnehmen."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-title"
+msgstr "Login-Fehler. Account deaktiviert."
+
+#. js-lingui-explicit-id
+msgid "login-page.account-deactivated-message"
+msgstr "Ihr Account wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator."
+
+#. js-lingui-explicit-id
+msgid "fingerprint.card-last-seen: {date}"
+msgstr "Letzte Tokenaktualisierung: {date}"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.search-text"
+msgstr "Fingerprint suchen"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.button-tooltip.filter"
+msgstr "Teile des Fingerprints eingeben um zu filtern"
+
+#. js-lingui-explicit-id
+msgid "fingerprint-panel.title"
+msgstr "Fingerprint Verwaltung (Temporäre Accounts)"
+
+#. js-lingui-explicit-id
+msgid "dashboard-tab-label-fingerprints"
+msgstr "Temporäre Accounts"
+
+#. js-lingui-explicit-id
+msgid "new-question"
+msgstr "Neue Frage"
+
+#. js-lingui-explicit-id
+msgid "question"
+msgstr "Frage"
+
+#. js-lingui-explicit-id
+msgid "email-pseudonym-placeholder"
+msgstr "Email oder Pseudonym"

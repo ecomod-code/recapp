@@ -19,6 +19,7 @@ export const questionSchema = zod
 		text: zod.string(), // Question text
 		type: questionTypesSchema,
 		authorId: uidSchema, // Author id
+		authorFingerprint: zod.string().optional(), // Author id
 		authorName: zod.string().optional(), // Display name of the author (may also be a nickname or ANONYMOUS)
 		quiz: uidSchema, // Quiz the question belongs
 		hint: zod.string().optional(), // Optional explanatory text/hint

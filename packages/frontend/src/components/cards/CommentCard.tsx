@@ -63,6 +63,7 @@ export const CommentCardContent: React.FC<
     isDisplayedInModal,
     isCommentSectionVisible,
 }) => {
+
     const { rendered } = useRendered({ value: comment.text });
 
     // const isQuizTeacher = teachers.includes(userId);
@@ -107,7 +108,7 @@ export const CommentCardContent: React.FC<
                 <div className="d-flex align-items-between justify-content-between">
                     <ButtonWithTooltip
                         title={i18n._("comment-card.button-tooltip.upvote")}
-                        variant="primary"
+                        variant= {comment.upvoters.includes(userId) ? "success" : "primary"} // {"primary"}
                         onClick={onUpvote}
                         className="px-2 m-1 d-flex"
                     >

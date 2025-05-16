@@ -137,9 +137,9 @@ export const QuizPage: React.FC = () => {
 	//     (quizData && quizData.quizStats && (quizData.quizStats.maximumParticipants ?? 0) > 0) ||
 	//     !!quizData?.questionStats;
 
-	const showStatTab =
-		mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
-		mbQuiz.map(q => !!q.questionStats).orElse(false);
+	const showStatTab = true;
+	//	mbQuiz.map(q => (q.quizStats?.maximumParticipants ?? 0) > 0).orElse(false) ||
+	//	mbQuiz.map(q => !!q.questionStats).orElse(false);
 
 	// const isQuizStateEditing2 = quizData?.quiz?.state && quizData.quiz.state === "EDITING";
 	const isQuizStateEditing = mbQuiz.flatMap(q => maybe(q.quiz?.state)).orElse("STOPPED") === "EDITING";
@@ -500,7 +500,7 @@ export const QuizPage: React.FC = () => {
 								</Tab>
 								{/* {showStatTab && (isQuizTeacher ? true : isQuizCompleted ) && ( */}
 								{showStatTab &&
-									(isUserInTeachersList ? true : isQuizCompleted && studentsCanSeeStatistics) && (
+									(isUserInTeachersList || (isQuizCompleted && studentsCanSeeStatistics)) && (
 										<Tab
 											eventKey={tabRecords.statistics.value}
 											title={i18n._(tabRecords.statistics.label)}

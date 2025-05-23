@@ -10,6 +10,7 @@ import { ErrorMessages } from "../actors/ErrorActor";
 import { useNavigate } from "react-router-dom";
 import { cookie } from "../utils";
 import { CurrentQuizMessages, CurrentQuizState } from "../actors/CurrentQuizActor";
+import { Spinner } from "react-bootstrap";
 
 // const tabClasses = "bg-content-container py-3";
 const tabClasses = "py-3";
@@ -38,6 +39,17 @@ export const Dashboard: React.FC = () => {
 	}
 
 	const isAdmin = state.map(lu => lu.user.role === "ADMIN").orElse(false);
+
+    // Show spinner while user or quiz state is not loaded
+    if (state.isEmpty() || mbQuiz.isEmpty()) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
+                <Spinner animation="border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </Spinner>
+            </div>
+        );
+    }
 
 	return (
 		<React.StrictMode>

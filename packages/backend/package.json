@@ -35,7 +35,8 @@
 		"unionize": "^3.1.0",
 		"winston": "^3.11.0",
 		"wkhtmltopdf": "^0.4.0",
-		"zod": "^3.22.4"
+		"zod": "^3.22.4",
+        "uuid": "^9.0.0"
 	},
 	"description": "Backend for RECAPP app",
 	"license": "MIT",

@@ -41,7 +41,7 @@ export const Dashboard: React.FC = () => {
 	const isAdmin = state.map(lu => lu.user.role === "ADMIN").orElse(false);
 
     // Show spinner while user or quiz state is not loaded
-    if (!state.orElse(undefined) || !mbQuiz.orElse(undefined)) {
+    if (state.isEmpty() || mbQuiz.isEmpty()) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ height: "100vh" }}>
                 <Spinner animation="border" role="status">

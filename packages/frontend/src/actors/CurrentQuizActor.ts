@@ -427,14 +427,14 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						ChangeState: async newState => {
 							if (newState === "STARTED") {
 								if (["ACTIVE", "EDITING", "STOPPED"].includes(this.state.quiz.state)) {
-									this.send(
-										`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
-										QuizRunActorMessages.Clear()
-									);
-									this.send(
-										`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
-										StatisticsActorMessages.Clear()
-									);
+									// this.send(
+									// 	`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									// 	QuizRunActorMessages.Clear()
+									// );
+									// this.send(
+									// 	`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									// 	StatisticsActorMessages.Clear()
+									// );
 									this.send(
 										actorUris.QuizActor,
 										QuizActorMessages.Update({

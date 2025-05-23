@@ -6,7 +6,9 @@
 	],
 	"dependencies": {
 		"@featherscloud/pinion": "^0.5.3",
-		"@manypkg/cli": "^0.21.2",
+		"@lingui/cli": "5.3.1",
+		"@lingui/vite-plugin": "5.3.1",
+		"@manypkg/cli": "^0.24.0",
 		"itu-utils": "^1.8.2",
 		"lerna": "^8.1.2",
 		"serialize-error": "8.1.0",

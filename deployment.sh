@@ -1,131 +1,100 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#
+# deploy_recapp_to_test.sh
+# This script deploys the RecApp application to the test environment.
+# It assumes:
+#  - The deploy user has passwordless sudo for the needed npm/docker commands.
+#  - $HOME is the home directory of that user, and ~/recapp is the app folder.
+#  - npm scripts: stop:docker:prod, build:docker:prod, start:docker:prod exist in package.json.
+#  - set -e is in effect, so any command failing will abort the script.
 
-# Auto-Deployment for recapp
+set -euo pipefail
 
-# Konfiguration
-if [ $# -eq 0 ]; then
-    REPO_PATH="/home/cloud/recapp"
-    LOG_FILE="/home/cloud/recapp/deploy.log"
-else
-    REPO_PATH="$1"
-    LOG_FILE="$1/deploy.log"
+# Define log file and rotation parameters
+# The log file will be stored in the user's home directory.
+# It will rotate when it exceeds 10 MB, keeping the last 3 old logs.
+# The log file will be named deploy.log, and old logs will be named deploy.log.1, deploy.log.2, etc.
+# The log rotation will be handled by the rotate_logs function.
+LOG_DIR="$HOME"
+LOG_FILE="$LOG_DIR/deploy.log"
+MAX_LOG_SIZE=$((10 * 1024 * 1024))   # 10 MB
+MAX_OLD_LOGS=3
+
+rotate_logs() {
+  # If deploy.log does not exist, nothing to rotate
+  [ -f "$LOG_FILE" ] || return
+
+  local actual_size
+  actual_size=$(stat -c%s "$LOG_FILE")
+  if [ "$actual_size" -le "$MAX_LOG_SIZE" ]; then
+    return
+  fi
+
+  # Shift old logs: deploy.log.2 -> deploy.log.3, deploy.log.1 -> deploy.log.2, deploy.log -> deploy.log.1
+  if [ -f "$LOG_DIR/deploy.log.$((MAX_OLD_LOGS - 1))" ]; then
+    rm -f "$LOG_DIR/deploy.log.$((MAX_OLD_LOGS - 1))"
+  fi
+
+  for (( i=MAX_OLD_LOGS-1; i>=1; i-- )); do
+    if [ -f "$LOG_DIR/deploy.log.$i" ]; then
+      mv "$LOG_DIR/deploy.log.$i" "$LOG_DIR/deploy.log.$((i + 1))"
+    fi
+  done
+
+  mv "$LOG_FILE" "$LOG_DIR/deploy.log.1"
+  : > "$LOG_FILE"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - Log rotated: previous log moved to deploy.log.1" >> "$LOG_FILE"
+}
+
+# Rotate logs if necessary
+rotate_logs
+
+# Append a timestamped message to both the log file and stdout
+log() {
+  local msg="$1"
+  echo "$(date '+%Y-%m-%d %H:%M:%S') - ${msg}" | tee -a "$LOG_FILE"
+}
+
+# On any unexpected exit (non-zero), log it
+on_error() {
+  local exit_code=$?
+  log "❌ Deployment script exited with code ${exit_code}."
+  exit "${exit_code}"
+}
+trap on_error ERR
+
+log "=== Starting deployment to test environment ==="
+
+# Verify sudo privileges (without a password prompt)
+if ! sudo -n true 2>/dev/null; then
+  log "ERROR: This script requires passwordless sudo privileges. Exiting."
+  exit 1
 fi
 
-PM2_PROCESS_NAME="backend"
+# Ensure the recapp directory exists
+REPO_DIR="$HOME/recapp"
+if [ ! -d "$REPO_DIR" ]; then
+  log "ERROR: Directory '$REPO_DIR' not found. Cannot deploy."
+  exit 1
+fi
 
-# Funktion zum Loggen
-log() {
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
-    echo "$1"
-}
+cd "$REPO_DIR"
 
-# Funktion zum Prüfen von Änderungen im Remote
-check_remote_changes() {
-    git fetch origin
-    local_branch=$(git rev-parse --abbrev-ref HEAD)
-    remote_branch="origin/$local_branch"
-    
-    if git diff --quiet "$local_branch" "$remote_branch"; then
-        log "No remote changes for current branch ($local_branch)."
-        return 1
-    else
-        log "New commits detected for current branch ($local_branch)."
-        return 0
-    fi
-}
+# 1) Stop the existing Docker production container
+log "Stopping existing production container..."
+sudo npm run stop:docker:prod 2>&1 | tee -a "$LOG_FILE"
 
-# Funktion zum Pullen von Änderungen
-pull_changes() {
-    if git pull origin "$(git rev-parse --abbrev-ref HEAD)"; then
-        log "Pulling changes was successful."
-        return 0
-    else
-        log "Error on pulling changes."
-        return 1
-    fi
-}
+# 2) Install dependencies (CI)
+log "Installing npm dependencies for CI..."
+sudo npm ci 2>&1 | tee -a "$LOG_FILE"
 
-# Funktion zum Bauen der Projekte
-build_projects() {
-    log "Starting rebuild"
-    
-    # Installiere Abhängigkeiten
-    if npm ci; then
-        log "Installed dependencies successfully."
-    else
-        log "Error on dependent package installation."
-        return 1
-    fi
-    
-    # Führe Lerna build aus
-    if npx lerna run build; then
-        log "Build all packages."
-        return 0
-    else
-        log "Error on building packages."
-        return 1
-    fi
-}
+# 3) Build the Docker image for production
+log "Building Docker image for production..."
+sudo npm run build:docker:prod 2>&1 | tee -a "$LOG_FILE"
 
-# Funktion zum Neustarten des PM2-Prozesses
-restart_pm2() {
-    if pm2 restart "$PM2_PROCESS_NAME"; then
-        log "Restartet backend."
-        return 0
-    else
-        log "Error on restarting the backend."
-        return 1
-    fi
-}
+# 4) Start the new production container
+log "Starting new production container..."
+sudo npm run start:docker:prod 2>&1 | tee -a "$LOG_FILE"
 
-# Funktion zum Kopieren der Frontend-Dateien und Setzen der Rechte
-change_frontend_permissions() {
-    if chmod -R o+r ./packages/frontend/dist/*; then
-        log "Made frontend build accessible by webserver."
-        return 0
-    else
-        log "Could not change frontend access rights for webserver"
-        return 1
-    fi
-}
-
-# Funktion zum Zurücksetzen auf den letzten funktionierenden Stand
-rollback() {
-    log "Errors occured. Rolling back."
-    git reset --hard HEAD~1
-    build_projects
-    restart_pm2
-    copy_frontend_files
-    log "Rollback finished."
-}
-
-# Hauptfunktion
-main() {
-    cd "$REPO_PATH" || { log "Fehler: Konnte nicht in das Repository-Verzeichnis wechseln."; exit 1; }
-
-    if [ "$1" = "force-build" ]; then
-        log "Forced deployment."
-        if build_projects; then
-            log "New version was deployed"
-        else
-            log "An error occured"
-            exit 1
-        fi
-        return
-    fi  
-
-    if check_remote_changes; then
-        if pull_changes && build_projects && restart_pm2 && change_frontend_permissions; then
-            log "New version was deployed"
-        else
-            log "An error occured"
-            rollback
-            exit 1
-        fi
-    else
-        log "No action neccessary."
-    fi
-}
-
-# Ausführung der Hauptfunktion
-main $2
+log "✅ Deployment to test environment completed successfully."
+exit 0

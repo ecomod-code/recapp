@@ -1,0 +1,26 @@
+name: Deploy to Test Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.7.0
+        with:
+          ssh-private-key: ${{ secrets.TEST_SSH_PRIVATE_KEY }}
+
+      - name: Add test server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.TEST_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+
+      - name: Trigger remote deploy script
+        run: |
+          ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }} \
+            "bash ~/deploy_recapp_to_test.sh"

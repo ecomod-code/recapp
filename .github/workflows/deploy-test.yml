@@ -24,14 +24,13 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.TEST_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
 
-      - name: Trigger remote deploy script
+      - name: Deploy ${{ env.BRANCH_NAME }} to test server
         run: |
+          echo "➡️ Starting remote deployment of branch '${BRANCH_NAME}'"
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }} \
-            set -e
-            cd ~/recapp
-            git fetch origin
-            git checkout --force "${BRANCH_NAME}"
-            "bash ~/deploy_recapp_to_test.sh"
-            echo "✅ Deployed branch '${BRANCH_NAME}' to test server."
-            EOF
+            "cd ~/recapp && \
+             git fetch origin && \
+             git checkout --force \"${BRANCH_NAME}\" && \
+             bash ~/deploy_recapp_to_test.sh"
+          echo "✅ Remote deployment of branch '${BRANCH_NAME}' succeeded"

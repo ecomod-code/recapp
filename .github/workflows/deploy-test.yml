@@ -4,11 +4,15 @@ on:
   push:
     branches:
       - main
+      - 'feature/**'
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      BRANCH_NAME: ${{ github.ref_name }}
+      
     steps:
       - name: Set up SSH agent
         uses: webfactory/ssh-agent@v0.7.0
@@ -24,4 +28,10 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
             ${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }} \
+            set -e
+            cd ~/recapp
+            git fetch origin
+            git checkout --force "${BRANCH_NAME}"
             "bash ~/deploy_recapp_to_test.sh"
+            echo "✅ Deployed branch '${BRANCH_NAME}' to test server."
+            EOF

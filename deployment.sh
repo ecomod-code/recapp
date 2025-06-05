@@ -22,12 +22,12 @@ MAX_OLD_LOGS=3
 
 rotate_logs() {
   # If deploy.log does not exist, nothing to rotate
-  [ -f "$LOG_FILE" ] || return
+  [ -f "$LOG_FILE" ] || return 0
 
   local actual_size
   actual_size=$(stat -c%s "$LOG_FILE")
   if [ "$actual_size" -le "$MAX_LOG_SIZE" ]; then
-    return
+    return 0
   fi
 
   # Shift old logs: deploy.log.2 -> deploy.log.3, deploy.log.1 -> deploy.log.2, deploy.log -> deploy.log.1
@@ -44,6 +44,7 @@ rotate_logs() {
   mv "$LOG_FILE" "$LOG_DIR/deploy.log.1"
   : > "$LOG_FILE"
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Log rotated: previous log moved to deploy.log.1" >> "$LOG_FILE"
+  return 0
 }
 
 # Rotate logs if necessary

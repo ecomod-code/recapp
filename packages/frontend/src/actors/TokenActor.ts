@@ -1,36 +1,50 @@
-import { Unit, unit, minutes } from "itu-utils";
+// packages/frontend/src/actors/TokenActor.ts
+
+import { Unit, unit } from "itu-utils";
 import { Actor, ActorRef, ActorSystem } from "ts-actors";
 import Axios from "axios";
 import { cookie } from "../utils";
 
-const updateToken = () => {
-	const hasToken = !!cookie("bearer");
-	if (hasToken) {
-		Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true }).catch(() => {
-			alert(
-				"Could not refresh token. Presumeably the authentication server is unavailable. Please report this error if it happens repeatedly."
-			);
-			window.location.href = "/";
-		});
-	}
-};
-
 export class TokenActor extends Actor<unknown, Unit> {
-	public interval: any;
+ public interval: any;
+ private expiresAt: Date;
 
-	public constructor(name: string, system: ActorSystem) {
-		super(name, system);
-	}
+ public constructor(name: string, system: ActorSystem) {
+   super(name, system);
+   this.expiresAt = new Date(); // Initialize with a default value
+ }
 
-	public override async afterStart(): Promise<void> {
-		this.interval = setInterval(updateToken, minutes(import.meta.env.VITE_INACTIVITY_LIMIT).valueOf());
-	}
+ public override async afterStart(): Promise<void> {
+   this.updateToken();
+ }
 
-	public override async beforeShutdown(): Promise<void> {
-		clearInterval(this.interval);
-	}
+ public override async beforeShutdown(): Promise<void> {
+   clearTimeout(this.interval);
+ }
 
-	public async receive(_from: ActorRef, _message: unknown): Promise<Unit> {
-		return unit();
-	}
+ private updateToken = () => {
+   const hasToken = !!cookie("bearer");
+   if (hasToken) {
+     Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
+       .then(response => {
+         this.expiresAt = new Date(response.data.expires_at);
+         this.scheduleNextUpdate();
+       })
+       .catch(error => {
+         console.error("Failed to refresh token:", error);
+         setTimeout(this.updateToken, 5000); // Retry after 5 seconds
+       });
+   }
+ };
+
+ private scheduleNextUpdate = () => {
+   const buffer = 30000; // 30 seconds before expiry
+   const delay = this.expiresAt.getTime() - Date.now() - buffer;
+   clearTimeout(this.interval); // Clear previous timeout
+   this.interval = setTimeout(this.updateToken, delay);
+ };
+
+ public async receive(_from: ActorRef, _message: unknown): Promise<Unit> {
+   return unit();
+ }
 }

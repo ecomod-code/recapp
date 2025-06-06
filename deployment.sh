@@ -10,6 +10,8 @@
 
 set -euo pipefail
 
+BRANCH="${1:-main}"
+
 # Define log file and rotation parameters
 # The log file will be stored in the user's home directory.
 # It will rotate when it exceeds 10 MB, keeping the last 3 old logs.
@@ -49,7 +51,7 @@ rotate_logs() {
 
 # Rotate logs if necessary
 rotate_logs
-
+echo "test end"
 # Append a timestamped message to both the log file and stdout
 log() {
   local msg="$1"
@@ -81,6 +83,12 @@ fi
 
 cd "$REPO_DIR"
 
+log "Fetching origin..."
+git fetch origin --prune
+
+log "Checking out branch '$BRANCH' (force)..."
+git checkout --force -B "$BRANCH" "origin/$BRANCH"
+  
 # 1) Stop the existing Docker production container
 log "Stopping existing production container..."
 sudo npm run stop:docker:prod 2>&1 | tee -a "$LOG_FILE"

@@ -1,2 +1,2 @@
-# recapp 1.4.2
-* almost ready to go public
+# recapp 1.6.2
+

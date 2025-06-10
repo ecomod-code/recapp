@@ -1,4 +1,13 @@
-FROM node:20-alpine
+FROM node:20-slim
+
+# Install wkhtmltopdf + minimal deps, then clean up apt caches
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      wkhtmltopdf \
+      fontconfig \
+      ttf-dejavu \
+      ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

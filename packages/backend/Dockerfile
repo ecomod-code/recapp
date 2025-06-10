@@ -3,10 +3,13 @@ FROM node:20-slim
 # Install wkhtmltopdf + minimal deps, then clean up apt caches
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      wkhtmltopdf \
-      fontconfig \
-      ttf-dejavu \
-      ca-certificates \
+      wkhtmltopdf         \
+      fontconfig          \
+      fonts-dejavu-core   \
+      ca-certificates     \
+      libx11-6            \
+      libxrender1         \
+      libxext6            \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

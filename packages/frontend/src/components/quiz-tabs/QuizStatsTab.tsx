@@ -185,7 +185,7 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																textUnderlineOffset: "3px",
 																// color: $primary
 															}}
-															onClick={() =>
+															onClick={noDetails ? null : () =>
 																tryActor.forEach(actor =>
 																	actor.send(
 																		actor,

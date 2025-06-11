@@ -185,8 +185,8 @@ export const QuizStatsTab: React.FC<{ quizData: CurrentQuizState }> = ({ quizDat
 																textUnderlineOffset: "3px",
 																// color: $primary
 															}}
-															onClick={() =>
-																tryActor.forEach(actor =>
+															// Only activate question stats if there are details available
+															onClick={() => noDetails ? null : tryActor.forEach(actor =>
 																	actor.send(
 																		actor,
 																		CurrentQuizMessages.ActivateQuestionStats(

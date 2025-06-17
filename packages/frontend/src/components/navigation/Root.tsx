@@ -14,7 +14,7 @@ import { Try, fromError, fromValue } from "tsmonads";
 
 export const Root: React.FC = () => {
   // 1) Keep the monadic Try<ActorSystem> so it matches your context type
-  const [init, setInit] = useState<Try<ActorSystem>>(fromError(new Error()));
+  const [init, setInit] = useState<Try<ActorSystem> | null>(null);
   const [rpcError, setRpcError] = useState<string>("");
   const navigate = useNavigate();
 
@@ -32,16 +32,20 @@ export const Root: React.FC = () => {
 
   // 3) After a successful init, check for the bearer cookie and redirect if missing
   useEffect(() => {
+    // only after we’ve attempted to initialize
+    if (init === null) return;
+
     init.match(
-      // onSuccess
+      // onSuccess: if cookie missing, go to login
       () => {
         if (!cookie("bearer")) {
           navigate("/", { replace: true });
         }
       },
-      // onFailure
+      // onFailure: actor‐system auth failed → back to login
       () => {
-        /* do nothing on failure; modal handle below */
+        // onFailure → redirect back to login instead of waiting at spinner
+        navigate("/", { replace: true });
       }
     );
   }, [init, navigate]);
@@ -76,8 +80,9 @@ export const Root: React.FC = () => {
   }
 
   // 5) While initializing, show a centered spinner
-  const ready = init.match(() => true, () => false);
-  if (!ready) {
+  // **before** we even have an init value, we’re still loading:
+  if (init === null) {
+    // If we’re still loading, show a spinner
     return (
       <div style={{
         display: "flex",
@@ -93,8 +98,31 @@ export const Root: React.FC = () => {
       </div>
     );
   }
+  // once we do have init, check if it succeeded
+  // 5.1. Did the actor system actually initialize successfully?
+  const ready = init.match(
+    () => true,   // on Success → ready to render
+    () => false   // on Failure → not ready
+  );
+  // 5.2. If not ready, show a centered spinner (and the failure‐effect will redirect)
+  if (!ready) {
+    return (
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh"
+      }}>
+        <Spinner animation="border" role="status">
+          <span className="visually-hidden">
+            <Trans id="loading" message="Loading…" />
+          </span>
+        </Spinner>
+      </div>
+    );
+  }
 
-  // 6) Everything’s good: render your app
+  // 6. Only once ready do you render your SystemContext and the app routes
   return (
     <SystemContext.Provider value={init}>
       <Layout>

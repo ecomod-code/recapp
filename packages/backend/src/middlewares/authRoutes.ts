@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt from "jsonwebtoken";
 import { Issuer, Client, ClientMetadata } from "openid-client";
 import Container from "typedi";
@@ -63,7 +62,7 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 	const userStore = createActorUri("UserStore");
 	const fpStore = createActorUri("FingerprintStore");
 	const uid = v4() as Id;
-	
+
 	try {
 		let fpData: Fingerprint | Error = await system.ask(fpStore, FingerprintStoreMessages.Get(fingerprint as Id));
 		console.log("New fingerprint", fingerprint, fpData);
@@ -81,8 +80,8 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			};
 			await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
 			fpData = fp;
-		} 
-		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined}));
+		}
+		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
 		if (fpData.blocked) {
 			console.debug("Fingerprint was blocked", fingerprint);
 			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
@@ -91,18 +90,18 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 	} catch (e) {
 		console.error(e);
 		console.debug("A new fingerprint has been found", fingerprint);
-			const fp: Fingerprint = {
-				uid: fingerprint as Id,
-				created: toTimestamp(),
-				updated: toTimestamp(),
-				lastSeen: toTimestamp(),
-				usageCount: 1,
-				blocked: false,
-				userUid: uid,
-				initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
-			};
-			await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
-		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined}));
+		const fp: Fingerprint = {
+			uid: fingerprint as Id,
+			created: toTimestamp(),
+			updated: toTimestamp(),
+			lastSeen: toTimestamp(),
+			usageCount: 1,
+			blocked: false,
+			userUid: uid,
+			initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
+		};
+		await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
+		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
 	}
 	try {
 		const existingUser: User | Error = await system.ask(userStore, UserStoreMessages.GetByFingerprint(fingerprint));
@@ -299,7 +298,7 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 		},
 		() => ctx.throw(401, "Unable to sign out.")
 	);
-	
+
 	ctx.set("Set-Cookie", `bearer=; path=/; max-age=0`);
 	ctx.redirect(process.env.FRONTEND_URI ?? "http://localhost:5173");
 };
@@ -313,7 +312,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 		async idToken => {
 			try {
 				const { sub } = jwt.decode(idToken) as jwt.JwtPayload;
-				
+
 				// Refresh the token
 				const client = await getOidc();
 				const system = Container.get<ActorSystem>("actor-system");
@@ -333,7 +332,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					const fpStore = createActorUri("FingerprintStore");
 					try {
 						let fpData: Fingerprint = await system.ask(fpStore, FingerprintStoreMessages.Get(session.fingerprint as Id));
-						await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({fingerprint: session.fingerprint as Id, userUid: session.uid, initialQuiz: undefined}));
+						await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: session.fingerprint as Id, userUid: session.uid, initialQuiz: undefined }));
 						if (fpData.blocked) {
 							system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
 							ctx.set("Set-Cookie", `bearer=; path=/`);
@@ -350,7 +349,7 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					ctx.body = "O.K.";
 					return;
 				}
-				 
+
 				try {
 					const newTokenSet = await client.refresh(session.refreshToken);
 					const decoded = jwt.decode(newTokenSet.id_token ?? "") as jwt.JwtPayload;
@@ -369,9 +368,14 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 							refreshExpires: toTimestamp(refreshExpires),
 						})
 					);
-					console.log(`User ${sub} token was refreshed`);
+					console.log(`User ${sub} token was refreshed.`);
 					ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
-					ctx.body = "O.K.";
+					// ctx.body = "O.K.";
+					ctx.body = {
+						expires_at: expires.toISO(),
+						refresh_expires: refreshExpires.toISO()
+					};
+
 				} catch (e) {
 					console.error("Failed to renew token", e);
 					system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));

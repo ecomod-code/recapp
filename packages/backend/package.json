@@ -48,5 +48,5 @@
 		"start": "ts-node ./src/index.ts",
 		"test": "npm test"
 	},
-	"version": "1.0.1"
+	"version": "1.0.2"
 }

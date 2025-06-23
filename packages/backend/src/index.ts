@@ -116,6 +116,21 @@ const start = async () => {
     app.keys = [process.env.OID_CLIENT_SECRET as string];
     app.use(session({}, app));
     app.use(cors({ credentials: true }));
+    // ─── Protect /Dashboard ──────────────────────────────────
+    app.use(async (ctx, next) => {
+      // Only intercept Dashboard routes
+      if (ctx.path.startsWith("/Dashboard")) {
+        // Pull the bearer cookie that your authRefresh/authProviderCallback set
+        const token = ctx.cookies.get("bearer");
+        if (!token) {
+          // No token → bounce to the login flow
+          ctx.redirect("/auth/login");
+          return;
+        }
+      }
+      await next();
+    });
+    // ────────────────────────────────────────────────────────
     app.use(router.routes());
     app.use(router.allowedMethods());
 

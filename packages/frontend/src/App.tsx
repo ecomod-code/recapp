@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { RequireAuth } from "./components/RequireAuth";
 import { Login } from "./Login";
 import { Dashboard } from "./pages/Dashboard";
 import { useEffect } from "react";
@@ -27,13 +28,22 @@ const router = createBrowserRouter([
     },
     {
         path: "/Dashboard",
-        element: <Root />,
+        // element: <Root />,
+        element: (
+            <RequireAuth>      {/* checks cookie */}
+                <Root />         {/* your layout with <Outlet/> */}
+            </RequireAuth>
+        ),
         // errorElement: <ErrorPage />,
         children: [
             {
-                path: "/Dashboard",
+                index: true,
                 element: <Dashboard />,
             },
+            // {
+            //     path: "/Dashboard",
+            //     element: <Dashboard />,
+            // },
             {
                 path: "/Dashboard/Quiz",
                 element: <QuizPage />,

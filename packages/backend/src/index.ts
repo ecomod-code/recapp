@@ -119,13 +119,19 @@ const start = async () => {
     app.use(router.routes());
     app.use(router.allowedMethods());
 
+    console.log("Registered routes:");
+    router.stack.forEach((layer) => {
+      const names = layer.stack.map(fn => fn.name || "<anonymous>");
+      console.log(`${layer.methods.join(",")} ${layer.path} → [${names.join(", ")}]`);
+    });
+
     const httpServer = app.listen(3123, "0.0.0.0");
 
     const distributor = new WebsocketDistributor(systemName, {
       server: httpServer,
       authenticationMiddleware,
       headers: {
-        Authorization: "apikey="+Container.get<string[]>("api-keys")[0]
+        Authorization: "apikey=" + Container.get<string[]>("api-keys")[0]
       },
     });
     const system = await DistributedActorSystem.create({

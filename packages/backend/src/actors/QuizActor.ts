@@ -111,8 +111,8 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					{ name: `Stats_${uid}`, parent: this.ref, strategy: "Restart" },
 					uid
 				);
-				this.logger.debug(`Stats actor ${stats.name} created`);
-				this.runActors.set(uid, stats);
+                                this.logger.debug(`Stats actor ${stats.name} created`);
+                                this.statisticsActors.set(uid, stats);
 			}
 		} catch (e) {
 			this.logger.error(JSON.stringify(e));

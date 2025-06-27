@@ -309,13 +309,22 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 									combined.statistics = quiz.statistics;
 								}
 							}
-							const quizToUpdate = quizSchema.parse(combined);
-							if (quiz.state && quiz.state !== "STOPPED") {
-								delete quizToUpdate.archived;
-							}
-							await this.storeEntity(quizToUpdate);
-							this.sendUpdateToSubscribers(quizToUpdate);
-							return quizToUpdate;
+                                                        let quizToUpdate: Quiz;
+                                                        try {
+                                                                quizToUpdate = quizSchema.parse(combined);
+                                                        } catch (e) {
+                                                                if (e instanceof Error) {
+                                                                        this.logger.error(e.message);
+                                                                        return serializeError(new Error(e.message));
+                                                                }
+                                                                return serializeError(new Error("Unknown validation error"));
+                                                        }
+                                                        if (quiz.state && quiz.state !== "STOPPED") {
+                                                                delete quizToUpdate.archived;
+                                                        }
+                                                        await this.storeEntity(quizToUpdate);
+                                                        this.sendUpdateToSubscribers(quizToUpdate);
+                                                        return quizToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Quiz not found")));
 					return result;

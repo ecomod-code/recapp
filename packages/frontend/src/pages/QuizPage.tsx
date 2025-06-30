@@ -1,4 +1,7 @@
-import { Fragment, useEffect, useState } from "react";
+// packages/frontend/src/pages/QuizPage.tsx
+
+import { Fragment, useEffect, useState, useRef } from "react";
+import type { Question } from "@recapp/models";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -69,8 +72,11 @@ export const QuizPage: React.FC = () => {
 	const [mbQuiz, tryQuizActor] = useStatefulActor<CurrentQuizState>("CurrentQuiz");
 	const [activeKey, setActiveKey] = useState<TabValue>(DEFAULT_ACTIVE_KEY);
 	const [showError, setShowError] = useState<string>("");
+	// ----- NEW: track loaded questions and retry flag -----
+	const [questionsRefetched, setQuestionsRefetched] = useState(false);
 
 	const deleted = mbQuiz.map(m => m.deleted).orElse(false);
+
 	useEffect(() => {
 		if (deleted) setShowError("quiz-error-quiz-deleted");
 	}, [deleted]);
@@ -237,6 +243,21 @@ export const QuizPage: React.FC = () => {
 		);
 	}
 
+	useEffect(() => {
+		if (quizData && !questionsRefetched) {
+			const expected = quizData.quiz.groups?.[0]?.questions.length ?? 0;
+			const loaded = quizData.questions.length;
+			if (expected > 0 && loaded !== expected) {
+				console.log(
+					`[ConsistencyCheck] Mismatch detected: re-fetch all questions from backend for quiz ${quizData.quiz.uid} – expected ${expected}, got ${loaded}`);
+				tryQuizActor.forEach(actor => {
+					`[ConsistencyCheck] Mismatch detected: re-fetch all questions from backend for quiz ${quizData.quiz.uid} – expected ${expected}, got ${loaded}`
+				});
+				setQuestionsRefetched(true);
+			}
+		}
+	}, [quizData]);
+
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
 		.match(
@@ -310,17 +331,17 @@ export const QuizPage: React.FC = () => {
 					);
 				};
 
-				let participationOptions = 
+				let participationOptions =
 					keys(quizData.quiz.studentParticipationSettings)
-								.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
-								.map(k => k as UserParticipation);
+						.filter(k => !!quizData.quiz.studentParticipationSettings[k as UserParticipation])
+						.map(k => k as UserParticipation);
 				if (isTemporary) {
 					participationOptions = participationOptions.filter(p => p !== "NAME");
 					if (participationOptions.length === 0) {
 						// TODO: Fehler anzeigen. Der Nutzer kann an dem Quiz nicht teilnehmen.
 						return <Container fluid>
 							<h1>Dieses Quiz hat Realnamenzwang. Melde dich bitte ab und mit deinem Uniaccount an.</h1>
-							</Container>;
+						</Container>;
 					}
 				}
 				return (
@@ -407,15 +428,15 @@ export const QuizPage: React.FC = () => {
 														questionText={
 															cmt.relatedQuestion
 																? mbQuiz
-																		.flatMap(q =>
-																			maybe(
-																				q.questions.find(
-																					q => q.uid === cmt.relatedQuestion
-																				)?.text
-																			)
+																	.flatMap(q =>
+																		maybe(
+																			q.questions.find(
+																				q => q.uid === cmt.relatedQuestion
+																			)?.text
 																		)
-																		.orElse("")
-																		.substring(0, 20)
+																	)
+																	.orElse("")
+																	.substring(0, 20)
 																: undefined
 														}
 													/>

@@ -5,7 +5,7 @@ import type { Question } from "@recapp/models";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { User, toId, Comment, Id, QuestionGroup, UserParticipation, isInTeachersList } from "@recapp/models";
+import { User, toId, Comment, Id, QuestionGroup, UserParticipation, isInTeachersList, QuestionActorMessages } from "@recapp/models";
 import { Maybe, maybe, nothing } from "tsmonads";
 import { keys } from "rambda";
 
@@ -249,14 +249,15 @@ export const QuizPage: React.FC = () => {
 			const loaded = quizData.questions.length;
 			if (expected > 0 && loaded !== expected) {
 				console.log(
-					`[ConsistencyCheck] Mismatch detected: re-fetch all questions from backend for quiz ${quizData.quiz.uid} – expected ${expected}, got ${loaded}`);
-				tryQuizActor.forEach(actor => {
 					`[ConsistencyCheck] Mismatch detected: re-fetch all questions from backend for quiz ${quizData.quiz.uid} – expected ${expected}, got ${loaded}`
+				);
+				tryQuizActor.forEach(actor => {
+					actor.send(`${actorUris.QuestionActorPrefix}${quizData.quiz.uid}`, QuestionActorMessages.GetAll());
 				});
 				setQuestionsRefetched(true);
 			}
 		}
-	}, [quizData]);
+	}, [quizData, questionsRefetched, tryQuizActor]);
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))

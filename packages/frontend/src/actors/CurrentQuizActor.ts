@@ -37,6 +37,8 @@ import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
 import { isMultiChoiceAnsweredCorrectly, shuffle } from "../utils";
 import { keys } from "rambda";
+import { d } from "@/utils/debugLog";
+import { hashStudentId } from "@/utils/hash";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -110,6 +112,7 @@ export type CurrentQuizState = {
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
+	private firstListReported = false; // for debugging: emit a single LIST_RESULT when the list goes from 0 → N for the first time.
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
@@ -130,7 +133,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
-		console.log("CURRENTQUIZ MESSAGE", message, this.state);
 		if (message.tag === "QuizUpdateMessage") {
 			if (message.quiz.uid !== this.quiz.orElse(toId("-"))) {
 				return nothing();
@@ -163,11 +165,25 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			});
 			return nothing();
 		} else if (message.tag === "QuestionUpdateMessage") {
+			const quizId = this.state.quiz.uid;
+			const before = this.state.questions.length;
+			let after = before;
+
 			this.updateState(draft => {
 				draft.questions = draft.questions.filter(u => u.uid != message.question.uid);
 				draft.questions.push(message.question as Question);
 				draft.questions.sort((a, b) => a.uid.localeCompare(b.uid));
+				after = draft.questions.length;
 			});
+
+			const delta = after - before;
+			d.wsDelta({ quizId, delta, totalAfter: after });
+
+			if (!this.firstListReported && after > 0) {
+				this.firstListReported = true;
+				d.listRes({ quizId, source: "client", returnedCount: after });
+			}
+
 			return nothing();
 		} else if (message.tag === "QuestionDeletedMessage") {
 			this.updateState(draft => {
@@ -345,9 +361,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									typeof answer === "string"
 										? answer
 										: answer.map(a => {
-												console.log("CLEAN is", a, "will be", a === null ? false : a);
-												return a === null ? false : a;
-											});
+											console.log("CLEAN is", a, "will be", a === null ? false : a);
+											return a === null ? false : a;
+										});
 
 								const answers = [...this.state.run.answers, cleanedAnswers];
 								const question = this.state.questions.find(q => q.uid === questionId)!;
@@ -735,6 +751,13 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										`${actorUris.StatsActorPrefix}${q}`,
 										StatisticsActorMessages.SubscribeToCollection()
 									);
+									// debuggin: confirms the client actually requested the full question set (and with which quizId).
+									d.listReq({
+										quizId: q,
+										transport: "actor",
+										urlOrMsg: "QuestionActor.GetAll",
+										params: { quizId: q }
+									});
 									this.send(`${actorUris.CommentActorPrefix}${q}`, CommentActorMessages.GetAll());
 									this.send(`${actorUris.QuestionActorPrefix}${q}`, QuestionActorMessages.GetAll());
 								});
@@ -742,21 +765,35 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
 								} else {
-									console.log("Sending RUN ", {
-										studentId: this.user.map(u => u.uid).orElse(toId("")),
-										quizId: this.state.quiz.uid,
-									});
-									const run: Error | QuizRun = await this.ask(
-										actorUris.QuizActor,
-										QuizActorMessages.GetUserRun({
-											studentId: this.user.map(u => u.uid).orElse(toId("")),
-											quizId: this.state.quiz.uid,
-										})
-									);
-									console.log("RUN", run);
-									if ((run as Error)?.message !== "No run for user" && Object.keys(run).length > 0) {
-										this.updateState(draft => {
-											draft.result = run as QuizRun;
+									const studentId = this.user.map(u => u.uid).orElse(toId(""));
+									const quizId = this.state.quiz.uid;
+
+									d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "start" });
+
+									try {
+										const run: Error | QuizRun = await this.ask(
+											actorUris.QuizActor,
+											QuizActorMessages.GetUserRun({ studentId, quizId })
+										);
+
+										// Distinguish the “no run” case
+										if ((run as any)?.message === "No run for user") {
+											d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "error", error: "no-run" });
+										} else {
+											d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "ok" });
+
+											if (run && Object.keys(run).length > 0) {
+												this.updateState(draft => {
+													draft.result = run as QuizRun;
+												});
+											}
+										}
+									} catch (e) {
+										d.run({
+											quizId,
+											studentIdHash: hashStudentId(studentId),
+											action: "error",
+											error: String(e)
 										});
 									}
 								}

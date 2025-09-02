@@ -4,6 +4,7 @@ import { Unit, unit } from "itu-utils";
 import { Actor, ActorRef, ActorSystem } from "ts-actors";
 import Axios from "axios";
 import { cookie } from "../utils";
+import { d } from "@/utils/debugLog";
 
 export class TokenActor extends Actor<unknown, Unit> {
   public interval: any;
@@ -16,6 +17,7 @@ export class TokenActor extends Actor<unknown, Unit> {
 
   public override async afterStart(): Promise<void> {
     this.updateToken();
+    d.auth({ ready: false, refresh: "start" });
   }
 
   public override async beforeShutdown(): Promise<void> {
@@ -24,16 +26,22 @@ export class TokenActor extends Actor<unknown, Unit> {
 
   private updateToken = () => {
     const hasToken = !!cookie("bearer");
+    if (!hasToken) {
+      d.auth({ ready: false });       // no cookie yet
+      return;
+    }
     if (hasToken) {
       Axios.get(import.meta.env.VITE_BACKEND_URI + "/auth/refresh", { withCredentials: true })
         .then(response => {
           console.debug("[TokenActor] /auth/refresh response.data:", response.data);
           // assume response.data.expires_at is ISO or epoch-string
           this.expiresAt = new Date(response.data.expires_at);
+          const tokenAgeSec = Math.max(0, Math.round((Date.now() - new Date(response.data.expires_at).getTime()) / 1000));
+          d.auth({ ready: true, refresh: "ok", tokenAgeSec });
           this.scheduleNextUpdate();
         })
         .catch(error => {
-          console.error("[TokenActor] Failed to refresh token:", error);
+          d.auth({ ready: false, refresh: "error" });
           setTimeout(this.updateToken, 5000); // Retry after 5 seconds
         });
     }

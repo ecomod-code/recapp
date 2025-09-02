@@ -4,7 +4,7 @@ import { Unit, unit } from "itu-utils";
 import { Actor, ActorRef, ActorSystem } from "ts-actors";
 import Axios from "axios";
 import { cookie } from "../utils";
-import { d } from "@/utils/debugLog";
+import { d } from "../utils/debugLog";
 
 export class TokenActor extends Actor<unknown, Unit> {
   public interval: any;
@@ -41,6 +41,7 @@ export class TokenActor extends Actor<unknown, Unit> {
           this.scheduleNextUpdate();
         })
         .catch(error => {
+          console.error("[TokenActor] Failed to refresh token:", error);
           d.auth({ ready: false, refresh: "error" });
           setTimeout(this.updateToken, 5000); // Retry after 5 seconds
         });

@@ -37,8 +37,8 @@ import { actorUris } from "../actorUris";
 import unionize, { UnionOf, ofType } from "unionize";
 import { isMultiChoiceAnsweredCorrectly, shuffle } from "../utils";
 import { keys } from "rambda";
-import { d } from "@/utils/debugLog";
-import { hashStudentId } from "@/utils/hash";
+import { d } from "../utils/debugLog";
+import { anonUserKey } from "../utils/hash";
 
 export const CurrentQuizMessages = unionize(
 	{
@@ -768,7 +768,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									const studentId = this.user.map(u => u.uid).orElse(toId(""));
 									const quizId = this.state.quiz.uid;
 
-									d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "start" });
+									d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "start" });
 
 									try {
 										const run: Error | QuizRun = await this.ask(
@@ -778,9 +778,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 										// Distinguish the “no run” case
 										if ((run as any)?.message === "No run for user") {
-											d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "error", error: "no-run" });
+											d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "error", error: "no-run" });
 										} else {
-											d.run({ quizId, studentIdHash: hashStudentId(studentId), action: "ok" });
+											d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "ok" });
 
 											if (run && Object.keys(run).length > 0) {
 												this.updateState(draft => {
@@ -791,7 +791,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									} catch (e) {
 										d.run({
 											quizId,
-											studentIdHash: hashStudentId(studentId),
+											studentIdHash: anonUserKey(studentId),
 											action: "error",
 											error: String(e)
 										});

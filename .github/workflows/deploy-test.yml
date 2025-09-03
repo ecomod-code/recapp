@@ -53,11 +53,17 @@ jobs:
           printf '%s\n' "${{ secrets.TEST_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
+      - name: Probe argv on remote
+        run: |
+          set -euo pipefail
+          echo "Runner sees BRANCH_NAME='$BRANCH_NAME'"
+          ssh "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
+          -- bash -lc 'echo "remote shell: $(bash --version | head -1)"; echo "argc=$#"; printf "argv: 1=<%s> 2=<%s> 3=<%s>\n" "${1-}" "${2-}" "${3-}"' -- "$BRANCH_NAME"
+
       - name: Deploy ${{ env.BRANCH_NAME }} to test server
         run: |
           set -euo pipefail
           echo "➡️ Starting remote deployment of branch '$BRANCH_NAME'"
-          ssh -o StrictHostKeyChecking=no \
-            "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
-            /home/cloud/deploy_recapp_to_test.sh "$BRANCH_NAME"
+          ssh "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
+            -- bash -lc '/home/cloud/deploy_recapp_to_test.sh "$1"' -- "$BRANCH_NAME"
           echo "✅ Remote deployment of branch '$BRANCH_NAME' succeeded"

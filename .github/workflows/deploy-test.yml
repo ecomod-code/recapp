@@ -57,7 +57,7 @@ jobs:
         run: |
           set -euo pipefail
           echo "➡️ Starting remote deployment of branch '$BRANCH_NAME'"
-          ssh -o StrictHostKeyChecking=yes \
+          ssh -o StrictHostKeyChecking=no \
             "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
-            -- bash ~/deployment.sh "$BRANCH_NAME"
+            -- bash ~/deploy_recapp_to_test.sh "$BRANCH_NAME"
           echo "✅ Remote deployment of branch '$BRANCH_NAME' succeeded"

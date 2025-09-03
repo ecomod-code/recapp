@@ -58,11 +58,32 @@ jobs:
           ssh-keyscan -p "$PORT" -t rsa    "$HOST" >> ~/.ssh/known_hosts 2>/dev/null
           chmod 600 ~/.ssh/known_hosts
 
+      - name: Check remote script path
+        run: |
+          set -euo pipefail
+          ssh -p "${{ secrets.TEST_SERVER_PORT || '22' }}" \
+            "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
+            -- /bin/bash --noprofile --norc -c 'set -e; ls -l /home/cloud/recapp_deployment; file /home/cloud/recapp_deployment; head -n1 /home/cloud/recapp_deployment'
+
       - name: Probe argv on remote
         run: |
           set -euo pipefail
           echo "Runner sees BRANCH_NAME='${BRANCH_NAME}'"
           ssh -p "${{ secrets.TEST_SERVER_PORT || '22' }}" \
             "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
-            -- bash --noprofile --norc -c \
-            'echo "remote shell: $(bash --version | head -1)"; echo "argc=$#"; printf "argv: 1=<%s> 2=<%s> 3=<%s>\n" "${1-}" "${2-}" "${3-}"' _ "$BRANCH_NAME"
+            -- /bin/bash --noprofile --norc -c \
+            'echo "remote shell: $(bash --version | head -1)"; echo "argc=$#"; printf "argv: 0=<%s> 1=<%s> 2=<%s>\n" "$0" "${1-}" "${2-}"' \
+            _ "$BRANCH_NAME"
+
+      - name: Deploy ${{ env.BRANCH_NAME }} to test server
+        run: |
+          set -euo pipefail
+          echo "➡️ Starting remote deployment of branch '${BRANCH_NAME}'"
+          ssh -T -p "${{ secrets.TEST_SERVER_PORT || '22' }}" \
+            "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
+            -- /bin/bash --noprofile --norc -s -- "$BRANCH_NAME" <<'REMOTE'
+          set -euo pipefail
+          echo "Remote received branch as \$1=<${1-}>"
+          exec /home/cloud/recapp_deployment "$1"
+          REMOTE
+              echo "✅ Remote deployment of branch '${BRANCH_NAME}' succeeded"

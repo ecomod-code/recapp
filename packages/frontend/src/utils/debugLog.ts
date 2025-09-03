@@ -1,9 +1,58 @@
-import type {
-  LogTag, BaseLog, AuthLog, RunLog, ListRequestLog,
-  ListResultLog, WsLifecycleLog, WsDeltaLog, ConsistencyLog
-} from "@recapp/models/debug/logTypes";
+type LogTag =
+  | "AUTH"
+  | "RUN"
+  | "LIST_REQUEST"
+  | "LIST_RESULT"
+  | "WS_OPEN"
+  | "WS_CLOSE"
+  | "WS_QUESTION_UPDATE"
+  | "CONSISTENCY";
 
-// Gate via Vite env; falls back to NODE_ENV for safety
+type BaseLog = { ts: string; quizId?: string };
+
+type AuthLog = BaseLog & {
+  ready: boolean;
+  tokenAgeSec?: number;
+  refresh?: "start" | "ok" | "error";
+  error?: string;
+};
+
+type RunLog = BaseLog & {
+  studentIdHash?: string;
+  action: "start" | "ok" | "error" | "duplicate-suppressed";
+  error?: string;
+};
+
+type ListRequestLog = BaseLog & {
+  transport: "http" | "actor";
+  urlOrMsg?: string;
+  params?: Record<string, unknown>;
+};
+
+type ListResultLog = BaseLog & {
+  source: "client" | "server";
+  returnedCount: number;
+  params?: Record<string, unknown>;
+  status?: number;
+};
+
+type WsLifecycleLog = BaseLog & {
+  event: "open" | "close";
+  reason?: string;
+};
+
+type WsDeltaLog = BaseLog & {
+  delta: number;
+  totalAfter: number;
+};
+
+type ConsistencyLog = BaseLog & {
+  serverTotal?: number;
+  clientLength: number;
+  loading?: boolean;
+  triggeredRefetch?: boolean;
+};
+
 const enabled =
   (import.meta as any)?.env?.VITE_DEBUG_RECAPP === "1" ||
   (typeof process !== "undefined" && process.env.DEBUG_RECAPP === "1");

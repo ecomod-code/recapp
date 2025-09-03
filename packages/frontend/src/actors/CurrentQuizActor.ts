@@ -765,8 +765,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								if (quizData.state === "STARTED") {
 									this.send(this.ref, CurrentQuizMessages.StartQuiz());
 								} else {
-									const studentId = this.user.map(u => u.uid).orElse(toId(""));
-									const quizId = this.state.quiz.uid;
+									const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
+									const quizId: Id = this.quiz.orElse(toId(""));
 
 									d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "start" });
 

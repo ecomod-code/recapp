@@ -1,37 +1,63 @@
 name: Deploy to Test Server
 
 on:
-  push:
-    branches:
-      - main
-      - 'feature/**'
   workflow_dispatch:
     inputs:
       branch:
-        description: "Branch to deploy"
+        description: "Branch to deploy (e.g., main or feature/x)"
         required: true
+        type: string
         default: main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-test
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    name: Deploy to TEST
     runs-on: ubuntu-latest
+
+    # Optional but recommended: add an environment gate
+    # Create an environment named "test" in Settings → Environments and add required reviewers.
+    environment:
+      name: test
+
     env:
-      BRANCH_NAME: ${{ github.event.inputs.branch || github.head_ref || github.ref_name }}
+      BRANCH_NAME: ${{ inputs.branch }}
+
     steps:
+      - name: Validate branch exists on GitHub
+        run: |
+          set -euo pipefail
+          if ! git ls-remote --heads \
+              "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}" \
+              "$BRANCH_NAME" | grep -q "refs/heads/$BRANCH_NAME$"; then
+            echo "❌ Branch '$BRANCH_NAME' not found in ${{ github.repository }}"
+            exit 1
+          fi
+          echo "✅ Branch '$BRANCH_NAME' exists"
+
       - name: Set up SSH agent
-        uses: webfactory/ssh-agent@v0.7.0
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.TEST_SSH_PRIVATE_KEY }}
 
       - name: Add test server to known_hosts
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.TEST_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 700 ~/.ssh
+          printf '%s\n' "${{ secrets.TEST_SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Deploy ${{ env.BRANCH_NAME }} to test server
         run: |
-          echo "➡️ Starting remote deployment of branch $BRANCH_NAME"
-          ssh -o StrictHostKeyChecking=no \
-            ${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }} \
-            "export BRANCH_NAME='${BRANCH_NAME}'; bash ~/deploy_recapp_to_test.sh '${BRANCH_NAME}'"
-          echo "✅ Remote deployment of branch $BRANCH_NAME succeeded"
+          set -euo pipefail
+          echo "➡️ Starting remote deployment of branch '$BRANCH_NAME'"
+          ssh -o StrictHostKeyChecking=yes \
+            "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
+            -- bash ~/deployment.sh "$BRANCH_NAME"
+          echo "✅ Remote deployment of branch '$BRANCH_NAME' succeeded"

@@ -64,7 +64,8 @@ jobs:
           echo "Runner sees BRANCH_NAME='${BRANCH_NAME}'"
           ssh -p "${{ secrets.TEST_SERVER_PORT || '22' }}" \
             "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
-            -- bash -lc 'echo "remote shell: $(bash --version | head -1)"; echo "argc=$#"; printf "argv: 1=<%s> 2=<%s> 3=<%s>\n" "${1-}" "${2-}" "${3-}"' -- "$BRANCH_NAME"
+            -- bash --noprofile --norc -c \
+            'echo "remote shell: $(bash --version | head -1)"; echo "argc=$#"; printf "argv: 1=<%s> 2=<%s> 3=<%s>\n" "${1-}" "${2-}" "${3-}"' _ "$BRANCH_NAME"
 
       - name: Deploy ${{ env.BRANCH_NAME }} to test server
         run: |
@@ -72,5 +73,6 @@ jobs:
           echo "➡️ Starting remote deployment of branch '${BRANCH_NAME}'"
           ssh -p "${{ secrets.TEST_SERVER_PORT || '22' }}" \
             "${{ secrets.TEST_SERVER_USER }}@${{ secrets.TEST_SERVER_HOST }}" \
-            -- bash -lc '/home/cloud/deploy_recapp_to_test.sh "$1"' -- "$BRANCH_NAME"
+            -- bash --noprofile --norc -c \
+            '/home/cloud/recapp_deployment "$1"' _ "$BRANCH_NAME"
           echo "✅ Remote deployment of branch '${BRANCH_NAME}' succeeded"

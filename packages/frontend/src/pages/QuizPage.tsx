@@ -243,10 +243,16 @@ export const QuizPage: React.FC = () => {
 		);
 	}
 
+	const runReady = mbQuiz.map(q => q.runReady).orElse(false);
+	const hasInitialQuestions = mbQuiz.map(q => q.hasInitialQuestions).orElse(false);
+
 	useEffect(() => {
-		if (quizData && !questionsRefetched) {
-			const expected = quizData.quiz.groups?.[0]?.questions.length ?? 0;
-			const loaded = quizData.questions.length;
+		// Don’t compare or refetch until run exists and first questions arrived
+		if (!quizData || !runReady || !hasInitialQuestions || questionsRefetched) return;
+
+		const expected = quizData.quiz.groups?.[0]?.questions.length ?? 0;
+		const loaded = quizData.questions.length;
+		if (expected > 0 && loaded !== expected) {
 			if (expected > 0 && loaded !== expected) {
 				console.log(
 					`[ConsistencyCheck] Mismatch detected: re-fetch all questions from backend for quiz ${quizData.quiz.uid} – expected ${expected}, got ${loaded}`
@@ -257,7 +263,7 @@ export const QuizPage: React.FC = () => {
 				setQuestionsRefetched(true);
 			}
 		}
-	}, [quizData, questionsRefetched, tryQuizActor]);
+	}, [quizData, runReady, hasInitialQuestions, questionsRefetched, tryQuizActor]);
 
 	return mbQuiz
 		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
@@ -272,6 +278,18 @@ export const QuizPage: React.FC = () => {
 				};
 
 				console.log("TL", isUserInTeachersList, quizData.quiz.previewers);
+
+				const runReady = !!quizData.runReady;
+				const hasInitialQuestions = !!quizData.hasInitialQuestions;
+
+				if (!runReady || !hasInitialQuestions) {
+					// Lightweight “syncing” UI — keeps users from seeing “0” briefly
+					return (
+						<div className="text-sm opacity-70">
+							syncing…
+						</div>
+					);
+				}
 
 				const run = quizData.run;
 				const qData = quizData.questions;

@@ -107,6 +107,9 @@ export type CurrentQuizState = {
 	result?: QuizRun;
 	exportFile?: string;
 	deleted: boolean;
+	runReady: boolean;
+	hasInitialQuestions: boolean;
+	questionsSubscribed: boolean;
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
@@ -129,6 +132,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			run: undefined,
 			exportFile: undefined,
 			deleted: false,
+			runReady: false,
+			hasInitialQuestions: false,
+			questionsSubscribed: false,
 		};
 	}
 
@@ -181,6 +187,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 			if (!this.firstListReported && after > 0) {
 				this.firstListReported = true;
+				this.updateState(s => { s.hasInitialQuestions = true; });
 				d.listRes({ quizId, source: "client", returnedCount: after });
 			}
 
@@ -298,16 +305,40 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								draft.run = undefined;
 								draft.exportFile = undefined;
 								draft.deleted = false;
+								draft.runReady = false;
+								draft.hasInitialQuestions = false;
+								draft.questionsSubscribed = false;
 							});
 							return unit();
 						},
 						GetRun: async () => {
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
 							const quizId: Id = this.quiz.orElse(toId(""));
+
+							// structured RUN start
+							d.run({ quizId, studentIdHash: anonUserKey(String(studentId), String(quizId)), action: "start" });
+
+							// build question ids from quiz metadata (groups → questions)
+							const questionIds: Id[] = (this.state.quiz?.groups ?? [])
+								.reduce((acc, g) => [...acc, ...(g.questions ?? [])], [] as Id[]);
+
+							// IMPORTANT: quiz-scoped run actor (prefix + quizId), and use GetForUser (get-or-create)
 							const run = await this.ask(
-								actorUris.QuizActor,
-								QuizActorMessages.GetUserRun({ studentId, quizId })
+								`${actorUris.QuizRunActorPrefix}${quizId}`,
+								QuizRunActorMessages.GetForUser({ studentId, questions: questionIds })
 							);
+
+							d.run({ quizId, studentIdHash: anonUserKey(String(studentId), String(quizId)), action: "ok" });
+							this.updateState(s => { s.run = run as QuizRun; s.runReady = true; });
+
+							// Subscribe & fetch questions exactly once, AFTER run is ready
+							if (!this.state.questionsSubscribed) {
+								this.updateState(s => { s.questionsSubscribed = true; });
+								this.send(`${actorUris.QuestionActorPrefix}${quizId}`, QuestionActorMessages.SubscribeToCollection());
+								d.listReq({ quizId, transport: "actor", urlOrMsg: "QuestionActor.GetAll", params: { quizId } });
+								this.send(`${actorUris.QuestionActorPrefix}${quizId}`, QuestionActorMessages.GetAll());
+							}
+
 							return run as QuizRun;
 						},
 						Activate: async ({ userId, quizId }) => {

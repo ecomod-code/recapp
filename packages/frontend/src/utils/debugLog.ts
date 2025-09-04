@@ -54,8 +54,8 @@ type ConsistencyLog = BaseLog & {
 };
 
 const enabled =
-  (import.meta as any)?.env?.VITE_DEBUG_RECAPP === "1" ||
-  (typeof process !== "undefined" && process.env.DEBUG_RECAPP === "1");
+  import.meta.env.VITE_DEBUG_RECAPP === "1" ||
+  localStorage.DEBUG_RECAPP === "1";  // runtime switch
 
 export function dlog<T extends BaseLog>(
   tag: LogTag,
@@ -64,6 +64,7 @@ export function dlog<T extends BaseLog>(
   if (!enabled) return;
   const line = { tag, ts: new Date().toISOString(), ...payload };
   // eslint-disable-next-line no-console
+  ((window as any).DEBUG_LOGS ||= []).push(line);
   console.info(JSON.stringify(line));
 }
 

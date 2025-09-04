@@ -18,6 +18,8 @@ COPY packages/models ./packages/models
 
 ENV VITE_API_URL=${FRONTEND_URI}
 ENV VITE_APP_URL=${BACKEND_URI}
+ARG VITE_DEBUG_RECAPP=0
+ENV VITE_DEBUG_RECAPP=$VITE_DEBUG_RECAPP
 
 RUN cd packages/frontend && npm run build
 

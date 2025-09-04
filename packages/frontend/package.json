@@ -1,7 +1,7 @@
 {
 	"name": "@recapp/frontend",
 	"private": true,
-	"version": "1.6.5",
+	"version": "1.6.5-testing",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",

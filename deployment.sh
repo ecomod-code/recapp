@@ -10,7 +10,7 @@
 
 set -euo pipefail
 
-BRANCH="${1:-main}"
+BRANCH="${1:?Usage: deployment.sh <branch>}"
 
 # Define log file and rotation parameters
 # The log file will be stored in the user's home directory.

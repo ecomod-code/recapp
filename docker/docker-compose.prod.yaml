@@ -1,5 +1,4 @@
 # docker-compose.prod.yaml (Production configuration)
-version: "3.8"
 
 services:
   frontend:
@@ -10,9 +9,11 @@ services:
         - VITE_API_URL=${BACKEND_URI:-http://localhost:3123}
         - VITE_APP_URL=${FRONTEND_URI:-http://localhost:5173}
         - VITE_INACTIVITY_LIMIT=1
+        - VITE_DEBUG_RECAPP=1 # change to 0 for production
     environment:
       - FRONTEND_URI=${FRONTEND_URI}
       - BACKEND_URI=${BACKEND_URI}
+      - VITE_DEBUG_RECAPP=1 # change to 0 for production
     ports:
       - "5173:80"
     depends_on:
@@ -40,6 +41,7 @@ services:
       - MONGODB_HOST=recapp-db
       - MONGODB_PORT=${MONGODB_PORT}
       - JWT_SECRET=${JWT_SECRET}
+      - DEBUG_RECAPP=1 # change to 0 for prod
 
     depends_on:
       - recapp-db

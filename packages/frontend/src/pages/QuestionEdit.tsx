@@ -73,6 +73,9 @@ export const QuestionEdit: React.FC = () => {
 		exportFile: undefined,
 		deleted: false,
 		isPresentationModeActive: false,
+		runReady: false,
+		hasInitialQuestions: false,
+		questionsSubscribed: false,
 	});
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
@@ -138,7 +141,7 @@ export const QuestionEdit: React.FC = () => {
 	const currentQuestionIndex = questionsIds.findIndex(x => x === currentQuestionId);
 	const isLastQuestion = currentQuestionIndex >= questionsIds.length - 1;
 
-	console.log("LOCATION state", state, "QUIZ", quiz);	
+	console.log("LOCATION state", state, "QUIZ", quiz);
 
 	const isUserInTeachersList = quiz?.quiz && keys(quiz?.quiz).length > 0 && userId ? isInTeachersList(quiz.quiz, userId) : false;
 	const isUserInStudentsList = quiz?.quiz && keys(quiz?.quiz).length > 0 && userId ? isInStudentList(quiz.quiz, userId) : true;
@@ -239,13 +242,13 @@ export const QuestionEdit: React.FC = () => {
 	const [showMDModal, setShowMDModal] = useState({ type: "", titleId: "" });
 	const [showTextModal, setShowTextModal] = useState({ property: "", titleId: "", editorText: "" });
 
-	const confirmBeforeLeaving = (callBack: ()=> void)=> {
+	const confirmBeforeLeaving = (callBack: () => void) => {
 		if (!checkIsQuestionChanged() || confirm("Changes that you made may not be saved.")) {
 			callBack();
 		}
 	};
 
-	const checkIsQuestionChanged = ()=> {
+	const checkIsQuestionChanged = () => {
 		const isQuestionChanged = (Object.keys(question) as (keyof QuestionState)[]).some((key) => {
 			return JSON.stringify(question[key]) !== JSON.stringify(defaultQuestion[key]);
 		});
@@ -253,21 +256,21 @@ export const QuestionEdit: React.FC = () => {
 		return isQuestionChanged;
 	};
 
-    useEffect(() => {
+	useEffect(() => {
 		const isQuestionChanged = checkIsQuestionChanged();
-        if (!isQuestionChanged) return;
+		if (!isQuestionChanged) return;
 
-        const handleOnBeforeUnload = (event: BeforeUnloadEvent) => {
-            event.preventDefault();
-            event.returnValue = "";
-            return "";
-        };
-        window.addEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+		const handleOnBeforeUnload = (event: BeforeUnloadEvent) => {
+			event.preventDefault();
+			event.returnValue = "";
+			return "";
+		};
+		window.addEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
 
-        return () => {
-            window.removeEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
-        };
-    }, [question]);
+		return () => {
+			window.removeEventListener("beforeunload", handleOnBeforeUnload, { capture: true });
+		};
+	}, [question]);
 
 	const handleClose = () => {
 		setShowMDModal({ type: "", titleId: "" });
@@ -353,7 +356,7 @@ export const QuestionEdit: React.FC = () => {
 	};
 
 	const onCancelClick = () => {
-		confirmBeforeLeaving(()=> {
+		confirmBeforeLeaving(() => {
 			resetQuestionEditModeFlag();
 			nav(-1);
 		});
@@ -392,7 +395,7 @@ export const QuestionEdit: React.FC = () => {
 						quizQuestion.authorName = userData.username;
 					}
 				},
-				() => {}
+				() => { }
 			);
 
 			tryQuizActor.forEach(actor => {
@@ -581,7 +584,7 @@ export const QuestionEdit: React.FC = () => {
 					<Breadcrumb>
 						<Breadcrumb.Item
 							onClick={() => {
-								confirmBeforeLeaving(()=> {
+								confirmBeforeLeaving(() => {
 									resetQuestionEditModeFlag();
 									nav({ pathname: "/Dashboard" });
 								});
@@ -593,7 +596,7 @@ export const QuestionEdit: React.FC = () => {
 							className="text-overflow-ellipsis"
 							style={{ maxWidth: 400 }}
 							onClick={() => {
-								confirmBeforeLeaving(()=> {
+								confirmBeforeLeaving(() => {
 									resetQuestionEditModeFlag();
 									nav(
 										{ pathname: "/Dashboard/quiz" },
@@ -650,7 +653,7 @@ export const QuestionEdit: React.FC = () => {
 											onUpvote={() => upvoteComment(cmt.uid)}
 											onAccept={() => finishComment(cmt.uid)}
 											onDelete={() => deleteComment(cmt.uid)}
-											onJumpToQuestion={() => {}}
+											onJumpToQuestion={() => { }}
 										/>
 									</div>
 								))
@@ -955,7 +958,7 @@ export const QuestionEdit: React.FC = () => {
 
 								<div className="mt-4 pb-1 d-flex gap-2 flex-column flex-lg-row align-items-lg-center justify-content-between">
 
-                  {question.type === "SINGLE" && <Trans id="activate-all-correct-answers" />}
+									{question.type === "SINGLE" && <Trans id="activate-all-correct-answers" />}
 									{question.type === "MULTIPLE" && <Trans id="activate-correct-answer" />}
 
 									<div className="d-flex flex-row flex-wrap">

@@ -283,18 +283,18 @@ export const QuizPage: React.FC = () => {
 				const hasInitialQuestions = !!quizData.hasInitialQuestions;
 				const isQuizStateStarted = quizData.quiz.state === "STARTED";
 
-				if (!isQuizStateStarted) {
-					return <div className="text-sm opacity-70">The quiz hasn’t started yet.</div>;
-				}
+				// if (!isQuizStateStarted) {
+				// 	return <div className="text-sm opacity-70">The quiz hasn’t started yet.</div>;
+				// }
 
-				if (!runReady || !hasInitialQuestions) {
-					// Lightweight “syncing” UI — keeps users from seeing “0” briefly
-					return (
-						<div className="text-sm opacity-70">
-							Fetching questions...
-						</div>
-					);
-				}
+				// if (!runReady || !hasInitialQuestions) {
+				// 	// Lightweight “syncing” UI — keeps users from seeing “0” briefly
+				// 	return (
+				// 		<div className="text-sm opacity-70">
+				// 			Fetching questions...
+				// 		</div>
+				// 	);
+				// }
 
 				const run = quizData.run;
 				const qData = quizData.questions;runReady

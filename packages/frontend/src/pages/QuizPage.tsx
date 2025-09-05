@@ -281,18 +281,23 @@ export const QuizPage: React.FC = () => {
 
 				const runReady = !!quizData.runReady;
 				const hasInitialQuestions = !!quizData.hasInitialQuestions;
+				const isQuizStateStarted = quizData.quiz.state === "STARTED";
+
+				if (!isQuizStateStarted) {
+					return <div className="text-sm opacity-70">The quiz hasn’t started yet.</div>;
+				}
 
 				if (!runReady || !hasInitialQuestions) {
 					// Lightweight “syncing” UI — keeps users from seeing “0” briefly
 					return (
 						<div className="text-sm opacity-70">
-							syncing…
+							Fetching questions...
 						</div>
 					);
 				}
 
 				const run = quizData.run;
-				const qData = quizData.questions;
+				const qData = quizData.questions;runReady
 				const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 				const currentQuestion = questions[run?.counter ?? 0];
 				const questionId = currentQuestion?.uid ?? toId("");
@@ -309,7 +314,6 @@ export const QuizPage: React.FC = () => {
 				// const userRole = localUser.map(u => u.role).orElse("STUDENT");
 				const isQuizCompleted = (quizData.run?.counter ?? 0) >= (quizData.run?.questions.length ?? 0);
 
-				const isQuizStateStarted = quizData.quiz.state === "STARTED";
 				const isStudentCommentsAllowed = quizData.quiz.studentComments;
 				const showCommentSection = isUserInTeachersList || (isQuizStateStarted && isStudentCommentsAllowed);
 

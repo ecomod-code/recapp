@@ -45,10 +45,16 @@ copied and pasted into a new test file (test-name.spec.ts).
 
 
 ### Running a Playwright test locally
-To run a test locally, the command `npx playwright test --headed` can be executed.  The tag `--headed` means that a physical 
-webpage will be opened during a test, so that the test operations can be viewed as the process runs. The command defaults to
-a headless test, meaning no visual webpage appears on the screen during a test run, and everything is instead being run 
-essentially "behind the scenes".
+To run a test locally, the command `npx playwright test [test_file_name.ts] --headed` can be executed.  The tag `--headed` means
+that a physical webpage will be opened during a test, so that the test operations can be viewed as the process runs. The command
+defaults to a headless test, meaning no visual webpage appears on the screen during a test run, and everything is instead being
+run essentially "behind the scenes". The test file name refers to the name of the .ts file containing the test actions of the 
+targetted test. 
+
+Additionally, multiple test files can be executed at once. This can be done by listing them in the command followed by a space. 
+For example: `npx playwright test [test_file_name_1.ts] [test_file_name_2.ts] --headed` 
+
+To run all created test files at once, the test file name can be left out of the command: `npx playwright test --headed`.
 
 To ensure a trace file is generated upon test execution, the tag `--trace on` can be added to the playwright test command. The 
 trace file will then be generated within `tests/e2e/test-artifacts` within the directory of the respective test. 

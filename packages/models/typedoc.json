@@ -1,6 +1,0 @@
-{
-  "entryPoints": ["src/index.ts"],
-  "out": "docs/models",
-  "tsconfig": "tsconfig.json",
-  "includeVersion": true
-}

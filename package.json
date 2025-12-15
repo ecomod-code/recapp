@@ -27,7 +27,8 @@
 		"stop:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml down",
 		"bootstrap": "lerna bootstrap",
 		"dev": "lerna run dev",
-		"build": "lerna run build"
+		"build": "lerna run build",
+		"docs": "typedoc"
 	},
 	"devDependencies": {
 		"typedoc": "^0.28.15"

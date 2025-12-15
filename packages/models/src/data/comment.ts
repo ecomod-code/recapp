@@ -1,6 +1,13 @@
 import zod from "zod";
 import { idEntitySchema, uidSchema } from "./base";
 
+
+/**
+ * Convert a plain string (e.g. from user input or DB) into an `Id`.
+ *
+ * Note: This does not validate the string, it only adds the `Id` type brand.
+ * Use `uidSchema.parse(...)` if you want runtime validation.
+ */
 export const commentSchema = zod
 	.object({
 		authorId: uidSchema, // WHo wrote this query

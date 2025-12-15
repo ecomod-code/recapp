@@ -11,8 +11,21 @@ export const timestampSchema = zod
 
 /** UID type */
 export const uidSchema = zod.string().brand("UID");
+
+/**
+ * A unique identifier for entities stored in Recapp.
+ *
+ * This is a branded string type: at runtime it's a string,
+ * but the TypeScript type system treats it as distinct from plain strings.
+ */
 export type Id = zod.infer<typeof uidSchema>;
 
+/**
+ * Convert a plain string (e.g. from user input or DB) into an `Id`.
+ *
+ * Note: This does not validate the string, it only adds the `Id` type brand.
+ * Use `uidSchema.parse(...)` if you want runtime validation.
+ */
 export const toId = (idString: string): Id => idString as Id;
 
 /** Actor or actor system uri */

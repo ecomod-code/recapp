@@ -28,5 +28,8 @@
 		"bootstrap": "lerna bootstrap",
 		"dev": "lerna run dev",
 		"build": "lerna run build"
+	},
+	"devDependencies": {
+		"typedoc": "^0.28.15"
 	}
 }

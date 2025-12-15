@@ -1,0 +1,75 @@
+name: Build & Deploy Docs to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22" # or whatever you use in the project
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build API docs for models
+        run: |
+          cd packages/models
+          npm run docs
+
+      - name: Prepare site folder
+        run: |
+          mkdir -p site/api
+          cp -r packages/models/docs/models/* site/api/
+
+          # Optional: placeholder index.html at root for now
+          cat > site/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <title>Recapp Docs</title>
+          </head>
+          <body>
+            <h1>Recapp Documentation</h1>
+            <ul>
+              <li><a href="api/">API Reference (models)</a></li>
+              <!-- Later add: <li><a href="manual/">User Manual</a></li> -->
+            </ul>
+          </body>
+          </html>
+          EOF
+
+      - name: Upload artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

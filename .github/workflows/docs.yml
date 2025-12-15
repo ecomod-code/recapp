@@ -1,4 +1,4 @@
-name: Build & Deploy Developer Docs
+name: Build & Deploy Docs to GitHub Pages
 
 on:
   push:
@@ -67,7 +67,6 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

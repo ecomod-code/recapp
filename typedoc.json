@@ -1,0 +1,31 @@
+{
+  "entryPointStrategy": "expand",
+  "entryPoints": [
+    "packages/models/src",
+    "packages/backend/src",
+    "packages/frontend/src"
+  ],
+
+  "out": "docs/api",
+  "name": "Recapp Code Reference",
+  "tsconfig": "tsconfig.json",
+  "skipErrorChecking": true,
+
+  "externalSymbolLinkMappings": {
+    "ts-actors": {
+      "Actor.ask": "https://github.com/hbel/ts-actors/blob/master/src/Actor.ts#L187" 
+    }
+  },
+
+  "exclude": [
+    "**/test/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
+  ],
+
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "excludeProtected": false
+}

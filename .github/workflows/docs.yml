@@ -32,27 +32,27 @@ jobs:
 
       - name: Build developer docs (all packages)
         run: npm run docs
-
       - name: Prepare site root (landing page)
         run: |
           # Create index.html at site root if it doesn't exist
           if [ ! -f docs/index.html ]; then
             mkdir -p docs
             cat > docs/index.html << 'EOF'
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<title>Recapp Documentation</title>
-</head>
-<body>
-<h1>Recapp Documentation</h1>
-<ul>
-<li><a href="api/">Recapp Code Reference (models, backend, frontend)</a></li>
-</ul>
-</body>
-</html>
-EOF
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <title>Recapp Documentation</title>
+            </head>
+            <body>
+              <h1>Recapp Documentation</h1>
+              <ul>
+                <li><a href="api/">Recapp Code Reference (models, backend, frontend)</a></li>
+                <!-- Later: <li><a href="manual/">User Manual</a></li> -->
+              </ul>
+            </body>
+            </html>
+            EOF
           fi
 
       - name: Upload artifact for GitHub Pages

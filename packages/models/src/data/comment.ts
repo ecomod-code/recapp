@@ -3,21 +3,29 @@ import { idEntitySchema, uidSchema } from "./base";
 
 
 /**
- * Convert a plain string (e.g. from user input or DB) into an `Id`.
+ * Schema and type for comments attached to a quiz or a specific question.
  *
- * Note: This does not validate the string, it only adds the `Id` type brand.
- * Use `uidSchema.parse(...)` if you want runtime validation.
+ * A comment is typically created by a student during a quiz run. It is
+ * associated with:
+ * - the author (`authorId`, `authorName`),
+ * - a quiz (`relatedQuiz`),
+ * - optionally a single question (`relatedQuestion`).
+ *
+ * Comments can be upvoted by other students and marked as answered by
+ * the teacher. Common entity fields like `uid`, `created`, and `updated`
+ * are merged in via `idEntitySchema`.
  */
 export const commentSchema = zod
 	.object({
-		authorId: uidSchema, // WHo wrote this query
-		authorName: zod.string(), // Which name to display with the query
-		text: zod.string(), // Query text
-		upvoters: zod.array(uidSchema), // Who upvoted the query
-		answered: zod.boolean(), // Was the query marked as answered by the teacher
-		relatedQuiz: uidSchema, // Relation to the quiz the comment was made on
-		relatedQuestion: uidSchema.optional(), // Optional relation to question if comment was generated from there
+		authorId: uidSchema, // Who wrote this query
+		authorName: zod.string(), // Name to display with the comment
+		text: zod.string(), // Comment text
+		upvoters: zod.array(uidSchema), // Users who upvoted the comment
+		answered: zod.boolean(), // Was the comment marked as answered by the teacher (quiz owner)
+		relatedQuiz: uidSchema, // Quiz the comment was made on
+		relatedQuestion: uidSchema.optional(), // Optional question the comment refers to
 	})
 	.merge(idEntitySchema);
 
+/** Type alias for comments, inferred from `commentSchema`. */
 export type Comment = zod.infer<typeof commentSchema>;

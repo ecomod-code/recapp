@@ -2,6 +2,15 @@ import zod from "zod";
 import { timestampSchema, uidSchema } from "./base";
 import { userRoleSchema } from "./user";
 
+/**
+ * Schema and type for browser/device fingerprints.
+ *
+ * A fingerprint ties an anonymous/temporary account to a browser instance.
+ * The `uid` field contains the fingerprint string itself. Additional fields
+ * track when the fingerprint was first seen, last used, how often it was
+ * used, whether it is blocked, which user it is associated with and an
+ * optional initial quiz.
+ */
 export const fingerprintSchema = zod.object({
 	uid: uidSchema, // This is also the fingerprint string itself
 	created: timestampSchema,
@@ -15,6 +24,17 @@ export const fingerprintSchema = zod.object({
 
 export type Fingerprint = zod.infer<typeof fingerprintSchema>;
 
+
+/**
+ * Schema and type for authenticated sessions.
+ *
+ * A session represents a logged-in user, including:
+ * - OpenID Connect tokens (`idToken`, `accessToken`, `refreshToken`),
+ * - token expiry times,
+ * - the associated user id and role,
+ * - the actor system identifier used by the frontend,
+ * - optional fingerprint and cookie configuration for temporary accounts.
+ */
 export const sessionSchema = zod.object({
 	idToken: zod.string(),
 	accessToken: zod.string(),

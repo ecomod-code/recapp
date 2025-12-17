@@ -22,6 +22,8 @@ See also our [Installation Guide](INSTALLATION.de.md) (at the moment, German onl
 Maintainers and contributors must follow this repository’s [CODE OF
 CONDUCT](CODE_OF_CONDUCT.md).
 
+Feel free to have a look at Recapp's [code reference](https://ecomod-code.github.io/recapp/api/).
+
 ## ENTWICKLUNG UND FÖRDERUNG
 
 Die Entwicklung von RECAPP wurde mit Mitteln des Niedersächsischen Ministeriums für Wissenschaft und Kultur gefördert. Die initiale Entwicklung erfolgte an der Georg-August-Universität Göttingen.

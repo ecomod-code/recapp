@@ -29,7 +29,7 @@
           - tab "Quiz questions" [selected] [ref=e39] [cursor=pointer]
         - tabpanel "Quiz questions" [ref=e41]:
           - generic [ref=e43]:
-            - strong [ref=e46]: Question 1 / 6
+            - strong [ref=e46]: Question 2 / 6
             - paragraph [ref=e49]: This is a test question.
             - generic [ref=e50]:
               - generic [ref=e51]:

@@ -52,17 +52,24 @@ run essentially "behind the scenes". The test file name refers to the name of th
 targetted test. 
 
 Additionally, multiple test files can be executed at once. This can be done by listing them in the command followed by a space. 
-For example: `npx playwright test [test_file_name_1.ts] [test_file_name_2.ts] --headed` 
-
+For example: `npx playwright test [test_file_name_1.ts] [test_file_name_2.ts]` 
+ 
 To run all created test files at once, the test file name can be left out of the command: `npx playwright test --headed`.
 
 To ensure a trace file is generated upon test execution, the tag `--trace on` can be added to the playwright test command. The 
 trace file will then be generated within `tests/e2e/test-artifacts` within the directory of the respective test. 
 
+To run multiple playwright tests in parallel, the tag `--fully-parallel` can  be added to the test command along with the 
+`--repeat-each [#]` tag. This ensures that a specified number of tests are run and they are all being run in parallel instead of
+sequentially. If multiple test files are specified in a test command, the `--repeat-each` tag will apply to each test. For example:
+`npx playwright test test1.ts test2.ts --repeat-each 5 --fully-parallel` will cause 10 workers to carry out 10 tests in total
+(5 workers for test1 and 5 workers for test2), all still being run in parallel.
 
 ### Viewing test reports
 The simplest and most uniform way to view playwright test reports is done using the command `npx playwright show-report test-report`. 
-Once again, this command must be run within the `tests/e2e` directory, like all other playwright commands.
+Once again, this command must be run within the `tests/e2e` directory, like all other playwright commands. All data for the resulting
+test is stored temporarily in the `test-report` directory, found within the `e2e` directory. Each time a new test is run, the 
+`test-report` file gets updated with contents from the most recent test.
 
 If desired, the user can view tests from the repository root with the command `npx playwright show-report tests/e2e/test-report`. 
 
@@ -73,7 +80,6 @@ directory location (`e2e/test-report` instead).
 To view trace files from previously executed tests, the following command can be executed: `npx playwright show-trace [filepath]`.
 The trace files are located within `test-artifacts/[test name]/trace.zip`. The test name may vary slightly from the name of the 
 respective .ts file. In order to correctly open the trace file, `trace.zip` must be included in the file path of the trace files.  
-
 Once the `show-trace` command is executed, a new window will open, showing the user the contents of the tracefile. 
 
 

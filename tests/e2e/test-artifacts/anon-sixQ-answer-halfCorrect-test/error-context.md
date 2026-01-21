@@ -15,7 +15,7 @@
         - list [ref=e19]:
           - listitem [ref=e20]:
             - button "Dashboard" [ref=e21] [cursor=pointer]
-          - listitem [ref=e22]: / Playwright Test Quiz
+          - listitem [ref=e22]: / Test Quiz Playwright
       - button "Show/hide comments" [ref=e25] [cursor=pointer]:
         - img [ref=e26]
         - text: Show/hide comments
@@ -26,9 +26,8 @@
         - tablist [ref=e37]:
           - tab "Quiz data" [ref=e38] [cursor=pointer]
           - tab "Quiz questions" [selected] [ref=e39] [cursor=pointer]
-          - tab "Statistical evaluation" [ref=e40] [cursor=pointer]
         - generic:
           - tabpanel "Quiz questions"
-  - contentinfo [ref=e42]:
-    - generic [ref=e43]: 1.6.5-OHT-002
+  - contentinfo [ref=e41]:
+    - generic [ref=e42]: 1.6.5-OHT-002
 ```

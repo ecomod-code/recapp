@@ -20,6 +20,11 @@ services:
       - backend
 
   backend:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
     build:
       context: ..
       dockerfile: packages/backend/Dockerfile
@@ -41,7 +46,7 @@ services:
       - MONGODB_HOST=recapp-db
       - MONGODB_PORT=${MONGODB_PORT}
       - JWT_SECRET=${JWT_SECRET}
-      - DEBUG_RECAPP=1 # change to 0 for prod
+      - DEBUG_RECAPP=0 # change to 0 for prod
 
     depends_on:
       - recapp-db

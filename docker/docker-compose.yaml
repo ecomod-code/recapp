@@ -1,8 +1,11 @@
 # Base configuration - what we need in dev and prod
-version: "3.8"
-
 services:
   recapp-db:
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
     restart: always
     image: mongo:6
     volumes:

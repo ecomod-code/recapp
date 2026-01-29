@@ -45,10 +45,20 @@ sudo docker compose --env-file .env.production -f docker/docker-compose.yaml -f 
 log "Bringing services up (recreate if needed)..."
 sudo docker compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml up -d 2>&1 | tee -a "$LOG_FILE"
 
-log "Health check backend..."
-# Adjust URL/port for your setup:
-if ! curl -fsS "http://127.0.0.1:3123/ping" >/dev/null 2>&1; then
-  log "ERROR: Backend health check failed."
+log "Health check backend (wait up to 60s)..."
+
+ok=0
+for i in {1..30}; do
+  if curl -fsS --max-time 2 "http://127.0.0.1:3123/ping" >/dev/null; then
+    ok=1
+    break
+  fi
+  sleep 2
+done
+
+if [[ "$ok" -ne 1 ]]; then
+  log "ERROR: Backend health check failed after retries."
+  sudo docker logs --tail 200 docker-backend-1 2>&1 | tee -a "$LOG_FILE"
   exit 1
 fi
 

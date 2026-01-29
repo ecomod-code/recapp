@@ -2,6 +2,7 @@
 
 services:
   frontend:
+    restart: unless-stopped
     build:
       context: ..
       dockerfile: packages/frontend/Dockerfile
@@ -20,6 +21,7 @@ services:
       - backend
 
   backend:
+    restart: unless-stopped
     logging:
       driver: "json-file"
       options:

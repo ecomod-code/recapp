@@ -13,6 +13,7 @@ export const QuizActorMessages = unionize(
 			userRole: UserRole | undefined;
 		}>(), // Import the json with the given filename
 		Update: ofType<Partial<Quiz> & { uid: Id }>(), // Update quiz data, answers updated Quiz
+		UnstallQuestions: ofType<{ quizId: Id }>(), // Force-unlock questions stuck in editMode for a quiz
 		Delete: ofType<Id>(), // Completely delete a quiz, including all comments and questions
 		GetAll: {}, // Get all quizzes accessible by the requester, will send back all quizzes in this list to the requester
 		Has: ofType<Id>(), // Check if quiz exists, answers with boolean
@@ -34,12 +35,12 @@ export const QuizActorMessages = unionize(
 /** Message send to the client on quiz subscriptions */
 export class QuizUpdateMessage {
 	public readonly tag = "QuizUpdateMessage" as const;
-	constructor(public readonly quiz: Partial<Quiz>) {}
+	constructor(public readonly quiz: Partial<Quiz>) { }
 }
 
 export class QuizDeletedMessage {
 	public readonly tag = "QuizDeletedMessage" as const;
-	constructor(public readonly quizId: Id) {}
+	constructor(public readonly quizId: Id) { }
 }
 
 export type QuizActorMessage = UnionOf<typeof QuizActorMessages>;

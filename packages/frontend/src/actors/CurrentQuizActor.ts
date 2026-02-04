@@ -501,7 +501,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								if (this.state.quiz.state !== "EDITING") {
 									this.send(
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-										QuestionActorMessages.Unstall()
+										QuizActorMessages.UnstallQuestions({
+											quizId: this.state.quiz.uid,
+										})
 									);
 									this.send(
 										actorUris.QuizActor,

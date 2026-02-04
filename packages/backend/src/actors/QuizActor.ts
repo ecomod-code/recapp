@@ -84,39 +84,52 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		void this.cleanupStalledQuestions();
 	}
 
-	private cleanupStalledQuestions = async (): Promise<void> => {
+
+	private async unstallQuestionsInDb(opts: {
+		quizId?: Id;          // if set, scope to a single quiz
+		force?: boolean;      // if true, ignore cutoff
+		reason: string;       // for log context
+	}): Promise<void> {
 		if (this.stalledCleanupRunning) return;
 		this.stalledCleanupRunning = true;
 
+		const { quizId, force = false, reason } = opts;
 		const cutOff = DateTime.utc().minus(STALLED_QUESTION_INTERVAL);
 
 		try {
 			const db = await this.connector.db();
 
-			// Only touch questions that are "stuck" in edit mode and old.
+			const filter: any = { editMode: true };
+			if (quizId) filter.quiz = quizId;
+			if (!force) filter["updated.value"] = { $lt: cutOff.toMillis() };
+
 			const result = await db.collection("questions").updateMany(
-				{
-					editMode: true,
-					"updated.value": { $lt: cutOff.toMillis() },
-				},
-				{
-					$set: { editMode: false, updated: toTimestamp() },
-				}
+				filter,
+				{ $set: { editMode: false, updated: toTimestamp() } }
 			);
 
-			// Only log if we actually changed something.
 			if ((result.modifiedCount ?? 0) > 0) {
 				this.logger.warn(
-					`CLEANUP stalled questions modified=${result.modifiedCount} matched=${result.matchedCount} cutOff=${cutOff.toISO()}`
+					`UNSTALL questions reason=${reason}` +
+					(quizId ? ` quiz=${String(quizId)}` : " quiz=ALL") +
+					` force=${force} modified=${result.modifiedCount} matched=${result.matchedCount}` +
+					(!force ? ` cutOff=${cutOff.toISO()}` : "")
 				);
 			}
 		} catch (e) {
 			this.logger.error(
-				`CLEANUP stalled questions failed: ${e instanceof Error ? e.stack : String(e)}`
+				`UNSTALL questions failed reason=${reason}` +
+				(quizId ? ` quiz=${String(quizId)}` : " quiz=ALL") +
+				` error=${e instanceof Error ? e.stack : String(e)}`
 			);
 		} finally {
 			this.stalledCleanupRunning = false;
 		}
+	}
+
+	private cleanupStalledQuestions = async (): Promise<void> => {
+		// preserves your current behavior: global + cutoff-based
+		await this.unstallQuestionsInDb({ reason: "periodic_cleanup", force: false });
 	};
 
 	protected override async afterEntityWasCached(uid: Id) {
@@ -276,6 +289,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						`runPresent=${mbRun ? "maybe" : "none"}`
 					);
 					return mbRun.match(identity, () => new Error("No run for user"));
+				},
+				UnstallQuestions: async ({ quizId }) => {
+					// - force=true: unlock everything immediately for that quiz
+					// - force=false: only unlock questions stuck > STALLED_QUESTION_INTERVAL
+					await this.unstallQuestionsInDb({ quizId, reason: "state_editing", force: true });
+					return unit();
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);

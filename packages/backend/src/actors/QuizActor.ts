@@ -19,7 +19,8 @@ import {
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { Timestamp, toTimestamp, unit } from "itu-utils";
+import { minutes, Timestamp, toTimestamp, unit } from "itu-utils";
+import { DateTime } from "luxon";
 import { CommentActor } from "./CommentActor";
 import { maybe } from "tsmonads";
 import { create } from "mutative";
@@ -45,6 +46,9 @@ type State = {
 
 type ResultType = any;
 
+const STALLED_QUESTION_CHECK_INTERVAL = minutes(5);
+const STALLED_QUESTION_INTERVAL = minutes(15);        // or 30?
+
 /**
  * Actor representing a quiz. Will also start a child actors for quiz comments
  */
@@ -53,6 +57,8 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	private questionActors = new Map<Id, ActorRef>();
 	private runActors = new Map<Id, ActorRef>();
 	private statisticsActors = new Map<Id, ActorRef>();
+	private stalledQuestionCleanupInterval?: NodeJS.Timeout;
+	private stalledCleanupRunning = false;
 
 	protected override state: State = {
 		cache: new Map(),
@@ -68,11 +74,52 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system, "quizzes");
+
+		this.stalledQuestionCleanupInterval = setInterval(
+			() => void this.cleanupStalledQuestions(),
+			STALLED_QUESTION_CHECK_INTERVAL.valueOf()
+		);
+
+		// run once after boot
+		void this.cleanupStalledQuestions();
 	}
 
+	private cleanupStalledQuestions = async (): Promise<void> => {
+		if (this.stalledCleanupRunning) return;
+		this.stalledCleanupRunning = true;
+
+		const cutOff = DateTime.utc().minus(STALLED_QUESTION_INTERVAL);
+
+		try {
+			const db = await this.connector.db();
+
+			// Only touch questions that are "stuck" in edit mode and old.
+			const result = await db.collection("questions").updateMany(
+				{
+					editMode: true,
+					"updated.value": { $lt: cutOff.toMillis() },
+				},
+				{
+					$set: { editMode: false, updated: toTimestamp() },
+				}
+			);
+
+			// Only log if we actually changed something.
+			if ((result.modifiedCount ?? 0) > 0) {
+				this.logger.warn(
+					`CLEANUP stalled questions modified=${result.modifiedCount} matched=${result.matchedCount} cutOff=${cutOff.toISO()}`
+				);
+			}
+		} catch (e) {
+			this.logger.error(
+				`CLEANUP stalled questions failed: ${e instanceof Error ? e.stack : String(e)}`
+			);
+		} finally {
+			this.stalledCleanupRunning = false;
+		}
+	};
+
 	protected override async afterEntityWasCached(uid: Id) {
-		// const maybeCommentActor = maybe(this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Comment_${uid}`)));
-		// maybeCommentActor.forEach(ca => this.commentActors.set(uid, ca));
 		try {
 			if (!this.commentActors.has(uid)) {
 				const comments = await this.system.createActor(
@@ -83,10 +130,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				this.logger.debug(`Comments actor ${comments.name} created`);
 				this.commentActors.set(uid, comments);
 			}
-			// const maybeQuestionActor = maybe(
-			//	this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Question_${uid}`))
-			//);
-			//maybeQuestionActor.forEach(ca => this.questionActors.set(uid, ca));
+
 			if (!this.questionActors.has(uid)) {
 				const questions = await this.system.createActor(
 					QuestionActor,
@@ -117,7 +161,14 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		} catch (e) {
 			this.logger.error(JSON.stringify(e));
 		}
+
 	}
+
+	public override async beforeShutdown(): Promise<void> {
+		await super.beforeShutdown();
+		if (this.stalledQuestionCleanupInterval) clearInterval(this.stalledQuestionCleanupInterval);
+	}
+
 
 	protected override async afterEntityRemovedFromCache(uid: Id) {
 		maybe(this.commentActors.get(uid)).forEach(c => {
@@ -321,7 +372,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 								if (!quiz.statistics?.quizId) {
 									this.logger.error("STATS update data lacks proper statistics block");
 									if (!c.statistics?.quizId) {
-								this.logger.error("STATS original data lacks proper statistics block");
+										this.logger.error("STATS original data lacks proper statistics block");
 										delete combined.statistics;
 									} else {
 										this.logger.info("STATS using original statistics block");

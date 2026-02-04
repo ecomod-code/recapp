@@ -57,12 +57,12 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 	private unstallQuestions = async (cutOff: DateTime) => {
 		// Remove questions that are blocked from editing, but seemed not be updated in the last STALLED_QUESTION_INTERVAL. (e.g. because a client lost the connection)
 		const db = await this.connector.db();
-		const candidates = await db
+		const candidates: Question[] = await db
 			.collection<Question>(this.collectionName)
 			.find({ editMode: true, quiz: this.uid })
 			.toArray();
-		const idsToReset = Array.from(candidates)
-			.filter(question => question.editMode && fromTimestamp(question.updated.value) < cutOff)
+		const idsToReset = candidates
+			.filter(question => question.editMode && fromTimestamp(question.updated.value).toMillis() < cutOff.toMillis())
 			.map(q => q.uid);
 		const count = idsToReset.length;
 		// Only report at info/warn if we actually reset something.
@@ -71,21 +71,13 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 				`QUESTIONACTOR resetting stalled questions quiz=${String(this.uid)} cutOff=${cutOff.toISO()} count=${count}`
 			);
 		}
-		// idsToReset.forEach(id =>
-		// 	this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }))
-		// 		.then(result => {
-		// 			this.logger.debug(
-		// 				`QUESTIONACTOR updateStalled resultType=${typeof result}` +
-		// 				(result && typeof result === "object" ? ` keys=${Object.keys(result as object).join(",")}` : ` value=${String(result)}`)
-		// 			);
-		// 		})
-		// 		.catch(e => this.logger.error(`QUESTIONACTOR error ${e instanceof Error ? e.stack : String(e)}`))
-		// );
 
 		let ok = 0;
 		let failed = 0;
 
-		for (const id of idsToReset) {
+		for (const id of Array.from(candidates)
+			.filter(question => question.editMode && fromTimestamp(question.updated.value).toMillis() < cutOff.toMillis())
+			.map(q => q.uid)) {
 			try {
 				const result = await this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }));
 				if (result instanceof Error) {

@@ -9,6 +9,7 @@ import { toTimestamp } from "itu-utils";
 import { DateTime } from "luxon";
 import { maybe } from "tsmonads";
 import { v4 } from "uuid";
+import { logger } from "../logger";
 
 const { BACKEND_URI, OID_CLIENT_ID, OPENID_PROVIDER, ISSUER, OID_CLIENT_SECRET, REDIRECT_URI, REQUIRES_OFFLINE_SCOPE } =
 	process.env;
@@ -65,9 +66,11 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 
 	try {
 		let fpData: Fingerprint | Error = await system.ask(fpStore, FingerprintStoreMessages.Get(fingerprint as Id));
-		console.log("New fingerprint", fingerprint, fpData);
+		// console.log("New fingerprint", fingerprint, fpData);
+		logger.info(`FINGERPRINT seen id=${String(fingerprint)}`);
 		if (fpData instanceof Error) {
-			console.debug("A new fingerprint has been found", fingerprint);
+			// console.debug("A new fingerprint has been found", fingerprint);
+			logger.debug(`FINGERPRINT new id=${String(fingerprint)}`);
 			const fp: Fingerprint = {
 				uid: fingerprint as Id,
 				created: toTimestamp(),
@@ -83,7 +86,8 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 		}
 		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
 		if (fpData.blocked) {
-			console.debug("Fingerprint was blocked", fingerprint);
+			// console.debug("Fingerprint was blocked", fingerprint);
+			logger.warn(`FINGERPRINT blocked id=${String(fingerprint)}`);
 			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
 			return;
 		}
@@ -234,7 +238,8 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 				}
 				const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
 				const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
-				console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
+				// console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
+				logger.debug(`AUTH token expiry idToken=${String(expires.toISO())} refresh=${String(refreshExpires.toISO())}`);
 				const sessionStore = createActorUri("SessionStore");
 				system.send(
 					sessionStore,
@@ -368,7 +373,8 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 							refreshExpires: toTimestamp(refreshExpires),
 						})
 					);
-					console.log(`User ${sub} token was refreshed.`);
+					// console.log(`User ${sub} token was refreshed.`);
+					logger.info(`AUTH token refreshed`); // omit sub to avoid identifying users
 					ctx.set("Set-Cookie", `bearer=${newTokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
 					// ctx.body = "O.K.";
 					ctx.body = {
@@ -377,7 +383,8 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					};
 
 				} catch (e) {
-					console.error("Failed to renew token", e);
+					// console.error("Failed to renew token", e);
+					logger.warn(`AUTH failed to renew token: ${e instanceof Error ? e.stack : String(e)}`);
 					system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
 					ctx.set("Set-Cookie", `bearer=; path=/`);
 					ctx.throw(401, "Token renewal failure");

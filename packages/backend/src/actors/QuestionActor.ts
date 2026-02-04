@@ -64,14 +64,51 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 		const idsToReset = Array.from(candidates)
 			.filter(question => question.editMode && fromTimestamp(question.updated.value) < cutOff)
 			.map(q => q.uid);
-		console.log("QUESTIONACTOR - resetting the stalled questions", idsToReset);
-		idsToReset.forEach(id =>
-			this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }))
-				.then(result => {
-					console.log("UPDATESTALLED", result);
-				})
-				.catch(e => console.error(e))
-		);
+		const count = idsToReset.length;
+		// Only report at info/warn if we actually reset something.
+		if (count > 0) {
+			this.logger.warn(
+				`QUESTIONACTOR resetting stalled questions quiz=${String(this.uid)} cutOff=${cutOff.toISO()} count=${count}`
+			);
+		}
+		// idsToReset.forEach(id =>
+		// 	this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }))
+		// 		.then(result => {
+		// 			this.logger.debug(
+		// 				`QUESTIONACTOR updateStalled resultType=${typeof result}` +
+		// 				(result && typeof result === "object" ? ` keys=${Object.keys(result as object).join(",")}` : ` value=${String(result)}`)
+		// 			);
+		// 		})
+		// 		.catch(e => this.logger.error(`QUESTIONACTOR error ${e instanceof Error ? e.stack : String(e)}`))
+		// );
+
+		let ok = 0;
+		let failed = 0;
+
+		for (const id of idsToReset) {
+			try {
+				const result = await this.ask(this.ref, QuestionActorMessages.Update({ uid: id, editMode: false }));
+				if (result instanceof Error) {
+					failed++;
+					this.logger.warn(
+						`QUESTIONACTOR unstall failed quiz=${String(this.uid)} q=${String(id)} err=${result.message}`
+					);
+				} else {
+					ok++;
+				}
+			} catch (e) {
+				failed++;
+				this.logger.error(
+					`QUESTIONACTOR unstall exception quiz=${String(this.uid)} q=${String(id)} error=${e instanceof Error ? e.stack : String(e)}`
+				);
+			}
+		}
+
+		if (count > 0) {
+			this.logger.warn(
+				`QUESTIONACTOR unstall summary quiz=${String(this.uid)} ok=${ok} failed=${failed} total=${count}`
+			);
+		}
 	};
 
 	constructor(
@@ -95,7 +132,10 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 	public async receive(from: ActorRef, message: QuestionActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		// MARK: This is interesting
-		console.debug("QUESTIONACTOR", from.name, message);
+		this.logger.debug(
+			`QUESTIONACTOR from=${String((from as any)?.name ?? from)} role=${String(clientUserRole)} ` +
+			`type=${String((message as any)?.QuestionActorMessage ?? (message as any)?.type ?? typeof message)}`
+		);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
 			return unit();
@@ -213,7 +253,11 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 			});
 			//#endregion
 		} catch (e) {
-			console.error("QUESTIONACTOR unhandled error", message, e);
+			this.logger.error(
+				`QUESTIONACTOR unhandled error ` +
+				`msgType=${String((message as any)?.QuestionActorMessage ?? (message as any)?.type ?? typeof message)} ` +
+				`error=${e instanceof Error ? e.stack : String(e)}`
+			);
 			throw e;
 		}
 	}

@@ -58,7 +58,11 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 			this.shutdown();
 			return unit();
 		}
-		console.log("QUIZRUNACTOR", from.name, JSON.stringify(message, undefined, 4));
+		// console.log("QUIZRUNACTOR", from.name, JSON.stringify(message, undefined, 4));
+		this.logger.debug(
+			`QUIZRUNACTOR from=${String((from as any)?.name ?? from)} ` +
+			`type=${String((message as any)?.QuizRunActorMessage ?? (message as any)?.type ?? typeof message)}`
+		);
 		try {
 			return await QuizRunActorMessages.match<Promise<ResultType>>(message, {
 				GetForUser: async ({ studentId, questions }) => {
@@ -71,7 +75,8 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 					const result = mbRunId.match<Promise<QuizRun | Error>>(
 						async runId => {
 							const run = await this.getEntity(runId.uid);
-							console.log("Found existing run", run);
+							// console.log("Found existing run", run);
+							this.logger.debug(`QUIZRUNACTOR found existing run present=${run ? "maybe" : "none"}`);
 							return run.match<QuizRun | Error>(identity, () => new Error());
 						},
 						async () => {
@@ -97,7 +102,8 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 									)
 								);
 							}
-							console.log("Created new run", run);
+							// console.log("Created new run", run);
+							this.logger.info(`QUIZRUNACTOR created new run`);
 							return run;
 						}
 					);

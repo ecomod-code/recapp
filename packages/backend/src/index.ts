@@ -134,11 +134,13 @@ const start = async () => {
     app.use(router.routes());
     app.use(router.allowedMethods());
 
-    console.log("Registered routes:");
-    router.stack.forEach((layer) => {
-      const names = layer.stack.map(fn => fn.name || "<anonymous>");
-      console.log(`${layer.methods.join(",")} ${layer.path} → [${names.join(", ")}]`);
-    });
+    if (process.env.DEBUG_RECAPP === "1" || process.env.LOG_LEVEL === "debug") {
+      logger.debug("Registered routes:");
+      router.stack.forEach(layer => {
+        const names = layer.stack.map(fn => fn.name || "<anonymous>");
+        logger.debug(`${layer.methods.join(",")} ${layer.path} -> [${names.join(", ")}]`);
+      });
+    }
 
     const httpServer = app.listen(3123, "0.0.0.0");
 

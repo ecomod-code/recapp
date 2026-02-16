@@ -42,7 +42,8 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	let client: Client;
 	try {
 		client = await getOidc();
-	} catch (e) {
+	} catch (e: any) {
+		console.error("[authLogin] getOidc failed:", e?.code, e?.message, e?.stack);
 		ctx.throw(400, "ID provider cannot be contacted. Login impossible");
 	}
 

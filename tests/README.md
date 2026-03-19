@@ -3,7 +3,7 @@
 
 
 
-Playwright is an open-source end-to-end framework made my Microsoft that provides a framework for testing software.
+Playwright is an open-source end-to-end framework made by Microsoft that provides a framework for testing software.
 It allows the user to control one to many browser pages in real time at once. Interacting with the webpage, clicking
 buttons, filling out forms, and waiting for results are all possible within this framework. The goal of Playwright is
 to simulate one to multiple human users using the software/website simulaneously. 

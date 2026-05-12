@@ -35,6 +35,7 @@ import { writeFile, readFile } from "fs/promises";
 import * as path from "path";
 import { AccessRole } from "./StoringActor";
 import { serializeError } from "serialize-error";
+import { Filter } from "mongodb";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -99,7 +100,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 		try {
 			const db = await this.connector.db();
 
-			const filter: any = { editMode: true };
+			const filter: Filter<Question> = { editMode: true };
 			if (quizId) filter.quiz = quizId;
 			if (!force) filter["updated.value"] = { $lt: cutOff.toMillis() };
 
@@ -172,7 +173,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				this.statisticsActors.set(uid, stats);
 			}
 		} catch (e) {
-			this.logger.error(JSON.stringify(e));
+			this.logger.error(`afterEntityWasCached failed uid=${String(uid)} error=${e instanceof Error ? e.stack : String(e)}`);
 		}
 
 	}
@@ -298,53 +299,56 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 				AddTeacher: async ({ quiz, teacher }) => {
 					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.teachers.push(teacher);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
+					const entity = q.orUndefined();
+					if (!entity) return new Error(`Quiz ${quiz} not found`);
+					entity.teachers.push(teacher);
+					await this.storeEntity(entity);
+					this.sendUpdateToSubscribers(entity);
+					return unit();
 				},
 				AddStudent: async ({ quiz, student }) => {
 					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.students.push(student);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
+					const entity = q.orUndefined();
+					if (!entity) return new Error(`Quiz ${quiz} not found`);
+					entity.students.push(student);
+					await this.storeEntity(entity);
+					this.sendUpdateToSubscribers(entity);
+					return unit();
 				},
 				Delete: async id => {
 					const mbQuiz = await this.getEntity(id);
-					return mbQuiz.map(async quiz => {
-						if (
-							clientUserRole !== "ADMIN" &&
-							(quiz.createdBy ? quiz.createdBy !== clientUserId : quiz.teachers[0] !== clientUserId)
-						) {
-							this.logger.warn(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
-							);
-							return new Error(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
-							);
-						}
-						const db = await this.connector.db();
-						await this.deleteEntity(id);
-						await this.state.cache.delete(id);
-						await this.afterEntityRemovedFromCache(id);
-						await db.collection<Question>("questions").deleteMany({ quiz: id });
-						await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
-						this.logger.debug(`Successfully deleted quiz ${id}`);
-						this.sendDeletionToSubscribers(id);
-						return unit();
-					});
+					const quiz = mbQuiz.orUndefined();
+					if (!quiz) return new Error(`Quiz ${id} not found`);
+					if (
+						clientUserRole !== "ADMIN" &&
+						(quiz.createdBy ? quiz.createdBy !== clientUserId : !quiz.teachers.includes(clientUserId))
+					) {
+						this.logger.warn(
+							`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+						);
+						return new Error(
+							`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+						);
+					}
+					const db = await this.connector.db();
+					await this.deleteEntity(id);
+					await this.state.cache.delete(id);
+					await this.afterEntityRemovedFromCache(id);
+					await db.collection<Question>("questions").deleteMany({ quiz: id });
+					await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
+					this.logger.debug(`Successfully deleted quiz ${id}`);
+					this.sendDeletionToSubscribers(id);
+					return unit();
 				},
 				RemoveUser: async ({ quiz, user }) => {
 					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.students = entity.students.filter(s => s !== user);
-						entity.teachers = entity.teachers.filter(s => s !== user);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
+					const entity = q.orUndefined();
+					if (!entity) return new Error(`Quiz ${quiz} not found`);
+					entity.students = entity.students.filter(s => s !== user);
+					entity.teachers = entity.teachers.filter(s => s !== user);
+					await this.storeEntity(entity);
+					this.sendUpdateToSubscribers(entity);
+					return unit();
 				},
 				Get: async uid => {
 					const quiz = await this.getEntity(uid);
@@ -502,8 +506,9 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					}
 					this.logger.debug(`EXPORT filename=${String(filename)}`);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
-					const importedObject = JSON.parse(jsonBuffer.toString());
+					let importedObject: any;
 					try {
+						importedObject = JSON.parse(jsonBuffer.toString());
 						const propertyKeys = [
 							"allowedQuestionTypesSettings",
 							"description",

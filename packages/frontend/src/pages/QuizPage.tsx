@@ -1,6 +1,6 @@
 // packages/frontend/src/pages/QuizPage.tsx
 
-import { Fragment, useEffect, useState, useRef } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import type { Question } from "@recapp/models";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
@@ -74,6 +74,8 @@ export const QuizPage: React.FC = () => {
 	const [showError, setShowError] = useState<string>("");
 	// ----- NEW: track loaded questions and retry flag -----
 	const [questionsRefetched, setQuestionsRefetched] = useState(false);
+	// Tracks whether the one-shot start/stop state change has already been dispatched.
+	const stateChangeApplied = useRef(false);
 
 	const deleted = mbQuiz.map(m => m.deleted).orElse(false);
 
@@ -111,15 +113,20 @@ export const QuizPage: React.FC = () => {
 			mbLocalUser.forEach(lu => {
 				q.send(q, CurrentQuizMessages.SetUser(lu.user));
 				q.send(q, CurrentQuizMessages.SetQuiz(toId(quizId)));
-				if (start) {
-					setTimeout(() => q.send(q, CurrentQuizMessages.ChangeState("STARTED")), 500);
-				}
-				if (stop) {
-					setTimeout(() => q.send(q, CurrentQuizMessages.ChangeState("STOPPED")), 500);
-				}
 			});
 		});
 	}, [quizId, tryQuizActor.hasValue]);
+
+	// Fire the one-shot state change (start/stop) only once the quiz data has loaded.
+	// Using a ref prevents the effect from firing again on subsequent quiz state updates.
+	useEffect(() => {
+		if (!quizData || stateChangeApplied.current || (!start && !stop)) return;
+		stateChangeApplied.current = true;
+		tryQuizActor.forEach(q => {
+			if (start) q.send(q, CurrentQuizMessages.ChangeState("STARTED"));
+			if (stop) q.send(q, CurrentQuizMessages.ChangeState("STOPPED"));
+		});
+	}, [quizData?.quiz?.uid]);
 
 	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
 	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));

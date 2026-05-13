@@ -5,7 +5,10 @@
 	"main": "src/index.ts",
 	"scripts": {
 		"build": "tsc",
-		"test": "echo \"Error: no test specified\" && exit 1"
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"typecheck": "tsc --noEmit",
+		"lint": "echo \"No linting configured\""
 	},
 	"author": "",
 	"license": "MIT",
@@ -21,5 +24,9 @@
 		"tsmonads": "^3.4.0",
 		"typescript": "^5.3.3",
 		"zod": "^3.22.4"
+	},
+	"devDependencies": {
+		"@vitest/coverage-v8": "^2.1.9",
+		"vitest": "^2.1.9"
 	}
 }

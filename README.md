@@ -1,3 +1,7 @@
+![CI](https://github.com/ecomod-code/recapp/actions/workflows/ci.yml/badge.svg)
+![Coverage](https://codecov.io/gh/ecomod-code/recapp/branch/main/graph/badge.svg)
+
+
 # RECAPP
 
 ## Setup instructions

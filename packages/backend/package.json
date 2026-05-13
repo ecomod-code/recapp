@@ -47,7 +47,14 @@
 		"build": "tsc --noEmit",
 		"dev": "ts-node-dev --files --env-file=../../.env.development ./src/index.ts",
 		"start": "ts-node ./src/index.ts",
-		"test": "npm test"
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"typecheck": "tsc --noEmit",
+		"lint": "echo \"No linting configured\""
 	},
-	"version": "1.0.3"
+	"version": "1.0.3",
+	"devDependencies": {
+		"@vitest/coverage-v8": "^2.1.9",
+		"vitest": "^2.1.9"
+	}
 }

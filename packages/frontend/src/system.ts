@@ -36,7 +36,6 @@ export const system = DistributedActorSystem.create({ distributor, systemName: s
 		const ta = await s.createActor(TokenActor, { name: "TokenActor" });
 		actorUris["TokenActor"] = toActorUri(ta.name);
 
-		const sa = s.getActorRef(`actors://${s.systemName}`);
 		return s;
 	} catch (e) {
 		console.error(e);

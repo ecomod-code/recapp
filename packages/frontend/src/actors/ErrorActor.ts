@@ -26,7 +26,7 @@ const errorIds = {
 
 export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: string }> {
 	protected state = { error: "" };
-	protected pingTimer: any;
+	protected pingTimer: ReturnType<typeof setTimeout> | undefined;
 
 	public constructor(name: string, system: ActorSystem) {
 		super(name, system);

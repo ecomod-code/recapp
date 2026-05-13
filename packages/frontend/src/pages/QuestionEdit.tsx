@@ -77,7 +77,7 @@ export const QuestionEdit: React.FC = () => {
 		hasInitialQuestions: false,
 		questionsSubscribed: false,
 	});
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	
 	const q = mbQuiz.map(q => q.quiz).orUndefined();
 	const isQuizStateStarted = q?.state === "STARTED";
 	const isQuizStateEditing = q?.state === "EDITING";
@@ -804,7 +804,7 @@ export const QuestionEdit: React.FC = () => {
 										onChange={val => setQuestion(prev => ({ ...prev, text: val ?? "" }))}
 										height="100%"
 										style={{ padding: 6 }}
-										// eslint-disable-next-line @typescript-eslint/no-unused-vars
+										
 										components={{ preview: (_source, _state, _dispatch) => <></> }}
 										preview="edit"
 									/>
@@ -894,7 +894,7 @@ export const QuestionEdit: React.FC = () => {
 										setQuestion(state => {
 											console.log({ state });
 
-											// eslint-disable-next-line @typescript-eslint/no-explicit-any
+											
 											// (state as any)[showTextModal.property] = text;
 											return { ...state, hint: text };
 										});

@@ -63,8 +63,8 @@ export function dlog<T extends BaseLog>(
 ) {
   if (!enabled) return;
   const line = { tag, ts: new Date().toISOString(), ...payload };
-  // eslint-disable-next-line no-console
-  ((window as any).DEBUG_LOGS ||= []).push(line);
+
+  ((window as Window & { DEBUG_LOGS?: unknown[] }).DEBUG_LOGS ||= []).push(line);
   console.info(JSON.stringify(line));
 }
 

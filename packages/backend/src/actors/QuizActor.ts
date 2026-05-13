@@ -104,7 +104,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 			if (quizId) filter.quiz = quizId;
 			if (!force) filter["updated.value"] = { $lt: cutOff.toMillis() };
 
-			const result = await db.collection("questions").updateMany(
+			const result = await db.collection<Question>("questions").updateMany(
 				filter,
 				{ $set: { editMode: false, updated: toTimestamp() } }
 			);

@@ -215,7 +215,7 @@ export const RunningQuizTab: React.FC<{
 										value={textAnswer}
 										onChange={val => setTextAnswer(val ?? "")}
 										height="100%"
-										// eslint-disable-next-line @typescript-eslint/no-unused-vars
+										
 										components={{ preview: (_source, _state, _dispath) => <></> }}
 										preview="edit"
 									/>

@@ -286,11 +286,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 	async receive(_from: ActorRef, message: MessageType): Promise<Unit | boolean | QuizRun> {
 		const maybeLocalMessage = await this.handleRemoteUpdates(message);
-		try {
-			// Deal with local messages
-			return maybeLocalMessage
-				.map(m =>
-					CurrentQuizMessages.match<Promise<Unit | boolean | QuizRun>>(m, {
+		// Deal with local messages
+		return maybeLocalMessage
+			.map(m =>
+				CurrentQuizMessages.match<Promise<Unit | boolean | QuizRun>>(m, {
 						Reset: async () => {
 							this.updateState(draft => {
 								draft.quiz = {} as Quiz;
@@ -789,7 +788,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 										);
 
 										// Distinguish the “no run” case
-										if ((run as any)?.message === "No run for user") {
+										if ((run as Error)?.message === "No run for user") {
 											d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "error", error: "no-run" });
 										} else {
 											d.run({ quizId, studentIdHash: anonUserKey(studentId), action: "ok" });
@@ -938,8 +937,5 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 					})
 				)
 				.orElse(Promise.resolve(unit()));
-		} catch (e) {
-			throw e;
-		}
 	}
 }

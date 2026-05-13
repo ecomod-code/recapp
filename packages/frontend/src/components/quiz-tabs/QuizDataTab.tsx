@@ -19,7 +19,7 @@ import axios from "axios";
 import { QuizExportModal } from "../modals/QuizExportModal";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { ShareQuizModal } from "../modals/ShareQuizModal";
-import { checkIsCreatingQuestionDisabled, checkIsParticipationDisabled, debounce } from "../../utils";
+import { checkIsCreatingQuestionDisabled, debounce } from "../../utils";
 import { CharacterTracker } from "../CharacterTracker";
 import { DESCRIPTION_MAX_CHARACTERS, TITLE_MAX_CHARACTERS, TITLE_MIN_CHARACTERS } from "../../constants/constants";
 import { useCurrentQuiz } from "../../hooks/state-actor/useCurrentQuiz";
@@ -108,7 +108,6 @@ export const QuizDataTab: React.FC<Props> = props => {
 	const isTitleAndDescriptionDisabled = props.disableForStudent || disabledByMode;
 
 	const isCreatingQuestionDisabled = checkIsCreatingQuestionDisabled(quiz.allowedQuestionTypesSettings);
-	const isParticipationDisabled = checkIsParticipationDisabled(quiz.studentParticipationSettings);
 
 	return (
 		<Form>

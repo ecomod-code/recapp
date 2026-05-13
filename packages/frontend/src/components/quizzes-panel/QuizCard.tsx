@@ -5,7 +5,7 @@ import { i18n } from "@lingui/core";
 import { fromTimestamp } from "itu-utils";
 import { Quiz, QuestionGroup, toId } from "@recapp/models";
 import Card from "react-bootstrap/Card";
-import { Pencil, Play, Share, Trash, StopFill } from "react-bootstrap-icons";
+import { Play, Share, Trash, StopFill } from "react-bootstrap-icons";
 import { ButtonWithTooltip } from "../ButtonWithTooltip";
 import { QuizStateBadge } from "../QuizStateBadge";
 import { useLocalUser } from "../../hooks/state-actor/useLocalUser";
@@ -30,8 +30,6 @@ export const QuizCard: React.FC<{
 	const isAuthorized = isAdmin || isQuizTeacher;
 
 	const isQuizStateStarted = quiz.state === "STARTED";
-	const isStudentQuestionAllowed = !!quiz.studentQuestions;
-	const isQuizEditable = !isQuizStateStarted && (isAuthorized || isStudentQuestionAllowed);
 
 	const navigateToQuizPage = () => {
 		nav({ pathname: "/Dashboard/quiz" }, { state: { quizId: quiz.uid } });

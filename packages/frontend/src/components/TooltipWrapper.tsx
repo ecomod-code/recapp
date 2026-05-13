@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Tooltip from "react-bootstrap/Tooltip";
 import { Placement } from "react-bootstrap/esm/types";
@@ -14,7 +14,7 @@ export const TooltipWrapper = ({ placement = "top", title, children }: Props) =>
             placement={placement}
             overlay={title ? <Tooltip>{title}</Tooltip> : <></>}
         >
-            {children as any}
+            {children as React.ReactElement}
         </OverlayTrigger>
     );
 };

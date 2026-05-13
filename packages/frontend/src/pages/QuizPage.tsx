@@ -1,7 +1,6 @@
 // packages/frontend/src/pages/QuizPage.tsx
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import type { Question } from "@recapp/models";
 import { i18n } from "@lingui/core";
 import { useActorSystem, useStatefulActor } from "ts-actors-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -287,7 +286,6 @@ export const QuizPage: React.FC = () => {
 				console.log("TL", isUserInTeachersList, quizData.quiz.previewers);
 
 				const runReady = !!quizData.runReady;
-				const hasInitialQuestions = !!quizData.hasInitialQuestions;
 				const isQuizStateStarted = quizData.quiz.state === "STARTED";
 
 				// if (!isQuizStateStarted) {
@@ -304,7 +302,7 @@ export const QuizPage: React.FC = () => {
 				// }
 
 				const run = quizData.run;
-				const qData = quizData.questions;runReady
+				const qData = quizData.questions;runReady;
 				const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 				const currentQuestion = questions[run?.counter ?? 0];
 				const questionId = currentQuestion?.uid ?? toId("");

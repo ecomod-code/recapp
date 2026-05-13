@@ -120,7 +120,7 @@ export const CommentEditorModal: React.FC<Props> = ({
                             value={value}
                             onChange={val => setValue(val ?? "")}
                             height="100%"
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                             
                             components={{ preview: (_source, _state, _dispath) => <></> }}
                             preview="edit"
                         />

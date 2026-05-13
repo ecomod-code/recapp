@@ -117,6 +117,16 @@ export const QuizPage: React.FC = () => {
 		});
 	}, [quizId, tryQuizActor.hasValue]);
 
+	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
+	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));
+
+	const quizData = mbQuiz
+		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+		.match(
+			quizData => quizData,
+			() => null
+		);
+
 	// Fire the one-shot state change (start/stop) only once the quiz data has loaded.
 	// Using a ref prevents the effect from firing again on subsequent quiz state updates.
 	useEffect(() => {
@@ -127,16 +137,6 @@ export const QuizPage: React.FC = () => {
 			if (stop) q.send(q, CurrentQuizMessages.ChangeState("STOPPED"));
 		});
 	}, [quizData?.quiz?.uid]);
-
-	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
-	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));
-
-	const quizData = mbQuiz
-		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
-		.match(
-			quizData => quizData,
-			() => null
-		);
 
 	let isUserInTeachersList = quizData ? isInTeachersList(quizData?.quiz, userId) : false;
 	if (localUser.map(l => l.role).orElse("STUDENT") === "ADMIN") {

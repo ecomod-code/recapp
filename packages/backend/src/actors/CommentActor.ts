@@ -57,7 +57,7 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 			this.shutdown();
 			return unit();
 		}
-		console.log("COMMENTACTOR", from.name, message);
+		this.logger.debug(`COMMENTACTOR from=${String((from as any)?.name ?? from)} type=${String((message as any)?.tag ?? typeof message)}`);
 		try {
 			return await CommentActorMessages.match<Promise<ResultType>>(message, {
 				Create: async comment => {
@@ -186,7 +186,7 @@ export class CommentActor extends SubscribableActor<Comment, CommentActorMessage
 				},
 			});
 		} catch (e) {
-			console.error(e);
+			this.logger.error(`COMMENTACTOR unhandled error from=${String((from as any)?.name ?? from)} error=${e instanceof Error ? e.stack : String(e)}`);
 			throw e;
 		}
 	}

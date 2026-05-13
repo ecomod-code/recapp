@@ -285,7 +285,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				GetUserRun: async ({ studentId, quizId }) => {
 					const db = await this.connector.db();
 					const mbRun = maybe(await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId }));
-					this.logger.warn(
+					this.logger.debug(
 						`GETUSERRUN studentId=${String(studentId)} quizId=${String(quizId)} ` +
 						`runPresent=${mbRun ? "maybe" : "none"}`
 					);

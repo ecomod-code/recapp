@@ -297,24 +297,6 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					await this.unstallQuestionsInDb({ quizId, reason: "state_editing", force: true });
 					return unit();
 				},
-				AddTeacher: async ({ quiz, teacher }) => {
-					const q = await this.getEntity(quiz);
-					const entity = q.orUndefined();
-					if (!entity) return new Error(`Quiz ${quiz} not found`);
-					entity.teachers.push(teacher);
-					await this.storeEntity(entity);
-					this.sendUpdateToSubscribers(entity);
-					return unit();
-				},
-				AddStudent: async ({ quiz, student }) => {
-					const q = await this.getEntity(quiz);
-					const entity = q.orUndefined();
-					if (!entity) return new Error(`Quiz ${quiz} not found`);
-					entity.students.push(student);
-					await this.storeEntity(entity);
-					this.sendUpdateToSubscribers(entity);
-					return unit();
-				},
 				Delete: async id => {
 					const mbQuiz = await this.getEntity(id);
 					const quiz = mbQuiz.orUndefined();
@@ -338,16 +320,6 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
 					this.logger.debug(`Successfully deleted quiz ${id}`);
 					this.sendDeletionToSubscribers(id);
-					return unit();
-				},
-				RemoveUser: async ({ quiz, user }) => {
-					const q = await this.getEntity(quiz);
-					const entity = q.orUndefined();
-					if (!entity) return new Error(`Quiz ${quiz} not found`);
-					entity.students = entity.students.filter(s => s !== user);
-					entity.teachers = entity.teachers.filter(s => s !== user);
-					await this.storeEntity(entity);
-					this.sendUpdateToSubscribers(entity);
 					return unit();
 				},
 				Get: async uid => {

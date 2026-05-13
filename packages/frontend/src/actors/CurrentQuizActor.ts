@@ -265,7 +265,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			StatisticsActorMessages.GetForQuiz()
 		);
 		if (!gs.quizId) {
-			console.error("getQuizStats: Quiz ID not set for statistics, should be " + this.state.quiz.uid);
 			return;
 		}
 		this.updateState(draft => {
@@ -360,14 +359,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									return question?.approved;
 								});
 
-							console.log(
-								"START_QUIZ",
-								studentId,
-								questions,
-								this.state.quiz.groups,
-								this.state.questions
-							);
-
 							// Die Fragen sollten hier in Reihenfolge stehen. Falls wir das mischen müssen, passiert das jetzt.
 							if (this.state.quiz.shuffleQuestions) {
 								const randomShuffle = shuffle(Math.random);
@@ -391,10 +382,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								const cleanedAnswers =
 									typeof answer === "string"
 										? answer
-										: answer.map(a => {
-											console.log("CLEAN is", a, "will be", a === null ? false : a);
-											return a === null ? false : a;
-										});
+										: answer.map(a => (a === null ? false : a));
 
 								const answers = [...this.state.run.answers, cleanedAnswers];
 								const question = this.state.questions.find(q => q.uid === questionId)!;
@@ -416,11 +404,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 									// Sonderbehandlung Single/Multi Choice - wir erhalten bei keiner Antwort ein leeres Array
 
-									console.log("MC is correct", answerCorrect);
-
 									if (cleanedAnswers.length === 0) {
-										console.warn("MC is not answered at all!");
-										answerCorrect = null; // question.answers.every(a => !a.correct);
+										answerCorrect = null;
 									}
 								}
 								const correct = [...this.state.run.correct, answerCorrect !== null && answerCorrect];
@@ -562,18 +547,18 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							return unit();
 						},
 						AddComment: async comment => {
-							this.user.map(async u => {
-								const comments = this.state.quiz.comments ? [...this.state.quiz.comments] : [];
-								const uid: Id = await this.ask(
-									`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
-									CommentActorMessages.Create({
-										authorId: u.uid,
-										...comment,
-									})
-								);
-								comments.push(uid);
-								this.send(this.ref, CurrentQuizMessages.Update({ comments: comments }));
-							});
+							const u = this.user.orUndefined();
+							if (!u) return unit();
+							const comments = this.state.quiz.comments ? [...this.state.quiz.comments] : [];
+							const uid: Id = await this.ask(
+								`${actorUris.CommentActorPrefix}${this.quiz.orElse(toId("-"))}`,
+								CommentActorMessages.Create({
+									authorId: u.uid,
+									...comment,
+								})
+							);
+							comments.push(uid);
+							this.send(this.ref, CurrentQuizMessages.Update({ comments: comments }));
 							return unit();
 						},
 						DeleteComment: async id => {
@@ -601,47 +586,44 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						},
 						AddQuestion: async ({ question, group }) => {
 							question.editMode = false;
+							const u = this.user.orUndefined();
+							if (!u) return unit();
 							try {
-								await this.user.map(async u => {
-									// if (this.state.quiz.teachers.includes(u.uid)) {
-									// 	console.debug("Auto-approving question");
-									// 	question.approved = true; // Teacher questions are automatically approved
-									// }
-
-									// all questions are now approved by default and the teacher can 'hide' them later (hide not approve)
-									question.approved = true; // Teacher questions are automatically approved
-
-									console.log("CURRENTQUIZ", "Creating question for user", u.uid);
-									const uid: Id = await this.ask(
+								question.approved = true;
+								const uid: Id = await this.ask(
+									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									QuestionActorMessages.Create({
+										authorId: u.uid,
+										authorFingerprint: u.fingerprint,
+										...question,
+									})
+								);
+								if (uid.toString() === "") {
+									console.error("Failed to create new question", question);
+									return unit();
+								}
+								const groups = this.state.quiz.groups;
+								const addTo = groups.find(g => g.name === group);
+								if (!addTo) {
+									// Target group disappeared (e.g. renamed concurrently); delete the orphaned question.
+									console.error(`AddQuestion: group "${group}" not found — rolling back created question ${String(uid)}`);
+									this.send(
 										`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-										QuestionActorMessages.Create({
-											authorId: u.uid,
-											authorFingerprint: u.fingerprint,
-											...question,
-										})
+										QuestionActorMessages.Delete(uid)
 									);
-									if (uid.toString() === "") {
-										// TODO Creatng the question failed.
-										console.error("Failed to create new question", question);
-										return;
-									}
-									const groups = this.state.quiz.groups;
-									const addTo = groups.find(g => g.name === group);
-									if (addTo) {
-										addTo.questions.push(uid);
-										addTo.questions = addTo.questions.filter(q => q !== "");
-										this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
-									}
-								});
+									return unit();
+								}
+								addTo.questions.push(uid);
+								addTo.questions = addTo.questions.filter(q => q !== "");
+								this.send(this.actorRef!, CurrentQuizMessages.Update({ groups }));
 							} catch (e) {
-								alert(e);
+								console.error("AddQuestion failed", e);
 								throw e;
 							}
 							return unit();
 						},
 						UpdateQuestion: async ({ question, group }) => {
 							if (!question.uid) {
-								console.error("Failed to update question without id", question);
 								return unit();
 							}
 							if (!question.editMode) {
@@ -711,10 +693,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 						},
 						SetQuiz: async uid => {
 							try {
-								if (!uid) {
-									console.error("No UID given for SetQuiz. This should never happen!");
-									return unit();
-								}
+								if (!uid) return unit();
 								if (uid === this.state.quiz.uid) {
 									if (this.state.quiz.state === "STARTED" && this.state.run === undefined) {
 										const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
@@ -831,8 +810,8 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									}
 								}
 								this.send(this.ref, CurrentQuizMessages.ActivateQuizStats());
-							} catch (e) {
-								console.error(e);
+							} catch {
+								// SetQuiz failed; actor state already cleared above
 							}
 							return unit();
 						},
@@ -890,8 +869,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.updateState(draft => {
 									draft.exportFile = filename;
 								});
-							} else {
-								console.error(filename);
 							}
 							return unit();
 						},
@@ -918,8 +895,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.updateState(draft => {
 									draft.exportFile = filename;
 								});
-							} else {
-								console.error(filename);
 							}
 							return unit();
 						},
@@ -933,8 +908,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.updateState(draft => {
 									draft.exportFile = filename;
 								});
-							} else {
-								console.error(filename);
 							}
 							return unit();
 						},
@@ -966,7 +939,6 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 				)
 				.orElse(Promise.resolve(unit()));
 		} catch (e) {
-			console.error(e);
 			throw e;
 		}
 	}

@@ -40,10 +40,10 @@ const config = {
     : "http://localhost:5173/Dashboard",
 };
 
-Container.set<string[]>(
-  "api-keys",
-  process.env.API_KEYS?.split(",") ?? ["25868755-c11c-42ee-b4ed-2115ac982ba4"]
-);
+if (!process.env.API_KEYS) {
+  throw new Error("API_KEYS environment variable is required but not set");
+}
+Container.set<string[]>("api-keys", process.env.API_KEYS.split(","));
 Container.set("config", config);
 
 const router = new koaRouter();

@@ -20,9 +20,13 @@ const sanitizeSchema = {
 };
 
 export const useRendered = ({ value }: { value: string }) => {
-    const [rendered, setRendered] = useState<string>("");
+    // Track both the rendered HTML and the input it was produced from so
+    // callers can detect when the rendered output is stale relative to the
+    // current value (the unified pipeline is async).
+    const [state, setState] = useState<{ value: string; rendered: string }>({ value: "", rendered: "" });
 
     useEffect(() => {
+        let cancelled = false;
         const f = async () => {
             const result = await unified()
                 .use(remarkParse)
@@ -33,10 +37,16 @@ export const useRendered = ({ value }: { value: string }) => {
                 .use(rehypeSanitize, sanitizeSchema)
                 .use(rehypeStringify)
                 .process(value);
-            setRendered(result.toString());
+            // Drop the result if the input changed (or component unmounted)
+            // while the pipeline was running, to avoid out-of-order writes.
+            if (cancelled) return;
+            setState({ value, rendered: result.toString() });
         };
         f();
+        return () => {
+            cancelled = true;
+        };
     }, [value]);
 
-    return { rendered };
-};
+    return { rendered: state.rendered, isStale: state.value !== value };
+    };

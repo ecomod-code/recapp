@@ -119,8 +119,11 @@ export const QuizPage: React.FC = () => {
 	const localUser: Maybe<User> = mbLocalUser.flatMap(u => (keys(u.user).length > 0 ? maybe(u.user) : nothing()));
 	const userId: Id = localUser.map(l => l.uid).orElse(toId(""));
 
+	// Only treat the actor state as "the current quiz" when the loaded quiz uid
+	// matches the quizId we navigated to. Otherwise the previous quiz briefly
+	// flashes on screen between navigation and the new fetch completing.
 	const quizData = mbQuiz
-		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+		.flatMap(q => (keys(q.quiz).length > 0 && q.quiz.uid === quizId ? maybe(q) : nothing()))
 		.match(
 			quizData => quizData,
 			() => null
@@ -272,7 +275,7 @@ export const QuizPage: React.FC = () => {
 	}, [quizData, runReady, hasInitialQuestions, questionsRefetched, tryQuizActor]);
 
 	return mbQuiz
-		.flatMap(q => (keys(q.quiz).length > 0 ? maybe(q) : nothing()))
+		.flatMap(q => (keys(q.quiz).length > 0 && q.quiz.uid === quizId ? maybe(q) : nothing()))
 		.match(
 			quizData => {
 				const allowed = () => {

@@ -71,7 +71,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		// Clear old entries from cache to save memory
 		this.state = create(this.state, draft => {
 			const isOld = (entity: Id) =>
-				fromTimestamp(draft.lastTouched.get(entity) ?? toTimestamp()) < cleanupTimestamp;
+				fromTimestamp(draft.lastTouched.get(entity) ?? toTimestamp()).toMillis() < cleanupTimestamp.toMillis();
 			const entitiesToRemove = Array.from(draft.cache.keys()).filter(isOld);
 			entitiesToRemove.forEach(e => {
 				draft.lastTouched.delete(e);

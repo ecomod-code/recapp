@@ -19,7 +19,8 @@ import {
 } from "@recapp/models";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
 import { ActorRef, ActorSystem } from "ts-actors";
-import { Timestamp, toTimestamp, unit } from "itu-utils";
+import { minutes, Timestamp, toTimestamp, unit } from "itu-utils";
+import { DateTime } from "luxon";
 import { CommentActor } from "./CommentActor";
 import { maybe } from "tsmonads";
 import { create } from "mutative";
@@ -34,6 +35,7 @@ import { writeFile, readFile } from "fs/promises";
 import * as path from "path";
 import { AccessRole } from "./StoringActor";
 import { serializeError } from "serialize-error";
+import { Filter } from "mongodb";
 
 type State = {
 	cache: Map<Id, Quiz>;
@@ -45,6 +47,9 @@ type State = {
 
 type ResultType = any;
 
+const STALLED_QUESTION_CHECK_INTERVAL = minutes(5);
+const STALLED_QUESTION_INTERVAL = minutes(15);        // or 30?
+
 /**
  * Actor representing a quiz. Will also start a child actors for quiz comments
  */
@@ -53,6 +58,8 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	private questionActors = new Map<Id, ActorRef>();
 	private runActors = new Map<Id, ActorRef>();
 	private statisticsActors = new Map<Id, ActorRef>();
+	private stalledQuestionCleanupInterval?: NodeJS.Timeout;
+	private stalledCleanupRunning = false;
 
 	protected override state: State = {
 		cache: new Map(),
@@ -68,11 +75,65 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 
 	constructor(name: string, system: ActorSystem) {
 		super(name, system, "quizzes");
+
+		this.stalledQuestionCleanupInterval = setInterval(
+			() => void this.cleanupStalledQuestions(),
+			STALLED_QUESTION_CHECK_INTERVAL.valueOf()
+		);
+
+		// run once after boot
+		void this.cleanupStalledQuestions();
 	}
 
+
+	private async unstallQuestionsInDb(opts: {
+		quizId?: Id;          // if set, scope to a single quiz
+		force?: boolean;      // if true, ignore cutoff
+		reason: string;       // for log context
+	}): Promise<void> {
+		if (this.stalledCleanupRunning) return;
+		this.stalledCleanupRunning = true;
+
+		const { quizId, force = false, reason } = opts;
+		const cutOff = DateTime.utc().minus(STALLED_QUESTION_INTERVAL);
+
+		try {
+			const db = await this.connector.db();
+
+			const filter: Filter<Question> = { editMode: true };
+			if (quizId) filter.quiz = quizId;
+			if (!force) filter["updated.value"] = { $lt: cutOff.toMillis() };
+
+			const result = await db.collection<Question>("questions").updateMany(
+				filter,
+				{ $set: { editMode: false, updated: toTimestamp() } }
+			);
+
+			if ((result.modifiedCount ?? 0) > 0) {
+				this.logger.warn(
+					`UNSTALL questions reason=${reason}` +
+					(quizId ? ` quiz=${String(quizId)}` : " quiz=ALL") +
+					` force=${force} modified=${result.modifiedCount} matched=${result.matchedCount}` +
+					(!force ? ` cutOff=${cutOff.toISO()}` : "")
+				);
+			}
+		} catch (e) {
+			this.logger.error(
+				`UNSTALL questions failed reason=${reason}` +
+				(quizId ? ` quiz=${String(quizId)}` : " quiz=ALL") +
+				` error=${e instanceof Error ? e.stack : String(e)}`
+			);
+		} finally {
+			this.stalledCleanupRunning = false;
+		}
+	}
+
+	private cleanupStalledQuestions = async (): Promise<void> => {
+		// preserves your current behavior: global + cutoff-based
+		await this.unstallQuestionsInDb({ reason: "periodic_cleanup", force: false });
+	};
+
 	protected override async afterEntityWasCached(uid: Id) {
-		// const maybeCommentActor = maybe(this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Comment_${uid}`)));
-		// maybeCommentActor.forEach(ca => this.commentActors.set(uid, ca));
 		try {
 			if (!this.commentActors.has(uid)) {
 				const comments = await this.system.createActor(
@@ -83,10 +144,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				this.logger.debug(`Comments actor ${comments.name} created`);
 				this.commentActors.set(uid, comments);
 			}
-			// const maybeQuestionActor = maybe(
-			//	this.system.childrenOf(this.ref!).find(a => a.name.endsWith(`Question_${uid}`))
-			//);
-			//maybeQuestionActor.forEach(ca => this.questionActors.set(uid, ca));
+
 			if (!this.questionActors.has(uid)) {
 				const questions = await this.system.createActor(
 					QuestionActor,
@@ -111,13 +169,20 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					{ name: `Stats_${uid}`, parent: this.ref, strategy: "Restart" },
 					uid
 				);
-                                this.logger.debug(`Stats actor ${stats.name} created`);
-                                this.statisticsActors.set(uid, stats);
+				this.logger.debug(`Stats actor ${stats.name} created`);
+				this.statisticsActors.set(uid, stats);
 			}
 		} catch (e) {
-			this.logger.error(JSON.stringify(e));
+			this.logger.error(`afterEntityWasCached failed uid=${String(uid)} error=${e instanceof Error ? e.stack : String(e)}`);
 		}
+
 	}
+
+	public override async beforeShutdown(): Promise<void> {
+		await super.beforeShutdown();
+		if (this.stalledQuestionCleanupInterval) clearInterval(this.stalledQuestionCleanupInterval);
+	}
+
 
 	protected override async afterEntityRemovedFromCache(uid: Id) {
 		maybe(this.commentActors.get(uid)).forEach(c => {
@@ -154,7 +219,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				continue;
 			}
 
-			console.log("SUBSCRIPTION SEND", subscriber, subscription.userRole, update.students, update.teachers);
+			const subscriberStr = String(subscriber);
+			this.logger.debug(
+				`SUBSCRIPTION SEND to=${subscriberStr} role=${subscription.userRole} ` +
+				`students=${Array.isArray(update.students) ? update.students.length : "?"} ` +
+				`teachers=${Array.isArray(update.teachers) ? update.teachers.length : "?"}`
+			);
 
 			const globalUpdateMessage = new QuizUpdateMessage(
 				subscription.properties.length > 0 ? pick(subscription.properties, update) : update
@@ -198,71 +268,69 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 	}
 
 	public async receive(from: ActorRef, message: QuizActorMessage): Promise<ResultType> {
-		console.log("QUIZACTOR", from.name, message);
+		this.logger.debug(
+			`QUIZACTOR from=${String((from as any)?.name ?? from)} ` +
+			`type=${String((message as any)?.QuizActorMessage ?? (message as any)?.type ?? typeof message)}`
+		);
+
 		try {
 			const [clientUserRole, clientUserId, clientIsTemporary] = await this.determineRole(from);
 			return await QuizActorMessages.match<Promise<ResultType>>(message, {
 				Create: async quiz => {
-					if (clientIsTemporary){
+					if (clientIsTemporary) {
 						return serializeError(new Error("Cannot export as a temporary user"));
-					}			
+					}
 					return this.create(quiz, clientUserRole, clientUserId);
 				},
 				GetUserRun: async ({ studentId, quizId }) => {
 					const db = await this.connector.db();
 					const mbRun = maybe(await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId }));
-					console.warn("GETUSERRUN", { studentId, quizId }, mbRun);
+					this.logger.debug(
+						`GETUSERRUN studentId=${String(studentId)} quizId=${String(quizId)} ` +
+						`runPresent=${mbRun ? "maybe" : "none"}`
+					);
 					return mbRun.match(identity, () => new Error("No run for user"));
 				},
-				AddTeacher: async ({ quiz, teacher }) => {
-					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.teachers.push(teacher);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
-				},
-				AddStudent: async ({ quiz, student }) => {
-					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.students.push(student);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
+				UnstallQuestions: async ({ quizId }) => {
+					// - force=true: unlock everything immediately for that quiz
+					// - force=false: only unlock questions stuck > STALLED_QUESTION_INTERVAL
+					await this.unstallQuestionsInDb({ quizId, reason: "state_editing", force: true });
+					return unit();
 				},
 				Delete: async id => {
 					const mbQuiz = await this.getEntity(id);
-					return mbQuiz.map(async quiz => {
-						if (
-							clientUserRole !== "ADMIN" &&
-							(quiz.createdBy ? quiz.createdBy !== clientUserId : quiz.teachers[0] !== clientUserId)
-						) {
-							this.logger.warn(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
-							);
-							return new Error(
-								`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
-							);
-						}
-						const db = await this.connector.db();
-						await this.deleteEntity(id);
-						await this.state.cache.delete(id);
-						await this.afterEntityRemovedFromCache(id);
-						await db.collection<Question>("questions").deleteMany({ quiz: id });
-						await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
-						this.logger.debug(`Successfully deleted quiz ${id}`);
-						this.sendDeletionToSubscribers(id);
-						return unit();
-					});
-				},
-				RemoveUser: async ({ quiz, user }) => {
-					const q = await this.getEntity(quiz);
-					q.map(async entity => {
-						entity.students = entity.students.filter(s => s !== user);
-						entity.teachers = entity.teachers.filter(s => s !== user);
-						await this.storeEntity(entity);
-						this.sendUpdateToSubscribers(entity);
-					});
+					const quiz = mbQuiz.orUndefined();
+					if (!quiz) return new Error(`Quiz ${id} not found`);
+					if (
+						clientUserRole !== "ADMIN" &&
+						(quiz.createdBy ? quiz.createdBy !== clientUserId : !quiz.teachers.includes(clientUserId))
+					) {
+						this.logger.warn(
+							`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+						);
+						return new Error(
+							`Cannot delete quiz. User ${clientUserId} is nor creating teacher nor admin (role: ${clientUserRole}).`
+						);
+					}
+					const db = await this.connector.db();
+					await this.deleteEntity(id);
+					await this.state.cache.delete(id);
+					// Delete all related data while the per-quiz actors are still alive
+					// so any change events they observe are absorbed cleanly. Also
+					// remove orphaned quizruns and statistics, which previously
+					// accumulated in the DB after every quiz deletion.
+					await db.collection<Question>("questions").deleteMany({ quiz: id });
+					await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
+					await db.collection<QuizRun>("quizruns").deleteMany({ quizId: id });
+					await db.collection("statistics").deleteMany({ quizId: id });
+					// Notify subscribers before tearing down the per-quiz actors so
+					// frontend clients have a chance to unsubscribe cleanly. Otherwise
+					// late unsubscribe sends arrive at already-destroyed targets and
+					// produce "Unknown target" log noise.
+					this.sendDeletionToSubscribers(id);
+					await this.afterEntityRemovedFromCache(id);
+					this.logger.debug(`Successfully deleted quiz ${id}`);
+					return unit();
 				},
 				Get: async uid => {
 					const quiz = await this.getEntity(uid);
@@ -274,18 +342,29 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 				Update: async quiz => {
 					const existingQuiz = await this.getEntity(quiz.uid);
-					console.log("UPDATING", JSON.stringify(existingQuiz), "WITH", JSON.stringify(quiz));
+					this.logger.info(
+						`UPDATING quiz (existing=${existingQuiz ? "maybe" : "none"}) ` +
+						`patchKeys=${quiz ? Object.keys(quiz as object).join(",") : "none"}`
+					);
 					const result = await existingQuiz
 						.map(async c => {
 							if (!(keys(quiz).length === 2)) {
 								if (!quiz.students && !quiz.comments && !quiz.groups && !quiz.previewers) {
 									if (!["TEACHER", "ADMIN"].includes(clientUserRole)) {
-										console.error(clientUserRole, "is not TEACHER or ADMIN");
-										return new Error("Invalid write access to quiz");
+										this.logger.error(
+											`INVALID_QUIZ_UPDATE: patch has no writable fields for non-teacher/admin ` +
+											`role=${String(clientUserRole)} userId=${String(clientUserId)} ` +
+											`patchKeys=${quiz ? Object.keys(quiz as object).join(",") : "none"}`
+										);
+										return new Error("Invalid quiz update: insufficient permissions or empty patch");
 									}
 									if (clientUserRole === "TEACHER" && !isInTeachersList(c, clientUserId)) {
 										// } c.teachers.some(i => i === clientUserId)) {
-										console.error(clientUserId, "is not in teacher list", c.teachers, keys(quiz));
+										this.logger.error(
+											`AUTH userId=${String(clientUserId)} not in teacher list ` +
+											`teachersCount=${Array.isArray(c.teachers) ? c.teachers.length : "?"} ` +
+											`quizKeys=${Array.isArray(keys(quiz)) ? keys(quiz).length : "?"}`
+										);
 										return new Error("Quiz not shared with teacher");
 									}
 								}
@@ -294,37 +373,37 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 							const { created, ...updateDelta } = quiz;
 							const combined = { ...c, ...updateDelta };
 							if (combined.statistics && !combined.statistics?.quizId) {
-								console.error("ERROR, quiz", combined.uid, "has no valid statistics block");
+								this.logger.error(`STATS quiz=${String((combined as any)?.uid ?? "?")} has no valid statistics block`);
 								if (!quiz.statistics?.quizId) {
-									console.error("Update DATA lacks proper statistics block");
+									this.logger.error("STATS update data lacks proper statistics block");
 									if (!c.statistics?.quizId) {
-										console.error("Original DATA lacks proper statistics block");
+										this.logger.error("STATS original data lacks proper statistics block");
 										delete combined.statistics;
 									} else {
-										console.error("Using original statistics block");
+										this.logger.info("STATS using original statistics block");
 										combined.statistics = c.statistics;
 									}
 								} else {
-									console.error("Using updated statistics block");
+									this.logger.info("STATS using updated statistics block");
 									combined.statistics = quiz.statistics;
 								}
 							}
-                                                        let quizToUpdate: Quiz;
-                                                        try {
-                                                                quizToUpdate = quizSchema.parse(combined);
-                                                        } catch (e) {
-                                                                if (e instanceof Error) {
-                                                                        this.logger.error(e.message);
-                                                                        return serializeError(new Error(e.message));
-                                                                }
-                                                                return serializeError(new Error("Unknown validation error"));
-                                                        }
-                                                        if (quiz.state && quiz.state !== "STOPPED") {
-                                                                delete quizToUpdate.archived;
-                                                        }
-                                                        await this.storeEntity(quizToUpdate);
-                                                        this.sendUpdateToSubscribers(quizToUpdate);
-                                                        return quizToUpdate;
+							let quizToUpdate: Quiz;
+							try {
+								quizToUpdate = quizSchema.parse(combined);
+							} catch (e) {
+								if (e instanceof Error) {
+									this.logger.error(e.message);
+									return serializeError(new Error(e.message));
+								}
+								return serializeError(new Error("Unknown validation error"));
+							}
+							if (quiz.state && quiz.state !== "STOPPED") {
+								delete quizToUpdate.archived;
+							}
+							await this.storeEntity(quizToUpdate);
+							this.sendUpdateToSubscribers(quizToUpdate);
+							return quizToUpdate;
 						})
 						.orElse(Promise.resolve(new Error("Quiz not found")));
 					return result;
@@ -357,10 +436,13 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 								quiz.students.some(i => i === clientUserId)
 							)
 						) {
-							console.error("DOnt subscribe", clientUserRole, quiz.students);
+							this.logger.debug(
+								`SUBSCRIBE_SKIPPED: not a participant ` +
+								`quizId=${String(uid)} userId=${String(clientUserId)} role=${String(clientUserRole)}`
+							);
 							return; // No subscription for people who are not part of the quiz
 						}
-						console.warn("Subscribe", clientUserId, clientUserRole);
+						this.logger.info(`SUBSCRIBE userId=${String(clientUserId)} role=${String(clientUserRole)}`);
 						this.state = create(this.state, draft => {
 							const subscribers = draft.subscribers.get(uid) ?? new Set();
 							subscribers.add(from.name as ActorUri);
@@ -381,7 +463,11 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				SubscribeToCollection: async (requestedProperties: string[]) => {
 					this.state = create(this.state, draft => {
 						draft.lastSeen.set(from.name as ActorUri, toTimestamp());
-						console.log("SUBSCRIBING TO QUIITES", from.name, clientUserId, clientUserRole);
+						this.logger.debug(
+							`SUBSCRIBING TO QUIZZES from=${String((from as any)?.name ?? from)} ` +
+							`userId=${String(clientUserId)} role=${String(clientUserRole)}`
+						);
+
 						draft.collectionSubscribers.set(from.name as ActorUri, {
 							properties: requestedProperties,
 							userId: clientUserId,
@@ -397,13 +483,14 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					return unit();
 				},
 				Import: async ({ filename, titlePrefix, userId, userRole }) => {
-					if (clientIsTemporary){
+					if (clientIsTemporary) {
 						return serializeError(new Error("Cannot export as a temporary user"));
 					}
-					console.log(filename);
+					this.logger.debug(`EXPORT filename=${String(filename)}`);
 					const jsonBuffer = await readFile(path.join("./downloads", filename));
-					const importedObject = JSON.parse(jsonBuffer.toString());
+					let importedObject: any;
 					try {
+						importedObject = JSON.parse(jsonBuffer.toString());
 						const propertyKeys = [
 							"allowedQuestionTypesSettings",
 							"description",
@@ -422,7 +509,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 						}
 					} catch (e) {
 						if (e instanceof Error) {
-							console.error(e);
+							this.logger.error(`ERROR ${e instanceof Error ? e.stack : String(e)}`);
 							return serializeError(new Error(e.message));
 						}
 					}
@@ -485,14 +572,17 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					return uid;
 				},
 				Export: async uid => {
-					if (clientIsTemporary){
+					if (clientIsTemporary) {
 						return serializeError(new Error("Cannot export as a temporary user"));
 					}
 					const db = await this.connector.db();
 					const mbQuiz = maybe(await db.collection<Quiz>(this.collectionName).findOne({ uid }));
 					return mbQuiz.match<Promise<Error | string>>(
 						async quiz => {
-							console.log("EXPORTING", quiz);
+							this.logger.info(
+								`EXPORTING quiz uid=${String((quiz as any)?.uid ?? "?")} ` +
+								`qCount=${Array.isArray((quiz as any)?.questions) ? (quiz as any).questions.length : "?"}`
+							);
 							const exportObject: any = { ...quiz };
 							exportObject.state = "EDITING";
 							delete exportObject.lastExport;
@@ -535,7 +625,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					);
 				},
 				Duplicate: async uid => {
-					if (clientIsTemporary){
+					if (clientIsTemporary) {
 						return serializeError(new Error("Cannot export as a temporary user"));
 					}
 					try {
@@ -565,7 +655,7 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 			});
 		} catch (e) {
-			console.error(e);
+			this.logger.error(`ERROR ${e instanceof Error ? e.stack : String(e)}`);
 			throw e;
 		}
 	}

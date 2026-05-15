@@ -28,7 +28,11 @@
 		"bootstrap": "lerna bootstrap",
 		"dev": "lerna run dev",
 		"build": "lerna run build",
-		"docs": "typedoc"
+		"docs": "typedoc",
+		"test": "lerna run test",
+		"lint": "lerna run lint",
+		"test:coverage": "lerna run test:coverage",
+		"typecheck": "lerna run typecheck"
 	},
 	"devDependencies": {
 		"typedoc": "^0.28.15"

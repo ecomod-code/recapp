@@ -67,7 +67,8 @@ export abstract class SubscribableActor<
 		const cleanupTimestamp = DateTime.utc().minus(CLEANUP_INTERVAL);
 		// Remove all old subscriptions
 		this.state = create(this.state, draft => {
-			const isOld = (s: ActorUri) => fromTimestamp(draft.lastSeen.get(s) ?? toTimestamp()) < cleanupTimestamp;
+			const isOld = (s: ActorUri) =>
+				fromTimestamp(draft.lastSeen.get(s) ?? toTimestamp()).toMillis() < cleanupTimestamp.toMillis();
 			const removedSubscribers = new Set<ActorUri>();
 			// Remove old collection subscribers
 			const oldCollectionSubscribers = Array.from(draft.collectionSubscribers.keys()).filter(isOld);

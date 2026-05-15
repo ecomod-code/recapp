@@ -52,7 +52,7 @@ export const MarkdownModal: React.FC<Props> = ({ show, titleId, editorValue, onC
                             value={value}
                             onChange={val => setValue(val ?? "")}
                             height="100%"
-                            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                             
                             components={{ preview: (_source, _state, _dispatch) => <></> }}
                             preview="edit"
                         />

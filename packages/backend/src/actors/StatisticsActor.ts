@@ -119,7 +119,11 @@ export class StatisticsActor extends SubscribableActor<
 
 	public async receive(from: ActorRef, message: StatisticsActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
-		console.debug("STATISTICSACTOR", from.name, message);
+		// console.debug("STATISTICSACTOR", from.name, message);
+		this.logger.debug(
+			`STATISTICSACTOR from=${String((from as any)?.name ?? from)} ` +
+			`type=${String((message as any)?.StatisticsActorMessage ?? (message as any)?.type ?? typeof message)}`
+		);
 		if (typeof message === "string" && message === "SHUTDOWN") {
 			this.shutdown();
 			return unit();
@@ -186,13 +190,13 @@ export class StatisticsActor extends SubscribableActor<
 											(stat as ChoiceElementStatistics).passed + 1;
 									}
 								}
-								console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
+								// console.log("OLDCHOICES", stat.answers, "NEW CHOICES", answer.choices);
 								(stat as ChoiceElementStatistics).answers = (
 									stat as ChoiceElementStatistics
 								).answers.map((a, i) => (answer.choices[i] ? a + 1 : a));
-								console.log("FINAL NEWCHOICES", stat.answers);
+								// console.log("FINAL NEWCHOICES", stat.answers);
 							}
-							console.log("EXISTING CHOICE UPDATE from ", clientUserId);
+							// console.log("EXISTING CHOICE UPDATE from ", clientUserId);
 							return stat;
 						},
 						() => {
@@ -227,12 +231,17 @@ export class StatisticsActor extends SubscribableActor<
 									answers: answer.choices.map(c => (c ? 1 : 0)),
 									wrong: answer.wrong ? 1 : 0,
 								};
-								console.log("BRAND new choice from ", clientUserId, answer);
+								// console.log("BRAND new choice from ", clientUserId, answer);
+								this.logger.debug(
+									`STATS choice update userId=${String(clientUserId)} ` +
+									`len=${Array.isArray((answer as any)?.choices) ? (answer as any).choices.length : "?"}`
+								);
 								return stat;
 							}
 						}
 					);
-					console.log("STATS", stats);
+					// console.log("STATS", stats);
+					this.logger.info(`STATS stored quizId=${String(this.uid)}`);
 					this.storeEntity(stats);
 					for (const [subscriber] of this.state.collectionSubscribers) {
 						this.send(subscriber, new StatisticsUpdateMessage(stats));
@@ -294,22 +303,22 @@ export class StatisticsActor extends SubscribableActor<
 								if (qstats.tag === "TextElementStatistics") {
 									lines.push(
 										`${question.text};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
-											`${qstats.answers[0] ?? ""};${!!qstats.answers[0] ? 1 : 0};` +
-											`${qstats.answers[1] ?? ""};${!!qstats.answers[1] ? 1 : 0};` +
-											`${qstats.answers[2] ?? ""};${!!qstats.answers[2] ? 1 : 0};` +
-											`${qstats.answers[3] ?? ""};${!!qstats.answers[3] ? 1 : 0};` +
-											`${qstats.answers[4] ?? ""};${!!qstats.answers[4] ? 1 : 0};` +
-											`${qstats.answers[5] ?? ""};${!!qstats.answers[5] ? 1 : 0}`
+										`${qstats.answers[0] ?? ""};${!!qstats.answers[0] ? 1 : 0};` +
+										`${qstats.answers[1] ?? ""};${!!qstats.answers[1] ? 1 : 0};` +
+										`${qstats.answers[2] ?? ""};${!!qstats.answers[2] ? 1 : 0};` +
+										`${qstats.answers[3] ?? ""};${!!qstats.answers[3] ? 1 : 0};` +
+										`${qstats.answers[4] ?? ""};${!!qstats.answers[4] ? 1 : 0};` +
+										`${qstats.answers[5] ?? ""};${!!qstats.answers[5] ? 1 : 0}`
 									);
 								} else {
 									lines.push(
 										`${question.text};${question.type};${stats.maximumParticipants};${stats.answers[index]};${stats.correctAnswers[index]};` +
-											`${question.answers[0]?.text ?? ""};${qstats.answers[0] ?? 0};` +
-											`${question.answers[1]?.text ?? ""};${qstats.answers[1] ?? 0};` +
-											`${question.answers[2]?.text ?? ""};${qstats.answers[2] ?? 0};` +
-											`${question.answers[3]?.text ?? ""};${qstats.answers[3] ?? 0};` +
-											`${question.answers[4]?.text ?? ""};${qstats.answers[4] ?? 0};` +
-											`${question.answers[5]?.text ?? ""};${qstats.answers[5] ?? 0}`
+										`${question.answers[0]?.text ?? ""};${qstats.answers[0] ?? 0};` +
+										`${question.answers[1]?.text ?? ""};${qstats.answers[1] ?? 0};` +
+										`${question.answers[2]?.text ?? ""};${qstats.answers[2] ?? 0};` +
+										`${question.answers[3]?.text ?? ""};${qstats.answers[3] ?? 0};` +
+										`${question.answers[4]?.text ?? ""};${qstats.answers[4] ?? 0};` +
+										`${question.answers[5]?.text ?? ""};${qstats.answers[5] ?? 0}`
 									);
 								}
 							}
@@ -593,7 +602,12 @@ export class StatisticsActor extends SubscribableActor<
 				},
 			});
 		} catch (e) {
-			console.error("STATISTICSACTOR Uncaught error", message.value, e);
+			// console.error("STATISTICSACTOR Uncaught error", message.value, e);
+			this.logger.error(
+				`STATISTICSACTOR uncaught error ` +
+				`msgType=${String((message as any)?.tag ?? (message as any)?.type ?? typeof message)} ` +
+				`error=${e instanceof Error ? e.stack : String(e)}`
+			);
 			throw e;
 		}
 	}

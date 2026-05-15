@@ -71,7 +71,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 
 	protected override cleanup(): void {
 		super.cleanup();
-		const cleanupTemps = async () => { 
+		const cleanupTemps = async () => {
 			const cleanupTimestamp = toTimestamp(DateTime.utc().minus({ days: REMOVE_TEMPS_INTERVAL }));
 			const db = await this.connector.db()
 			const temporaryUsers = await db.collection<User>(this.collectionName).find({ isTemporary: true }).toArray();
@@ -85,11 +85,15 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				}
 			})
 		}
-		cleanupTemps();	
+		cleanupTemps();
 	}
 
 	public async receive(from: ActorRef, message: UserStoreMessage): Promise<ResultType> {
-		console.log("USERSTORE", from.name, message);
+		// console.log("USERSTORE", from.name, message);
+		this.logger.debug(
+			`USERSTORE from=${String((from as any)?.name ?? from)} ` +
+			`type=${String((message as any)?.tag ?? (message as any)?.type ?? (message as any)?.UserStoreMessage ?? typeof message)}`
+		);
 		try {
 			const [clientUserRole, clientUserId] = await this.determineRole(from);
 			const result = await UserStoreMessages.match<Promise<ResultType>>(message, {
@@ -107,7 +111,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					}
 					const db = await this.connector.db();
 					const noOfUsers = await db.collection<User>(this.collectionName).countDocuments();
-					console.log("NUMBEROFUSERS", noOfUsers);
+					this.logger.debug(`USERSTORE NUMBEROFUSERS=${noOfUsers}`);
 					if (noOfUsers === 0) {
 						// The first user will always be an admin
 						userToStore.role = "ADMIN";
@@ -178,7 +182,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					users.forEach(user => {
 						const { _id, quizUsage, ...rest } = user;
 						//if (clientUserRole === "SYSTEM" || !rest.isTemporary) {
-							this.send(from, new UserUpdateMessage(rest));
+						this.send(from, new UserUpdateMessage(rest));
 						//}
 					});
 					return unit();
@@ -243,15 +247,17 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					return !this.state.nicknames.has(nickname);
 				},
 				Find: async ({ query, role }) => {
+					if (!query) return new Error("User not found with query <>");
 					const db = await this.connector.db();
-					const users = await db.collection<User>(this.collectionName).find({}).toArray();
-					const user = users.find(
-						u =>
-							u.nickname?.toLocaleLowerCase() === query?.toLocaleLowerCase() ||
-							u.uid?.toLocaleLowerCase() === query?.toLocaleLowerCase() ||
-							u.email?.toLocaleLowerCase() === query?.toLocaleLowerCase() ||
-							u.username?.toLocaleLowerCase() === query?.toLocaleLowerCase()
-					);
+					const q = query.toLocaleLowerCase();
+					const user = await db.collection<User>(this.collectionName).findOne({
+						$or: [
+							{ nickname: { $regex: `^${q}$`, $options: "i" } },
+							{ uid: { $regex: `^${q}$`, $options: "i" } },
+							{ email: { $regex: `^${q}$`, $options: "i" } },
+							{ username: { $regex: `^${q}$`, $options: "i" } },
+						],
+					});
 					if (user) {
 						if (role === "STUDENT") {
 							return user;
@@ -271,7 +277,7 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				},
 				Remove: async uid => {
 					const db = await this.connector.db();
-					const mbUser = maybe(await db.collection<User>(this.collectionName).findOne({uid}));
+					const mbUser = maybe(await db.collection<User>(this.collectionName).findOne({ uid }));
 					return mbUser.match<Unit | Error>(
 						user => {
 							if (user.isTemporary) {
@@ -292,10 +298,19 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 					return new Error(`Unknown message ${JSON.stringify(message)} from ${from.name}`);
 				},
 			});
-			console.log("To ", from.name, result);
+			// console.log("To ", from.name, result);
+			const rid = (result as any)?.uid ?? (result as any)?.value?.uid ?? undefined;
+			this.logger.debug(
+				`USERSTORE reply to=${String((from as any)?.name ?? from)} ` +
+				`resultType=${result instanceof Error ? "Error" : typeof result}` +
+				(rid ? ` uid=${String(rid)}` : "")
+			);
 			return result;
 		} catch (e) {
-			console.error(from, message, e);
+			this.logger.error(
+				`USERSTORE unhandled error from=${String((from as any)?.name ?? from)} ` +
+				`msg=${JSON.stringify(message)} error=${e instanceof Error ? e.stack : String(e)}`
+			);
 			throw e;
 		}
 	}
@@ -345,10 +360,17 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 						createActorUri("SessionStore"),
 						SessionStoreMessages.GetSessionForUserId(newUser.uid)
 					) as Promise<Session>
-				).then((session: Session) => {
-					session.role = newUser.role;
-					this.send(createActorUri("SessionStore"), SessionStoreMessages.StoreSession(session));
-				});
+				)
+					.then((session: Session) => {
+						session.role = newUser.role;
+						this.send(createActorUri("SessionStore"), SessionStoreMessages.StoreSession(session));
+					})
+					.catch((e: unknown) => {
+						this.logger.error(
+							`Failed to update session role for user ${String(newUser.uid)}: ` +
+							`${e instanceof Error ? e.stack : String(e)}`
+						);
+					});
 			}
 
 			for (const [subscriber, subscription] of this.state.collectionSubscribers) {
@@ -365,7 +387,8 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 				draft.lastSeen.set(subscriber, toTimestamp());
 			}
 		});
-		console.log("Updated user", newUser);
+		// console.log("Updated user", newUser);
+		this.logger.info(`USERSTORE updated user uid=${String((newUser as any)?.uid ?? "?")}`);
 		return this.storeEntity(newUser)
 			.then(() => newUser)
 			.catch(error => error as Error);

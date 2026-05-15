@@ -40,10 +40,10 @@ const config = {
     : "http://localhost:5173/Dashboard",
 };
 
-Container.set<string[]>(
-  "api-keys",
-  process.env.API_KEYS?.split(",") ?? ["25868755-c11c-42ee-b4ed-2115ac982ba4"]
-);
+if (!process.env.API_KEYS) {
+  throw new Error("API_KEYS environment variable is required but not set");
+}
+Container.set<string[]>("api-keys", process.env.API_KEYS.split(","));
 Container.set("config", config);
 
 const router = new koaRouter();
@@ -134,11 +134,13 @@ const start = async () => {
     app.use(router.routes());
     app.use(router.allowedMethods());
 
-    console.log("Registered routes:");
-    router.stack.forEach((layer) => {
-      const names = layer.stack.map(fn => fn.name || "<anonymous>");
-      console.log(`${layer.methods.join(",")} ${layer.path} → [${names.join(", ")}]`);
-    });
+    if (process.env.DEBUG_RECAPP === "1" || process.env.LOG_LEVEL === "debug") {
+      logger.debug("Registered routes:");
+      router.stack.forEach(layer => {
+        const names = layer.stack.map(fn => fn.name || "<anonymous>");
+        logger.debug(`${layer.methods.join(",")} ${layer.path} -> [${names.join(", ")}]`);
+      });
+    }
 
     const httpServer = app.listen(3123, "0.0.0.0");
 

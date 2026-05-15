@@ -60,7 +60,7 @@ export const UserParticipationSelect = (props: Props) => {
         },
     };
     if (props.temporary) {
-        delete (userParticipationOptions as any).NAME;
+        delete (userParticipationOptions as Record<string, unknown>).NAME;
     }
 
     useEffect(() => {

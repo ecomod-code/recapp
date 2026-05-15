@@ -45,7 +45,7 @@ export const RunningQuizTab: React.FC<{
 	const currentQuestion = questions[run?.counter ?? 0];
 	const questionId = currentQuestion?.uid ?? toId("");
 	const questionText = questions.at(run?.counter ?? 0)?.text;
-	const { rendered } = useRendered({ value: questionText ?? "" });
+	const { rendered, isStale } = useRendered({ value: questionText ?? "" });
 
 	console.log("ANSWERSTATE", quizState, run);
 
@@ -154,9 +154,13 @@ export const RunningQuizTab: React.FC<{
 					</Card.Header>
 					<Card.Body>
 						<div
+							key={questionId}
 							className="p-2 text-start h-30"
 							style={{ fontSize: 20 }}
-							dangerouslySetInnerHTML={{ __html: rendered }}
+							// When isStale is true the rendered HTML still belongs to the
+							// previous question; render empty until the new HTML is ready
+							// so the old question text doesn't flash on advancement.
+							dangerouslySetInnerHTML={{ __html: isStale ? "" : rendered }}
 						/>
 					</Card.Body>
 					<Card.Footer>
@@ -215,7 +219,7 @@ export const RunningQuizTab: React.FC<{
 										value={textAnswer}
 										onChange={val => setTextAnswer(val ?? "")}
 										height="100%"
-										// eslint-disable-next-line @typescript-eslint/no-unused-vars
+										
 										components={{ preview: (_source, _state, _dispath) => <></> }}
 										preview="edit"
 									/>

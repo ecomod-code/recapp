@@ -26,7 +26,7 @@ const errorIds = {
 
 export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: string }> {
 	protected state = { error: "" };
-	protected pingTimer: any;
+	protected pingTimer: ReturnType<typeof setTimeout> | undefined;
 
 	public constructor(name: string, system: ActorSystem) {
 		super(name, system);
@@ -53,10 +53,11 @@ export class ErrorActor extends StatefulActor<ErrorMessage, Unit, { error: strin
 	}
 
 	public async receive(_from: ActorRef, message: ErrorMessage): Promise<Unit> {
-		console.log(_from, JSON.stringify(message), JSON.stringify(ErrorMessages.SetError(new Error("fdgjfhgdfjhg"))));
+		// console.log(_from, JSON.stringify(message), JSON.stringify(ErrorMessages.SetError(new Error("fdgjfhgdfjhg"))));
 		ErrorMessages.match(message, {
 			SetError: error => {
 				console.error(error);
+				// errorLog({ tag: "ErrorActor.error", error });
 				this.updateState(draft => {
 					draft.error = this.errorForMessage(error.message);
 				});

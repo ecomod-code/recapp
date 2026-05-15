@@ -7,7 +7,7 @@ import { cookie } from "../utils";
 import { d } from "../utils/debugLog";
 
 export class TokenActor extends Actor<unknown, Unit> {
-  public interval: any;
+  public interval: ReturnType<typeof setTimeout> | undefined;
   private expiresAt: Date;
 
   public constructor(name: string, system: ActorSystem) {
@@ -64,7 +64,7 @@ export class TokenActor extends Actor<unknown, Unit> {
 
     clearTimeout(this.interval); // Clear previous timeout
 
-    // clamp to at least 1 s to avoid tight loops
+    // clamp to at least 1s to avoid tight loops
     const safeDelay = Math.max(delay, 1_000);
     if (delay <= 0) {
       console.warn("[TokenActor] Computed delay <= 0, forcing retry in 1 s");

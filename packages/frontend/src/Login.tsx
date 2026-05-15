@@ -26,7 +26,7 @@ export const Login = () => {
                 <div className="flex-grow-1" />
 
                 <div>
-                    <p className="h1">RECAPP</p>
+                    <img src="./recapp_logo.png" alt="Recapp" width="280" />
                     <Button
                         variant="primary"
                         href={`${import.meta.env.VITE_BACKEND_URI}/auth/login`}

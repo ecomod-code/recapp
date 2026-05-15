@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { i18n } from "@lingui/core";
 import { Trans } from "@lingui/react";
 import { Layout } from "../../layout/Layout";
 import { SystemContext } from "ts-actors-react";

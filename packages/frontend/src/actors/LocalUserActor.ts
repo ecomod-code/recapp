@@ -115,7 +115,7 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 				});
 			}
 		} else if (message.tag == "QuizUpdateMessage") {
-			const names: any[] = message.quiz.teachers
+			const names: { username: string }[] = message.quiz.teachers
 				? await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers))
 				: [];
 			this.updateState(draft => {
@@ -154,9 +154,9 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 					userRole: undefined,
 				})
 			);
-			if ((result as any).message) {
+			if ((result as Error).message) {
 				this.updateState(draft => {
-					draft.error = (result as any).message;
+					draft.error = (result as Error).message;
 				});
 			} else {
 				this.updateState(draft => {

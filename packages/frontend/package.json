@@ -1,7 +1,7 @@
 {
 	"name": "@recapp/frontend",
 	"private": true,
-	"version": "1.6.5-OHT-003",
+	"version": "1.6.6-20260515",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",

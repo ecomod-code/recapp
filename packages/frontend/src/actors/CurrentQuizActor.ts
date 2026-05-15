@@ -154,9 +154,34 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			}
 			return nothing();
 		} else if (message.tag === "QuizDeletedMessage") {
-			/* if (message.quizId !== this.quiz.orElse(toId("-"))) {
+			// Ignore deletions for quizzes we're not currently watching — otherwise
+			// any quiz deletion (e.g. from the dashboard list) would clear our state
+			// and surface a misleading "quiz deleted" error.
+			if (message.quizId !== this.quiz.orElse(toId("-"))) {
 				return nothing();
-			} */
+			}
+			// Proactively unsubscribe from the per-quiz collection actors before
+			// the backend tears them down, so cleanup messages reach live targets
+			// instead of producing "Unknown target" log noise.
+			this.quiz.forEach(q => {
+				this.send(actorUris.QuizActor, QuizActorMessages.UnsubscribeFrom(q));
+				this.send(
+					`${actorUris.CommentActorPrefix}${q}`,
+					CommentActorMessages.UnsubscribeFromCollection()
+				);
+				this.send(
+					`${actorUris.QuestionActorPrefix}${q}`,
+					QuestionActorMessages.UnsubscribeFromCollection()
+				);
+				this.send(
+					`${actorUris.QuizRunActorPrefix}${q}`,
+					QuizRunActorMessages.UnsubscribeFromCollection()
+				);
+				this.send(
+					`${actorUris.StatsActorPrefix}${q}`,
+					StatisticsActorMessages.UnsubscribeFromCollection()
+				);
+			});
 			this.updateState(draft => {
 				draft.quiz = {} as Quiz;
 				draft.deleted = true;

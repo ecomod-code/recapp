@@ -315,11 +315,21 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 					const db = await this.connector.db();
 					await this.deleteEntity(id);
 					await this.state.cache.delete(id);
-					await this.afterEntityRemovedFromCache(id);
+					// Delete all related data while the per-quiz actors are still alive
+					// so any change events they observe are absorbed cleanly. Also
+					// remove orphaned quizruns and statistics, which previously
+					// accumulated in the DB after every quiz deletion.
 					await db.collection<Question>("questions").deleteMany({ quiz: id });
 					await db.collection<Comment>("comments").deleteMany({ relatedQuiz: id });
-					this.logger.debug(`Successfully deleted quiz ${id}`);
+					await db.collection<QuizRun>("quizruns").deleteMany({ quizId: id });
+					await db.collection("statistics").deleteMany({ quizId: id });
+					// Notify subscribers before tearing down the per-quiz actors so
+					// frontend clients have a chance to unsubscribe cleanly. Otherwise
+					// late unsubscribe sends arrive at already-destroyed targets and
+					// produce "Unknown target" log noise.
 					this.sendDeletionToSubscribers(id);
+					await this.afterEntityRemovedFromCache(id);
+					this.logger.debug(`Successfully deleted quiz ${id}`);
 					return unit();
 				},
 				Get: async uid => {

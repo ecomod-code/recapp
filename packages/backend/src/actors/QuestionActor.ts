@@ -63,6 +63,17 @@ export class QuestionActor extends SubscribableActor<Question, QuestionActorMess
 			return unit();
 		}
 
+		const knownTags = ["Create", "Update", "GetAll", "Delete", "SubscribeToCollection", "UnsubscribeFromCollection"];
+		const messageTag = (message as { QuestionActorMessage?: string })?.QuestionActorMessage;
+		if (!messageTag || !knownTags.includes(messageTag)) {
+			this.logger.warn(
+				`QUESTIONACTOR ignored unknown message ` +
+				`from=${String((from as any)?.name ?? from)} ` +
+				`tag=${String(messageTag ?? (message as any)?.QuizActorMessage ?? typeof message)}`
+			);
+			return unit();
+		}
+
 		try {
 			return await QuestionActorMessages.match<Promise<ResultType>>(message, {
 				Create: async question => {

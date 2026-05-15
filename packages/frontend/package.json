@@ -1,7 +1,7 @@
 {
 	"name": "@recapp/frontend",
 	"private": true,
-	"version": "1.6.6-20260515",
+	"version": "1.6.6",
 	"type": "module",
 	"scripts": {
 		"dev": "vite",
@@ -19,7 +19,7 @@
 		"@lingui/macro": "^4.7.1",
 		"@lingui/react": "^4.7.1",
 		"@lingui/vite-plugin": "^5.3.1",
-		"@recapp/models": "^1.0.0",
+		"@recapp/models": "^1.1.0",
 		"@types/katex": "^0.16.7",
 		"@types/luxon": "^3.4.2",
 		"@types/serialize-error": "^4.0.1",

@@ -67,8 +67,9 @@ export const Activate: React.FC = () => {
 				</Modal.Footer>
 			</Modal>
 			<div>
-				<img src="./recapp_logo.png" alt="Recapp" width="280" />
+				<img src="./recapp_logo.svg" alt="Recapp" width="280" />
 			</div>
+			<br />
 			<div>
 				<Trans id="login-page.info-text" />
 			</div>

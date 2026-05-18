@@ -55,6 +55,7 @@
 	"version": "1.0.5",
 	"devDependencies": {
 		"@vitest/coverage-v8": "^2.1.9",
+		"mongodb-memory-server": "^9.5.0",
 		"vitest": "^2.1.9"
 	}
 }

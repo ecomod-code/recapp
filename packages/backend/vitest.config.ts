@@ -6,6 +6,7 @@ export default defineConfig({
     environment: "node",
     passWithNoTests: true,
     include: ["test/**/*.test.ts", "src/**/*.test.ts"],
+    setupFiles: ["test/setup/vitest.setup.ts"],
     coverage: {
       reporter: ["text", "lcov"],
       include: ["src/**/*.ts"],

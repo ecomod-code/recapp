@@ -83,7 +83,7 @@ export const HeaderSection: React.FC = () => {
 						<Navbar className="bg-body-tertiary" sticky="top">
 							<Container>
 								<Navbar.Brand href="#">
-                                    <img src="/recapp_logo.svg" alt="Recapp" height="30" />
+                                    <img src="/recapp_logo.svg" alt="Recapp" height="50" />
                                 </Navbar.Brand>
                                 {!quizData?.isPresentationModeActive ? (
                                     <Nav className="justify-content-end flex-grow-1 pe-3">

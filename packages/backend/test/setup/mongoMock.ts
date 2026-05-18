@@ -39,10 +39,11 @@ function applySet(doc: AnyDoc, $set: AnyDoc): void {
 		const parts = key.split(".");
 		let cur = doc;
 		for (let i = 0; i < parts.length - 1; i++) {
-			if (cur[parts[i]] == null) cur[parts[i]] = {};
-			cur = cur[parts[i]];
+			const part = parts[i]!;
+			if (cur[part] == null) cur[part] = {};
+			cur = cur[part] as AnyDoc;
 		}
-		cur[parts[parts.length - 1]] = value;
+		cur[parts[parts.length - 1]!] = value;
 	}
 }
 
@@ -74,7 +75,7 @@ class MockCollection<T extends AnyDoc> {
 	): Promise<UpdateResult> {
 		const idx = this.docs.findIndex(doc => matchesFilter(doc, filter));
 		if (idx >= 0) {
-			applySet(this.docs[idx], update.$set);
+			applySet(this.docs[idx] as AnyDoc, update.$set);
 			return { acknowledged: true, matchedCount: 1, modifiedCount: 1, upsertedCount: 0, upsertedId: null } as UpdateResult;
 		}
 		if (options?.upsert) {
@@ -88,8 +89,8 @@ class MockCollection<T extends AnyDoc> {
 	async updateMany(filter: AnyDoc, update: { $set: AnyDoc }): Promise<UpdateResult> {
 		let count = 0;
 		for (const doc of this.docs) {
-			if (matchesFilter(doc, filter)) {
-				applySet(doc, update.$set);
+			if (matchesFilter(doc as AnyDoc, filter)) {
+				applySet(doc as AnyDoc, update.$set);
 				count++;
 			}
 		}

@@ -20,6 +20,7 @@ import { nothing } from "tsmonads";
 import * as path from "path";
 import { writeFile } from "fs/promises";
 import wk from "wkhtmltopdf";
+import { logger } from "../logger";
 
 type State = {
 	cache: Map<Id, TextElementStatistics | ChoiceElementStatistics>;
@@ -268,7 +269,7 @@ export class StatisticsActor extends SubscribableActor<
 				Clear: async () => {
 					const db = await this.connector.db();
 					const result = await db.collection(this.collectionName).deleteMany({ quizId: this.uid });
-					console.warn(result);
+					logger.warn(JSON.stringify(result));
 					this.state.cache = new Map();
 					this.state.subscribers.forEach(subscriberSet =>
 						subscriberSet.forEach(subscriber =>

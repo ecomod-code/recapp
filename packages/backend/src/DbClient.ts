@@ -1,5 +1,6 @@
 import { Auth, Db, MongoClient } from "mongodb";
 import { Service } from "typedi";
+import { logger } from "./logger";
 
 export const createConnection = async (): Promise<MongoClient> => {
   const { MONGODB_PORT, MONGODB_USER, MONGODB_PW, MONGODB_HOST } = process.env;
@@ -25,7 +26,7 @@ export class DbClient {
       try {
         await this.connection.connect();
       } catch (e) {
-        console.error(e);
+        logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
         throw e;
       }
     }

@@ -8,6 +8,7 @@ import { Draft, create } from "mutative";
 import { Timestamp, Unit, fromTimestamp, hours, toTimestamp, unit } from "itu-utils";
 import { DateTime } from "luxon";
 import { systemEquals, createActorUri, extractSystemName } from "../utils";
+import { logger } from "../logger";
 
 export const CLEANUP_INTERVAL = hours(24);
 
@@ -54,7 +55,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		)
 			.then(s => s as Session)
 			.catch((e: Error): Session => {
-				console.error(e);
+				logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 				return { role: "STUDENT", uid: "", fingerprint: "-"} as Session;
 			});
 		return [session.role, session.uid, !!session.fingerprint];
@@ -128,7 +129,7 @@ export abstract class StoringActor<Entity extends Document & { updated: Timestam
 		if (result.upsertedCount === 1 || result.modifiedCount === 1 || result.matchedCount === 1) {
 			return entity;
 		}
-		console.error(result);
+		logger.error(JSON.stringify(result));
 		throw new Error("FATAL: Storing a session failed");
 	};
 

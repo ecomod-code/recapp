@@ -4,6 +4,7 @@ import { create } from "mutative";
 import { ActorUri, Fingerprint, FingerprintStoreMessage, FingerprintStoreMessages, FingerprintUpdateMessage, Id, User, UserStoreMessage, UserStoreMessages } from "@recapp/models";
 import { identity, pick } from "rambda";
 import { CollecionSubscription, SubscribableActor } from "./SubscribableActor";
+import { logger } from "../logger";
 
 type FingerprintStoreResult = Unit | Error | Fingerprint | boolean;
 
@@ -54,7 +55,7 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 					fingerprint.updated = toTimestamp();
 					const newFingerprint = { ...currentFingerprint, ...fingerprint };
 					draft.cache.set(fingerprint.uid, newFingerprint);
-					console.debug("SToring new fingerprint", newFingerprint);
+					logger.debug(`Storing new fingerprint ${JSON.stringify(newFingerprint)}`);
 					this.storeEntity(newFingerprint);
 				});
 				return unit();

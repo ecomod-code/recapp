@@ -59,7 +59,7 @@ const upload = multer({
     if (
       ![".json"].includes(path.extname(file.originalname).toLocaleLowerCase())
     ) {
-      console.warn(
+      logger.warn(
         `File ${file.originalname} cannot be uploaded. Wrong file format`
       );
       callback(
@@ -179,7 +179,7 @@ const start = async () => {
       errorReceiver: true,
     });
   } catch (err) {
-    console.error(err);
+    logger.error(err instanceof Error ? err.stack ?? err.message : String(err));
     process.exit(1);
   }
 };

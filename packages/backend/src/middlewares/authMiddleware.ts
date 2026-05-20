@@ -35,12 +35,12 @@ export const authenticationMiddleware = (request: IncomingMessage, next: (err: E
 		.map(bearerValid)
 		.orElse(Promise.resolve("" as Id)) as Promise<Id>;
 	tokenValid
-		.then(uid => {
+		.then(async uid => {
 			if (!uid) {
 				next(authorizationError());
 				return;
 			}
-			Container.get<ActorSystem>("actor-system").send(
+			await Container.get<ActorSystem>("actor-system").ask(
 				createActorUri("SessionStore"),
 				SessionStoreMessages.StoreSession({ uid, actorSystem })
 			);

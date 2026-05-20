@@ -1,0 +1,29 @@
+/**
+ * Recapp brand colors
+ * Primary: #153268 (from packages/frontend/src/styles/_variables.scss)
+ * Logo fill: #1f3464
+ */
+
+:root {
+  --vp-c-brand-1: #153268;
+  --vp-c-brand-2: #1c4080;
+  --vp-c-brand-3: #2352a0;
+  --vp-c-brand-soft: rgba(21, 50, 104, 0.14);
+
+  --vp-button-brand-bg: #153268;
+  --vp-button-brand-hover-bg: #1c4080;
+  --vp-button-brand-active-bg: #0f2450;
+  --vp-button-brand-border: transparent;
+  --vp-button-brand-hover-border: transparent;
+  --vp-button-brand-active-border: transparent;
+  --vp-button-brand-text: #ffffff;
+  --vp-button-brand-hover-text: #ffffff;
+  --vp-button-brand-active-text: #ffffff;
+}
+
+.dark {
+  --vp-c-brand-1: #4d7cc7;
+  --vp-c-brand-2: #3a6ab8;
+  --vp-c-brand-3: #2857a0;
+  --vp-c-brand-soft: rgba(77, 124, 199, 0.16);
+}

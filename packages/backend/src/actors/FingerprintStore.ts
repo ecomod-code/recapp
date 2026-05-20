@@ -73,7 +73,7 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 						this.storeEntity({...fp, blocked: true});
 						this.updateSubscribers({...fp, blocked: true})
 						if (uid)
-							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid: fp.uid, active: false }));
+							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: false }));
 						return unit();
 					},
 					() => {
@@ -89,7 +89,7 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 						this.storeEntity({...fp, blocked: false});
 						this.updateSubscribers({...fp, blocked: false})
 						if (uid)
-							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid: fp.uid, active: true }));
+							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: true }));
 						return unit();
 					},
 					() => {

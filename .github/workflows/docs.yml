@@ -21,18 +21,35 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Needed for lastUpdated timestamps in VitePress
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: "npm"
 
-      - name: Install dependencies
-        run: npm install
+      # ── 1. Install root dependencies (needed for TypeDoc) ──────────────────
+      - name: Install root dependencies
+        run: npm ci
 
-      - name: Build developer docs (all packages)
-        run: npm run docs   # -> TypeDoc outputs to docs/api
+      # ── 2. Build TypeDoc API reference → docs/api/ ─────────────────────────
+      - name: Build API reference (TypeDoc)
+        run: npm run docs
 
+      # ── 3. Install VitePress dependencies ──────────────────────────────────
+      - name: Install VitePress dependencies
+        working-directory: docs-user
+        run: npm ci
+
+      # ── 4. Build VitePress user guide → docs/ (overwrites index.html) ──────
+      - name: Build user guide (VitePress)
+        working-directory: docs-user
+        run: npm run docs:build
+
+      # ── 5. Upload combined docs/ folder to GitHub Pages ────────────────────
       - name: Upload artifact for GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:

@@ -13,6 +13,7 @@ import { ActorRef, ActorSystem } from "ts-actors";
 import { Timestamp, Unit, toTimestamp, unit } from "itu-utils";
 import { create } from "mutative";
 import { identity, pick } from "rambda";
+import { logger } from "../logger";
 import { v4 } from "uuid";
 import { maybe } from "tsmonads";
 
@@ -139,7 +140,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 				Clear: async () => {
 					const db = await this.connector.db();
 					const result = await db.collection<QuizRun>(this.collectionName).deleteMany({ quizId: this.uid });
-					console.warn(result);
+					logger.warn(JSON.stringify(result));
 					this.state.cache = new Map();
 					this.state.subscribers.forEach(subscriberSet =>
 						subscriberSet.forEach(subscriber => this.send(subscriber, new QuizRunDeletedMessage()))
@@ -169,7 +170,7 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 				},
 			});
 		} catch (e) {
-			console.error(e);
+			logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 			throw e;
 		}
 	}

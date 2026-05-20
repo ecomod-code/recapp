@@ -8,6 +8,7 @@ import Container from "typedi";
 import jwt from "jsonwebtoken";
 import koa from "koa";
 import crypto from "crypto";
+import { logger } from "./logger";
 
 export const systemName = "recapp-backend";
 
@@ -100,7 +101,7 @@ export const createTempJwt = (userId: Id, fingerprint: string): any => {
 		const token = jwt.sign(payload, JWT_SECRET as jwt.Secret, options);
 		return token;
 	} catch (error) {
-		console.error("Error on creating token:", error);
+		logger.error(`Error on creating token: ${error instanceof Error ? error.stack ?? error.message : String(error)}`);
 		throw error;
 	}
 };

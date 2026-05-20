@@ -27,8 +27,12 @@ export const CreateQuiz: React.FC = () => {
 	return flattenSystem(tSystem, tActor, mbState).match(
 		([system, actor, state]) => {
 			const createQuiz = async () => {
-				const uid = await system.ask(actorUris["CreateQuiz"], CreateQuizMessages.CreateQuiz());
-				nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: uid } });
+				try {
+					const uid = await system.ask(actorUris["CreateQuiz"], CreateQuizMessages.CreateQuiz());
+					nav({ pathname: "/Dashboard/Quiz" }, { state: { quizId: uid } });
+				} catch (e) {
+					console.error("CreateQuiz actor rejected:", e);
+				}
 			};
 			const { quiz, validation } = state;
 

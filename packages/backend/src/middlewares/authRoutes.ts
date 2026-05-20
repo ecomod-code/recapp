@@ -43,7 +43,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	try {
 		client = await getOidc();
 	} catch (e: any) {
-		console.error("[authLogin] getOidc failed:", e?.code, e?.message, e?.stack);
+		logger.error(`[authLogin] getOidc failed: code=${String(e?.code)} message=${String(e?.message)} stack=${String(e?.stack)}`);
 		ctx.throw(400, "ID provider cannot be contacted. Login impossible");
 	}
 
@@ -82,10 +82,10 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 				userUid: uid,
 				initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
 			};
-			await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
+			await system.ask(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
 			fpData = fp;
 		}
-		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
+		await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
 		if (fpData.blocked) {
 			// console.debug("Fingerprint was blocked", fingerprint);
 			logger.warn(`FINGERPRINT blocked id=${String(fingerprint)}`);
@@ -93,8 +93,8 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			return;
 		}
 	} catch (e) {
-		console.error(e);
-		console.debug("A new fingerprint has been found", fingerprint);
+		logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
+		logger.debug(`FINGERPRINT new (catch) id=${String(fingerprint)}`);
 		const fp: Fingerprint = {
 			uid: fingerprint as Id,
 			created: toTimestamp(),
@@ -105,26 +105,26 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			userUid: uid,
 			initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined,
 		};
-		await system.send(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
-		await system.send(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
+		await system.ask(fpStore, FingerprintStoreMessages.StoreFingerprint(fp));
+		await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: fingerprint as Id, userUid: uid as Id, initialQuiz: quiz && quiz !== "false" ? quiz as Id : undefined }));
 	}
 	try {
 		const existingUser: User | Error = await system.ask(userStore, UserStoreMessages.GetByFingerprint(fingerprint));
 		if (existingUser instanceof Error) {
-			console.debug("A new fingerprint has been generated");
+			logger.debug("FINGERPRINT new (no existing user)");
 		} else if (!existingUser.active) {
 			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "?error=userdeactivated");
 			return;
 		}
 	} catch (e) {
-		console.error(e);
+		logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 	}
 	// Wenn nicht, dann Token, temporären User und Session anlegen
 	const token = createTempJwt(uid, fingerprint);
 	const decoded = jwt.decode(token) as jwt.JwtPayload;
 	const sessionStore = createActorUri("SessionStore");
 	const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
-	await system.send(
+	await system.ask(
 		userStore,
 		UserStoreMessages.Create({
 			uid,
@@ -141,7 +141,7 @@ export const authTempAccount = async (ctx: koa.Context): Promise<void> => {
 			initialQuiz: quiz && quiz !== "false" ? quiz : undefined,
 		})
 	);
-	await system.send(
+	await system.ask(
 		sessionStore,
 		SessionStoreMessages.StoreSession({
 			idToken: token,
@@ -172,7 +172,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 	try {
 		client = await getOidc();
 	} catch (e) {
-		console.error(e);
+		logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 		ctx.status = 400;
 		ctx.body = "ID provider cannot be contacted. Access impossible.";
 		return;
@@ -203,7 +203,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 			try {
 				const userExists = await system.ask(userStore, UserStoreMessages.Has(uid));
 				if (!userExists) {
-					await system.send(
+					await system.ask(
 						userStore,
 						UserStoreMessages.Create({
 							uid,
@@ -242,7 +242,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 				// console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
 				logger.debug(`AUTH token expiry idToken=${String(expires.toISO())} refresh=${String(refreshExpires.toISO())}`);
 				const sessionStore = createActorUri("SessionStore");
-				system.send(
+				await system.ask(
 					sessionStore,
 					SessionStoreMessages.StoreSession({
 						idToken: tokenSet.id_token ?? "",
@@ -256,7 +256,7 @@ export const authProviderCallback = async (ctx: koa.Context): Promise<void> => {
 				);
 				ctx.set("Set-Cookie", `bearer=${tokenSet.id_token}; path=/; expires=${refreshExpires.toHTTP()}`);
 			} catch (e) {
-				console.error("authProviderCallback", e);
+				logger.error(`authProviderCallback ${e instanceof Error ? e.stack ?? e.message : String(e)}`);
 				throw e;
 			}
 			ctx.redirect((process.env.FRONTEND_URI ?? "http://localhost:5173") + "/Dashboard");
@@ -289,16 +289,16 @@ export const authLogout = async (ctx: koa.Context): Promise<void> => {
 				if (session instanceof Error) {
 					throw session;
 				}
-				await system.send(sessionStore, SessionStoreMessages.RemoveSession(session.uid));
+				await system.ask(sessionStore, SessionStoreMessages.RemoveSession(session.uid));
 				if (session.fingerprint) {
 					const userStore = createActorUri("UserStore");
-					await system.send(
+					await system.ask(
 						userStore,
 						UserStoreMessages.Remove(session.uid)
 					);
 				}
 			} catch (e) {
-				console.error("authLogout", e);
+				logger.error(`authLogout ${e instanceof Error ? e.stack ?? e.message : String(e)}`);
 				throw e;
 			}
 		},
@@ -340,13 +340,13 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 						let fpData: Fingerprint = await system.ask(fpStore, FingerprintStoreMessages.Get(session.fingerprint as Id));
 						await system.ask(fpStore, FingerprintStoreMessages.IncreaseCount({ fingerprint: session.fingerprint as Id, userUid: session.uid, initialQuiz: undefined }));
 						if (fpData.blocked) {
-							system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
+							await system.ask(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
 							ctx.set("Set-Cookie", `bearer=; path=/`);
 							ctx.throw(401, "Token renewal failure");
 							return;
 						}
 					} catch (e) {
-						console.error(e);
+						logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 					}
 					const token = createTempJwt(session.uid, session.fingerprint);
 					const thirtyDaysFromNow = new Date();
@@ -362,8 +362,8 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 					const decodedRefresh = jwt.decode(newTokenSet.refresh_token ?? "") as jwt.JwtPayload;
 					const expires = DateTime.fromMillis((decoded.exp ?? -1) * 1000).toUTC();
 					const refreshExpires = DateTime.fromMillis(((decodedRefresh ?? decoded).exp ?? -1) * 1000).toUTC();
-					console.log("Setting expiry to", expires.toISO(), refreshExpires.toISO());
-					system.send(
+					logger.debug(`AUTH refresh expiry idToken=${String(expires.toISO())} refresh=${String(refreshExpires.toISO())}`);
+					await system.ask(
 						sessionStore,
 						SessionStoreMessages.StoreSession({
 							uid: sub as Id,
@@ -386,12 +386,12 @@ export const authRefresh = async (ctx: koa.Context): Promise<void> => {
 				} catch (e) {
 					// console.error("Failed to renew token", e);
 					logger.warn(`AUTH failed to renew token: ${e instanceof Error ? e.stack : String(e)}`);
-					system.send(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
+					await system.ask(sessionStore, SessionStoreMessages.RemoveSession(sub as Id));
 					ctx.set("Set-Cookie", `bearer=; path=/`);
 					ctx.throw(401, "Token renewal failure");
 				}
 			} catch (e) {
-				console.error(e);
+				logger.error(e instanceof Error ? e.stack ?? e.message : String(e));
 				ctx.set("Set-Cookie", `bearer=; path=/`);
 				ctx.throw(401, "Invalid token");
 			}

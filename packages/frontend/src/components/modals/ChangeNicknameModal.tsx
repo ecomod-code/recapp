@@ -33,6 +33,7 @@ export const ChangeNicknameModal: React.FC<Props> = ({ show, defaultValue, onClo
                 s
                     .ask("actors://recapp-backend/UserStore", UserStoreMessages.IsNicknameUnique(newValue))
                     .then(result => !result && setError(i18n._("error-nickname-already-used")))
+                    .catch(() => { /* network error — skip uniqueness check */ })
             );
         }
     };

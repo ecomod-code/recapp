@@ -76,6 +76,11 @@ export class SharingActor extends StatefulActor<SharingMessage, Unit, SharingSta
 								draft.errors.push({ id: toId(v4()), queryNotFound: query });
 							});
 						}
+					})
+					.catch(() => {
+						this.updateState(draft => {
+							draft.errors.push({ id: toId(v4()), queryNotFound: query });
+						});
 					});
 			},
 			Clear: () => {

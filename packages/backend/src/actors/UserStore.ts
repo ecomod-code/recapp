@@ -353,26 +353,6 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 			newUser.updated = toTimestamp();
 			draft.cache.set(userToStore.uid, newUser);
 
-			// If the role has changed, also update the session store
-			if (oldUser.role !== newUser.role) {
-				(
-					this.ask(
-						createActorUri("SessionStore"),
-						SessionStoreMessages.GetSessionForUserId(newUser.uid)
-					) as Promise<Session>
-				)
-					.then((session: Session) => {
-						session.role = newUser.role;
-						this.send(createActorUri("SessionStore"), SessionStoreMessages.StoreSession(session));
-					})
-					.catch((e: unknown) => {
-						this.logger.error(
-							`Failed to update session role for user ${String(newUser.uid)}: ` +
-							`${e instanceof Error ? e.stack : String(e)}`
-						);
-					});
-			}
-
 			for (const [subscriber, subscription] of this.state.collectionSubscribers) {
 				this.send(
 					subscriber,
@@ -389,8 +369,30 @@ export class UserStore extends SubscribableActor<User, UserStoreMessage, ResultT
 		});
 		// console.log("Updated user", newUser);
 		this.logger.info(`USERSTORE updated user uid=${String((newUser as any)?.uid ?? "?")}`);
-		return this.storeEntity(newUser)
+		const storeResult = await this.storeEntity(newUser)
 			.then(() => newUser)
 			.catch(error => error as Error);
+		if (!(storeResult instanceof Error) && oldUser.role !== newUser.role) {
+			try {
+				const sessionOrError = await this.ask(
+					createActorUri("SessionStore"),
+					SessionStoreMessages.GetSessionForUserId(newUser.uid)
+				);
+				if (!(sessionOrError instanceof Error)) {
+					const session = sessionOrError as Session;
+					session.role = newUser.role;
+					await this.ask(
+						createActorUri("SessionStore"),
+						SessionStoreMessages.StoreSession(session)
+					);
+				}
+			} catch (e: unknown) {
+				this.logger.error(
+					`Failed to update session role for user ${String(newUser.uid)}: ` +
+					`${e instanceof Error ? e.stack : String(e)}`
+				);
+			}
+		}
+		return storeResult;
 	};
 }

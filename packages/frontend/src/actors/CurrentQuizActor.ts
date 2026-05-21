@@ -598,7 +598,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								g.questions = g.questions.filter(q => q !== id);
 								return g;
 							});
-							await this.send(
+							await this.ask(
 								actorUris.QuizActor,
 								QuizActorMessages.Update({ uid: this.state.quiz.uid, groups })
 							);

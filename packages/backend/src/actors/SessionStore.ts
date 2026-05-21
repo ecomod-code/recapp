@@ -47,16 +47,16 @@ export class SessionStore extends StoringActor<Session, SessionStoreMessage, Ses
 	public async receive(from: ActorRef, message: SessionStoreMessage): Promise<SessionStoreResult> {
 		const result = await SessionStoreMessages.match<Promise<SessionStoreResult>>(message, {
 			StoreSession: async session => {
-				this.state = await create(this.state, async draft => {
-					const currentSession = (await this.getEntity(session.uid)).orElse({} as Session);
+				const currentSession = (await this.getEntity(session.uid)).orElse({} as Session);
+				session.updated = toTimestamp();
+				const newSession = { ...currentSession, ...session };
+				this.state = create(this.state, draft => {
 					if (session.actorSystem) {
 						draft.clientIndex.set(session.actorSystem, session.uid);
 					}
-					session.updated = toTimestamp();
-					const newSession = { ...currentSession, ...session };
 					draft.cache.set(session.uid, newSession);
-					this.storeEntity(newSession);
 				});
+				await this.storeEntity(newSession);
 				return unit();
 			},
 			CheckSession: async userId => {

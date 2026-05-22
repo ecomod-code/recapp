@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script>
+    var lang = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    var base = '/recapp/';
+    if (lang.startsWith('de')) {
+      window.location.replace(base + 'de/');
+    } else {
+      window.location.replace(base + 'en/');
+    }
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/recapp/en/">
+  </noscript>
+</head>
+<body></body>
+</html>

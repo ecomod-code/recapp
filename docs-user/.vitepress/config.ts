@@ -4,15 +4,13 @@ export default defineConfig({
   base: "/recapp/",
   title: "Recapp User Guide",
 
-  // Build output goes into the repo's docs/ folder,
-  // where TypeDoc has already placed docs/api/
   outDir: "../docs",
-  // Don't wipe docs/api/ that TypeDoc built before us
   cleanUrls: true,
 
-  // Auto-detect browser language and redirect to /de/ or /en/
   locales: {
-    de: {
+    // root locale handles /recapp/ fallback for VitePress internals.
+    // Content lives in de/ and en/ — public/index.html redirects / to the right language.
+    root: {
       label: "Deutsch",
       lang: "de",
       link: "/de/",
@@ -51,10 +49,7 @@ export default defineConfig({
         ],
         outlineTitle: "Auf dieser Seite",
         lastUpdatedText: "Zuletzt aktualisiert",
-        docFooter: {
-          prev: "Vorherige Seite",
-          next: "Nächste Seite",
-        },
+        docFooter: { prev: "Vorherige Seite", next: "Nächste Seite" },
         darkModeSwitchLabel: "Erscheinungsbild",
         sidebarMenuLabel: "Menü",
         returnToTopLabel: "Nach oben",
@@ -100,22 +95,16 @@ export default defineConfig({
           },
         ],
         lastUpdatedText: "Last updated",
-        docFooter: {
-          prev: "Previous page",
-          next: "Next page",
-        },
+        docFooter: { prev: "Previous page", next: "Next page" },
       },
     },
   },
 
   themeConfig: {
-    // Shared across both locales
     socialLinks: [
       { icon: "github", link: "https://github.com/ecomod-code/recapp" },
     ],
-    search: {
-      provider: "local",
-    },
+    search: { provider: "local" },
   },
 
   lastUpdated: true,

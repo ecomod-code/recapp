@@ -73,7 +73,7 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: "Guide", link: "/en/guide/getting-started" },
-          { text: "API Reference", link: "/recapp/api/", target: "_self" },
+          { text: "API Reference", link: "/api/", target: "_self" },
         ],
         sidebar: [
           {

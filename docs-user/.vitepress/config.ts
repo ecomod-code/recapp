@@ -27,6 +27,7 @@ export default defineConfig({
             items: [
               { text: "Was ist Recapp?", link: "/de/guide/what-is-recapp" },
               { text: "Erste Schritte", link: "/de/guide/getting-started" },
+              { text: "Recapp in der Praxis", link: "/de/guide/teaching-scenario" },
             ],
           },
           {
@@ -74,6 +75,7 @@ export default defineConfig({
             items: [
               { text: "What is Recapp?", link: "/en/guide/what-is-recapp" },
               { text: "Getting Started", link: "/en/guide/getting-started" },
+              { text: "Recapp in Practice", link: "/en/guide/teaching-scenario" },
             ],
           },
           {

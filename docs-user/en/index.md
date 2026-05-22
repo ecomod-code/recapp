@@ -27,6 +27,6 @@ features:
   - icon: 🔗
     title: API Reference
     details: Technical source code documentation for developers.
-    link: /recapp/api/
+    link: /api/
     linkText: Go to API reference
 ---

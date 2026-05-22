@@ -27,6 +27,6 @@ features:
   - icon: 🔗
     title: API-Referenz
     details: Technische Dokumentation des Quellcodes für Entwicklerinnen und Entwickler.
-    link: /recapp/api/
+    link: /api/
     linkText: Zur API-Referenz
 ---

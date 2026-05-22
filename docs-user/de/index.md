@@ -28,5 +28,6 @@ features:
     title: API-Referenz
     details: Technische Dokumentation des Quellcodes für Entwicklerinnen und Entwickler.
     link: /api/
+    target: _self
     linkText: Zur API-Referenz
 ---

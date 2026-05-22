@@ -28,5 +28,6 @@ features:
     title: API Reference
     details: Technical source code documentation for developers.
     link: /api/
+    target: _self
     linkText: Go to API reference
 ---

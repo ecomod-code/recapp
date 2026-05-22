@@ -3,8 +3,14 @@ import { defineConfig } from "vitepress";
 export default defineConfig({
   base: "/recapp/",
   title: "Recapp User Guide",
+  head: [['link', { rel: 'icon', href: '../recapp_logo.svg' }]],
 
   outDir: "../docs",
+  vite: {
+    build: {
+      emptyOutDir: false,
+    }
+  },
   cleanUrls: true,
 
   locales: {
@@ -19,7 +25,7 @@ export default defineConfig({
       themeConfig: {
         nav: [
           { text: "Handbuch", link: "/de/guide/getting-started" },
-          { text: "API-Referenz", link: "/recapp/api/", target: "_self" },
+          { text: "API-Referenz", link: "/api/", target: "_self" },
         ],
         sidebar: [
           {
@@ -103,6 +109,10 @@ export default defineConfig({
   },
 
   themeConfig: {
+    logo: {
+  src: '/recapp_logo.svg',
+  style: 'height: 3rem;'  // default is roughly 1.6rem
+    },
     socialLinks: [
       { icon: "github", link: "https://github.com/ecomod-code/recapp" },
     ],

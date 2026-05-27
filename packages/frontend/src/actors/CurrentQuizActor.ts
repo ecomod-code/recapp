@@ -150,7 +150,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 				this.send(this.ref, CurrentQuizMessages.GetTeacherNames(message.quiz.teachers));
 			}
 			if (message.quiz.state === "STARTED" && !this.state.run) {
-				this.send(this.ref, CurrentQuizMessages.StartQuiz());
+				this.send(this.ref, CurrentQuizMessages.GetRun());
 			}
 			return nothing();
 		} else if (message.tag === "QuizDeletedMessage") {
@@ -341,9 +341,19 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							// structured RUN start
 							d.run({ quizId, studentIdHash: anonUserKey(String(studentId), String(quizId)), action: "start" });
 
-							// build question ids from quiz metadata (groups → questions)
-							const questionIds: Id[] = (this.state.quiz?.groups ?? [])
-								.reduce((acc, g) => [...acc, ...(g.questions ?? [])], [] as Id[]);
+							// Build question IDs from quiz metadata. Filter by approved when Question
+							// objects are already in the WS cache; if not yet loaded, include the
+							// question (safe default — GetForUser is get-or-create, so an existing
+							// run is returned unchanged and the questions param is ignored).
+							let questionIds: Id[] = (this.state.quiz?.groups ?? [])
+								.reduce((acc, g) => [...acc, ...(g.questions ?? [])], [] as Id[])
+								.filter(q => {
+									const question = this.state.questions.find(qu => qu.uid === q);
+									return !question || question.approved;
+								});
+							if (this.state.quiz.shuffleQuestions) {
+								questionIds = shuffle(Math.random)(questionIds);
+							}
 
 							// IMPORTANT: quiz-scoped run actor (prefix + quizId), and use GetForUser (get-or-create)
 							const run = await this.ask(
@@ -799,7 +809,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								});
 
 								if (quizData.state === "STARTED") {
-									this.send(this.ref, CurrentQuizMessages.StartQuiz());
+									this.send(this.ref, CurrentQuizMessages.GetRun());
 								} else {
 									const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
 									const quizId: Id = this.quiz.orElse(toId(""));

@@ -446,12 +446,23 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 
 								const wrong = [...this.state.run.wrong, answerCorrect !== null && !answerCorrect];
 
+								const nextCounter = this.state.run.counter + 1;
+
+								this.updateState(draft => {
+									if (draft.run) {
+										draft.run.counter = nextCounter;
+										draft.run.answers = answers as QuizRun["answers"];
+										draft.run.correct = correct;
+										draft.run.wrong = wrong;
+									}
+								});
+
 								this.send(
 									`${actorUris.QuizRunActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									QuizRunActorMessages.Update({
 										uid: this.state.run.uid,
 										answers,
-										counter: this.state.run.counter + 1,
+										counter: nextCounter,
 										correct,
 										wrong,
 									})

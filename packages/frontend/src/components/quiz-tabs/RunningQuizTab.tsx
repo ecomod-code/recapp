@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import "katex/dist/katex.css";
@@ -30,6 +30,13 @@ export const RunningQuizTab: React.FC<{
 	const [textAnswer, setTextAnswer] = useState("");
 	const [answers, setAnswers] = useState<boolean[]>([]);
 	const { run, questions: qData } = quizState;
+
+	useEffect(() => {
+		setAnswered(false);
+		setTextAnswer("");
+		setAnswers([]);
+	}, [run?.counter]);
+
 	console.log(
 		"QUES",
 		quizState.questions.length,
@@ -71,10 +78,6 @@ export const RunningQuizTab: React.FC<{
 
 	const nextQuestion = () => {
 		logQuestionClicked();
-
-		setAnswered(false);
-		setTextAnswer("");
-		setAnswers([]);
 	};
 
 	const updateAnswer = (index: number, value: boolean) => {

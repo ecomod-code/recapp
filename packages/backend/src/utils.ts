@@ -31,7 +31,10 @@ export const bearerValid = async (idTokenString: string): Promise<Id> => {
 		.orUndefined();
 	try {
 		if (userId) {
-			await system.ask(createActorUri("SessionStore"), SessionStoreMessages.GetSessionForUserId(userId));
+			const result = await system.ask(createActorUri("SessionStore"), SessionStoreMessages.GetSessionForUserId(userId));
+			if (result instanceof Error) {
+				return Promise.reject(new Error("Session expired"));
+			}
 			return Promise.resolve(userId);
 		} else {
 			return Promise.reject(new Error("Unknown user"));

@@ -76,6 +76,7 @@ export const QuestionEdit: React.FC = () => {
 		runReady: false,
 		hasInitialQuestions: false,
 		questionsSubscribed: false,
+		runFetchStarted: false,
 	});
 	
 	const q = mbQuiz.map(q => q.quiz).orUndefined();

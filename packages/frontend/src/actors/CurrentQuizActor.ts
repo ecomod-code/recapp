@@ -110,6 +110,7 @@ export type CurrentQuizState = {
 	runReady: boolean;
 	hasInitialQuestions: boolean;
 	questionsSubscribed: boolean;
+	runFetchStarted: boolean;
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
@@ -135,6 +136,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			runReady: false,
 			hasInitialQuestions: false,
 			questionsSubscribed: false,
+			runFetchStarted: false,
 		};
 	}
 
@@ -240,6 +242,20 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 				return nothing();
 			}
 			this.updateState(draft => {
+				const incomingCounter = (message.run as Partial<QuizRun>).counter;
+				const currentCounter = draft.run?.counter ?? 0;
+				if (
+					draft.run &&
+					typeof incomingCounter === "number" &&
+					incomingCounter < currentCounter
+				) {
+					// Defence-in-depth: a WS update carrying a counter lower than the
+					// current (optimistic) state would regress run.counter and trigger
+					// RunningQuizTab's useEffect, resetting answered/answers and either
+					// re-enabling the previous question (repetition) or hiding the Next
+					// button (reset). Ignore it.
+					return;
+				}
 				draft.run = { ...draft.run, ...message.run } as QuizRun;
 				draft.result = { ...draft.result, ...message.run } as QuizRun;
 			});
@@ -247,6 +263,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 		} else if (message.tag === "QuizRunDeletedMessage") {
 			this.updateState(draft => {
 				draft.run = undefined;
+				draft.runFetchStarted = false;
 			});
 			return nothing();
 		} else if (message.tag === "StatisticsUpdateMessage") {
@@ -331,10 +348,22 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								draft.runReady = false;
 								draft.hasInitialQuestions = false;
 								draft.questionsSubscribed = false;
+								draft.runFetchStarted = false;
 							});
 							return unit();
 						},
 						GetRun: async () => {
+							// Synchronous dedup. ts-actors does not serialize handler
+							// invocations per actor (Actor.send dispatches via setTimeout +
+							// RxJS Subject), so multiple GetRun messages queued by
+							// SetQuiz + handleRemoteUpdates would otherwise all start
+							// concurrent asks. The flag is set before the first await, so
+							// JS run-to-completion guarantees later invocations see it.
+							if (this.state.runFetchStarted) {
+								return (this.state.run ?? (undefined as unknown)) as QuizRun;
+							}
+							this.updateState(s => { s.runFetchStarted = true; });
+
 							const studentId: Id = this.user.map(u => u.uid).orElse(toId(""));
 							const quizId: Id = this.quiz.orElse(toId(""));
 
@@ -355,14 +384,30 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								questionIds = shuffle(Math.random)(questionIds);
 							}
 
-							// IMPORTANT: quiz-scoped run actor (prefix + quizId), and use GetForUser (get-or-create)
-							const run = await this.ask(
-								`${actorUris.QuizRunActorPrefix}${quizId}`,
-								QuizRunActorMessages.GetForUser({ studentId, questions: questionIds })
-							);
+							let run: QuizRun;
+							try {
+								// IMPORTANT: quiz-scoped run actor (prefix + quizId), and use GetForUser (get-or-create)
+								run = (await this.ask(
+									`${actorUris.QuizRunActorPrefix}${quizId}`,
+									QuizRunActorMessages.GetForUser({ studentId, questions: questionIds })
+								)) as QuizRun;
+							} catch (e) {
+								// Allow a future retry by clearing the in-flight flag.
+								this.updateState(s => { s.runFetchStarted = false; });
+								throw e;
+							}
 
 							d.run({ quizId, studentIdHash: anonUserKey(String(studentId), String(quizId)), action: "ok" });
-							this.updateState(s => { s.run = run as QuizRun; s.runReady = true; });
+							this.updateState(s => {
+								// Counter guard. The backend atomic upsert removes the
+								// sibling-run race, but a late completion that races with
+								// LogAnswer's optimistic counter increment must not regress
+								// the visible state.
+								if (!s.run || (run?.counter ?? 0) >= (s.run.counter ?? 0)) {
+									s.run = run;
+								}
+								s.runReady = true;
+							});
 
 							// Subscribe & fetch questions exactly once, AFTER run is ready
 							if (!this.state.questionsSubscribed) {
@@ -372,7 +417,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.send(`${actorUris.QuestionActorPrefix}${quizId}`, QuestionActorMessages.GetAll());
 							}
 
-							return run as QuizRun;
+							return run;
 						},
 						Activate: async ({ userId, quizId }) => {
 							const quiz: Quiz = await this.ask(actorUris.QuizActor, QuizActorMessages.Get(quizId));
@@ -787,6 +832,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									draft.quizStats = undefined;
 									draft.quiz = quizData;
 									draft.deleted = !quizData || keys(quizData).length === 0;
+									draft.runFetchStarted = false;
+									draft.runReady = false;
+									draft.questionsSubscribed = false;
 								});
 
 								this.send(this.ref, CurrentQuizMessages.GetTeacherNames(quizData.teachers));

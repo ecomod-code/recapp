@@ -15,7 +15,6 @@ import { create } from "mutative";
 import { identity, pick } from "rambda";
 import { logger } from "../logger";
 import { v4 } from "uuid";
-import { maybe } from "tsmonads";
 
 type State = {
 	cache: Map<Id, QuizRun>;
@@ -53,6 +52,25 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 		super(name, system, "quizruns");
 	}
 
+	public override async beforeStart(): Promise<void> {
+		try {
+			const db = await this.connector.db();
+			await db
+				.collection<QuizRun>(this.collectionName)
+				.createIndex({ studentId: 1, quizId: 1 }, { unique: true, name: "studentId_quizId_unique" });
+		} catch (e) {
+			// Pre-existing duplicate (studentId, quizId) docs from the prior race condition
+			// will block this index creation. Continue without the index — the atomic upsert
+			// is still narrower than the previous read-then-create. Deduplicate and re-deploy
+			// to gain the strict guarantee.
+			this.logger.warn(
+				`QUIZRUNACTOR could not create unique index on (studentId, quizId): ${
+					e instanceof Error ? e.message : String(e)
+				}`
+			);
+		}
+	}
+
 	public async receive(from: ActorRef, message: QuizRunActorMessage): Promise<ResultType> {
 		const [clientUserRole, clientUserId] = await this.determineRole(from);
 		if (typeof message === "string" && message === "SHUTDOWN") {
@@ -67,48 +85,52 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 		try {
 			return await QuizRunActorMessages.match<Promise<ResultType>>(message, {
 				GetForUser: async ({ studentId, questions }) => {
+					if (questions.length === 0) return undefined as any;
 					const db = await this.connector.db();
-					const mbRunId = maybe(
-						await db
-							.collection<QuizRun>(this.collectionName)
-							.findOne({ studentId, quizId: this.uid }, { uid: 1, _id: 0 } as any)
-					);
-					const result = mbRunId.match<Promise<QuizRun | Error>>(
-						async runId => {
-							const run = await this.getEntity(runId.uid);
-							// console.log("Found existing run", run);
-							this.logger.debug(`QUIZRUNACTOR found existing run present=${run ? "maybe" : "none"}`);
-							return run.match<QuizRun | Error>(identity, () => new Error());
-						},
-						async () => {
-							if (questions.length === 0) return undefined as any;
-							const run: QuizRun = {
-								uid: v4() as Id,
-								studentId,
-								quizId: this.uid,
-								counter: 0,
-								questions,
-								answers: [],
-								created: toTimestamp(),
-								updated: toTimestamp(),
-								correct: [],
-								wrong: [],
-							};
-							await this.storeEntity(run);
-							for (const [subscriber, subscription] of this.state.collectionSubscribers) {
-								this.send(
-									subscriber,
-									new QuizRunUpdateMessage(
-										subscription.properties.length > 0 ? pick(subscription.properties, run) : run
-									)
-								);
-							}
-							// console.log("Created new run", run);
-							this.logger.info(`QUIZRUNACTOR created new run`);
-							return run;
+					const candidate: QuizRun = {
+						uid: v4() as Id,
+						studentId,
+						quizId: this.uid,
+						counter: 0,
+						questions,
+						answers: [],
+						created: toTimestamp(),
+						updated: toTimestamp(),
+						correct: [],
+						wrong: [],
+					};
+					// Atomic upsert. Replaces the previous findOne + conditional insert,
+					// which allowed concurrent GetForUser calls to each create sibling
+					// run documents (Question Reset / Repetition glitch root cause).
+					const stored = (await db
+						.collection<QuizRun>(this.collectionName)
+						.findOneAndUpdate(
+							{ studentId, quizId: this.uid },
+							{ $setOnInsert: candidate },
+							{ upsert: true, returnDocument: "after" }
+						)) as unknown as QuizRun | null;
+					if (!stored) {
+						return new Error("Failed to upsert quiz run");
+					}
+					if (stored.uid === candidate.uid) {
+						// We just inserted — notify collection subscribers using the
+						// in-memory candidate object (avoids leaking MongoDB's _id field).
+						for (const [subscriber, subscription] of this.state.collectionSubscribers) {
+							this.send(
+								subscriber,
+								new QuizRunUpdateMessage(
+									subscription.properties.length > 0
+										? pick(subscription.properties, candidate)
+										: candidate
+								)
+							);
 						}
-					);
-					return result;
+						this.logger.info(`QUIZRUNACTOR created new run`);
+						return candidate;
+					}
+					const existing = await this.getEntity(stored.uid);
+					this.logger.debug(`QUIZRUNACTOR returning existing run`);
+					return existing.match<QuizRun | Error>(identity, () => new Error());
 				},
 				Update: async run => {
 					const existingRun = await this.getEntity(run.uid);

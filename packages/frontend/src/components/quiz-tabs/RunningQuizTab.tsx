@@ -45,24 +45,11 @@ export const RunningQuizTab: React.FC<{
 		setAnswers([]);
 	}, [run?.counter]);
 
-	console.log(
-		"QUES",
-		quizState.questions.length,
-		"RUN",
-		quizState.run,
-		"ENTRY",
-		quizState.run?.counter,
-		"FOO",
-		quizState.questions[0]
-	);
-
 	const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 	const currentQuestion = questions[run?.counter ?? 0];
 	const questionId = currentQuestion?.uid ?? toId("");
 	const questionText = questions.at(run?.counter ?? 0)?.text;
 	const { rendered, isStale } = useRendered({ value: questionText ?? "" });
-
-	console.log("ANSWERSTATE", quizState, run);
 
 	if (!quizState.run || !quizState.questions) {
 		return null;
@@ -97,12 +84,10 @@ export const RunningQuizTab: React.FC<{
 				a[i] = false;
 			}
 			a[index] = value;
-			console.log("ANSWERS NEW", a, value);
 			setAnswers(a);
 		} else {
 			const a = answersCopy;
 			a[index] = value;
-			console.log("ANSWERS", a, value);
 			setAnswers(a);
 		}
 	};

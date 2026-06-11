@@ -1024,10 +1024,28 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							return unit();
 						},
 						GetTeacherNames: async () => {
-							const names: Array<{ nickname?: string; username: string }> = await this.ask(
-								actorUris.UserStore,
-								UserStoreMessages.GetNames(this.state.quiz.teachers)
-							);
+							// DistributedActorSystem rejects the ask Promise with a string on
+							// timeout; without the try/catch the rejection unwinds out of the
+							// handler and the supervisor shuts CurrentQuiz down (see
+							// getuserrun-counter-regression investigation). Names are cosmetic;
+							// degrade to empty rather than killing the session.
+							let names: Array<{ nickname?: string; username: string }> = [];
+							try {
+								const result = await this.ask(
+									actorUris.UserStore,
+									UserStoreMessages.GetNames(this.state.quiz.teachers)
+								);
+								if (Array.isArray(result)) {
+									names = result;
+								}
+							} catch (e) {
+								d.runState({
+									source: "AskFailure",
+									beforeCounter: null,
+									afterCounter: null,
+									reason: `GetTeacherNames ask failed: ${String(e)}`,
+								});
+							}
 							this.updateState(draft => {
 								draft.teacherNames = names.map(n =>
 									n.nickname ? `${n.username} (${n.nickname})` : n.username

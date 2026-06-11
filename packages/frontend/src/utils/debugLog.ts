@@ -37,7 +37,8 @@ type RunStateWriteLog = BaseLog & {
     | "QuizRunUpdate"
     | "QuizRunDeleted"
     | "Reset"
-    | "useEffect-counter";
+    | "useEffect-counter"
+    | "AskFailure";
   beforeCounter: number | null; // null = state.run was undefined
   afterCounter: number | null;  // null = state.run set/left as undefined
   runUidBefore?: string;

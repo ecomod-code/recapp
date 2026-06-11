@@ -162,7 +162,16 @@ export class QuizRunActor extends SubscribableActor<QuizRun, QuizRunActorMessage
 				Clear: async () => {
 					const db = await this.connector.db();
 					const result = await db.collection<QuizRun>(this.collectionName).deleteMany({ quizId: this.uid });
-					logger.warn(JSON.stringify(result));
+					const runSubscriberCount = Array.from(this.state.subscribers.values())
+						.reduce((acc, set) => acc + set.size, 0);
+					const collectionSubscriberCount = this.state.collectionSubscribers.size;
+					logger.warn(
+						`QUIZRUNACTOR_CLEAR quizId=${String(this.uid)} ` +
+						`deletedCount=${result.deletedCount} ` +
+						`runSubscribers=${runSubscriberCount} ` +
+						`collectionSubscribers=${collectionSubscriberCount} ` +
+						`from=${String((from as any)?.name ?? from)}`
+					);
 					this.state.cache = new Map();
 					this.state.subscribers.forEach(subscriberSet =>
 						subscriberSet.forEach(subscriber => this.send(subscriber, new QuizRunDeletedMessage()))

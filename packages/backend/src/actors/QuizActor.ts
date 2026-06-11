@@ -284,10 +284,12 @@ export class QuizActor extends SubscribableActor<Quiz, QuizActorMessage, ResultT
 				},
 				GetUserRun: async ({ studentId, quizId }) => {
 					const db = await this.connector.db();
-					const mbRun = maybe(await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId }));
+					const found = await db.collection<QuizRun>("quizruns").findOne({ studentId, quizId });
+					const mbRun = maybe(found);
 					this.logger.debug(
 						`GETUSERRUN studentId=${String(studentId)} quizId=${String(quizId)} ` +
-						`runPresent=${mbRun ? "maybe" : "none"}`
+						`runPresent=${found ? "yes" : "no"} ` +
+						`runUid=${found?.uid ?? "-"} counter=${found?.counter ?? "-"}`
 					);
 					return mbRun.match(identity, () => new Error("No run for user"));
 				},

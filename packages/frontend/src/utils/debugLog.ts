@@ -1,6 +1,7 @@
 type LogTag =
   | "AUTH"
   | "RUN"
+  | "RUN_STATE_WRITE"
   | "LIST_REQUEST"
   | "LIST_RESULT"
   | "WS_OPEN"
@@ -21,6 +22,28 @@ type RunLog = BaseLog & {
   studentIdHash?: string;
   action: "start" | "ok" | "error" | "duplicate-suppressed";
   error?: string;
+};
+
+// Tracks every write to CurrentQuizActor's state.run (or attempted write
+// blocked by a counter guard). Use to diagnose counter regressions and
+// to verify which code path produced any given state change.
+type RunStateWriteLog = BaseLog & {
+  source:
+    | "GetRun"
+    | "StartQuiz"
+    | "SetQuiz-same"
+    | "SetQuiz-different"
+    | "LogAnswer"
+    | "QuizRunUpdate"
+    | "QuizRunDeleted"
+    | "Reset"
+    | "useEffect-counter";
+  beforeCounter: number | null; // null = state.run was undefined
+  afterCounter: number | null;  // null = state.run set/left as undefined
+  runUidBefore?: string;
+  runUidAfter?: string;
+  blocked?: boolean;            // true = guard rejected the write
+  reason?: string;
 };
 
 type ListRequestLog = BaseLog & {
@@ -72,6 +95,7 @@ export function dlog<T extends BaseLog>(
 export const d = {
   auth: (p: Omit<AuthLog, "ts">) => dlog<AuthLog>("AUTH", p),
   run: (p: Omit<RunLog, "ts">) => dlog<RunLog>("RUN", p),
+  runState: (p: Omit<RunStateWriteLog, "ts">) => dlog<RunStateWriteLog>("RUN_STATE_WRITE", p),
   listReq: (p: Omit<ListRequestLog, "ts">) => dlog<ListRequestLog>("LIST_REQUEST", p),
   listRes: (p: Omit<ListResultLog, "ts">) => dlog<ListResultLog>("LIST_RESULT", p),
   wsLife: (p: Omit<WsLifecycleLog, "ts">) => dlog<WsLifecycleLog>("WS_OPEN", p),

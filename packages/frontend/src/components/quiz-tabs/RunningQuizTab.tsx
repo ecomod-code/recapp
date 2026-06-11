@@ -18,6 +18,7 @@ import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 import { Trans } from "@lingui/react";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 import { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT } from "../../colorPalette";
+import { d } from "../../utils/debugLog";
 
 export const RunningQuizTab: React.FC<{
 	isUserInTeachersList:boolean;
@@ -32,6 +33,13 @@ export const RunningQuizTab: React.FC<{
 	const { run, questions: qData } = quizState;
 
 	useEffect(() => {
+		d.runState({
+			source: "useEffect-counter",
+			beforeCounter: null,
+			afterCounter: run?.counter ?? null,
+			runUidAfter: run?.uid,
+			reason: "counter-dep-fired",
+		});
 		setAnswered(false);
 		setTextAnswer("");
 		setAnswers([]);

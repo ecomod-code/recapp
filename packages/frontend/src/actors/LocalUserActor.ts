@@ -60,6 +60,13 @@ export type LocalUserState = {
 };
 
 export class LocalUserActor extends StatefulActor<Messages, Unit | string, LocalUserState> {
+	// Override the ts-actors default ("Shutdown"). A long-lived session actor
+	// shouldn't die from one handler exception (e.g. a timed-out ask raising
+	// the string-rejection contract from DistributedActorSystem.js:41). The
+	// supervisor still logs the warning + console.error; we just keep
+	// processing the next message instead of freezing the page.
+	strategy = "Resume" as const;
+
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
 		this.state = {

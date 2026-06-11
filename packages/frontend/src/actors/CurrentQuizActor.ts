@@ -114,6 +114,13 @@ export type CurrentQuizState = {
 };
 
 export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean | QuizRun, CurrentQuizState> {
+	// Override the ts-actors default ("Shutdown"). A long-lived session actor
+	// shouldn't die from one handler exception (e.g. a timed-out ask raising
+	// the string-rejection contract from DistributedActorSystem.js:41). The
+	// supervisor still logs the warning + console.error; we just keep
+	// processing the next message instead of freezing the page.
+	strategy = "Resume" as const;
+
 	private quiz: Maybe<Id> = nothing();
 	private user: Maybe<User> = nothing();
 	private firstListReported = false; // for debugging: emit a single LIST_RESULT when the list goes from 0 → N for the first time.

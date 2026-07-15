@@ -45,9 +45,9 @@ You can only add people who have already logged into Recapp at least once. If so
 
 Controls what name students can use when submitting questions and comments. All three are enabled by default, letting students choose. Disable any option to remove it from their choices.
 
-- **Anonymous** — no name is shown
-- **Pseudonym** — the name set in their account settings
-- **Real name** — their university account name
+- **Anonymous participation** — no name is shown
+- **Participation with Pseudonym** — the name set in their account settings is shown
+- **Participation with real name** — their university account name is shown
 
 Teachers always participate under their real name.
 
@@ -57,9 +57,9 @@ Controls which question formats are available. All three are enabled by default.
 
 | Type | Description |
 |---|---|
-| **Free text** | Students write a text answer; not automatically graded |
-| **Single choice** | One correct answer among several options |
-| **Multiple choice** | Multiple answers can be correct |
+| **Free-text questions** | Students write a text answer; not automatically graded |
+| **Single-choice questions** | One correct answer among several options |
+| **Multiple-choice questions** | Multiple answers can be correct |
 
 ### Shuffling
 

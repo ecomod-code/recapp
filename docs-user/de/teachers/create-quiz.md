@@ -6,7 +6,7 @@
 
 Klicken Sie im Dashboard oben rechts auf **<mark>+ Neues Quiz</mark>**. Es öffnet sich eine Einstellungsseite, auf der Sie das Quiz konfigurieren können. Mindestens ein **Titel** ist erforderlich — alle anderen Einstellungen haben sinnvolle Standardwerte und können jederzeit geändert werden, solange das Quiz im Bearbeitungsmodus ist.
 
-Klicken Sie auf **<mark>Quiz erstellen</mark>**, um zu bestätigen. Sie werden direkt zum Tab **<mark>Quizfragen</mark>** des neuen Quiz weitergeleitet und können sofort Fragen hinzufügen oder das Quiz mit Studierenden teilen.
+Klicken Sie auf **<mark>Quiz anlegen</mark>**, um zu bestätigen. Sie werden direkt zum Tab **<mark>Quizfragen</mark>** des neuen Quiz weitergeleitet und können sofort Fragen hinzufügen oder das Quiz mit Studierenden teilen.
 
 ## Bestehendes Quiz importieren
 
@@ -16,7 +16,7 @@ Alle Einstellungen und Fragen werden importiert. Der Name der importierenden Leh
 
 ## Quizeinstellungen
 
-Die Quizeinstellungen befinden sich im Tab **<mark>Quizdaten</mark>** und können jederzeit angepasst werden, solange das Quiz im Bearbeitungs- oder Kurationsmodus ist. Studierende sehen lediglich Titel und Beschreibung — alle übrigen Einstellungen sind nur für Lehrende sichtbar.
+Die Quizeinstellungen befinden sich im Tab **<mark>Quizdaten</mark>** und können jederzeit angepasst werden, solange das Quiz im Editier- oder Kurationsmodus ist. Studierende sehen lediglich Titel und Beschreibung — alle übrigen Einstellungen sind nur für Lehrende sichtbar.
 
 ### Grundlegende Informationen
 
@@ -28,8 +28,7 @@ Zusätzliche Informationen zum Quiz. Ebenfalls für Studierende sichtbar.
 
 ### Lehrende
 
-Das Feld „Lehrende" listet alle Personen mit Lehrenden-Zugang auf. Um eine weitere Lehrperson oder eine Tutorin/einen Tutor hinzuzufügen, klicken Sie auf **<mark>Teilen</mark>** neben dem Feld, suchen Sie nach E-Mail-Adresse oder Name und klicken Sie auf **<mark>Mit bestätigten Nutzenden teilen</mark>**.
-
+Das Feld „Lehrpersonen" listet alle Personen mit Lehrenden-Zugang auf. Um eine weitere Lehrperson oder eine Tutorin/einen Tutor hinzuzufügen, klicken Sie auf **<mark>Teilen</mark>** neben dem Feld, suchen Sie nach E-Mail-Adresse oder Name und klicken Sie erst auf **<mark>"Hinzufügen<mark>** und dann auf **<mark>Quiz teilen</mark>**.
 ::: warning Lehrende hinzufügen
 Hinzugefügt werden können nur Personen, die sich mindestens einmal in Recapp angemeldet haben. Wenn jemand sich noch nie angemeldet hat, senden Sie dieser Person zunächst den Quiz-Link und fügen Sie sie nach ihrer ersten Anmeldung hinzu.
 :::
@@ -38,18 +37,18 @@ Hinzugefügt werden können nur Personen, die sich mindestens einmal in Recapp a
 
 | Einstellung | Standard | Funktion |
 |---|---|---|
-| <mark>Teilnehmerkommentare erlauben</mark> | **An** | Studierende können im gestarteten Quiz Kommentare zu Fragen hinterlassen |
-| <mark>Teilnehmenden erlauben, Fragen zu stellen</mark> | **An** | Studierende können im Bearbeitungsmodus Fragen hinzufügen und bearbeiten |
+| <mark>Kommentare von Teilnehmenden erlauben</mark> | **An** | Studierende können im gestarteten Quiz Kommentare zu Fragen hinterlassen |
+| <mark>Fragen durch Teilnehmende erstellen lassen</mark> | **An** | Studierende können im Bearbeitungsmodus Fragen hinzufügen und bearbeiten |
 | <mark>Teilnehmende können Statistiken einsehen</mark> | **Aus** | Studierende können die Ergebnisse nach Abschluss des Quiz sehen |
-| <mark>Kommentarliste ausblenden</mark> | **Aus** | Wenn aktiviert, sind Kommentare für alle unsichtbar |
+| <mark>Kommentarliste verbergen</mark> | **Aus** | Wenn aktiviert, sind Kommentare für alle unsichtbar |
 
-### Teilnahmeoptionen
+### Teilnahmemöglichkeiten
 
 Legt fest, welchen Namen Studierende beim Einreichen von Fragen und Kommentaren verwenden können. Standardmäßig sind alle drei Optionen aktiviert, sodass Studierende frei wählen können. Deaktivierte Optionen stehen nicht zur Auswahl.
 
-- **Anonym** — kein Name wird angezeigt
-- **Pseudonym** — der in den Kontoeinstellungen festgelegte Anzeigename
-- **Klarname** — der Name des Universitätskontos
+- **Anonyme Teilnahme** — kein Name wird angezeigt
+- **Teilnahme mit Pseudonym** — der in den Kontoeinstellungen festgelegte Anzeigename
+- **Teilnahme mit echtem Namen** — der Name des Universitätskontos
 
 Lehrende nehmen stets unter ihrem Klarnamen teil.
 
@@ -60,8 +59,8 @@ Legt fest, welche Frageformate verfügbar sind. Standardmäßig sind alle drei a
 | Typ | Beschreibung |
 |---|---|
 | **<mark>Freitext</mark>** | Studierende schreiben eine eigene Antwort; keine automatische Bewertung |
-| **<mark>Einfachauswahl</mark>** | Eine richtige Antwort unter mehreren Optionen |
-| **<mark>Mehrfachauswahl</mark>** | Mehrere Antworten können richtig sein |
+| **<mark>Single-Choice</mark>** | Einzelauswahl; Eine richtige Antwort unter mehreren Optionen |
+| **<mark>Multiple-Choice</mark>** | Mehrfachauswahl; Mehrere Antworten können richtig sein |
 
 ### Reihenfolge und Zufallsmischung
 

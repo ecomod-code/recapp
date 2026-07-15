@@ -11,7 +11,7 @@ Every quiz is always in one of four states, shown in the top-right corner of the
 | <Badge type="tip" text="STARTED" /> | View questions and live statistics | Answer questions; see results after finishing (if permitted) |
 | <Badge type="danger" text="STOPPED" /> | View questions and statistics, export, delete/archive | View questions and statistics (if permitted) |
 
-A newly created quiz starts in **Editing** mode. You control transitions using the Start quiz, Stop quiz, and curation controls.
+A newly created quiz starts in **Editing** mode. You control transitions using the Start quiz, Stop quiz, and Edit quiz buttons.
 
 ::: tip Resetting statistics
 Statistics reset automatically when a quiz is returned to editing mode. You can also reset them manually in stopped mode — see [Statistics](./statistics#resetting-statistics).
@@ -92,7 +92,8 @@ These actions are in the **Quiz data** tab, or via the trash icon on the dashboa
 
 | Action | What it does |
 |---|---|
-| **Duplicate** | Creates a copy in your dashboard. Useful for reusing a quiz each semester. |
-| **Export** | Downloads a `.json` file with all settings and questions (no student names). Can be re-imported later. |
-| **Archive** | Hides the quiz from your dashboard but keeps it accessible via its original link and QR code. Toggle **Show archived quizzes** on the dashboard to see archived quizzes. |
-| **Delete** | Permanently removes the quiz. This cannot be undone. |
+| **Duplicate quiz** | Creates a copy in your dashboard. Useful for reusing a quiz each semester. |
+| **Export quiz** | Downloads a `.json` file with all settings and questions (no student names). Can be re-imported later. |
+| **Archive quiz** | Hides the quiz from your dashboard but keeps it accessible via its original link and QR code. Toggle **Show archived quizzes** on the dashboard to see archived quizzes. |
+
+To delete a quiz, go to the Dashboard page and click the red button with the garbage can on it under the quiz that you want to delete.

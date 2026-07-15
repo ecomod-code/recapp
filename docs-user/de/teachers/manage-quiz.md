@@ -13,10 +13,10 @@ Jedes Quiz befindet sich stets in einem von vier Zuständen, der oben rechts in 
 | <Badge type="tip" text="STARTED" /> | Fragen und Live-Statistiken einsehen | Fragen beantworten; Ergebnisse nach Abschluss sehen (wenn erlaubt) |
 | <Badge type="danger" text="STOPPED" /> | Fragen und Statistiken einsehen, exportieren, löschen/archivieren | Fragen und Statistiken einsehen (wenn erlaubt) |
 
-Ein neu erstelltes Quiz startet im Status <Badge type="warning" text="EDITING" />. Sie steuern die Übergänge über die Schaltflächen <mark>Quiz starten</mark>, <mark>Quiz stoppen</mark> und die Kurationsfunktion.
+Ein neu erstelltes Quiz startet im Status <Badge type="warning" text="EDITING" />. Sie steuern die Übergänge über die Schaltflächen <mark>Quizmodus starten</mark>, <mark>Quiz stoppen</mark> und <mark>Editiermodus aktivieren</mark>.
 
 ::: tip Statistiken zurücksetzen
-Statistiken werden automatisch zurückgesetzt, wenn das Quiz in den Bearbeitungsmodus zurückversetzt wird. Sie können sie auch manuell im gestoppten Modus zurücksetzen — siehe [Statistiken](./statistics#statistiken-zurücksetzen).
+Statistiken werden automatisch zurückgesetzt, wenn das Quiz in den Editiermodus zurückversetzt wird. Sie können sie auch manuell im gestoppten Modus zurücksetzen — siehe [Statistiken](./statistics#statistiken-zurücksetzen).
 :::
 
 ## Fragen hinzufügen
@@ -42,7 +42,7 @@ Lehrende und Studierende können gleichzeitig Fragen hinzufügen. Das gleichzeit
 
 ## Quiz kuratieren
 
-Im Kurationsmodus können Sie die von Studierenden eingereichten Fragen prüfen und finalisieren, bevor das Quiz gestartet wird. Um ihn zu aktivieren, klicken Sie im Tab <mark>Quizfragen</mark> auf **<mark>Teilnehmendenfragen</mark>** — die Schaltfläche wird weiß, um den aktiven Kurationsmodus anzuzeigen.
+Im Kurationsmodus können Sie die von Studierenden eingereichten Fragen prüfen und finalisieren, bevor das Quiz gestartet wird. Um ihn zu aktivieren, klicken Sie im Tab <mark>Quizfragen</mark> zuerst auf **<mark>Editiermodus Aktivieren</mark>** und dann auf **<mark>Fragen von Teilnehmenden</mark>** — die Schaltfläche wird weiß, um den aktiven Kurationsmodus anzuzeigen.
 
 Im Kurationsmodus können Studierende keine Fragen mehr hinzufügen oder bearbeiten. Sie können:
 
@@ -55,7 +55,7 @@ Im Kurationsmodus können Studierende keine Fragen mehr hinzufügen oder bearbei
 **Fragen löschen** — Nur ausgeblendete Fragen können gelöscht werden.
 
 ::: tip Wann ist der Kurationsmodus aktiv?
-Wenn Sie in den Einstellungen „<mark>Teilnehmenden erlauben, Fragen zu stellen</mark>" deaktiviert haben, startet das Quiz direkt im Kurationsmodus — es gibt keine Bearbeitungsphase für Studierende.
+Wenn Sie in den Einstellungen „<mark>Fragen durch Teilnehmende erstellen lassen</mark>" deaktiviert haben, startet das Quiz direkt im Kurationsmodus — es gibt keine Bearbeitungsphase für Studierende.
 :::
 
 ## Quiz teilen
@@ -82,11 +82,11 @@ Kommentare ermöglichen es Lehrenden und Studierenden, einzelne Fragen (oder das
 - Kommentare mit einem Daumen-hoch bewerten
 - Eigene Kommentare löschen
 
-Das Kommentarfeld kann jederzeit über **<mark>Kommentare anzeigen/ausblenden</mark>** ein- oder ausgeklappt werden. Um Kommentare dauerhaft für alle auszublenden, aktivieren Sie **<mark>Kommentarliste ausblenden</mark>** in den Quizeinstellungen.
+Das Kommentarfeld kann jederzeit über **<mark>Kommentare anzeigen/ausblenden</mark>** ein- oder ausgeklappt werden. Um Kommentare dauerhaft für alle auszublenden, aktivieren Sie **<mark>Kommentarliste verbergen</mark>** in den Quizeinstellungen.
 
 ## Teilnehmeransicht
 
-Klicken Sie auf **<mark>Teilnehmeransicht</mark>** (oben rechts im Tab <mark>Quizdaten</mark> oder <mark>Quizfragen</mark>), um eine Vorschau des Quiz aus der Perspektive der Studierenden zu sehen.
+Klicken Sie auf **<mark>Teilnehmendenansicht</mark>** (oben rechts im Tab <mark>Quizdaten</mark> oder <mark>Quizfragen</mark>), um eine Vorschau des Quiz aus der Perspektive der Studierenden zu sehen.
 
 ## Duplizieren, exportieren, archivieren und löschen
 
@@ -98,3 +98,5 @@ Diese Aktionen finden sich im Tab **<mark>Quizdaten</mark>** oder über das Papi
 | **<mark>Daten exportieren</mark>** | Lädt eine `.json`-Datei mit allen Einstellungen und Fragen herunter (ohne Teilnehmendennamen). Kann später erneut importiert werden. |
 | **<mark>Quiz archivieren</mark>** | Blendet das Quiz im Dashboard aus, aber es bleibt über den ursprünglichen Link und QR-Code erreichbar. Mit **<mark>Archivierte Quizze anzeigen</mark>** im Dashboard können archivierte Quizze wieder eingeblendet werden. |
 | **<mark>Quiz löschen</mark>** | Löscht das Quiz dauerhaft. Dieser Vorgang kann nicht rückgängig gemacht werden. |
+
+Um ein Quiz zu löschen, gehen Sie zum Dashboard und klicken Sie auf den roten Mülleimer-Knopf unter dem entsprechenden Quiz.

@@ -43,6 +43,8 @@ services:
     build:
       context: ..
       dockerfile: packages/backend/Dockerfile
+      args:
+        - SERVER_PORT=${SERVER_PORT}
     environment:
       - NODE_ENV=production
       - FRONTEND_URI=${FRONTEND_URI}

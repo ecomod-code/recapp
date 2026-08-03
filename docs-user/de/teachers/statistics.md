@@ -37,7 +37,7 @@ Das Farbschema der Statistikansicht wird pro Person in **Kontoeinstellungen → 
 
 ## Statistiken zurücksetzen
 
-Statistiken werden automatisch zurückgesetzt, wenn das Quiz in den Bearbeitungsmodus zurückversetzt wird. Um sie zurückzusetzen, ohne den Quizstatus zu ändern, klicken Sie auf **<mark>Statistiken zurücksetzen</mark>** oben rechts im Tab <mark>Statistische Auswertung</mark>. Diese Option ist nur im gestoppten Modus verfügbar.
+Statistiken werden automatisch zurückgesetzt, wenn das Quiz in den Editiermodus zurückversetzt wird. Um sie zurückzusetzen, ohne den Quizstatus zu ändern, klicken Sie auf **<mark>Statistiken zurücksetzen</mark>** oben rechts im Tab <mark>Statistische Auswertung</mark>. Diese Option ist nur im gestoppten Modus verfügbar.
 
 ## Exportieren
 

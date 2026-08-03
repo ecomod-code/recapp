@@ -31,7 +31,7 @@ Die Kontoeinstellungen sind jederzeit über die Schaltfläche mit Ihren Namensin
 | Einstellung | Funktion |
 |---|---|
 | **Pseudonym** | Ein Anzeigename, der statt Ihres echten Namens bei der Teilnahme an Quizzen verwendet wird. Klicken Sie auf *<mark>Bearbeiten</mark>*, um ihn festzulegen oder zu ändern. |
-| **<mark>Teilnahmeoptionen</mark>** | Ihr bevorzugter Standardname beim Einreichen von Fragen oder Kommentaren: anonym, Pseudonym oder Klarname. |
+| **<mark>Optionen zur Teilnahme</mark>** | Ihr bevorzugter Standardname beim Einreichen von Fragen oder Kommentaren: anonym, Pseudonym oder Name. |
 | **Sprache** | Wechsel der Benutzeroberfläche zwischen Deutsch und Englisch. |
 | **<mark>Farbpalette</mark>** | Auswahl zwischen zwei Farbschemata (Rot/Grün oder Blau/Gelb) aus Gründen der Barrierefreiheit. |
 | **<mark>Abmelden</mark>** | Sitzung beenden und Recapp verlassen. |

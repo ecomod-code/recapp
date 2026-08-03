@@ -33,7 +33,7 @@ Im gestoppten Modus:
 - Können alle Beteiligten weiterhin Fragen und Statistiken einsehen
 - Bietet sich eine gute Gelegenheit, die Ergebnisse gemeinsam mit den Studierenden zu besprechen
 
-Sie können jederzeit in den Bearbeitungsmodus zurückkehren, aber dies **setzt alle Statistiken zurück**. Bleiben Sie im gestoppten Modus, wenn Sie die Ergebnisse später noch auswerten oder exportieren möchten.
+Sie können jederzeit in den Editiermodus zurückkehren, aber dies **setzt alle Statistiken zurück**. Bleiben Sie im gestoppten Modus, wenn Sie die Ergebnisse später noch auswerten oder exportieren möchten.
 
 ## Ergebnisse exportieren
 

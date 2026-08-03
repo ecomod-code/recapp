@@ -12,7 +12,7 @@ The overview lists all questions. Each question has a horizontal bar showing the
 *[Placeholder: Statistical evaluation tab showing two or three questions, each with the correct/wrong split bar, tick count on the left and cross count on the right]*
 :::
 
-Students see this same view after completing the quiz — if you've enabled **Participants can view statistics** in the quiz settings. Below each question they also see whether their own answer was correct.
+Students see this same view after completing the quiz — if you've enabled **Participants can view statistics** in the Quiz data tab. Below each question they also see whether their own answer was correct.
 
 ## Question detail
 
@@ -31,7 +31,7 @@ Toggle **Presentation mode** at the top left of the Statistical evaluation tab t
 
 ## Accessibility
 
-The colour scheme in the statistics view is set per user via **Account settings → Colour palette**. Two palettes are available — red/green and blue/yellow — to accommodate different types of colour vision. Remind students they can adjust this in their own account settings.
+The colour scheme in the statistics view is set per user by clicking on the circle with the user initials in the top right corner, then clicking on **Colour palette**. Two palettes are available — red/green and blue/yellow — to accommodate different types of colour vision. Remind students they can adjust this in their own account settings.
 
 ## Resetting statistics
 

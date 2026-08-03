@@ -2,13 +2,13 @@
 
 # Fragen erstellen <Badge type="info" text="Studierende" />
 
-Wenn das Quiz im **Bearbeitungsmodus** ist, können Sie Fragen einreichen, die Ihre Kommilitoninnen und Kommilitonen später beantworten werden. Das Formulieren von Fragen ist der Kern von Recapp — es fordert Sie auf, sich intensiv mit dem Lernstoff auseinanderzusetzen.
+Wenn das Quiz im **Editiermodus** ist, können Sie Fragen einreichen, die Ihre Kommilitoninnen und Kommilitonen später beantworten werden. Das Formulieren von Fragen ist der Kern von Recapp — es fordert Sie auf, sich intensiv mit dem Lernstoff auseinanderzusetzen.
 
 ## Eine Frage hinzufügen
 
 Klicken Sie im Tab **<mark>Quizfragen</mark>** auf **<mark>+ Neue Frage</mark>**.
 
-**1. Namensanzeige wählen**  
+**1. Autor wählen**  
 Wählen Sie, wie Ihr Name bei der Frage erscheint: anonym, Pseudonym oder Klarname. Die verfügbaren Optionen hängen von den Einstellungen Ihrer Lehrperson ab. Die Lehrperson sieht immer, wer eine Frage eingereicht hat — andere Studierende nicht.
 
 **2. Fragetyp auswählen**  
@@ -31,7 +31,7 @@ Klicken Sie auf **<mark>Frage speichern</mark>**. Ihre Frage erscheint in der Li
 
 ## Ihre Frage bearbeiten
 
-Sie können Ihre eigenen Fragen bearbeiten, solange das Quiz im Bearbeitungsmodus ist. Klicken Sie auf das **Stift-Symbol** auf Ihrer Fragenkarte, nehmen Sie Änderungen vor und klicken Sie auf **<mark>Frage speichern</mark>**.
+Sie können Ihre eigenen Fragen bearbeiten, solange das Quiz im Editiermodus ist. Klicken Sie auf das **Stift-Symbol** auf Ihrer Fragenkarte, nehmen Sie Änderungen vor und klicken Sie auf **<mark>Frage speichern</mark>**.
 
 Sobald Ihre Lehrperson in den Kurationsmodus wechselt, ist eine Bearbeitung nicht mehr möglich.
 

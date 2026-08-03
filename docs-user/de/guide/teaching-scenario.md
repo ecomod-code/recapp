@@ -20,15 +20,15 @@ Das Ergebnis: Derselbe Inhalt wird zweimal, auf zwei verschiedene Arten, wiederh
 
 ## Das Quiz vorbereiten
 
-Erstellen Sie vorab ein leeres Quiz in Recapp. Die einzige Einstellung, die Sie **zwingend** aktivieren müssen, ist **<mark>Teilnehmenden erlauben, Fragen zu stellen</mark>** — ohne sie können Studierende nichts einreichen. Alle anderen Einstellungen sind optional, aber folgende sind es wert, bedacht zu werden:
+Erstellen Sie vorab ein leeres Quiz in Recapp. Die einzige Einstellung, die Sie **zwingend** aktivieren müssen, ist **<mark>Fragen durch Teilnehmende erstellen lassen</mark>** — ohne sie können Studierende nichts einreichen. Alle anderen Einstellungen sind optional, aber folgende sind es wert, bedacht zu werden:
 
 **<mark>Erlaubte Fragetypen</mark>** — Einfach- und Mehrfachauswahl-Fragen eignen sich besonders gut für die Rekapitulation, weil Studierende dabei auch falsche Antworten formulieren müssen. Erwägen Sie, Freitextfragen für dieses Szenario zu deaktivieren.
 
-**<mark>Teilnehmerkommentare erlauben</mark>** — Sinnvoll, wenn Studierende Verständnisprobleme markieren oder Rückfragen stellen sollen. Sie können diese Kommentare in der Abschlussdiskussion aufgreifen.
+**<mark>Kommentare von Teilnehmenden erlauben</mark>** — Sinnvoll, wenn Studierende Verständnisprobleme markieren oder Rückfragen stellen sollen. Sie können diese Kommentare in der Abschlussdiskussion aufgreifen.
 
 **<mark>Teilnehmende können Statistiken einsehen</mark>** — Wenn Sie diese Option deaktivieren, sehen Studierende nach Abschluss nur ihre eigenen Ergebnisse, nicht die der Gruppe. Das gibt Ihnen mehr Kontrolle über die Diskussion — alle schauen gemeinsam auf die Gruppenstatistik am Beamer, statt individuell auf dem Smartphone.
 
-**<mark>Kommentarliste ausblenden</mark>** — Wenn Kommentare erlaubt sind, Sie aber möchten, dass Studierende zunächst unabgelenkt antworten, blenden Sie die Kommentarliste während der Antwortphase aus und schalten Sie sie erst in der Diskussion wieder ein.
+**<mark>Kommentarliste verbergen</mark>** — Wenn Kommentare erlaubt sind, Sie aber möchten, dass Studierende zunächst unabgelenkt antworten, blenden Sie die Kommentarliste während der Antwortphase aus und schalten Sie sie erst in der Diskussion wieder ein.
 
 ## Durchführung
 

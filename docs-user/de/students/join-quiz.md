@@ -33,6 +33,6 @@ Klicken Sie auf den Kreis mit Ihren Namensinitialen oben rechts, um Ihre Kontoei
 | Einstellung | Funktion |
 |---|---|
 | **Pseudonym** | Ein Anzeigename statt Ihres echten Namens. Legen Sie ihn fest, bevor Sie einem Quiz beitreten, wenn Sie anonym teilnehmen möchten. |
-| **<mark>Teilnahmeoptionen</mark>** | Ihr bevorzugter Standardname: anonym, Pseudonym oder Klarname. |
+| **<mark>Optionen zur Teilnahme</mark>** | Ihr bevorzugter Standardname: anonym, Pseudonym oder Klarname. |
 | **Sprache** | Wechsel zwischen Deutsch und Englisch. |
 | **<mark>Farbpalette</mark>** | Auswahl eines Farbschemas für Barrierefreiheit (Rot/Grün oder Blau/Gelb). |

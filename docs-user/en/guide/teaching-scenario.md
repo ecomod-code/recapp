@@ -46,7 +46,7 @@ Students need to know when question submission closes, and you need time to cura
 
 ### Between sessions: curate
 
-Once the submission window closes, switch the quiz to curation mode. Go through the submitted questions and:
+Once the submission window closes, switch the quiz to editing mode. Go through the submitted questions and:
 - Fix unclear wording or incorrect answer options
 - Remove duplicates or questions that are too vague to be useful
 - Reorder questions if a particular sequence makes sense

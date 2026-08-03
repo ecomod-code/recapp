@@ -1,22 +1,35 @@
 # docker-compose.prod.yaml (Production configuration)
 
 services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - DOMAIN=${DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    depends_on:
+      - backend
+      - frontend
+
   frontend:
     restart: unless-stopped
     build:
       context: ..
       dockerfile: packages/frontend/Dockerfile
       args:
-        - VITE_API_URL=${BACKEND_URI:-http://localhost:3123}
-        - VITE_APP_URL=${FRONTEND_URI:-http://localhost:5173}
-        - VITE_INACTIVITY_LIMIT=1
+        - VITE_BACKEND_URI=${BACKEND_URI}
+        - VITE_FRONTEND_URI=${FRONTEND_URI}
         - VITE_DEBUG_RECAPP=1 # change to 0 for production
     environment:
       - FRONTEND_URI=${FRONTEND_URI}
       - BACKEND_URI=${BACKEND_URI}
       - VITE_DEBUG_RECAPP=1 # change to 0 for production
-    ports:
-      - "5173:80"
     depends_on:
       - backend
 
@@ -30,8 +43,8 @@ services:
     build:
       context: ..
       dockerfile: packages/backend/Dockerfile
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
+      args:
+        - SERVER_PORT=${SERVER_PORT}
     environment:
       - NODE_ENV=production
       - FRONTEND_URI=${FRONTEND_URI}

@@ -9,6 +9,7 @@ deploy.log
 .env.production
 .env.development
 docker/mongo/
+docker/caddy/
 **/yarn.lock
 **/downloads/*.csv
 **/downloads/*.json

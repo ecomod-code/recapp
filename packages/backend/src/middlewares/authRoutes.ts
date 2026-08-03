@@ -48,7 +48,7 @@ export const authLogin = async (ctx: koa.Context): Promise<void> => {
 	}
 
 	const authUrl = client.authorizationUrl({
-		scope: "openid email profile" + (REQUIRES_OFFLINE_SCOPE ? " offline_access" : ""),
+		scope: "openid email profile" + (REQUIRES_OFFLINE_SCOPE === "true" ? " offline_access" : ""),
 		response_type: "code",
 	});
 	ctx.redirect(authUrl);

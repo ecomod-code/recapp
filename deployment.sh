@@ -47,9 +47,13 @@ sudo docker compose --env-file .env.production -f docker/docker-compose.yaml -f 
 
 log "Health check backend (wait up to 60s)..."
 
+COMPOSE="sudo docker compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml"
+BACKEND_CID="$($COMPOSE ps -q backend)"
+
 ok=0
 for i in {1..30}; do
-  if curl -fsS --max-time 2 "http://127.0.0.1:3123/ping" >/dev/null; then
+  status="$(sudo docker inspect --format='{{.State.Health.Status}}' "$BACKEND_CID" 2>/dev/null || echo "unknown")"
+  if [[ "$status" == "healthy" ]]; then
     ok=1
     break
   fi
@@ -57,8 +61,8 @@ for i in {1..30}; do
 done
 
 if [[ "$ok" -ne 1 ]]; then
-  log "ERROR: Backend health check failed after retries."
-  sudo docker logs --tail 200 docker-backend-1 2>&1 | tee -a "$LOG_FILE"
+  log "ERROR: Backend health check failed after retries (status: ${status:-unknown})."
+  $COMPOSE logs --tail 200 backend 2>&1 | tee -a "$LOG_FILE"
   exit 1
 fi
 

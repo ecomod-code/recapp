@@ -28,7 +28,7 @@ Zusätzliche Informationen zum Quiz. Ebenfalls für Studierende sichtbar.
 
 ### Lehrende
 
-Das Feld „Lehrpersonen" listet alle Personen mit Lehrenden-Zugang auf. Um eine weitere Lehrperson oder eine Tutorin/einen Tutor hinzuzufügen, klicken Sie auf **<mark>Teilen</mark>** neben dem Feld, suchen Sie nach E-Mail-Adresse oder Name und klicken Sie erst auf **<mark>"Hinzufügen<mark>** und dann auf **<mark>Quiz teilen</mark>**.
+Das Feld „Lehrpersonen" listet alle Personen mit Lehrenden-Zugang auf. Um eine weitere Lehrperson oder eine Tutorin/einen Tutor hinzuzufügen, klicken Sie auf **<mark>Teilen</mark>** neben dem Feld, suchen Sie nach E-Mail-Adresse oder Name und klicken Sie erst auf **<mark>"Hinzufügen"</mark>** und dann auf **<mark>Quiz teilen</mark>**.
 ::: warning Lehrende hinzufügen
 Hinzugefügt werden können nur Personen, die sich mindestens einmal in Recapp angemeldet haben. Wenn jemand sich noch nie angemeldet hat, senden Sie dieser Person zunächst den Quiz-Link und fügen Sie sie nach ihrer ersten Anmeldung hinzu.
 :::

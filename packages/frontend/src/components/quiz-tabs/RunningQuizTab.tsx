@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { i18n } from "@lingui/core";
 import MDEditor, { commands } from "@uiw/react-md-editor";
 import "katex/dist/katex.css";
@@ -18,6 +18,7 @@ import { isMultiChoiceAnsweredCorrectly } from "../../utils";
 import { Trans } from "@lingui/react";
 import { CHECK_SYMBOL, X_SYMBOL } from "../../constants/layout";
 import { CORRECT_COLOR, WRONG_COLOR, CORRECT_COLOR_TEXT, WRONG_COLOR_TEXT } from "../../colorPalette";
+import { d } from "../../utils/debugLog";
 
 export const RunningQuizTab: React.FC<{
 	isUserInTeachersList:boolean;
@@ -30,24 +31,25 @@ export const RunningQuizTab: React.FC<{
 	const [textAnswer, setTextAnswer] = useState("");
 	const [answers, setAnswers] = useState<boolean[]>([]);
 	const { run, questions: qData } = quizState;
-	console.log(
-		"QUES",
-		quizState.questions.length,
-		"RUN",
-		quizState.run,
-		"ENTRY",
-		quizState.run?.counter,
-		"FOO",
-		quizState.questions[0]
-	);
+
+	useEffect(() => {
+		d.runState({
+			source: "useEffect-counter",
+			beforeCounter: null,
+			afterCounter: run?.counter ?? null,
+			runUidAfter: run?.uid,
+			reason: "counter-dep-fired",
+		});
+		setAnswered(false);
+		setTextAnswer("");
+		setAnswers([]);
+	}, [run?.counter]);
 
 	const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 	const currentQuestion = questions[run?.counter ?? 0];
 	const questionId = currentQuestion?.uid ?? toId("");
 	const questionText = questions.at(run?.counter ?? 0)?.text;
 	const { rendered, isStale } = useRendered({ value: questionText ?? "" });
-
-	console.log("ANSWERSTATE", quizState, run);
 
 	if (!quizState.run || !quizState.questions) {
 		return null;
@@ -71,10 +73,6 @@ export const RunningQuizTab: React.FC<{
 
 	const nextQuestion = () => {
 		logQuestionClicked();
-
-		setAnswered(false);
-		setTextAnswer("");
-		setAnswers([]);
 	};
 
 	const updateAnswer = (index: number, value: boolean) => {
@@ -86,12 +84,10 @@ export const RunningQuizTab: React.FC<{
 				a[i] = false;
 			}
 			a[index] = value;
-			console.log("ANSWERS NEW", a, value);
 			setAnswers(a);
 		} else {
 			const a = answersCopy;
 			a[index] = value;
-			console.log("ANSWERS", a, value);
 			setAnswers(a);
 		}
 	};

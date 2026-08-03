@@ -60,6 +60,13 @@ export type LocalUserState = {
 };
 
 export class LocalUserActor extends StatefulActor<Messages, Unit | string, LocalUserState> {
+	// Override the ts-actors default ("Shutdown"). A long-lived session actor
+	// shouldn't die from one handler exception (e.g. a timed-out ask raising
+	// the string-rejection contract from DistributedActorSystem.js:41). The
+	// supervisor still logs the warning + console.error; we just keep
+	// processing the next message instead of freezing the page.
+	strategy = "Resume" as const;
+
 	constructor(name: string, system: ActorSystem) {
 		super(name, system);
 		this.state = {
@@ -115,9 +122,21 @@ export class LocalUserActor extends StatefulActor<Messages, Unit | string, Local
 				});
 			}
 		} else if (message.tag == "QuizUpdateMessage") {
-			const names: { username: string }[] = message.quiz.teachers
-				? await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers))
-				: [];
+			// DistributedActorSystem rejects the ask Promise with a string on
+			// timeout; without try/catch the rejection crashes LocalUser via the
+			// supervisor (see getuserrun-counter-regression investigation).
+			// Teacher names are cosmetic — degrade to empty on failure.
+			let names: { username: string }[] = [];
+			if (message.quiz.teachers) {
+				try {
+					const result = await this.ask(actorUris.UserStore, UserStoreMessages.GetNames(message.quiz.teachers));
+					if (Array.isArray(result)) {
+						names = result;
+					}
+				} catch {
+					// keep names = []; next QuizUpdateMessage will retry the fetch
+				}
+			}
 			this.updateState(draft => {
 				if (message.quiz.uid) {
 					const isTeacher = message.quiz.teachers?.includes(this.state.user?.uid ?? toId(""));

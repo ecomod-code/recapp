@@ -11,8 +11,8 @@ services:
       - DOMAIN=${DOMAIN}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
+      - ./caddy/data:/data
+      - ./caddy/config:/config
     depends_on:
       - backend
       - frontend
@@ -71,7 +71,3 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.driver.mtu: "1450" # adjust to your indrastructure
-
-volumes:
-  caddy_data:
-  caddy_config:

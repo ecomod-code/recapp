@@ -1,0 +1,63 @@
+version: 2
+updates:
+  # Application + tooling dependencies (npm workspaces are picked up from root)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    groups:
+      # Bundle all non-major bumps into a single PR to cut review noise.
+      # Major bumps still arrive as individual PRs.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    ignore:
+      # Dev/build/monorepo tooling: suppress MAJOR-version PRs so they don't
+      # flood the list. These are done deliberately, not via Dependabot; the
+      # transitive vulns they carry are build-time only (not shipped in the
+      # backend/frontend containers). Minor/patch still flow via the group above.
+      - dependency-name: "lerna"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "nx"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@nx/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@manypkg/cli"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@featherscloud/pinion"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typedoc"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vite"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "vitest"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitest/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@vitejs/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "eslint-plugin-*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@typescript-eslint/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "jsdom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "mongodb-memory-server"
+        update-types: ["version-update:semver-major"]
+
+  # Keep GitHub Actions used by the CI workflow up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"

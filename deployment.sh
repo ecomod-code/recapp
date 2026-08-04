@@ -36,6 +36,12 @@ DEPLOY_DESC="$(git show -s --format='%h %ci %d %s' HEAD)"
 echo "$(date -Is) branch=$BRANCH ref=$DEPLOY_REF $DEPLOY_DESC" | tee -a "$HOME/deploy.log" >> "$HOME/deploy.refs.log"
 
 log "Installing npm deps (non-root)..."
+# Clean node_modules before npm ci: npm's workspace reify can fail with
+# ENOTEMPTY when swapping versions of *nested* workspace deps (seen on npm 9,
+# node 22). Removing the tree first avoids the buggy retire/move path; npm ci
+# does a full reinstall regardless, so this costs no correctness, only a little
+# time on deploys that changed dependencies.
+rm -rf node_modules packages/*/node_modules
 npm ci 2>&1 | tee -a "$LOG_FILE"
 
 log "Building docker images..."

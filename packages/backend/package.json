@@ -25,7 +25,7 @@
 		"mongodb": "^6.21.0",
 		"multer": "^2.1.1",
 		"mutative": "^1.3.0",
-		"openid-client": "^5.7.1",
+		"openid-client": "^6.8.4",
 		"reflect-metadata": "^0.2.1",
 		"serialize-error": "8.1.0",
 		"ts-actors": "^3.4.2",

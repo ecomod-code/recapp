@@ -19,7 +19,7 @@
 		"itu-utils": "^1.8.2",
 		"js-yaml": "^4.1.1",
 		"lerna": "^8.1.2",
-		"serialize-error": "8.1.0",
+		"serialize-error": "13.0.1",
 		"ts-actors": "^3.4.2",
 		"tsmonads": "^3.4.0",
 		"typescript": "^5.3.3",

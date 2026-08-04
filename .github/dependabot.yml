@@ -81,6 +81,10 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "@testing-library/*"
         update-types: ["version-update:semver-major"]
+      # katex 0.x: hold minor/major (0.16 -> 0.18 is a breaking render change
+      # and math rendering is core). Patch bumps (0.16.x) still flow.
+      - dependency-name: "katex"
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
 
   # Keep GitHub Actions used by the CI workflow up to date
   - package-ecosystem: "github-actions"

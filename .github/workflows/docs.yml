@@ -51,7 +51,7 @@ jobs:
 
       # ── 5. Upload combined docs/ folder to GitHub Pages ────────────────────
       - name: Upload artifact for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: docs
 

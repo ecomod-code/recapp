@@ -1,0 +1,26 @@
+version: 2
+updates:
+  # Application + tooling dependencies (npm workspaces are picked up from root)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    groups:
+      # Bundle all non-major bumps into a single PR to cut review noise.
+      # Major bumps still arrive as individual PRs.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Keep GitHub Actions used by the CI workflow up to date
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels:
+      - "dependencies"
+      - "github-actions"

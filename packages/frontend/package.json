@@ -46,7 +46,7 @@
 		"ts-actors-react": "^1.0.1",
 		"tsmonads": "^3.4.0",
 		"unionize": "^3.1.0",
-		"uuid": "^9.0.1",
+		"uuid": "^14.0.1",
 		"zod": "^3.22.4",
 		"zustand": "^4.5.7"
 	},

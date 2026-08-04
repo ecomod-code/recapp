@@ -52,6 +52,35 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "mongodb-memory-server"
         update-types: ["version-update:semver-major"]
+      # Runtime/framework majors deliberately deferred (done as their own
+      # migration, not via auto-PRs). NOT react-router — we want the eventual
+      # fix for its RSC-CSRF advisory.
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "mongodb"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "koa"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "koa-session"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@koa/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "zustand"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "zod"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "js-yaml"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "itu-utils"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@testing-library/*"
+        update-types: ["version-update:semver-major"]
 
   # Keep GitHub Actions used by the CI workflow up to date
   - package-ecosystem: "github-actions"

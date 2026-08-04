@@ -17,7 +17,7 @@
 	"dependencies": {
 		"@lingui/cli": "^5.3.1",
 		"@lingui/macro": "^4.7.1",
-		"@lingui/react": "^4.7.1",
+		"@lingui/react": "^6.6.0",
 		"@lingui/vite-plugin": "^5.3.1",
 		"@recapp/models": "^1.1.0",
 		"@types/katex": "^0.16.8",

@@ -111,7 +111,10 @@ router
 const start = async () => {
   try {
     app.use(errorHandler);
-    app.use(koaLogger(logger));
+    // Log every request except the health check, which the Docker HEALTHCHECK
+    // hits every ~10s and would otherwise flood the logs.
+    const requestLogger = koaLogger(logger);
+    app.use((ctx, next) => (ctx.path === "/ping" ? next() : requestLogger(ctx, next)));
     app.use(koaBody());
     app.keys = [process.env.OID_CLIENT_SECRET as string];
     app.use(session({}, app));

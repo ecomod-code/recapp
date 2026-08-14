@@ -13,9 +13,9 @@
 	"author": "",
 	"license": "MIT",
 	"dependencies": {
-		"@lingui/cli": "5.3.1",
-		"@lingui/vite-plugin": "5.3.1",
-		"@manypkg/cli": "^0.24.0",
+		"@lingui/cli": "5.9.5",
+		"@lingui/vite-plugin": "5.9.5",
+		"@manypkg/cli": "^0.25.1",
 		"itu-utils": "^1.8.2",
 		"js-yaml": "^4.1.1",
 		"lerna": "^8.1.2",

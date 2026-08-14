@@ -14,7 +14,7 @@ on_error() {
 }
 trap on_error ERR INT TERM
 
-log "=== Starting deployment to PROD (branch: ${BRANCH}) ==="
+log "=== Starting deployment on $(hostname) (branch: ${BRANCH}) ==="
 
 # Sudo check (only needed for docker/compose, ideally)
 if ! sudo -n true 2>/dev/null; then
@@ -42,6 +42,11 @@ log "Installing npm deps (non-root)..."
 # does a full reinstall regardless, so this costs no correctness, only a little
 # time on deploys that changed dependencies.
 rm -rf node_modules packages/*/node_modules
+# An interrupted install can leave the npm cache tmp dir in a bad state, making
+# the next `npm ci` abort with `EEXIST ... ~/.npm/_cacache/tmp/...`. Verify the
+# cache first (prunes stale tmp entries); fall back to a full clean if verify
+# itself trips.
+npm cache verify || npm cache clean --force
 npm ci 2>&1 | tee -a "$LOG_FILE"
 
 log "Building docker images..."

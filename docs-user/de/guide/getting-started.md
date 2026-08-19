@@ -12,8 +12,8 @@ Ein separates Recapp-Konto ist nicht erforderlich.
 
 Nach der Anmeldung gelangen Sie zum **Dashboard** — Ihrer Startseite in Recapp. Hier werden alle Quizze angezeigt, mit denen Sie verbunden sind: selbst erstellte, als Studierende/r beigetretene sowie Quizze, bei denen Sie als Lehrperson hinzugefügt wurden. Die Quizze sind nach dem Datum der letzten Änderung sortiert.
 
-::: info 📸 Screenshot
-*[Platzhalter: Dashboard mit zwei oder drei Quizkarten mit Titel, Teilnehmeranzahl, Name der Lehrperson und Statusbadges — eines <Badge type="warning" text="EDITING" />, eines <Badge type="tip" text="STARTED" />, eines <Badge type="danger" text="STOPPED" />]*
+::: info
+![](../../images/Dashboard_DE.png)
 :::
 
 Jede Quizkarte zeigt:

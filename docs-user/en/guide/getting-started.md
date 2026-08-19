@@ -10,8 +10,8 @@ No separate Recapp account is needed.
 
 After logging in, you land on the **dashboard** — your home page in Recapp. It shows all quizzes you're connected to: ones you've created, ones you've joined as a student, and ones where you've been added as a teacher. Quizzes are sorted by the date of the last change.
 
-::: info 📸 Screenshot
-*[Placeholder: Dashboard showing two or three quiz cards with title, participant count, teacher name, and status badges — one <Badge type="warning" text="EDITING" />, one <Badge type="tip" text="STARTED" />, one <Badge type="danger" text="STOPPED" />]*
+::: info
+![](../../images/Dashboard_EN.png)
 :::
 
 Each quiz card shows:

@@ -10,8 +10,8 @@ Die Übersicht listet alle Fragen auf. Jede Frage hat einen horizontalen Balken,
 - **Linke Hälfte** — richtige Antworten, mit einem Häkchen und der absoluten Anzahl
 - **Rechte Hälfte** — falsche Antworten, mit einem Kreuz und der absoluten Anzahl
 
-::: info 📸 Screenshot
-*[Platzhalter: Tab „Statistische Auswertung" mit zwei oder drei Fragen, jeweils mit dem Richtig/Falsch-Balken, Häkchen-Anzahl links und Kreuz-Anzahl rechts]*
+::: info
+![](../../images/Stat_Eval.png)
 :::
 
 Studierende sehen diese Ansicht nach Abschluss des Quiz — sofern Sie **<mark>Teilnehmende können Statistiken einsehen</mark>** in den Quizeinstellungen aktiviert haben. Unterhalb jeder Frage sehen sie außerdem, ob ihre eigene Antwort richtig oder falsch war.

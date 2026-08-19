@@ -8,8 +8,8 @@ The overview lists all questions. Each question has a horizontal bar showing the
 - **Left half** — correct answers, with a tick mark and the absolute count
 - **Right half** — wrong answers, with a cross and the absolute count
 
-::: info 📸 Screenshot
-*[Placeholder: Statistical evaluation tab showing two or three questions, each with the correct/wrong split bar, tick count on the left and cross count on the right]*
+::: info
+![](../../images/Stat_Eval.png)
 :::
 
 Students see this same view after completing the quiz — if you've enabled **Participants can view statistics** in the Quiz data tab. Below each question they also see whether their own answer was correct.

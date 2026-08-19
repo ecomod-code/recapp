@@ -33,7 +33,6 @@
 		"start:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml up -d",
 		"stop:docker:dev": "docker-compose --env-file .env.development -f docker/docker-compose.yaml -f docker/docker-compose.dev.yaml down",
 		"stop:docker:prod": "docker-compose --env-file .env.production -f docker/docker-compose.yaml -f docker/docker-compose.prod.yaml down",
-		"bootstrap": "lerna bootstrap",
 		"dev": "lerna run dev",
 		"build": "lerna run build",
 		"docs": "typedoc",

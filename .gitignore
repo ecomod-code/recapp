@@ -15,3 +15,7 @@ docker/caddy/
 **/downloads/*.csv
 **/downloads/*.json
 .vscode
+
+# Playwright E2E output (generated on test runs, never commit)
+tests/e2e/test-artifacts/
+tests/e2e/test-report/

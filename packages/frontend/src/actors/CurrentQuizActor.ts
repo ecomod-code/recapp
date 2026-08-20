@@ -107,6 +107,10 @@ export type CurrentQuizState = {
 	result?: QuizRun;
 	exportFile?: string;
 	deleted: boolean;
+	// An answer selected before `run` finished (re)initialising. LogAnswer
+	// buffers it here instead of silently dropping it, and it is replayed once
+	// `run` and the question set are ready. See flushPendingAnswer().
+	pendingAnswer?: { questionId: Id; answer: string | boolean[] };
 	runReady: boolean;
 	hasInitialQuestions: boolean;
 	questionsSubscribed: boolean;
@@ -140,11 +144,34 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 			run: undefined,
 			exportFile: undefined,
 			deleted: false,
+			pendingAnswer: undefined,
 			runReady: false,
 			hasInitialQuestions: false,
 			questionsSubscribed: false,
 			runFetchStarted: false,
 		};
+	}
+
+	/**
+	 * Replay an answer that arrived while `run` was undefined (buffered by
+	 * LogAnswer's else branch). Called from every path that (re)initialises
+	 * `run` and from the question-list update. It is a no-op unless the run and
+	 * the answered question are both present, so calling it eagerly at several
+	 * sites is safe regardless of the order in which run/questions settle. The
+	 * buffer is cleared before re-dispatching so the answer applies exactly once
+	 * and cannot re-enter this flush loop.
+	 */
+	private flushPendingAnswer(): void {
+		const pending = this.state.pendingAnswer;
+		if (!pending) return;
+		if (!this.state.run) return;
+		// LogAnswer requires the Question to be loaded (it reads question.type);
+		// wait for the question set if it hasn't arrived yet.
+		if (!this.state.questions.some(q => q.uid === pending.questionId)) return;
+		this.updateState(s => {
+			s.pendingAnswer = undefined;
+		});
+		this.send(this.ref, CurrentQuizMessages.LogAnswer(pending));
 	}
 
 	private async handleRemoteUpdates(message: MessageType): Promise<Maybe<CurrentQuizMessage>> {
@@ -225,6 +252,10 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 				d.listRes({ quizId, source: "client", returnedCount: after });
 			}
 
+			// Questions just arrived; replay an answer buffered before run/questions
+			// were ready (no-op unless run is set and the question is now present).
+			this.flushPendingAnswer();
+
 			return nothing();
 		} else if (message.tag === "QuestionDeletedMessage") {
 			this.updateState(draft => {
@@ -293,6 +324,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 				});
 				draft.run = undefined;
 				draft.runFetchStarted = false;
+				draft.pendingAnswer = undefined;
 			});
 			return nothing();
 		} else if (message.tag === "StatisticsUpdateMessage") {
@@ -380,6 +412,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								draft.run = undefined;
 								draft.exportFile = undefined;
 								draft.deleted = false;
+								draft.pendingAnswer = undefined;
 								draft.runReady = false;
 								draft.hasInitialQuestions = false;
 								draft.questionsSubscribed = false;
@@ -470,6 +503,11 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 								this.send(`${actorUris.QuestionActorPrefix}${quizId}`, QuestionActorMessages.GetAll());
 							}
 
+							// Replay an answer buffered while run was undefined (no-op unless
+							// the answered question is already loaded; the QuestionUpdate
+							// handler retries once questions arrive).
+							this.flushPendingAnswer();
+
 							return run;
 						},
 						Activate: async ({ userId, quizId }) => {
@@ -528,6 +566,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									});
 								}
 							});
+
+							// run just (re)initialised — replay a buffered answer if any.
+							this.flushPendingAnswer();
 
 							return unit();
 						},
@@ -626,6 +667,24 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									`${actorUris.StatsActorPrefix}${this.quiz.orElse(toId("-"))}`,
 									StatisticsActorMessages.Update(stat)
 								);
+							} else {
+								// `run` is undefined — the answer was selected during the run
+								// (re)initialisation window (e.g. a WS reconnect cleared `run`
+								// and the async re-fetch hasn't completed, or a reset was
+								// dequeued ahead of this LogAnswer). Buffer it instead of
+								// silently dropping; flushPendingAnswer() replays it once the
+								// run and question set are ready. Last-write-wins: only one
+								// question is answerable at a time, so a single slot suffices.
+								this.updateState(draft => {
+									draft.pendingAnswer = { questionId, answer };
+								});
+								d.runState({
+									source: "LogAnswer",
+									beforeCounter: null,
+									afterCounter: null,
+									blocked: true,
+									reason: "run-undefined-buffered",
+								});
 							}
 							return unit();
 						},
@@ -909,6 +968,9 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 											this.send(this.ref, CurrentQuizMessages.StartQuiz());
 										}
 									}
+									// Reconnect re-runs SetQuiz for the same quiz and repopulates
+									// run here; replay a buffered answer if one is waiting.
+									this.flushPendingAnswer();
 									return unit();
 								}
 								this.state = { ...this.state, comments: [], questions: [], deleted: false };
@@ -947,6 +1009,7 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 									draft.quizStats = undefined;
 									draft.quiz = quizData;
 									draft.deleted = !quizData || keys(quizData).length === 0;
+									draft.pendingAnswer = undefined;
 									draft.runFetchStarted = false;
 									draft.runReady = false;
 									draft.questionsSubscribed = false;

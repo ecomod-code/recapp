@@ -1,3 +1,28 @@
+## [Release] v1.7.1 – 2026-08-20
+
+Patch release fixing a quiz-answer race: an answer selected during the brief
+run-(re)initialisation window could be silently dropped. No operator action —
+frontend-only change, deploy stack and config unchanged since v1.7.0.
+
+Versions: frontend `1.7.0 → 1.7.1`, backend `1.1.0`, models `1.1.0`.
+
+### Highlights
+
+- **Quiz reliability**
+  - Fixed answers being silently discarded when selected before the quiz run
+    finished initialising (e.g. during a startup WebSocket reconnect, when the
+    `GetRun` re-fetch stalls on the actor ask-timeout). Such answers are now
+    buffered and replayed once the run and its questions are ready, instead of
+    being no-oped
+  - The student answer UI is now gated on the run being present, so a question
+    can't be answered before its run exists; teacher tabs still render normally
+    while editing
+
+- **Testing**
+  - Added a `CurrentQuizActor` unit test covering the buffer-and-replay path
+
+---
+
 ## [Release] v1.7.0 – 2026-08-14
 
 Quiz-reliability hardening, a deployment-stack move to **Caddy**, tighter session

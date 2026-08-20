@@ -288,24 +288,23 @@ export const QuizPage: React.FC = () => {
 
 				console.log("TL", isUserInTeachersList, quizData.quiz.previewers);
 
-				const runReady = !!quizData.runReady;
 				const isQuizStateStarted = quizData.quiz.state === "STARTED";
 
 				// if (!isQuizStateStarted) {
 				// 	return <div className="text-sm opacity-70">The quiz hasn’t started yet.</div>;
 				// }
 
-				// if (!runReady || !hasInitialQuestions) {
-				// 	// Lightweight “syncing” UI — keeps users from seeing “0” briefly
-				// 	return (
-				// 		<div className="text-sm opacity-70">
-				// 			Fetching questions...
-				// 		</div>
-				// 	);
-				// }
+				// Gate for the student answer UI (RunningQuizTab): the run must exist
+				// AND the first questions must have arrived. Without this, a radio is
+				// clickable while `run` is still undefined (e.g. during a startup or
+				// mid-quiz WS reconnect that clears `run` and re-fetches it async),
+				// and CurrentQuizActor.LogAnswer would silently drop the selection.
+				// Scoped to the RunningQuizTab branch below (not page-wide) so it never
+				// hides the teacher tabs, which render without a `run` while editing.
+				const answerReady = !!quizData.run && hasInitialQuestions;
 
 				const run = quizData.run;
-				const qData = quizData.questions;runReady;
+				const qData = quizData.questions;
 				const questions = run?.questions.map(id => qData.find(q => q.uid === id)) ?? [];
 				const currentQuestion = questions[run?.counter ?? 0];
 				const questionId = currentQuestion?.uid ?? toId("");
@@ -535,12 +534,18 @@ export const QuizPage: React.FC = () => {
 									tabClassName={quizData.isPresentationModeActive ? "d-none" : ""}
 								>
 									{disableForStudent && quizData.quiz.state === "STARTED" ? (
-										<RunningQuizTab
-											isUserInTeachersList={isUserInTeachersList}
-											onClickAddComment={() => setShowMDModal(true)}
-											quizState={quizData}
-											logQuestion={logQuestion}
-										/>
+										answerReady ? (
+											<RunningQuizTab
+												isUserInTeachersList={isUserInTeachersList}
+												onClickAddComment={() => setShowMDModal(true)}
+												quizState={quizData}
+												logQuestion={logQuestion}
+											/>
+										) : (
+											// Lightweight “syncing” UI while the run (re)initialises —
+											// keeps the question from being answerable too early.
+											<div className="text-sm opacity-70">Fetching questions...</div>
+										)
 									) : (
 										<QuestionsTab
 											isUserInTeachersList={isUserInTeachersList}

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-BRANCH="${1:-production}"
+BRANCH="${1:-main}"
 REPO_DIR="$HOME/recapp"
 LOG_FILE="$HOME/deploy.log"
 

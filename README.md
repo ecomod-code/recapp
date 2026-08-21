@@ -1,6 +1,6 @@
 <img src="assets/recapp_logo.svg" alt="Recapp Logo" width="220" />
 
-![CI](https://github.com/ecomod-code/recapp/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/ecomod-code/recapp/actions/workflows/ci.yml/badge.svg?branch=main)
 ![Coverage](https://codecov.io/gh/ecomod-code/recapp/branch/main/graph/badge.svg)
 
 # RECAPP

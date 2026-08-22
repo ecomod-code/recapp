@@ -1,0 +1,49 @@
+name: Run Playwright Tests
+
+on:
+  push:
+    branches:
+      - feature/implementing-playwright  # Runs when pushing to playright branch for now
+
+jobs:
+  test:
+    name: Run Playwright Tests on Feature Branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout feature/implementing-playwright branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/implementing-playwright  
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium
+
+      - name: Run Playwright Tests
+        run: |
+          npx playwright test \
+            recapp/tests/e2e/anon-sixQ-ans-allCorrect.wait.spec.ts \
+            recapp/tests/e2e/anon-sixQ-ans-halfCorrect.spec.ts \
+            --workers 1 \
+            --repeat-each 50 \
+            --timeout 60000 \
+            --trace on
+
+      - name: Upload Test Report as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: recapp/tests/e2e/test-report/
+          if-no-files-found: ignore

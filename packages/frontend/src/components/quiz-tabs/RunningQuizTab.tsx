@@ -51,6 +51,20 @@ export const RunningQuizTab: React.FC<{
 	const questionText = questions.at(run?.counter ?? 0)?.text;
 	const { rendered, isStale } = useRendered({ value: questionText ?? "" });
 
+	// Reset per-question local state in step with the current question, before it is
+	// read during render. questionId only changes once the counter advances (after the
+	// backend round-trip), so this does NOT reintroduce the synchronous pre-round-trip
+	// reset removed in 47bef5d (which reopened the repetition-glitch double submission).
+	// Without this, stale `answers` (sized to a previous, larger question) outlives the
+	// counter change for one render and crashes isMultiChoiceAnsweredCorrectly.
+	const [prevQuestionId, setPrevQuestionId] = useState(questionId);
+	if (questionId !== prevQuestionId) {
+		setPrevQuestionId(questionId);
+		setAnswered(false);
+		setTextAnswer("");
+		setAnswers([]);
+	}
+
 	if (!quizState.run || !quizState.questions) {
 		return null;
 	}

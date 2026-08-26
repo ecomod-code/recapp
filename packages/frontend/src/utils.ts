@@ -49,6 +49,14 @@ export const isMultiChoiceAnsweredCorrectly = (answers2: boolean[], question: Qu
 		return false;
 	}
 
+	// A selection longer than the current question's option count belongs to a
+	// previous (larger) question whose local state hasn't been reset yet. Treat it
+	// as not-yet-answered instead of indexing question.answers out of bounds, which
+	// throws "question.answers[i].correct" during render (answers-length crash).
+	if (answers.length > (question?.answers.length ?? 0)) {
+		return false;
+	}
+
 	while (answers.length < (question?.answers.length ?? 0)) {
 		answers.push(false);
 	}

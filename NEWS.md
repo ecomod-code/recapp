@@ -1,3 +1,24 @@
+## [Release] v1.7.2 – 2026-08-26
+
+Patch release fixing a client-side crash in running quizzes: advancing from a
+question with more options to one with fewer could throw a full-page error
+("undefined is not an object (question.answers[i].correct)"). Students could
+dismiss and refresh to continue; no data was affected. No operator action —
+frontend-only change, deploy stack and config unchanged since v1.7.1.
+
+Versions: frontend `1.7.1 → 1.7.2`, backend `1.1.0`, models `1.1.0`.
+
+### Highlights
+
+- **Quiz reliability**
+  - Fixed a render crash when advancing to a question with fewer answer options
+    than the previous one. Stale local selection state (sized to the previous
+    question) briefly outlived the question change and was indexed out of bounds.
+  - The answer-correctness check now ignores a selection that doesn't match the
+    current question's option count, and per-question state is reset in step with
+    the question during render — without reintroducing the earlier double-submit
+    regression.
+
 ## [Release] v1.7.1 – 2026-08-20
 
 Patch release fixing a quiz-answer race: an answer selected during the brief

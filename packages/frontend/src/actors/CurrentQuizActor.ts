@@ -801,19 +801,28 @@ export class CurrentQuizActor extends StatefulActor<MessageType, Unit | boolean 
 							return unit();
 						},
 						DeleteQuestion: async id => {
-							// Question also needs to be deleted from the groups of the quiz
-							const groups = this.state.quiz.groups.map(g => {
-								g.questions = g.questions.filter(q => q !== id);
-								return g;
-							});
-							await this.ask(
-								actorUris.QuizActor,
-								QuizActorMessages.Update({ uid: this.state.quiz.uid, groups })
-							);
-							await this.ask(
-								`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
-								QuestionActorMessages.Delete(id)
-							);
+							try {
+								// Remove the question from the quiz groups FIRST, then delete the
+								// question itself. The sequential await already aborts the delete if
+								// the groups update rejects, so a failed update can't leave dangling
+								// group references; the try/catch surfaces the rejection (matching
+								// AddQuestion) instead of dropping it.
+								const groups = this.state.quiz.groups.map(g => {
+									g.questions = g.questions.filter(q => q !== id);
+									return g;
+								});
+								await this.ask(
+									actorUris.QuizActor,
+									QuizActorMessages.Update({ uid: this.state.quiz.uid, groups })
+								);
+								await this.ask(
+									`${actorUris.QuestionActorPrefix}${this.quiz.orElse(toId("-"))}`,
+									QuestionActorMessages.Delete(id)
+								);
+							} catch (e) {
+								console.error("DeleteQuestion failed", e);
+								throw e;
+							}
 							return unit();
 						},
 						AddQuestion: async ({ question, group }) => {

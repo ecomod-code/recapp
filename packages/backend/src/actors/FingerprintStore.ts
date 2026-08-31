@@ -50,14 +50,11 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 		}
 		const result = await FingerprintStoreMessages.match<Promise<FingerprintStoreResult>>(message, {
 			StoreFingerprint: async fingerprint => {
-				this.state = await create(this.state, async draft => {
-					const currentFingerprint = (await this.getEntity(fingerprint.uid)).orElse({} as Fingerprint);
-					fingerprint.updated = toTimestamp();
-					const newFingerprint = { ...currentFingerprint, ...fingerprint };
-					draft.cache.set(fingerprint.uid, newFingerprint);
-					logger.debug(`Storing new fingerprint ${JSON.stringify(newFingerprint)}`);
-					this.storeEntity(newFingerprint);
-				});
+				const currentFingerprint = (await this.getEntity(fingerprint.uid)).orElse({} as Fingerprint);
+				fingerprint.updated = toTimestamp();
+				const newFingerprint = { ...currentFingerprint, ...fingerprint };
+				logger.debug(`Storing new fingerprint ${JSON.stringify(newFingerprint)}`);
+				await this.storeEntity(newFingerprint);
 				return unit();
 			},
 			Get: async id => {
@@ -66,49 +63,42 @@ export class FingerprintStore extends SubscribableActor<Fingerprint, Fingerprint
 				return Promise.resolve(retVal)
 			},
 			Block: async id => {
-				const mbFingerprint = await this.getEntity(id)
-				const {uid} = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
-				return mbFingerprint.match<Unit|Error>(
-					fp => {
-						this.storeEntity({...fp, blocked: true});
-						this.updateSubscribers({...fp, blocked: true})
-						if (uid)
-							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: false }));
-						return unit();
-					},
-					() => {
-						return new Error(`Unknown fingerprint id ${id}`);
-					}
-				)
+				const fp = (await this.getEntity(id)).orUndefined();
+				if (!fp) {
+					return new Error(`Unknown fingerprint id ${id}`);
+				}
+				const { uid } = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
+				const updated = { ...fp, blocked: true };
+				await this.storeEntity(updated);
+				this.updateSubscribers(updated);
+				if (uid) {
+					this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: false }));
+				}
+				return unit();
 			},
 			Unblock: async id => {
-				const mbFingerprint = await this.getEntity(id)
-				const {uid} = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
-				return mbFingerprint.match<Unit|Error>(
-					fp => {
-						this.storeEntity({...fp, blocked: false});
-						this.updateSubscribers({...fp, blocked: false})
-						if (uid)
-							this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: true }));
-						return unit();
-					},
-					() => {
-						return new Error(`Unknown fingerprint id ${id}`);
-					}
-				)
+				const fp = (await this.getEntity(id)).orUndefined();
+				if (!fp) {
+					return new Error(`Unknown fingerprint id ${id}`);
+				}
+				const { uid } = await this.ask<UserStoreMessage, User>("actors://recapp-backend/UserStore", UserStoreMessages.GetByFingerprint(id));
+				const updated = { ...fp, blocked: false };
+				await this.storeEntity(updated);
+				this.updateSubscribers(updated);
+				if (uid) {
+					this.send("actors://recapp-backend/UserStore", UserStoreMessages.Update({ uid, active: true }));
+				}
+				return unit();
 			},
 			IncreaseCount: async ({fingerprint, userUid, initialQuiz}) => {
-				const mbFingerprint = await this.getEntity(fingerprint)
-				return mbFingerprint.match<Unit|Error>(
-					fp => {
-						this.storeEntity({...fp, usageCount: fp.usageCount + 1, lastSeen: toTimestamp(), userUid, initialQuiz: initialQuiz ?? fp.initialQuiz});
-						this.updateSubscribers({...fp, usageCount: fp.usageCount + 1, lastSeen: toTimestamp(), userUid, initialQuiz: initialQuiz ?? fp.initialQuiz})
-						return unit();
-					},
-					() => {
-						return new Error(`Unknown fingerprint id ${fingerprint}`);
-					}
-				)
+				const fp = (await this.getEntity(fingerprint)).orUndefined();
+				if (!fp) {
+					return new Error(`Unknown fingerprint id ${fingerprint}`);
+				}
+				const updated = { ...fp, usageCount: fp.usageCount + 1, lastSeen: toTimestamp(), userUid, initialQuiz: initialQuiz ?? fp.initialQuiz };
+				await this.storeEntity(updated);
+				this.updateSubscribers(updated);
+				return unit();
 			},
 			GetMostRecent: async () => {
 				const db = await this.connector.db();

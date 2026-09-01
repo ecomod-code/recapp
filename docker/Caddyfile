@@ -1,5 +1,26 @@
+{
+	# The compose port mapping publishes 443/tcp only, so QUIC never reaches
+	# the container. Without this, Caddy would still advertise h3 via Alt-Svc
+	# and clients that act on it hang for up to 30 days.
+	servers {
+		protocols h1 h2
+	}
+}
+
 {$DOMAIN} {
 	encode gzip
+
+	# Access log without client IPs — the diagnostic value here is whether a
+	# request arrived at all, which needs no personal data.
+	log {
+		format filter {
+			wrap json
+			fields {
+				request>remote_ip delete
+				request>client_ip delete
+			}
+		}
+	}
 
 	handle_path /api/* {
 		reverse_proxy backend:3123

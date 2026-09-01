@@ -4,6 +4,11 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "10"
     ports:
       - "80:80"
       - "443:443"
@@ -70,4 +75,4 @@ networks:
   default:
     driver: bridge
     driver_opts:
-      com.docker.network.driver.mtu: "1450" # adjust to your indrastructure
+      com.docker.network.driver.mtu: "1450" # adjust to your infrastructure

@@ -243,7 +243,7 @@ export class StatisticsActor extends SubscribableActor<
 					);
 					// console.log("STATS", stats);
 					this.logger.info(`STATS stored quizId=${String(this.uid)}`);
-					this.storeEntity(stats);
+					await this.storeEntity(stats);
 					for (const [subscriber] of this.state.collectionSubscribers) {
 						this.send(subscriber, new StatisticsUpdateMessage(stats));
 					}

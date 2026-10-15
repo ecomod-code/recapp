@@ -1,9 +1,20 @@
 import { test, expect } from '@playwright/test';
+import 'dotenv/config';
+import path from 'path';
+import {config as loadDotenv } from 'dotenv';
+
+const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
+loadDotenv({ path: envPath });
+
 
 test('test', async ({ page }) => {
-  await page.goto('https://c102-238.cloud.gwdg.de/activate?quiz=238be342-7829-4401-9c17-a1192a06c1be');
+
+  const shareLink = process.env.SHARE_URL;
+
+  await page.goto(shareLink);
   await page.getByRole('button', { name: 'Continue without login' }).click();
   await page.getByRole('dialog').getByRole('button', { name: 'Login' }).click();
+
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
@@ -37,7 +48,6 @@ test('test', async ({ page }) => {
   await page.getByRole('textbox').nth(3).fill('2');
   await page.getByRole('textbox').nth(4).click();
   await page.getByRole('textbox').nth(4).fill('3');
-  await page.getByText('-OHT-002').click();
   await page.getByRole('textbox').nth(5).click();
   await page.getByRole('textbox').nth(5).fill('4');
   await page.getByRole('button', { name: 'Save question' }).click();
@@ -104,8 +114,6 @@ test('test', async ({ page }) => {
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('checkbox').nth(1).check();
-  await page.getByRole('checkbox').nth(1).click();
-  await page.locator('.mb-2.mt-2 > .align-self-center').first().click();
   await page.getByRole('textbox').nth(2).click();
   await page.getByRole('textbox').nth(2).fill('1');
   await page.getByRole('textbox').nth(3).click();

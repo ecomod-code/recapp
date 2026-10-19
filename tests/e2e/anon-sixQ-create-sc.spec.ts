@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import 'dotenv/config';
+//import 'dotenv/config';  // redundant, if bugs occur then uncomment this and try again
 import path from 'path';
 import {config as loadDotenv } from 'dotenv';
 
@@ -9,7 +9,7 @@ loadDotenv({ path: envPath });
 
 test('test', async ({ page }) => {
 
-  const shareLink = process.env.SHARE_URL;
+  const shareLink = process.env.PLAYWRIGHT_SHARE_URL;
 
   await page.goto(shareLink);
   await page.getByRole('button', { name: 'Continue without login' }).click();

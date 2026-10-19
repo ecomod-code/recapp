@@ -12,7 +12,7 @@ loadDotenv({ path: envPath });
 test('test', async ({ page }) => {
   const recappEmail = process.env.PLAYWRIGHT_USERNAME;
   const recappPassword = process.env.PLAYWRIGHT_PASSWORD;
-  const otpKey = process.env.OTP_KEY;
+  const otpKey = process.env.PLAYWRIGHT_OTP_KEY;
 
   if (!recappEmail || !recappPassword || !otpKey) {
     throw new Error('Missing env vars – check .env');
@@ -160,8 +160,8 @@ test('test', async ({ page }) => {
 
   const envContent = fs.readFileSync(envPath, 'utf8');
   const updatedContent = envContent
-    .replace(/SHARE_URL=.*/, `SHARE_URL=${url}`)
-    .replace(/# SHARE_URL=.*/, `SHARE_URL=${url}`);
+    .replace(/PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`)
+    .replace(/# PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`);
   
   // Write back to .env file
   fs.writeFileSync(envPath, updatedContent);

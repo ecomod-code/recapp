@@ -1,5 +1,12 @@
 name: Run Playwright Tests
-
+permissions:
+  contents: read
+  actions: read
+  packages: read
+  pages: read
+  pull-requests: read
+  id-token: write
+  
 on:
   push:
     branches:

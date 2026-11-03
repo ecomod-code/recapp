@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     name: Run Playwright Tests on Feature Branch (Sequential)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     env:
           PLAYWRIGHT_USERNAME: ${{ secrets.PLAYWRIGHT_USERNAME}}

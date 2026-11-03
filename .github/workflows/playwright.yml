@@ -44,16 +44,16 @@ jobs:
             --workers 1 \
             --timeout 180000 \
             --trace on \
-            --output-dir=recapp/tests/e2e/test-report/user-test
+            --output recapp/tests/e2e/test-report/user-test
 
-      - name: Run PLaywright Test (Anonymously)
+      - name: Run Playwright Test (Anonymously)
         run: |
           npx playwright test \
             recapp/tests/e2e/anon-sixQ-create-sc.spec.ts \
             --workers 1 \
             --timeout 180000 \
             --trace on \
-            --output-dir=recapp/tests/e2e/test-report/anon-test 
+            --output recapp/tests/e2e/test-report/anon-test 
           
       - name: Upload Test Report as Artifact
         uses: actions/upload-artifact@v4

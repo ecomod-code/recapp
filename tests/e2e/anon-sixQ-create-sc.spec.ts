@@ -3,13 +3,13 @@ import { test, expect } from '@playwright/test';
 import path from 'path';
 import {config as loadDotenv } from 'dotenv';
 
-const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
-loadDotenv({ path: envPath });
+//const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
+//loadDotenv({ path: envPath });
 
 
 test('test', async ({ page }) => {
 
-  const shareLink = process.env.PLAYWRIGHT_SHARE_URL;
+  const shareLink = fs.readFileSync('quiz-link.txt','utf8');
 
   await page.goto(shareLink);
   await page.getByRole('button', { name: 'Continue without login' }).click();

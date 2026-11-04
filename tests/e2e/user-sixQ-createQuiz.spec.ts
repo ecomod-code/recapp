@@ -5,8 +5,8 @@ import path from 'path';
 import {config as loadDotenv } from 'dotenv';
 
 const fs = require('fs');
-const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
-loadDotenv({ path: envPath });
+//const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
+//loadDotenv({ path: envPath });
 
 
 test('test', async ({ page }) => {
@@ -158,12 +158,13 @@ test('test', async ({ page }) => {
 
   console.log('✅ Extracted URL:', url);
 
-  const envContent = fs.readFileSync(envPath, 'utf8');
-  const updatedContent = envContent
-    .replace(/PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`)
-    .replace(/# PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`);
+//  const envContent = fs.readFileSync(envPath, 'utf8');
+//  const updatedContent = envContent
+//    .replace(/PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`)
+//    .replace(/# PLAYWRIGHT_SHARE_URL=.*/, `PLAYWRIGHT_SHARE_URL=${url}`);
   
+
   // Write back to .env file
-  fs.writeFileSync(envPath, updatedContent);
+  fs.writeFileSync(quiz-link.txt, updatedContent);
 
 });

@@ -165,6 +165,6 @@ test('test', async ({ page }) => {
   
 
   // Write back to .env file
-  fs.writeFileSync(quiz-link.txt, updatedContent);
+  fs.writeFileSync('quiz-link.txt', updatedContent);
 
 });

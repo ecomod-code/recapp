@@ -75,7 +75,7 @@ test('user-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(0).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 2');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 3');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -93,7 +93,7 @@ test('user-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(0).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 2');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 4');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -111,7 +111,7 @@ test('user-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(0).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 2');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 5');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -129,7 +129,7 @@ test('user-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(0).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 2');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 6');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -188,7 +188,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 1');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 7');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -206,7 +206,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 2');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 8');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -224,7 +224,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 3');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 9');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -242,7 +242,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 4');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 10');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -260,7 +260,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 5');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 11');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
@@ -278,7 +278,7 @@ test('anon-Test', async ({ page }) => {
   await page.getByRole('button', { name: 'New question' }).click();
   await page.getByRole('combobox').nth(1).selectOption('SINGLE');
   await page.getByRole('textbox', { name: 'Question' }).click();
-  await page.getByRole('textbox', { name: 'Question' }).fill('question 6');
+  await page.getByRole('textbox', { name: 'Question' }).fill('question 12');
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();
   await page.getByRole('button', { name: 'Add answer' }).click();

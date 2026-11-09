@@ -10,7 +10,15 @@ import fs from 'fs';
 
 test('test', async ({ page }) => {
 
-  const shareLink = fs.readFileSync('quiz-link.txt','utf8');
+  const filePath = path.join(__dirname, 'quiz-link.txt');
+  
+  if (!fs.existsSync(filePath)) {
+    throw new Error('quiz-link.txt not found. Did the previous test run successfully?');
+  }
+
+  const shareLink = fs.readFileSync(filePath,'utf8').trim();
+
+  if (!shareLink) throw new Error('quiz-link.txt is empty');
 
   await page.goto(shareLink);
   await page.getByRole('button', { name: 'Continue without login' }).click();

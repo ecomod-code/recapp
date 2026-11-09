@@ -167,6 +167,7 @@ test('test', async ({ page }) => {
   
 
   // Write back to .env file
-  fs.writeFileSync('quiz-link.txt', url);
+  const filePath = path.join(__dirname, 'quiz-link.txt');
+  fs.writeFileSync(filePath, url);
 
 });

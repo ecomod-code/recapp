@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 //import 'dotenv/config';  // redundant, if bugs occur then uncomment this and try again
 import path from 'path';
 import {config as loadDotenv } from 'dotenv';
-importfr from 'fs';
+import fs from 'fs';
 
 //const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
 //loadDotenv({ path: envPath });

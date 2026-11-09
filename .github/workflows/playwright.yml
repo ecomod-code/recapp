@@ -43,24 +43,28 @@ jobs:
       - name: Run Playwright Test (with User Credentials)
         run: |
           npx playwright test \
-            recapp/tests/e2e/user-sixQ-createQuiz.spec.ts \
+            user-sixQ-createQuiz.spec.ts \
             --workers 1 \
             --timeout 180000 \
             --trace on \
             --output recapp/tests/e2e/test-report/user-test
+        working-directory: tests/e2e/
 
       - name: Run Playwright Test (Anonymously)
         run: |
           npx playwright test \
-            recapp/tests/e2e/anon-sixQ-create-sc.spec.ts \
+            anon-sixQ-create-sc.spec.ts \
             --workers 1 \
             --timeout 180000 \
             --trace on \
             --output recapp/tests/e2e/test-report/anon-test 
-          
+        working-directory: tests/e2e/
+
       - name: Upload Test Report as Artifact
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: tests/e2e/test-report/
+          path: |
+            tests/e2e/test-report/
+            tests/e2e/test-artifacts/
           if-no-files-found: warn

@@ -43,12 +43,10 @@ jobs:
       - name: Run Playwright Test (with User Credentials and Anonymously)
         run: |
           npx playwright test \
-            user-sixQ-createQuiz.spec.ts \
-            anon-sixQ-create-sc.spec.ts \           
+            workflow-sixQ-createQuiz.spec.ts \
             --workers 1 \
             --timeout 180000 \
-            --trace on \
-            --output recapp/tests/e2e/test-report/user-test
+            --trace on 
         working-directory: tests/e2e/
 
       - name: Upload Test Report as Artifact

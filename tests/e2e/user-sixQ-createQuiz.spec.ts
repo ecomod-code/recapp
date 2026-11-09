@@ -6,7 +6,7 @@ import {config as loadDotenv } from 'dotenv';
 import fs from 'fs';
 
 
-const fs = require('fs');
+//const fs = require('fs');
 //const envPath = path.resolve(__dirname, '../../.env'); // <-- adjust if your test f>
 //loadDotenv({ path: envPath });
 
